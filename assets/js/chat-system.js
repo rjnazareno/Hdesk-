@@ -268,7 +268,17 @@ class ChatSystem {
 
         const isTemp = response.id && response.id.toString().startsWith('temp_');
         const isStaff = response.user_type === 'it_staff';
-        const alignRight = !isStaff;
+        const currentUserIsStaff = window.CURRENT_USER_TYPE === 'it_staff';
+        
+        // Your own messages go right (blue), other person's messages go left (green)
+        let alignRight;
+        if (currentUserIsStaff) {
+            // Admin view: Admin messages right (blue), Employee messages left (green)
+            alignRight = isStaff;
+        } else {
+            // Employee view: Employee messages right (blue), Admin messages left (green)
+            alignRight = !isStaff;
+        }
 
         // Format timestamp
         let timeDisplay;
@@ -283,7 +293,7 @@ class ChatSystem {
         const responseHtml = `
             <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-4" ${isTemp ? 'data-temp-message="true"' : ''}>
                 <div class="max-w-xs">
-                    <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm">
+                    <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff'} px-4 py-3 shadow-sm">
                         <p class="text-sm leading-relaxed whitespace-pre-wrap">${response.message}</p>
                         <div class="flex justify-start mt-2">
                             <span class="text-xs opacity-75">${timeDisplay}</span>

@@ -722,14 +722,22 @@ if ($ticket) {
                         <?php foreach ($responses as $index => $response): ?>
                             <?php 
                             $isStaff = $response['user_type'] === 'it_staff';
-                            // For now, let's make staff messages align left (received) and user messages align right (sent)
-                            $alignRight = !$isStaff; // User messages on right, staff on left
+                            $currentUserIsStaff = $_SESSION['user_type'] === 'it_staff';
+                            
+                            // Your own messages go right (blue), other person's messages go left (green)
+                            if ($currentUserIsStaff) {
+                                // Admin view: Admin messages right (blue), Employee messages left (green)
+                                $alignRight = $isStaff;
+                            } else {
+                                // Employee view: Employee messages right (blue), Admin messages left (green) 
+                                $alignRight = !$isStaff;
+                            }
                             ?>
                             
                             <!-- Chat Bubble -->
                             <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-4">
                                 <div class="max-w-xs">
-                                    <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : ($isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received') ?> px-4 py-3 shadow-sm">
+                                    <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' ?> px-4 py-3 shadow-sm">
                                         <p class="text-sm leading-relaxed whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
                                         <div class="flex justify-start mt-2">
                                             <span class="text-xs opacity-75"><?= date('g:i A', strtotime($response['created_at'])) ?></span>
@@ -961,6 +969,7 @@ if ($ticket) {
     <script>
         window.TICKET_ID = <?= $ticketId ?>;
         window.INITIAL_RESPONSE_COUNT = <?= count($responses) ?>;
+        window.CURRENT_USER_TYPE = '<?= $_SESSION['user_type'] ?>';
         window.SESSION_RESPONSE_ADDED = <?= isset($_SESSION["response_added_ticket_{$ticketId}"]) ? 'true' : 'false' ?>;
         <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
         <?php unset($_SESSION["response_added_ticket_{$ticketId}"]); ?>
