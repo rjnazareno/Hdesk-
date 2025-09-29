@@ -46,11 +46,19 @@ try {
     
     // Also get the latest response details for better messaging
     $stmt2 = $db->prepare("
-        SELECT tr.message, tr.user_id, tr.created_at,
-               COALESCE(e.username, i.username, 'Unknown User') as username
+        SELECT 
+            tr.message, 
+            tr.user_id, 
+            tr.user_type,
+            tr.created_at,
+            CASE 
+                WHEN tr.user_type = 'employee' THEN COALESCE(e.username, CONCAT(e.fname, ' ', e.lname))
+                WHEN tr.user_type = 'it_staff' THEN COALESCE(i.username, i.name)
+                ELSE 'Unknown User'
+            END as username
         FROM ticket_responses tr
-        LEFT JOIN employees e ON tr.user_id = e.id
-        LEFT JOIN it_staff i ON tr.user_id = i.staff_id
+        LEFT JOIN employees e ON tr.user_id = e.id AND tr.user_type = 'employee'
+        LEFT JOIN it_staff i ON tr.user_id = i.user_id AND tr.user_type = 'it_staff'
         WHERE tr.ticket_id = ? AND tr.created_at > ? AND tr.user_id != ?
         ORDER BY tr.created_at DESC
         LIMIT 1
