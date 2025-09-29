@@ -662,7 +662,7 @@ if ($ticket) {
                 
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
-                    <form id="messengerForm" class="flex items-end space-x-3">
+                    <form id="messengerForm" action="#" method="post" onsubmit="return false;" class="flex items-end space-x-3">
                         <div class="flex-1">
                             <textarea name="response_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
@@ -680,7 +680,7 @@ if ($ticket) {
                         </div>
                         <?php endif; ?>
                         
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
+                        <button type="button" onclick="submitMessage(event)" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Send
                         </button>
@@ -1113,7 +1113,10 @@ if ($ticket) {
             // Handle form submission via AJAX
             form.addEventListener('submit', function(e) {
                 e.preventDefault(); // Prevent normal form submission
-                console.log('Messenger form submitted via AJAX');
+                e.stopPropagation(); // Stop event bubbling
+                console.log('AJAX form submit handler triggered');
+                console.log('Form element:', form);
+                console.log('Event prevented:', e.defaultPrevented);
                 
                 const formData = new FormData();
                 formData.append('ticket_id', <?= $ticketId ?>);
@@ -1623,10 +1626,25 @@ if ($ticket) {
         function handleEnterKey(event) {
             if (event.ctrlKey && event.key === 'Enter') {
                 event.preventDefault();
-                const form = document.getElementById('messengerForm');
-                if (form) {
-                    form.dispatchEvent(new Event('submit', { cancelable: true }));
-                }
+                submitMessage(event);
+            }
+        }
+        
+        // Direct message submission function
+        function submitMessage(event) {
+            event.preventDefault();
+            console.log('submitMessage called - preventing normal form submission');
+            
+            const form = document.getElementById('messengerForm');
+            if (form) {
+                // Trigger the form's submit event which will be handled by AJAX
+                const submitEvent = new Event('submit', { 
+                    cancelable: true, 
+                    bubbles: true 
+                });
+                form.dispatchEvent(submitEvent);
+            } else {
+                console.error('messengerForm not found');
             }
         }
         
