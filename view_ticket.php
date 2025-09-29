@@ -980,6 +980,11 @@ if ($ticket) {
             initializeAjaxChat();
         });
         
+        // Global variables for AJAX chat
+        let lastResponseCount = <?= count($responses) ?>;
+        let isTyping = false;
+        let typingTimer;
+        
         // AJAX Chat Functions
         function initializeAjaxChat() {
             const form = document.getElementById('ajaxResponseForm');
@@ -988,10 +993,6 @@ if ($ticket) {
             const sendBtn = document.getElementById('sendBtn');
             const statusDiv = document.getElementById('responseStatus');
             const responsesContainer = document.querySelector('.space-y-6');
-            
-            let isTyping = false;
-            let typingTimer;
-            let lastResponseCount = <?= count($responses) ?>;
             
             // Handle form submission via AJAX
             form.addEventListener('submit', function(e) {
