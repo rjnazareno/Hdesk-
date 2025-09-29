@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Enhanced Ticket View with Activity Logging
  */
@@ -241,6 +241,127 @@ if ($ticket) {
         @keyframes fadeIn {
             from { opacity: 0; transform: translateX(100px); }
             to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+     <style>
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #3B82F6;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Scrollable chat container styles */
+        #chatContainer {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+        
+        #chatContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        /* Messenger-style chat bubble animations and effects */
+        .chat-bubble {
+            transition: all 0.2s ease-in-out;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+        
+        .chat-bubble:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Message bubble tail effects */
+        .bubble-sent::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -6px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid #3b82f6;
+            border-bottom: 6px solid transparent;
+        }
+        
+        .bubble-received::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-right: 6px solid #f0f9ff;
+            border-bottom: 6px solid transparent;
+        }
+        
+        .bubble-staff::before {
+            border-right-color: #dcfce7 !important;
         }
     </style>
 </head>
@@ -511,9 +632,9 @@ if ($ticket) {
                         </h4>
                         <form method="POST" class="space-y-4">
                             <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>🔴 Open</option>
-                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔵 In Progress</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>✅ Closed (Resolved)</option>
+                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>ðŸ”´ Open</option>
+                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>ðŸ”µ In Progress</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>âœ… Closed (Resolved)</option>
                             </select>
                             <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                 <i class="fas fa-save mr-2"></i>Update Status
@@ -529,10 +650,10 @@ if ($ticket) {
                         </h4>
                         <form method="POST" class="space-y-4">
                             <select name="assigned_to" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">👤 Unassigned</option>
+                                <option value="">ðŸ‘¤ Unassigned</option>
                                 <?php foreach ($itStaff as $staff): ?>
                                     <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
-                                        👨‍💻 <?= htmlspecialchars($staff['name']) ?>
+                                        ðŸ‘¨â€ðŸ’» <?= htmlspecialchars($staff['name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -687,7 +808,7 @@ if ($ticket) {
                     </form>
                     
                     <div class="mt-2 text-xs text-gray-500 text-center">
-                        Press Ctrl+Enter to send • Include details to help resolve the issue
+                        Press Ctrl+Enter to send â€¢ Include details to help resolve the issue
                     </div>
                 </div>
             </div>
@@ -728,7 +849,7 @@ if ($ticket) {
                                 <input type="checkbox" id="emailNotif" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
                                 <label for="emailNotif" class="text-xs text-gray-700">Email enabled</label>
                             </div>
-                            <span class="text-xs text-green-600 font-medium">✓ Active</span>
+                            <span class="text-xs text-green-600 font-medium">âœ“ Active</span>
                         </div>
                     </div>
                     
@@ -864,920 +985,19 @@ if ($ticket) {
         
     </div>
     
-    <!-- Device Notification JavaScript -->
+    <!-- Global Variables for External Scripts -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const enableBtn = document.getElementById('enableNotifications');
-            const statusDiv = document.getElementById('notificationStatus');
-            const ticketId = <?= $ticketId ?>;
-            
-            // Don't auto-start notifications - let users choose when to enable them
-            console.log('Notification system ready for ticket:', ticketId);
-            // startUpdateChecker(); // Removed auto-start - only enable when user clicks button
-            
-            // Check if a response was just added (from PHP session)
-            <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
-            console.log('Response was just added, clearing notification cache for other users');
-            // Clear the session flag
-            <?php unset($_SESSION["response_added_ticket_{$ticketId}"]); ?>
-            // Force an immediate check after 3 seconds to allow other users to be notified
-            setTimeout(() => {
-                console.log('Triggering immediate notification check for other users');
-            }, 3000);
-            <?php endif; ?>
-            
-            // Check if browser notifications are manually enabled and start checker if needed
-            if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
-                updateButtonState(true);
-                statusDiv?.classList.remove('hidden');
-                // Only start update checker if notifications were previously enabled
-                startUpdateChecker();
-            }
-            
-            // Handle manual notification enable/disable
-            enableBtn?.addEventListener('click', function() {
-                if (Notification.permission === 'denied') {
-                    alert('Notifications are blocked. Please enable them in your browser settings and refresh the page.');
-                    return;
-                }
-                
-                if (Notification.permission === 'default') {
-                    Notification.requestPermission().then(function(permission) {
-                        if (permission === 'granted') {
-                            enableNotifications();
-                        } else {
-                            alert('Please allow notifications to use this feature.');
-                        }
-                    });
-                } else if (Notification.permission === 'granted') {
-                    if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
-                        disableNotifications();
-                    } else {
-                        enableNotifications();
-                    }
-                }
-            });
-            
-            function enableNotifications() {
-                localStorage.setItem(`notifications_ticket_${ticketId}`, 'enabled');
-                updateButtonState(true);
-                statusDiv?.classList.remove('hidden');
-                
-                // Start the update checker when notifications are enabled
-                startUpdateChecker();
-                
-                // Show confirmation notification
-                if (Notification.permission === 'granted') {
-                    new Notification('IT Help Desk - Notifications Enabled', {
-                        body: `You'll now receive desktop notifications for updates to Ticket #${ticketId}`,
-                        icon: '/favicon.ico',
-                        tag: `ticket-${ticketId}-enabled`
-                    });
-                }
-                
-                console.log('Browser notifications enabled for ticket:', ticketId);
-            }
-            
-            function disableNotifications() {
-                localStorage.removeItem(`notifications_ticket_${ticketId}`);
-                updateButtonState(false);
-                statusDiv?.classList.add('hidden');
-                
-                // Stop the update checker when notifications are disabled
-                stopUpdateChecker();
-                
-                console.log('Browser notifications disabled for ticket:', ticketId);
-            }
-            
-            function updateButtonState(enabled) {
-                if (enabled) {
-                    enableBtn.innerHTML = '<i class="fas fa-bell-slash mr-2"></i>Disable Notifications';
-                    enableBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    enableBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-                } else {
-                    enableBtn.innerHTML = '<i class="fas fa-bell mr-2"></i>Enable Browser Notifications';
-                    enableBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-                    enableBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }
-            }
-            
-            // Function to show in-page notification banner
-            function showInPageNotification(message) {
-                // Create notification banner
-                const banner = document.createElement('div');
-                banner.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-                banner.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-bell mr-3"></i>
-                        <span>${message}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `;
-                
-                document.body.appendChild(banner);
-                
-                // Auto-remove after 5 seconds
-                setTimeout(() => {
-                    if (banner.parentNode) {
-                        banner.remove();
-                    }
-                }, 5000);
-            }
-            
-            function startUpdateChecker() {
-                // Check for updates every 30 seconds
-                console.log('Starting update checker for ticket:', ticketId);
-                window.updateChecker = setInterval(checkForUpdates, 30000);
-            }
-            
-            function stopUpdateChecker() {
-                if (window.updateChecker) {
-                    clearInterval(window.updateChecker);
-                    console.log('Update checker stopped');
-                }
-            }
-            
-            function checkForUpdates() {
-                // Check if page is visible to avoid unnecessary requests
-                if (document.hidden) return;
-                
-                console.log('Checking for updates on ticket:', ticketId);
-                
-                fetch(`api/safe_check_updates.php?id=${ticketId}`)
-                    .then(response => {
-                        console.log('API Response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Update check data:', data);
-                        if (data.hasUpdates) {
-                            console.log('New updates found, showing notifications');
-                            
-                            // Always show in-page notification
-                            showInPageNotification(data.message);
-                            
-                            // Show browser notification only if explicitly enabled and permitted
-                            const browserNotificationsEnabled = localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled';
-                            if (browserNotificationsEnabled && Notification.permission === 'granted') {
-                                new Notification(`Ticket #${ticketId} - New Update`, {
-                                    body: data.message || 'New activity on your ticket',
-                                    icon: '/favicon.ico',
-                                    tag: `ticket-${ticketId}-update`,
-                                    requireInteraction: false
-                                });
-                                console.log('Desktop notification sent');
-                            }
-                            
-                            // Refresh the responses section to show new content
-                            setTimeout(() => {
-                                location.reload();
-                            }, 2000);
-                        } else {
-                            console.log('No updates found');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Update check failed:', error);
-                        // If API doesn't exist yet, stop checking to avoid spam
-                        if (error.message.includes('404')) {
-                            clearInterval(window.updateChecker);
-                        }
-                    });
-            }
-            
-            // Start update checker if notifications are already enabled
-            if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
-                startUpdateChecker();
-            }
-            
-            // Stop update checker when page is unloaded
-            window.addEventListener('beforeunload', function() {
-                if (window.updateChecker) {
-                    clearInterval(window.updateChecker);
-                }
-            });
-            
-            // Test buttons functionality
-            document.getElementById('testNotificationBtn')?.addEventListener('click', function() {
-                if (Notification.permission === 'granted') {
-                    new Notification('Test Notification - IT Help Desk', {
-                        body: `This is a test notification for Ticket #${ticketId}`,
-                        icon: '/favicon.ico',
-                        tag: `ticket-${ticketId}-test`
-                    });
-                    console.log('Test notification sent');
-                } else {
-                    alert('Notifications not permitted. Permission: ' + Notification.permission);
-                }
-            });
-            
-            document.getElementById('checkNowBtn')?.addEventListener('click', function() {
-                console.log('Manual update check triggered');
-                checkForUpdates();
-            });
-            
-            // Debug info on page load
-            console.log('Notification system initialized for ticket:', ticketId);
-            console.log('Notification permission:', Notification.permission);
-            console.log('Notifications enabled:', localStorage.getItem(`notifications_ticket_${ticketId}`));
-            
-            // AJAX Chat System
-            console.log('About to call initializeAjaxChat...');
-            initializeAjaxChat();
-            console.log('initializeAjaxChat called');
-        });
-        
-        // Global variables for AJAX chat
-        let lastResponseCount = <?= count($responses) ?>;
-        let isTyping = false;
-        let typingTimer;
-        
-        // AJAX Chat Functions
-        function initializeAjaxChat() {
-            console.log('initializeAjaxChat function started');
-            const form = document.getElementById('messengerForm');
-            const textarea = document.getElementById('response_text');
-            const clearBtn = document.getElementById('clearBtn');
-            const sendBtn = document.getElementById('messengerSendBtn');
-            const statusDiv = document.getElementById('responseStatus');
-            const chatContainer = document.getElementById('chatContainer');
-            
-            // Make sure we have the form
-            if (!form) {
-                console.error('Messenger form not found');
-                return;
-            }
-            
-            console.log('Form found:', form);
-            console.log('Setting up submit event listener');
-
-            // Handle form submission via AJAX
-            try {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Prevent normal form submission
-                    e.stopPropagation(); // Stop event bubbling
-                    console.log('AJAX form submit handler triggered');
-                    console.log('Form element:', form);
-                    console.log('Event prevented:', e.defaultPrevented);
-                
-                const formData = new FormData();
-                formData.append('ticket_id', <?= $ticketId ?>);
-                formData.append('response_text', textarea.value);
-                
-                // Add internal checkbox if it exists (IT staff only)
-                const internalCheckbox = document.querySelector('input[name="is_internal"]');
-                if (internalCheckbox && internalCheckbox.checked) {
-                    formData.append('is_internal', '1');
-                }
-                
-                // Disable form while sending
-                const submitBtn = document.getElementById('messengerSendBtn');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-                }
-                
-                fetch('api/add_response_ajax.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.text().then(text => {
-                        console.log('Raw response:', text);
-                        try {
-                            return JSON.parse(text);
-                        } catch (e) {
-                            console.error('JSON parse error:', e);
-                            throw new Error('Invalid JSON response: ' + text.substring(0, 200));
-                        }
-                    });
-                })
-                .then(data => {
-                    console.log('Parsed data:', data);
-                    if (data.success) {
-                        showStatus('Response sent successfully!', 'success');
-                        textarea.value = '';
-                        
-                        // Add the new response to the display immediately (optimistic update)
-                        if (data.response) {
-                            addResponseToDisplay(data.response);
-                        } else {
-                            // Fallback: create immediate display while saving to database
-                            const immediateResponse = {
-                                id: 'temp_' + Date.now(),
-                                user_type: '<?= $_SESSION['user_type'] ?>',
-                                display_name: '<?= $_SESSION['user_type'] === 'it_staff' ? 'IT Support' : 'Employee' ?>',
-                                message: formData.get('response_text'),
-                                is_internal: formData.has('is_internal'),
-                                formatted_date: new Date().toLocaleString('en-US', {
-                                    month: 'short', 
-                                    day: 'numeric', 
-                                    year: 'numeric',
-                                    hour: 'numeric', 
-                                    minute: '2-digit',
-                                    hour12: true
-                                })
-                            };
-                            addResponseToDisplay(immediateResponse);
-                        }
-                        
-                        // Update response counter
-                        lastResponseCount++;
-                        updateResponseCounter();
-                        
-                        // Clear typing status
-                        clearTypingStatus();
-                        
-                        // Trigger fast polling for immediate updates
-                        if (window.triggerFastPolling) {
-                            window.triggerFastPolling();
-                        }
-                        
-                    } else {
-                        showStatus(data.error || 'Failed to send response', 'error');
-                        if (data.debug) {
-                            console.error('Server debug info:', data.debug);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('AJAX error:', error);
-                    showStatus('Error: ' + error.message, 'error');
-                })
-                .finally(() => {
-                    // Re-enable form
-                    if (submitBtn) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
-                    }
-                });
-            });
-            console.log('Submit event listener attached successfully');
-            } catch (error) {
-                console.error('Error attaching submit event listener:', error);
-            }
-            
-            // Clear button functionality
-            clearBtn.addEventListener('click', function() {
-                textarea.value = '';
-                clearTypingStatus();
-            });
-            
-            // Typing indicator functionality
-            textarea.addEventListener('input', function() {
-                if (!isTyping) {
-                    isTyping = true;
-                    sendTypingStatus(true);
-                }
-                
-                // Reset the typing timer
-                clearTimeout(typingTimer);
-                typingTimer = setTimeout(() => {
-                    isTyping = false;
-                    sendTypingStatus(false);
-                }, 2000); // Stop typing after 2 seconds of inactivity
-            });
-            
-            // Stop typing when user leaves textarea
-            textarea.addEventListener('blur', function() {
-                if (isTyping) {
-                    clearTimeout(typingTimer);
-                    isTyping = false;
-                    sendTypingStatus(false);
-                }
-            });
-            
-            // Start checking for new responses and typing indicators
-            startRealtimeUpdates();
-        }
-        
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('responseStatus');
-            statusDiv.className = `mt-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 border border-green-300 text-green-700' : 'bg-red-100 border border-red-300 text-red-700'}`;
-            statusDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
-            statusDiv.classList.remove('hidden');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                statusDiv.classList.add('hidden');
-            }, 5000);
-        }
-        
-        function addResponseToDisplay(response) {
-            const chatContainer = document.getElementById('chatContainer');
-            const emptyState = document.querySelector('.text-center.py-16');
-            
-            // Remove empty state if present
-            if (emptyState) {
-                emptyState.remove();
-            }
-            
-            // Check if this is a temporary message
-            const isTemp = response.id && response.id.toString().startsWith('temp_');
-            const isStaff = response.user_type === 'it_staff';
-            const alignRight = !isStaff; // User messages on right, staff on left
-            
-            // Create new response HTML in messenger bubble format
-            const responseHtml = `
-                <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2" ${isTemp ? 'data-temp-message="true"' : ''}>
-                    <div class="max-w-xs lg:max-w-md">
-                        <!-- Message Bubble -->
-                        <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm ${isTemp ? 'opacity-75 border-dashed' : ''}">
-                            
-                            <!-- Message Content -->
-                            <p class="text-sm leading-relaxed whitespace-pre-wrap">
-                                ${response.message}
-                            </p>
-                            
-                            <!-- Message Info Footer -->
-                            <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                <div class="flex items-center space-x-2">
-                                    ${response.is_internal ? '<span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
-                                    <span class="font-medium">
-                                        ${isStaff ? 'IT Support' : 'Employee'}
-                                    </span>
-                                    ${isTemp ? '<span class="italic">(sending...)</span>' : ''}
-                                </div>
-                                <span>
-                                    ${new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Avatar and Date (only for received messages) -->
-                        ${!alignRight ? `
-                            <div class="flex items-center mt-1 ml-2">
-                                <div class="w-6 h-6 rounded-full ${isStaff ? 'bg-green-500' : 'bg-blue-500'} flex items-center justify-center mr-2">
-                                    <i class="fas ${isStaff ? 'fa-headset' : 'fa-user'} text-white text-xs"></i>
-                                </div>
-                                <span class="text-xs text-gray-500">
-                                    ${new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-                                </span>
-                            </div>
-                        ` : `
-                            <div class="flex justify-end mt-1 mr-2">
-                                <span class="text-xs text-gray-500">
-                                    ${new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-                                </span>
-                            </div>
-                        `}
-                    </div>
-                </div>
-            `;
-          
-            // Add the new response to chat container
-            if (chatContainer) {
-                chatContainer.insertAdjacentHTML('beforeend', responseHtml);
-                
-                // Auto-scroll to bottom
-                setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 100);
-            }
-    
-        
-        function updateResponseCounter() {
-            const counter = document.querySelector('.bg-blue-100.text-blue-800.px-3.py-1.rounded-full');
-            if (counter) {
-                counter.textContent = lastResponseCount;
-            }
-            
-            const activityCounter = document.querySelector('.font-bold.text-gray-900');
-            if (activityCounter && activityCounter.textContent.match(/^\d+$/)) {
-                activityCounter.textContent = lastResponseCount;
-            }
-        }
-        
-        function sendTypingStatus(isTyping) {
-            fetch('api/typing_status.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ticket_id: <?= $ticketId ?>,
-                    is_typing: isTyping
-                })
-            }).catch(error => {
-                console.error('Typing status error:', error);
-            });
-        }
-        
-        function clearTypingStatus() {
-            sendTypingStatus(false);
-        }
-        
-        function checkForTypingIndicators() {
-            fetch(`api/get_typing_status.php?ticket_id=<?= $ticketId ?>`)
-                .then(response => response.json())
-                .then(data => {
-                    const typingIndicator = document.getElementById('typingIndicator');
-                    
-                    if (data.someone_typing) {
-                        typingIndicator.classList.remove('hidden');
-                    } else {
-                        typingIndicator.classList.add('hidden');
-                    }
-                })
-                .catch(error => {
-                    console.error('Typing check error:', error);
-                });
-        }
-        
-        function startRealtimeUpdates() {
-            console.log('Starting real-time updates...');
-            
-            // Check for typing indicators every 2 seconds
-            const typingInterval = setInterval(checkForTypingIndicators, 2000);
-            
-            let normalInterval = 2000; // Normal checking every 2 seconds  
-            let fastInterval = 500;   // Fast checking every 500ms after activity
-            let currentInterval = normalInterval;
-            let lastActivityTime = Date.now();
-            
-            function checkForNewResponses() {
-                console.log('Checking for new responses... Current count:', lastResponseCount);
-                
-                fetch(`api/get_latest_responses.php?ticket_id=<?= $ticketId ?>&after_count=${lastResponseCount}`)
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Response data:', data);
-                        
-                        if (data.success && data.new_responses && data.new_responses.length > 0) {
-                            console.log(`Found ${data.new_responses.length} new responses`);
-                            
-                            // Remove any temporary messages before adding real ones
-                            document.querySelectorAll('[data-temp-message="true"]').forEach(temp => temp.remove());
-                            
-                            data.new_responses.forEach(response => {
-                                addResponseToDisplay(response);
-                            });
-                            
-                            lastResponseCount += data.new_responses.length;
-                            updateResponseCounter();
-                            
-                            // Show notification for new messages from others
-                            const newMessageNotification = document.createElement('div');
-                            newMessageNotification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                            newMessageNotification.innerHTML = `<i class="fas fa-comment mr-2"></i>New message received!`;
-                            document.body.appendChild(newMessageNotification);
-                            
-                            setTimeout(() => {
-                                if (newMessageNotification.parentNode) {
-                                    newMessageNotification.remove();
-                                }
-                            }, 3000);
-                            
-                            // Switch to fast polling for 30 seconds after activity
-                            lastActivityTime = Date.now();
-                            if (currentInterval !== fastInterval) {
-                                switchToFastPolling();
-                            }
-                        } else {
-                            console.log('No new responses found');
-                            
-                            // Switch back to normal polling if no activity for 30 seconds
-                            if (Date.now() - lastActivityTime > 30000 && currentInterval !== normalInterval) {
-                                switchToNormalPolling();
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Response check error:', error);
-                    });
-            }
-            
-            function switchToFastPolling() {
-                console.log('Switching to fast polling (1s)');
-                clearInterval(window.chatIntervals.responses);
-                currentInterval = fastInterval;
-                window.chatIntervals.responses = setInterval(checkForNewResponses, fastInterval);
-            }
-            
-            function switchToNormalPolling() {
-                console.log('Switching to normal polling (3s)');
-                clearInterval(window.chatIntervals.responses);
-                currentInterval = normalInterval;
-                window.chatIntervals.responses = setInterval(checkForNewResponses, normalInterval);
-            }
-            
-            // Start with normal polling
-            const responseInterval = setInterval(checkForNewResponses, currentInterval);
-            
-            // Store intervals for potential cleanup
-            window.chatIntervals = {
-                typing: typingInterval,
-                responses: responseInterval
-            };
-            
-            // Expose functions globally for triggering after message send
-            window.triggerFastPolling = switchToFastPolling;
-            window.addResponseToDisplay = addResponseToDisplay;
-        }
+        window.TICKET_ID = <?= $ticketId ?>;
+        window.INITIAL_RESPONSE_COUNT = <?= count($responses) ?>;
+        window.SESSION_RESPONSE_ADDED = <?= isset($_SESSION["response_added_ticket_{$ticketId}"]) ? 'true' : 'false' ?>;
+        <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
+        <?php unset($_SESSION["response_added_ticket_{$ticketId}"]); ?>
+        <?php endif; ?>
     </script>
-
-    <!-- CSS for typing dots animation -->
-    <style>
-        .typing-dots {
-            display: inline-block;
-        }
-        
-        .typing-dots span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #3B82F6;
-            animation: typing 1.4s infinite ease-in-out both;
-        }
-        
-        .typing-dots span:nth-child(1) {
-            animation-delay: -0.32s;
-        }
-        
-        .typing-dots span:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-        
-        @keyframes typing {
-            0%, 80%, 100% {
-                transform: scale(0);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Scrollable chat container styles */
-        #chatContainer {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e0 #f7fafc;
-        }
-        
-        #chatContainer::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        #chatContainer::-webkit-scrollbar-track {
-            background: #f7fafc;
-            border-radius: 4px;
-        }
-        
-        #chatContainer::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 4px;
-        }
-        
-        #chatContainer::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-        
-        /* Messenger-style chat bubble animations and effects */
-        .chat-bubble {
-            transition: all 0.2s ease-in-out;
-            animation: messageSlideIn 0.3s ease-out;
-        }
-        
-        .chat-bubble:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        @keyframes messageSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Message bubble tail effects */
-        .bubble-sent::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: -6px;
-            width: 0;
-            height: 0;
-            border-left: 6px solid #3b82f6;
-            border-bottom: 6px solid transparent;
-        }
-        
-        .bubble-received::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -6px;
-            width: 0;
-            height: 0;
-            border-right: 6px solid #f0f9ff;
-            border-bottom: 6px solid transparent;
-        }
-        
-        .bubble-staff::before {
-            border-right-color: #dcfce7 !important;
-        }
-    </style>
     
-    <script>
-        // Initialize scrollable chat functionality
-        function initScrollableChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            if (chatContainer) {
-                // Auto-scroll to bottom on page load
-                setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 100);
-                
-                // Observe for new messages and auto-scroll
-                const observer = new MutationObserver(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                });
-                
-                observer.observe(chatContainer, { 
-                    childList: true, 
-                    subtree: true 
-                });
-            }
-        }
-        
-        // Handle Enter key in textarea (Ctrl+Enter to send)
-        function handleEnterKey(event) {
-            if (event.ctrlKey && event.key === 'Enter') {
-                event.preventDefault();
-                submitMessage(event);
-            }
-        }
-        
-        // Direct message submission function
-        function submitMessage(event) {
-            event.preventDefault();
-            console.log('submitMessage called - handling AJAX directly [v2.0]');
-            console.log('Current timestamp:', new Date().toISOString());
-            
-            const form = document.getElementById('messengerForm');
-            const textarea = document.getElementById('response_text');
-            const submitBtn = document.getElementById('messengerSendBtn');
-            
-            if (!form || !textarea) {
-                console.error('Form or textarea not found');
-                return;
-            }
-            
-            const messageText = textarea.value.trim();
-            if (!messageText) {
-                console.log('No message to send');
-                return;
-            }
-            
-            // Show message immediately (optimistic UI)
-            const tempId = 'temp_' + Date.now();
-            const tempResponse = {
-                id: tempId,
-                user_type: 'employee',
-                display_name: 'Employee', 
-                message: messageText,
-                is_internal: false,
-                formatted_date: 'Sending...'
-            };
-            
-            const chatContainer = document.getElementById('chatContainer');
-            if (chatContainer) {
-                const responseHtml = `
-                    <div class="flex justify-end mb-2" data-temp-id="${tempId}">
-                        <div class="max-w-xs lg:max-w-md">
-                            <div class="chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm opacity-75">
-                                <p class="text-sm leading-relaxed whitespace-pre-wrap">${tempResponse.message}</p>
-                                <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                    <span class="font-medium">Employee</span>
-                                    <span class="italic">Sending...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                chatContainer.insertAdjacentHTML('beforeend', responseHtml);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-            
-            // Disable button while sending
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-            }
-            
-            const formData = new FormData();
-            formData.append('ticket_id', <?= $ticketId ?>);
-            formData.append('response_text', messageText);
-            
-            console.log('Sending AJAX request...');
-            fetch('api/add_response_ajax.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.text().then(text => {
-                    console.log('Raw response:', text);
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        console.error('Invalid JSON response:', text);
-                        throw new Error('Invalid JSON response from server');
-                    }
-                });
-            })
-            .then(data => {
-                console.log('AJAX success:', data);
-                if (data.success) {
-                    // Update temporary message to confirmed (instead of removing and re-adding)
-                    const tempElement = document.querySelector(`[data-temp-id="${tempId}"]`);
-                    if (tempElement) {
-                        // Update the temporary message to show it's confirmed
-                        const bubbleElement = tempElement.querySelector('.chat-bubble');
-                        if (bubbleElement) {
-                            bubbleElement.classList.remove('opacity-75');
-                            const sendingSpan = tempElement.querySelector('span.italic');
-                            if (sendingSpan) {
-                                sendingSpan.textContent = data.response.formatted_date;
-                                sendingSpan.classList.remove('italic');
-                            }
-                        }
-                        // Remove the temp-id attribute
-                        tempElement.removeAttribute('data-temp-id');
-                    }
-                    
-                    // Clear the textarea
-                    textarea.value = '';
-                    
-                    // Trigger fast polling to pick up any other new messages
-                    if (window.triggerFastPolling) {
-                        console.log('Triggering fast polling...');
-                        window.triggerFastPolling();
-                    }
-                    
-                    console.log('Message sent successfully');
-                } else {
-                    console.error('Server error:', data.error);
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('AJAX error:', error);
-                
-                // Remove temporary message on error
-                const tempElement = document.querySelector(`[data-temp-id="${tempId}"]`);
-                if (tempElement) {
-                    tempElement.remove();
-                }
-                
-                alert('Error sending message: ' + error.message);
-            })
-            .finally(() => {
-                // Re-enable button
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
-                }
-            });
-        }
-        
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initScrollableChat);
-    </script>
+    <!-- External JavaScript Files -->
+    <script src="assets/js/notifications.js"></script>
+    <script src="assets/js/chat-system.js"></script>
+    
 </body>
 </html>
