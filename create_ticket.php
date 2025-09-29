@@ -1,6 +1,7 @@
 <?php
 require_once 'config/database.php';
 require_once 'includes/security.php';
+require_once 'includes/activity_logger.php';
 
 // Start session and require login
 session_start();
@@ -77,6 +78,10 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'create_ticket') {
         
         if ($stmt->execute([getUserId(), $subject, $description, $category, $priority])) {
             $ticketId = $db->lastInsertId();
+            
+            // Log the ticket creation activity
+            $logger = new ActivityLogger($db);
+            $logger->logTicketCreated(getUserId(), 'employee', $ticketId, $subject, $priority, $category);
             
             // Handle file uploads if any
             if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {

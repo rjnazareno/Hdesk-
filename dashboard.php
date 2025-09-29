@@ -254,6 +254,44 @@ function timeAgo($datetime) {
                 
                 <!-- Search and User Menu -->
                 <div class="flex items-center space-x-3">
+                    <!-- Quick Actions Dropdown -->
+                    <div class="relative">
+                        <button type="button" id="quickActionsBtn" class="github-btn flex items-center space-x-2">
+                            <i class="fas fa-bolt"></i>
+                            <span class="hidden sm:inline">Quick Actions</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="quickActionsMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div class="py-2">
+                                <?php if (!$isITStaff): ?>
+                                <a href="create_ticket.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-plus mr-3 text-green-500"></i>
+                                    New Ticket
+                                </a>
+                                <?php endif; ?>
+                                <a href="?status=open" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-folder-open mr-3 text-yellow-500"></i>
+                                    Open Tickets
+                                </a>
+                                <a href="?status=in_progress" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-spinner mr-3 text-blue-500"></i>
+                                    In Progress
+                                </a>
+                                <?php if ($isITStaff): ?>
+                                <a href="?priority=urgent" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-exclamation-triangle mr-3 text-red-500"></i>
+                                    Urgent Only
+                                </a>
+                                <?php endif; ?>
+                                <div class="border-t border-gray-100 my-2"></div>
+                                <a href="?" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-refresh mr-3 text-gray-500"></i>
+                                    All Tickets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="relative hidden sm:block">
                         <form method="GET" class="flex">
                             <input type="text" 
@@ -461,6 +499,13 @@ function timeAgo($datetime) {
                                         <?php echo $ticket['response_count']; ?>
                                     </span>
                                     <?php endif; ?>
+                                    
+                                    <!-- History link -->
+                                    <a href="ticket_history.php?id=<?php echo $ticket['ticket_id']; ?>" 
+                                       class="flex items-center text-blue-600 hover:text-blue-700">
+                                        <i class="fas fa-history mr-1"></i>
+                                        History
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -515,5 +560,27 @@ function timeAgo($datetime) {
             <?php endif; ?>
         </div>
     </div>
+    
+    <!-- JavaScript for Quick Actions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quickActionsBtn = document.getElementById('quickActionsBtn');
+            const quickActionsMenu = document.getElementById('quickActionsMenu');
+            
+            if (quickActionsBtn && quickActionsMenu) {
+                quickActionsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    quickActionsMenu.classList.toggle('hidden');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!quickActionsBtn.contains(e.target) && !quickActionsMenu.contains(e.target)) {
+                        quickActionsMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
