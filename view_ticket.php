@@ -575,52 +575,61 @@ if ($ticket) {
                         <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
                     </div>
                 <?php else: ?>
-                    <!-- Scrollable Chat Container -->
-                    <div id="chatContainer" class="max-h-96 overflow-y-auto pr-2 space-y-6 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <!-- Messenger-Style Chat Container -->
+                    <div id="chatContainer" class="max-h-96 overflow-y-auto p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
                         <?php foreach ($responses as $index => $response): ?>
-                            <div class="relative">
-                                <!-- Timeline connector -->
-                                <?php if ($index < count($responses) - 1): ?>
-                                    <div class="absolute left-6 top-16 w-0.5 h-full bg-gray-200"></div>
-                                <?php endif; ?>
-                                
-                                <div class="flex items-start space-x-4">
-                                    <!-- Avatar -->
-                                    <div class="flex-shrink-0">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Response Content -->
-                                    <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <div class="flex items-center space-x-3">
-                                                <span class="font-bold text-gray-900">
-                                                    <?= $response['user_type'] === 'it_staff' ? 'IT Support' : 'Employee' ?>
-                                                </span>
-                                                <span class="text-gray-400">•</span>
-                                                <span class="text-sm text-gray-600">
-                                                    <?= date('M j, Y \a\t g:i A', strtotime($response['created_at'])) ?>
-                                                </span>
-                                            </div>
-                                            
+                            <?php 
+                            $isStaff = $response['user_type'] === 'it_staff';
+                            // For now, let's make staff messages align left (received) and user messages align right (sent)
+                            $alignRight = !$isStaff; // User messages on right, staff on left
+                            ?>
+                            
+                            <!-- Chat Bubble -->
+                            <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-2">
+                                <div class="max-w-xs lg:max-w-md">
+                                    <!-- Message Bubble -->
+                                    <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : ($isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received') ?> px-4 py-3 shadow-sm">
+                                        
+                                        <!-- Message Content -->
+                                        <p class="text-sm leading-relaxed whitespace-pre-wrap">
+                                            <?= htmlspecialchars($response['message']) ?>
+                                        </p>
+                                        
+                                        <!-- Message Info Footer -->
+                                        <div class="flex items-center justify-between mt-2 text-xs opacity-75">
                                             <div class="flex items-center space-x-2">
                                                 <?php if ($response['is_internal']): ?>
-                                                    <span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full border border-orange-200">
+                                                    <span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs">
                                                         <i class="fas fa-lock mr-1"></i>Internal
                                                     </span>
                                                 <?php endif; ?>
-                                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                                                    <?= $response['user_type'] === 'it_staff' ? 'Staff' : 'User' ?>
+                                                <span class="font-medium">
+                                                    <?= $isStaff ? 'IT Support' : 'Employee' ?>
                                                 </span>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="prose prose-sm max-w-none">
-                                            <p class="text-gray-800 whitespace-pre-wrap leading-relaxed m-0"><?= htmlspecialchars($response['message']) ?></p>
+                                            <span>
+                                                <?= date('g:i A', strtotime($response['created_at'])) ?>
+                                            </span>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Avatar and Date (only for received messages) -->
+                                    <?php if (!$alignRight): ?>
+                                        <div class="flex items-center mt-1 ml-2">
+                                            <div class="w-6 h-6 rounded-full <?= $isStaff ? 'bg-green-500' : 'bg-blue-500' ?> flex items-center justify-center mr-2">
+                                                <i class="fas <?= $isStaff ? 'fa-headset' : 'fa-user' ?> text-white text-xs"></i>
+                                            </div>
+                                            <span class="text-xs text-gray-500">
+                                                <?= date('M j, Y', strtotime($response['created_at'])) ?>
+                                            </span>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="flex justify-end mt-1 mr-2">
+                                            <span class="text-xs text-gray-500">
+                                                <?= date('M j, Y', strtotime($response['created_at'])) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -1425,6 +1434,55 @@ if ($ticket) {
         
         #chatContainer::-webkit-scrollbar-thumb:hover {
             background: #a0aec0;
+        }
+        
+        /* Messenger-style chat bubble animations and effects */
+        .chat-bubble {
+            transition: all 0.2s ease-in-out;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+        
+        .chat-bubble:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Message bubble tail effects */
+        .bubble-sent::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -6px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid #3b82f6;
+            border-bottom: 6px solid transparent;
+        }
+        
+        .bubble-received::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-right: 6px solid #f0f9ff;
+            border-bottom: 6px solid transparent;
+        }
+        
+        .bubble-staff::before {
+            border-right-color: #dcfce7 !important;
         }
     </style>
     
