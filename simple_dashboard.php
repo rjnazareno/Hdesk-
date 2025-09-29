@@ -126,7 +126,7 @@ try {
                             <?= htmlspecialchars($_SESSION['user_data']['name'] ?? 'User') ?>
                         </span>
                     </span>
-                    <a href="simple_login.php?logout=1" class="text-red-600 hover:text-red-700 text-sm font-medium">
+                    <a href="login.php?logout=1" class="text-red-600 hover:text-red-700 text-sm font-medium">
                         Logout
                     </a>
                 </div>

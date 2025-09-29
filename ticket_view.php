@@ -13,7 +13,7 @@ session_start();
 
 // Simple auth check
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {
-    header('Location: simple_login.php');
+    header('Location: login.php');
     exit;
 }
 

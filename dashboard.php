@@ -8,7 +8,7 @@ requireLogin();
 
 // Debug: Check session data (remove in production)
 if (empty($_SESSION['user_id'])) {
-    header('Location: simple_login.php?error=session_expired');
+    header('Location: login.php?error=session_expired');
     exit;
 }
 

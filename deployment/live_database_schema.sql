@@ -180,15 +180,15 @@ CREATE TABLE IF NOT EXISTS `activity_log` (
 -- Insert default IT Staff account
 INSERT INTO `it_staff` (`name`, `email`, `username`, `password`, `role`, `is_active`) 
 VALUES 
-('System Administrator', 'admin@company.com', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1)
+('System Administrator', 'admin@company.com', 'admin', 'admin123', 'admin', 1)
 ON DUPLICATE KEY UPDATE `updated_at` = current_timestamp();
 
 -- Insert sample employees
 INSERT INTO `employees` (`fname`, `lname`, `email`, `username`, `password`, `position`, `status`, `role`) 
 VALUES 
-('John', 'Doe', 'john.doe@company.com', 'john', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Software Developer', 'active', 'employee'),
-('Jane', 'Smith', 'jane.smith@company.com', 'jane', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Marketing Manager', 'active', 'employee'),
-('Mike', 'Johnson', 'mike.johnson@company.com', 'mike', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'HR Specialist', 'active', 'employee')
+('John', 'Doe', 'john.doe@company.com', 'john', 'password123', 'Software Developer', 'active', 'employee'),
+('Jane', 'Smith', 'jane.smith@company.com', 'jane', 'password123', 'Marketing Manager', 'active', 'employee'),
+('Mike', 'Johnson', 'mike.johnson@company.com', 'mike', 'password123', 'HR Specialist', 'active', 'employee')
 ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
 
 -- Insert default ticket categories
