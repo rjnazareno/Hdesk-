@@ -20,18 +20,31 @@ $ticketId = intval($_GET['id']);
 $userId = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? 'Test User';
 
+// Option to simulate different user
+$simulateOtherUser = isset($_GET['other_user']) && $_GET['other_user'] === '1';
+
 try {
     $database = Database::getInstance();
     $db = $database->getConnection();
     
     // Add a test response
     $stmt = $db->prepare("
-        INSERT INTO ticket_responses (ticket_id, user_id, message, created_at) 
-        VALUES (?, ?, ?, NOW())
+        INSERT INTO ticket_responses (ticket_id, user_id, user_type, message, created_at) 
+        VALUES (?, ?, ?, ?, NOW())
     ");
     
-    $testMessage = "Test response added at " . date('Y-m-d H:i:s') . " for notification testing.";
-    $stmt->execute([$ticketId, $userId, $testMessage]);
+    if ($simulateOtherUser) {
+        // Simulate response from a different user
+        $testUserId = ($userId == 1) ? 2 : 1; // Use different ID
+        $testUserType = ($_SESSION['user_type'] === 'employee') ? 'it_staff' : 'employee';
+        $testMessage = "Test response from OTHER USER at " . date('Y-m-d H:i:s') . " - This should trigger notification!";
+    } else {
+        $testUserId = $userId;
+        $testUserType = $_SESSION['user_type'] ?? 'employee';
+        $testMessage = "Test response from SAME USER at " . date('Y-m-d H:i:s') . " - This should NOT trigger notification.";
+    }
+    
+    $stmt->execute([$ticketId, $testUserId, $testUserType, $testMessage]);
     
     echo json_encode([
         'success' => true,

@@ -821,7 +821,11 @@ if ($ticket) {
                 
                 console.log('Checking for updates on ticket:', ticketId);
                 
-                fetch(`api/check_ticket_updates.php?id=${ticketId}`)
+                // Add timestamp parameter to help with timing issues
+                const lastClientCheck = localStorage.getItem(`last_client_check_${ticketId}`) || 0;
+                const url = `api/check_ticket_updates.php?id=${ticketId}&client_time=${lastClientCheck}`;
+                
+                fetch(url)
                     .then(response => {
                         console.log('API Response status:', response.status);
                         if (!response.ok) {
@@ -840,6 +844,9 @@ if ($ticket) {
                                     tag: `ticket-${ticketId}-update`,
                                     requireInteraction: false
                                 });
+                                
+                                // Update client-side timestamp
+                                localStorage.setItem(`last_client_check_${ticketId}`, Math.floor(Date.now() / 1000));
                             } else {
                                 console.log('Notification permission not granted:', Notification.permission);
                             }
