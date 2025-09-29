@@ -31,11 +31,25 @@ try {
         exit;
     }
     
-    // Verify ticket exists
-    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
-    $stmt = $db->prepare($ticketQuery);
-    $stmt->execute([$ticketId]);
-    $ticket = $stmt->fetch();
+    // Verify ticket exists - try both id and ticket_id for compatibility
+    $ticket = null;
+    try {
+        $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
+        $stmt = $db->prepare($ticketQuery);
+        $stmt->execute([$ticketId]);
+        $ticket = $stmt->fetch();
+    } catch (Exception $e) {
+        // Try with ticket_id if id column doesn't exist
+        try {
+            $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
+            $stmt = $db->prepare($ticketQuery);
+            $stmt->execute([$ticketId]);
+            $ticket = $stmt->fetch();
+        } catch (Exception $e2) {
+            echo json_encode(['success' => false, 'error' => 'Database structure error: ' . $e2->getMessage()]);
+            exit;
+        }
+    }
     
     if (!$ticket) {
         echo json_encode(['success' => false, 'error' => 'Ticket not found']);
@@ -60,14 +74,21 @@ try {
     $result = $stmt->execute([$ticketId, $userId, $userType, $responseText, $isInternal]);
     
     if ($result) {
-        // Update ticket's updated_at timestamp
-        $updateTicket = "UPDATE tickets SET updated_at = NOW() WHERE ticket_id = ?";
-        $stmt = $db->prepare($updateTicket);
-        $stmt->execute([$ticketId]);
+        // Update ticket's updated_at timestamp - try both id and ticket_id for compatibility
+        try {
+            $updateTicket = "UPDATE tickets SET updated_at = NOW() WHERE id = ?";
+            $stmt = $db->prepare($updateTicket);
+            $stmt->execute([$ticketId]);
+        } catch (Exception $e) {
+            // Try with ticket_id if id column doesn't exist
+            $updateTicket = "UPDATE tickets SET updated_at = NOW() WHERE ticket_id = ?";
+            $stmt = $db->prepare($updateTicket);
+            $stmt->execute([$ticketId]);
+        }
         
-        // Get the newly created response with formatting
+        // Get the newly created response with formatting - handle both id and ticket_id
         $getResponseQuery = "
-            SELECT tr.response_id as id, tr.*, tr.created_at,
+            SELECT tr.*, tr.created_at,
                    CASE 
                        WHEN tr.user_type = 'it_staff' THEN 'IT Support'
                        ELSE 'Employee'
@@ -107,6 +128,17 @@ try {
     
 } catch (Exception $e) {
     error_log("Add response AJAX error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'error' => 'Server error occurred']);
+    echo json_encode([
+        'success' => false, 
+        'error' => 'Server error occurred',
+        'debug' => [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'ticket_id' => $ticketId ?? 'not set',
+            'user_id' => $userId ?? 'not set',
+            'user_type' => $userType ?? 'not set'
+        ]
+    ]);
 }
 ?>

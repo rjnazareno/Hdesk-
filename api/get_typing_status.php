@@ -22,11 +22,25 @@ try {
         exit;
     }
     
-    // Verify ticket exists and user has access
-    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
-    $stmt = $db->prepare($ticketQuery);
-    $stmt->execute([$ticketId]);
-    $ticket = $stmt->fetch();
+    // Verify ticket exists and user has access - try both id and ticket_id for compatibility
+    $ticket = null;
+    try {
+        $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
+        $stmt = $db->prepare($ticketQuery);
+        $stmt->execute([$ticketId]);
+        $ticket = $stmt->fetch();
+    } catch (Exception $e) {
+        // Try with ticket_id if id column doesn't exist
+        try {
+            $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
+            $stmt = $db->prepare($ticketQuery);
+            $stmt->execute([$ticketId]);
+            $ticket = $stmt->fetch();
+        } catch (Exception $e2) {
+            echo json_encode(['success' => false, 'error' => 'Database structure error']);
+            exit;
+        }
+    }
     
     if (!$ticket) {
         echo json_encode(['success' => false, 'error' => 'Ticket not found']);
