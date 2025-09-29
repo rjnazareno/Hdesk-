@@ -262,7 +262,7 @@ $categories = [
 
             <form id="createTicketForm" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
                 <input type="hidden" name="csrf_token" value="<?php echo escape($csrfToken); ?>">
-                <input type="hidden" name="action" value="create_ticket">>
+                <input type="hidden" name="action" value="create_ticket">
 
                 <!-- Subject -->
                 <div>

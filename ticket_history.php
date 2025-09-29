@@ -192,9 +192,9 @@ function timeAgo($datetime) {
                 </div>
                 <div class="text-right text-sm text-gray-600">
                     <div><strong>Employee:</strong> <?php echo escape($ticket['employee_name']); ?></div>
-                    <?php if ($ticket['assigned_staff_name']): ?>
+                    <?php if ($ticket['assigned_staff_name']) { ?>
                     <div><strong>Assigned:</strong> <?php echo escape($ticket['assigned_staff_name']); ?></div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
             </div>
         </div>
@@ -205,15 +205,15 @@ function timeAgo($datetime) {
                 <h3 class="text-lg font-semibold text-gray-900">Activity Timeline</h3>
             </div>
             
-            <?php if (empty($activities)): ?>
+            <?php if (empty($activities)) { ?>
             <div class="p-12 text-center">
                 <i class="fas fa-history text-gray-300 text-4xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">No Activity History</h3>
                 <p class="text-gray-600">This ticket doesn't have any recorded activities yet.</p>
             </div>
-            <?php else: ?>
+            <?php } else { ?>
             <div class="divide-y divide-gray-200">
-                <?php foreach ($activities as $activity): ?>
+                <?php foreach ($activities as $activity) { ?>
                 <div class="p-6 hover:bg-gray-50">
                     <div class="flex items-start space-x-4">
                         <!-- Activity Icon -->
@@ -244,7 +244,7 @@ function timeAgo($datetime) {
                             </div>
                             
                             <!-- Show response content if it's a response activity -->
-                            <?php if ($activity['action'] === 'response_added'): ?>
+                            <?php if ($activity['action'] === 'response_added') { ?>
                                 <?php 
                                 $details = json_decode($activity['details'], true);
                                 $responseId = $details['response_id'] ?? null;
@@ -257,11 +257,11 @@ function timeAgo($datetime) {
                                         <div class="text-sm font-medium text-gray-900">
                                             Response Content
                                         </div>
-                                        <?php if ($response['is_internal']): ?>
+                                        <?php if ($response['is_internal']) { ?>
                                         <span class="text-xs px-2 py-1 bg-orange-100 text-orange-600 rounded-full">
                                             Internal Note
                                         </span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </div>
                                     <div class="text-gray-700 text-sm whitespace-pre-wrap">
                                         <?php echo escape($response['message']); ?>
@@ -273,27 +273,27 @@ function timeAgo($datetime) {
                                     }
                                 }
                                 ?>
-                            <?php endif; ?>
+                            <?php } ?>
                             
                             <!-- Additional activity details -->
                             <div class="mt-2 text-xs text-gray-500">
                                 <i class="fas fa-clock mr-1"></i>
                                 <?php echo date('M j, Y \a\t g:i A', strtotime($activity['created_at'])); ?>
-                                <?php if ($activity['ip_address']): ?>
+                                <?php if ($activity['ip_address']) { ?>
                                 <span class="ml-3">
                                     <i class="fas fa-globe mr-1"></i>
                                     <?php echo escape($activity['ip_address']); ?>
                                 </span>
-                                <?php endif; ?>
+                                <?php } ?>
                             </div>
                         </div>
                     </div>
                 </div>
-                <?php endforeach; ?>
+                <?php } ?>
             </div>
             
             <!-- Pagination -->
-            <?php if ($totalPages > 1): ?>
+            <?php if ($totalPages > 1) { ?>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
                 <div class="flex items-center justify-between">
                     <div class="text-sm text-gray-700">
@@ -302,37 +302,37 @@ function timeAgo($datetime) {
                     </div>
                     
                     <div class="flex space-x-1">
-                        <?php if ($page > 1): ?>
+                        <?php if ($page > 1) { ?>
                         <a href="?id=<?php echo $ticketId; ?>&page=<?php echo ($page - 1); ?>" 
                            class="px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50">
                             <i class="fas fa-chevron-left mr-1"></i>Previous
                         </a>
-                        <?php endif; ?>
+                        <?php } ?>
                         
                         <?php
                         $startPage = max(1, $page - 2);
                         $endPage = min($totalPages, $page + 2);
                         
-                        for ($i = $startPage; $i <= $endPage; $i++):
+                        for ($i = $startPage; $i <= $endPage; $i++) {
                         ?>
                         <a href="?id=<?php echo $ticketId; ?>&page=<?php echo $i; ?>" 
                            class="px-3 py-2 text-sm border rounded-md 
                            <?php echo $i === $page ? 'bg-blue-50 border-blue-300 text-blue-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'; ?>">
                             <?php echo $i; ?>
                         </a>
-                        <?php endfor; ?>
+                        <?php } ?>
                         
-                        <?php if ($page < $totalPages): ?>
+                        <?php if ($page < $totalPages) { ?>
                         <a href="?id=<?php echo $ticketId; ?>&page=<?php echo ($page + 1); ?>" 
                            class="px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50">
                             Next<i class="fas fa-chevron-right ml-1"></i>
                         </a>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
-            <?php endif; ?>
+            <?php } ?>
+            <?php } ?>
         </div>
     </div>
 </body>

@@ -172,34 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
             }
         }
         
-                
-                $message = 'Response added successfully!';
-            }
-        }
-        
-        if (isset($_POST['update_status']) && $userType === 'it_staff') {
-            // Update ticket status (IT staff only)
-            $new_status = $_POST['status'] ?? '';
-            $valid_statuses = ['open', 'in_progress', 'resolved', 'closed'];
-            
-            if (in_array($new_status, $valid_statuses)) {
-                $stmt = $db->prepare("UPDATE tickets SET status = ?, updated_at = NOW() WHERE ticket_id = ?");
-                $stmt->execute([$new_status, $ticketId]);
-                $message = 'Status updated successfully!';
-            }
-        }
-        
-        if (isset($_POST['assign_ticket']) && $userType === 'it_staff') {
-            // Assign ticket (IT staff only)
-            $assigned_to = intval($_POST['assigned_to'] ?? 0);
-            
-            if ($assigned_to > 0) {
-                $stmt = $db->prepare("UPDATE tickets SET assigned_to = ?, updated_at = NOW() WHERE ticket_id = ?");
-                $stmt->execute([$assigned_to, $ticketId]);
-                $message = 'Ticket assigned successfully!';
-            }
-        }
-        
     } catch (Exception $e) {
         $error = 'Error processing request: ' . $e->getMessage();
     }
