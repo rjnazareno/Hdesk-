@@ -11,7 +11,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(['error' => 'Authentication required', 'redirect' => 'simple_login.php']);
+    echo json_encode(['error' => 'Authentication required', 'redirect' => 'login.php']);
     exit;
 }
 
@@ -39,19 +39,19 @@ try {
         SELECT COUNT(*) as new_responses,
                MAX(created_at) as latest_response_time
         FROM ticket_responses 
-        WHERE ticket_id = ? AND created_at > ? AND responder_id != ?
+        WHERE ticket_id = ? AND created_at > ? AND user_id != ?
     ");
     $stmt->execute([$ticketId, $lastCheck, $userId]);
     $result = $stmt->fetch();
     
     // Also get the latest response details for better messaging
     $stmt2 = $db->prepare("
-        SELECT tr.message, tr.responder_id, tr.created_at,
+        SELECT tr.message, tr.user_id, tr.created_at,
                COALESCE(e.username, i.username, 'Unknown User') as username
         FROM ticket_responses tr
-        LEFT JOIN employees e ON tr.responder_id = e.id
-        LEFT JOIN it_staff i ON tr.responder_id = i.staff_id
-        WHERE tr.ticket_id = ? AND tr.created_at > ? AND tr.responder_id != ?
+        LEFT JOIN employees e ON tr.user_id = e.id
+        LEFT JOIN it_staff i ON tr.user_id = i.staff_id
+        WHERE tr.ticket_id = ? AND tr.created_at > ? AND tr.user_id != ?
         ORDER BY tr.created_at DESC
         LIMIT 1
     ");

@@ -10,7 +10,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(['error' => 'Authentication required', 'redirect' => 'simple_login.php']);
+    echo json_encode(['error' => 'Authentication required', 'redirect' => 'login.php']);
     exit;
 }
 
@@ -32,11 +32,11 @@ try {
     $sessionKey = "last_check_ticket_{$ticketId}";
     $lastCheck = $_SESSION[$sessionKey] ?? date('Y-m-d H:i:s', time() - 120);
     
-    // Simple query to check for new responses
+    // Simple query to check for new responses - using correct field name
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as new_count
         FROM ticket_responses 
-        WHERE ticket_id = ? AND created_at > ? AND responder_id != ?
+        WHERE ticket_id = ? AND created_at > ? AND user_id != ?
     ");
     $stmt->execute([$ticketId, $lastCheck, $userId]);
     $result = $stmt->fetch();

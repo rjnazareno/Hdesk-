@@ -203,7 +203,7 @@
                         // Authentication required
                         return response.json().then(data => {
                             log('❌ Authentication required - please login first');
-                            log(`Redirect to: ${data.redirect || 'simple_login.php'}`);
+                            log(`Redirect to: ${data.redirect || 'login.php'}`);
                             throw new Error('Authentication required');
                         });
                     }

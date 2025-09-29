@@ -11,7 +11,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(['error' => 'Authentication required', 'redirect' => 'simple_login.php']);
+    echo json_encode(['error' => 'Authentication required', 'redirect' => 'login.php']);
     exit;
 }
 
@@ -34,9 +34,9 @@ try {
     $database = Database::getInstance();
     $db = $database->getConnection();
     
-    // Add a test response
+    // Add a test response - using correct field names from actual database
     $stmt = $db->prepare("
-        INSERT INTO ticket_responses (ticket_id, responder_id, message, created_at) 
+        INSERT INTO ticket_responses (ticket_id, user_id, message, created_at) 
         VALUES (?, ?, ?, NOW())
     ");
     
