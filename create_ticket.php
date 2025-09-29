@@ -2,6 +2,7 @@
 require_once 'config/database.php';
 require_once 'includes/security.php';
 require_once 'includes/activity_logger.php';
+require_once 'includes/activity_logger.php';
 
 // Start session and require login
 session_start();

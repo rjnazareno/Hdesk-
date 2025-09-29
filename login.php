@@ -1,4 +1,4 @@
-<?php
+    <?php
 require_once 'config/database.php';
 require_once 'includes/security.php';
 
@@ -30,8 +30,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$username]);
                 $user = $stmt->fetch();
                 
-                // Verify password using password_verify for hashed passwords
-                if ($user && password_verify($password, $user['password'])) {
+                // Check password - handle both hashed and plain text
+                $passwordMatch = false;
+                if ($user) {
+                    // First try password_verify for hashed passwords
+                    if (password_verify($password, $user['password'])) {
+                        $passwordMatch = true;
+                    }
+                    // If that fails, try direct comparison for plain text passwords
+                    elseif ($password === $user['password']) {
+                        $passwordMatch = true;
+                        
+                        // Optionally update to hashed password for security
+                        try {
+                            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                            $updateStmt = $pdo->prepare("UPDATE it_staff SET password = ? WHERE staff_id = ?");
+                            $updateStmt->execute([$hashedPassword, $user['id']]);
+                        } catch (Exception $e) {
+                            // Log but don't fail login if password update fails
+                            error_log("Password hash update failed: " . $e->getMessage());
+                        }
+                    }
+                }
+                
+                if ($passwordMatch) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['user_type'] = 'it_staff';
@@ -172,6 +194,7 @@ if (isset($_SESSION['user_id'])) {
                     <div class="bg-blue-50 p-3 rounded-lg">
                         <strong class="text-blue-800">IT Staff:</strong>
                         <div class="text-blue-700">Username: admin | Password: admin123</div>
+                        <div class="text-blue-600 text-xs mt-1">Note: Password can be plain text or hashed</div>
                     </div>
                     <div class="bg-green-50 p-3 rounded-lg">
                         <strong class="text-green-800">Employee Examples:</strong>
