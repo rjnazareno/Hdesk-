@@ -148,7 +148,9 @@ class ChatSystem {
                         <div class="chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm opacity-75">
                             <p class="text-sm leading-relaxed whitespace-pre-wrap">${messageText}</p>
                             <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                <span class="font-medium">Employee</span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-medium">Employee</span>
+                                </div>
                                 <span class="italic">Sending...</span>
                             </div>
                         </div>
@@ -169,8 +171,11 @@ class ChatSystem {
             if (bubbleElement) {
                 bubbleElement.classList.remove('opacity-75');
                 const sendingSpan = tempElement.querySelector('span.italic');
-                if (sendingSpan) {
-                    sendingSpan.textContent = response.formatted_date;
+                if (sendingSpan && response.formatted_date) {
+                    // Extract time from formatted date like "Dec 29, 2024 at 4:40 PM"
+                    const timeMatch = response.formatted_date.match(/at\s(\d{1,2}:\d{2}\s[AP]M)/);
+                    const timeDisplay = timeMatch ? timeMatch[1] : new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+                    sendingSpan.textContent = timeDisplay;
                     sendingSpan.classList.remove('italic');
                 }
             }
