@@ -1,8 +1,18 @@
 <?php
+// Clean output buffer to ensure clean JSON response
+ob_start();
+
+// Suppress error display for clean JSON output
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config/database.php';
 session_start();
 
+// Clear any previous output
+ob_clean();
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
 
 // Verify user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {
@@ -111,10 +121,20 @@ try {
     
 } catch (Exception $e) {
     error_log("Get latest responses API error: " . $e->getMessage());
+    ob_clean(); // Clear any previous output
     echo json_encode([
         'success' => false, 
-        'error' => 'Server error occurred',
-        'new_responses' => []
+        'error' => 'Server error occurred: ' . $e->getMessage(),
+        'new_responses' => [],
+        'debug' => [
+            'ticket_id' => $ticketId ?? 'not set',
+            'after_count' => $afterCount ?? 'not set',
+            'user_type' => $userType ?? 'not set'
+        ]
     ]);
 }
+
+// Ensure no additional output after JSON
+ob_end_flush();
+exit;
 ?>

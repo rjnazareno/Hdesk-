@@ -1,8 +1,18 @@
 <?php
+// Clean output buffer to ensure clean JSON response
+ob_start();
+
+// Suppress error display for clean JSON output
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config/database.php';
 session_start();
 
+// Clear any previous output
+ob_clean();
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
 
 // Verify user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {

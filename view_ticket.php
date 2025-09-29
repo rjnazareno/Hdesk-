@@ -1037,9 +1037,27 @@ if ($ticket) {
                         showStatus('Response sent successfully!', 'success');
                         textarea.value = '';
                         
-                        // Add the new response to the display
+                        // Add the new response to the display immediately (optimistic update)
                         if (data.response) {
                             addResponseToDisplay(data.response);
+                        } else {
+                            // Fallback: create immediate display while saving to database
+                            const immediateResponse = {
+                                id: 'temp_' + Date.now(),
+                                user_type: '<?= $_SESSION['user_type'] ?>',
+                                display_name: '<?= $_SESSION['user_type'] === 'it_staff' ? 'IT Support' : 'Employee' ?>',
+                                message: formData.get('response_text'),
+                                is_internal: formData.has('is_internal'),
+                                formatted_date: new Date().toLocaleString('en-US', {
+                                    month: 'short', 
+                                    day: 'numeric', 
+                                    year: 'numeric',
+                                    hour: 'numeric', 
+                                    minute: '2-digit',
+                                    hour12: true
+                                })
+                            };
+                            addResponseToDisplay(immediateResponse);
                         }
                         
                         // Update response counter
@@ -1048,6 +1066,11 @@ if ($ticket) {
                         
                         // Clear typing status
                         clearTypingStatus();
+                        
+                        // Trigger fast polling for immediate updates
+                        if (window.triggerFastPolling) {
+                            window.triggerFastPolling();
+                        }
                         
                     } else {
                         showStatus(data.error || 'Failed to send response', 'error');
@@ -1122,9 +1145,12 @@ if ($ticket) {
                 emptyState.remove();
             }
             
+            // Check if this is a temporary message
+            const isTemp = response.id && response.id.toString().startsWith('temp_');
+            
             // Create new response HTML
             const responseHtml = `
-                <div class="relative">
+                <div class="relative" ${isTemp ? 'data-temp-message="true"' : ''}>
                     <div class="flex items-start space-x-4">
                         <!-- Avatar -->
                         <div class="flex-shrink-0">
@@ -1134,12 +1160,13 @@ if ($ticket) {
                         </div>
                         
                         <!-- Response Content -->
-                        <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                        <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200 ${isTemp ? 'opacity-75 border-dashed' : ''}">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center space-x-3">
                                     <span class="font-bold text-gray-900">${response.display_name}</span>
                                     <span class="text-gray-400">•</span>
                                     <span class="text-sm text-gray-600">${response.formatted_date}</span>
+                                    ${isTemp ? '<span class="text-xs text-gray-500 italic">(sending...)</span>' : ''}
                                 </div>
                                 
                                 <div class="flex items-center space-x-2">
@@ -1224,26 +1251,96 @@ if ($ticket) {
         }
         
         function startRealtimeUpdates() {
-            // Check for typing indicators every 2 seconds
-            setInterval(checkForTypingIndicators, 2000);
+            console.log('Starting real-time updates...');
             
-            // Check for new responses every 5 seconds (separate from notifications)
-            setInterval(() => {
+            // Check for typing indicators every 2 seconds
+            const typingInterval = setInterval(checkForTypingIndicators, 2000);
+            
+            let normalInterval = 3000; // Normal checking every 3 seconds
+            let fastInterval = 1000;   // Fast checking every 1 second after activity
+            let currentInterval = normalInterval;
+            let lastActivityTime = Date.now();
+            
+            function checkForNewResponses() {
+                console.log('Checking for new responses... Current count:', lastResponseCount);
+                
                 fetch(`api/get_latest_responses.php?ticket_id=<?= $ticketId ?>&after_count=${lastResponseCount}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
-                        if (data.new_responses && data.new_responses.length > 0) {
+                        console.log('Response data:', data);
+                        
+                        if (data.success && data.new_responses && data.new_responses.length > 0) {
+                            console.log(`Found ${data.new_responses.length} new responses`);
+                            
+                            // Remove any temporary messages before adding real ones
+                            document.querySelectorAll('[data-temp-message="true"]').forEach(temp => temp.remove());
+                            
                             data.new_responses.forEach(response => {
                                 addResponseToDisplay(response);
                             });
+                            
                             lastResponseCount += data.new_responses.length;
                             updateResponseCounter();
+                            
+                            // Show notification for new messages from others
+                            const newMessageNotification = document.createElement('div');
+                            newMessageNotification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                            newMessageNotification.innerHTML = `<i class="fas fa-comment mr-2"></i>New message received!`;
+                            document.body.appendChild(newMessageNotification);
+                            
+                            setTimeout(() => {
+                                if (newMessageNotification.parentNode) {
+                                    newMessageNotification.remove();
+                                }
+                            }, 3000);
+                            
+                            // Switch to fast polling for 30 seconds after activity
+                            lastActivityTime = Date.now();
+                            if (currentInterval !== fastInterval) {
+                                switchToFastPolling();
+                            }
+                        } else {
+                            console.log('No new responses found');
+                            
+                            // Switch back to normal polling if no activity for 30 seconds
+                            if (Date.now() - lastActivityTime > 30000 && currentInterval !== normalInterval) {
+                                switchToNormalPolling();
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('Response check error:', error);
                     });
-            }, 5000);
+            }
+            
+            function switchToFastPolling() {
+                console.log('Switching to fast polling (1s)');
+                clearInterval(window.chatIntervals.responses);
+                currentInterval = fastInterval;
+                window.chatIntervals.responses = setInterval(checkForNewResponses, fastInterval);
+            }
+            
+            function switchToNormalPolling() {
+                console.log('Switching to normal polling (3s)');
+                clearInterval(window.chatIntervals.responses);
+                currentInterval = normalInterval;
+                window.chatIntervals.responses = setInterval(checkForNewResponses, normalInterval);
+            }
+            
+            // Start with normal polling
+            const responseInterval = setInterval(checkForNewResponses, currentInterval);
+            
+            // Store intervals for potential cleanup
+            window.chatIntervals = {
+                typing: typingInterval,
+                responses: responseInterval
+            };
+            
+            // Expose functions globally for triggering after message send
+            window.triggerFastPolling = switchToFastPolling;
         }
     </script>
     
