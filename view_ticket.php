@@ -1698,10 +1698,32 @@ if ($ticket) {
                     textarea.value = '';
                     
                     // Add the new response to chat
-                    if (window.addResponseToDisplay) {
+                    console.log('Checking for addResponseToDisplay...');
+                    console.log('window.addResponseToDisplay:', typeof window.addResponseToDisplay);
+                    if (typeof window.addResponseToDisplay === 'function') {
+                        console.log('Calling addResponseToDisplay with:', data.response);
                         window.addResponseToDisplay(data.response);
                     } else {
-                        console.error('addResponseToDisplay not available');
+                        console.error('addResponseToDisplay not available - implementing inline display');
+                        // Inline implementation as fallback
+                        const chatContainer = document.getElementById('chatContainer');
+                        if (chatContainer) {
+                            const response = data.response;
+                            const responseHtml = `
+                                <div class="mb-4 flex justify-end">
+                                    <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl bg-blue-600 text-white shadow-sm">
+                                        <div class="flex items-start space-x-2">
+                                            <div class="flex-1">
+                                                <div class="font-medium text-sm">${response.display_name}</div>
+                                                <div class="mt-1 text-sm whitespace-pre-wrap">${response.message}</div>
+                                                <div class="mt-2 text-xs opacity-75">${response.formatted_date}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            chatContainer.insertAdjacentHTML('beforeend', responseHtml);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
                     }
                     
                     console.log('Message sent successfully');
