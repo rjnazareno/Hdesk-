@@ -346,7 +346,6 @@ function timeAgo($datetime) {
                             <option value="">All Status</option>
                             <option value="open" <?php echo $filters['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
                             <option value="in_progress" <?php echo $filters['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
-                            <option value="resolved" <?php echo $filters['status'] === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
                             <option value="closed" <?php echo $filters['status'] === 'closed' ? 'selected' : ''; ?>>Closed</option>
                         </select>
                     </div>
@@ -421,8 +420,7 @@ function timeAgo($datetime) {
                         <option value="">All statuses</option>
                         <option value="open" <?php echo $filters['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
                         <option value="in_progress" <?php echo $filters['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
-                        <option value="resolved" <?php echo $filters['status'] === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                        <option value="closed" <?php echo $filters['status'] === 'closed' ? 'selected' : ''; ?>>Closed</option>
+                        <option value="closed" <?php echo $filters['status'] === 'closed' || $filters['status'] === 'resolved' ? 'selected' : ''; ?>>Closed</option>
                     </select>
                     
                     <!-- Priority Filter -->

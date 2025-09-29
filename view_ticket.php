@@ -493,8 +493,7 @@ if ($ticket) {
                             <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>🔴 Open</option>
                                 <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔵 In Progress</option>
-                                <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>🟢 Resolved</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>⚪ Closed</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>✅ Closed (Resolved)</option>
                             </select>
                             <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                 <i class="fas fa-save mr-2"></i>Update Status
@@ -613,6 +612,53 @@ if ($ticket) {
                 <?php endif; ?>
             </div>
             
+            <!-- Device Notifications -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-bell text-blue-600 mr-3"></i>
+                    Device Notifications
+                    <span class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Beta</span>
+                </h3>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Browser Notifications -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-desktop mr-2 text-blue-600"></i>
+                            Browser Notifications
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-4">Get real-time notifications when there are updates to this ticket</p>
+                        <button id="enableNotifications" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium w-full">
+                            <i class="fas fa-bell mr-2"></i>Enable Browser Notifications
+                        </button>
+                    </div>
+                    
+                    <!-- Email Notifications -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition-colors">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-envelope mr-2 text-green-600"></i>
+                            Email Notifications
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-4">Receive email updates for ticket status changes and responses</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="emailNotif" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                <label for="emailNotif" class="text-sm text-gray-700">Email enabled</label>
+                            </div>
+                            <span class="text-xs text-green-600 font-medium">✓ Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Status -->
+                <div id="notificationStatus" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        <span class="text-sm text-gray-700 font-medium">Notifications are enabled for Ticket #<?= $ticketId ?></span>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Add Response Form -->
             <div id="responseForm" class="bg-white rounded-xl shadow-lg p-6 card-hover">
                 <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
@@ -676,5 +722,126 @@ if ($ticket) {
         <?php endif; ?>
         
     </div>
+    
+    <!-- Device Notification JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const enableBtn = document.getElementById('enableNotifications');
+            const statusDiv = document.getElementById('notificationStatus');
+            const ticketId = <?= $ticketId ?>;
+            
+            // Check if notifications are already enabled
+            if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
+                updateButtonState(true);
+                statusDiv.classList.remove('hidden');
+            }
+            
+            enableBtn.addEventListener('click', function() {
+                if (Notification.permission === 'denied') {
+                    alert('Notifications are blocked. Please enable them in your browser settings and refresh the page.');
+                    return;
+                }
+                
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === 'granted') {
+                            enableNotifications();
+                        } else {
+                            alert('Please allow notifications to use this feature.');
+                        }
+                    });
+                } else if (Notification.permission === 'granted') {
+                    if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
+                        disableNotifications();
+                    } else {
+                        enableNotifications();
+                    }
+                }
+            });
+            
+            function enableNotifications() {
+                localStorage.setItem(`notifications_ticket_${ticketId}`, 'enabled');
+                updateButtonState(true);
+                statusDiv.classList.remove('hidden');
+                
+                // Show confirmation notification
+                new Notification('IT Help Desk - Notifications Enabled', {
+                    body: `You'll now receive notifications for updates to Ticket #${ticketId}`,
+                    icon: '/assets/images/favicon.ico',
+                    tag: `ticket-${ticketId}-enabled`
+                });
+                
+                // Start checking for updates
+                startUpdateChecker();
+            }
+            
+            function disableNotifications() {
+                localStorage.removeItem(`notifications_ticket_${ticketId}`);
+                updateButtonState(false);
+                statusDiv.classList.add('hidden');
+                
+                // Stop checking for updates
+                if (window.updateChecker) {
+                    clearInterval(window.updateChecker);
+                }
+            }
+            
+            function updateButtonState(enabled) {
+                if (enabled) {
+                    enableBtn.innerHTML = '<i class="fas fa-bell-slash mr-2"></i>Disable Notifications';
+                    enableBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    enableBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                } else {
+                    enableBtn.innerHTML = '<i class="fas fa-bell mr-2"></i>Enable Browser Notifications';
+                    enableBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    enableBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }
+            }
+            
+            function startUpdateChecker() {
+                // Check for updates every 30 seconds if notifications are enabled
+                if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
+                    window.updateChecker = setInterval(checkForUpdates, 30000);
+                }
+            }
+            
+            function checkForUpdates() {
+                // Check if page is visible to avoid unnecessary requests
+                if (document.hidden) return;
+                
+                fetch(`api/check_ticket_updates.php?id=${ticketId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.hasUpdates) {
+                            new Notification(`Ticket #${ticketId} - New Update`, {
+                                body: data.message || 'New activity on your ticket',
+                                icon: '/assets/images/favicon.ico',
+                                tag: `ticket-${ticketId}-update`,
+                                requireInteraction: false
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Update check failed:', error);
+                        // If API doesn't exist yet, stop checking to avoid spam
+                        if (error.message.includes('404')) {
+                            clearInterval(window.updateChecker);
+                        }
+                    });
+            }
+            
+            // Start update checker if notifications are already enabled
+            if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
+                startUpdateChecker();
+            }
+            
+            // Stop update checker when page is unloaded
+            window.addEventListener('beforeunload', function() {
+                if (window.updateChecker) {
+                    clearInterval(window.updateChecker);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
