@@ -1643,22 +1643,79 @@ if ($ticket) {
         // Direct message submission function
         function submitMessage(event) {
             event.preventDefault();
-            console.log('submitMessage called - preventing normal form submission');
+            console.log('submitMessage called - handling AJAX directly');
             
             const form = document.getElementById('messengerForm');
-            if (form) {
-                console.log('Form found in submitMessage:', form);
-                console.log('Dispatching submit event...');
-                // Trigger the form's submit event which will be handled by AJAX
-                const submitEvent = new Event('submit', { 
-                    cancelable: true, 
-                    bubbles: true 
-                });
-                form.dispatchEvent(submitEvent);
-                console.log('Submit event dispatched');
-            } else {
-                console.error('messengerForm not found');
+            const textarea = document.getElementById('response_text');
+            const submitBtn = document.getElementById('messengerSendBtn');
+            
+            if (!form || !textarea) {
+                console.error('Form or textarea not found');
+                return;
             }
+            
+            const messageText = textarea.value.trim();
+            if (!messageText) {
+                console.log('No message to send');
+                return;
+            }
+            
+            // Disable button while sending
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            }
+            
+            const formData = new FormData();
+            formData.append('ticket_id', <?= $ticketId ?>);
+            formData.append('response_text', messageText);
+            
+            console.log('Sending AJAX request...');
+            fetch('api/add_response_ajax.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.text().then(text => {
+                    console.log('Raw response:', text);
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Invalid JSON response:', text);
+                        throw new Error('Invalid JSON response from server');
+                    }
+                });
+            })
+            .then(data => {
+                console.log('AJAX success:', data);
+                if (data.success) {
+                    // Clear the textarea
+                    textarea.value = '';
+                    
+                    // Add the new response to chat
+                    addResponseToDisplay(data.response);
+                    
+                    console.log('Message sent successfully');
+                } else {
+                    console.error('Server error:', data.error);
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('AJAX error:', error);
+                alert('Error sending message: ' + error.message);
+            })
+            .finally(() => {
+                // Re-enable button
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
+                }
+            });
         }
         
         // Initialize when page loads
