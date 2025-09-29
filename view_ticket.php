@@ -785,8 +785,8 @@ if ($ticket) {
             
         </div>
             
-            <!-- Add Response Form -->
-            <div id="responseForm" class="bg-white rounded-xl shadow-lg p-6 card-hover">
+            <!-- Add Response Form (Hidden - Using Integrated Form Instead) -->
+            <div id="responseForm" class="hidden bg-white rounded-xl shadow-lg p-6 card-hover">
                 <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
                     <i class="fas fa-pen text-blue-600 mr-3"></i>
                     Add Your Response
