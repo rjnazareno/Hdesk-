@@ -1705,18 +1705,35 @@ if ($ticket) {
                         window.addResponseToDisplay(data.response);
                     } else {
                         console.error('addResponseToDisplay not available - implementing inline display');
-                        // Inline implementation as fallback
+                        // Inline implementation as fallback - matching original design
                         const chatContainer = document.getElementById('chatContainer');
                         if (chatContainer) {
                             const response = data.response;
+                            const isStaff = response.user_type === 'it_staff';
+                            const alignRight = !isStaff; // User messages on right, staff on left
+                            
                             const responseHtml = `
-                                <div class="mb-4 flex justify-end">
-                                    <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl bg-blue-600 text-white shadow-sm">
-                                        <div class="flex items-start space-x-2">
-                                            <div class="flex-1">
-                                                <div class="font-medium text-sm">${response.display_name}</div>
-                                                <div class="mt-1 text-sm whitespace-pre-wrap">${response.message}</div>
-                                                <div class="mt-2 text-xs opacity-75">${response.formatted_date}</div>
+                                <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2">
+                                    <div class="max-w-xs lg:max-w-md">
+                                        <!-- Message Bubble -->
+                                        <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm">
+                                            
+                                            <!-- Message Content -->
+                                            <p class="text-sm leading-relaxed whitespace-pre-wrap">
+                                                ${response.message}
+                                            </p>
+                                            
+                                            <!-- Message Info Footer -->
+                                            <div class="flex items-center justify-between mt-2 text-xs opacity-75">
+                                                <div class="flex items-center space-x-2">
+                                                    ${response.is_internal ? '<span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
+                                                    <span class="font-medium">
+                                                        ${isStaff ? 'IT Support' : 'Employee'}
+                                                    </span>
+                                                </div>
+                                                <span>
+                                                    ${response.formatted_date}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
