@@ -227,6 +227,15 @@ if ($ticket) {
         .status-resolved { @apply bg-green-100 text-green-800 border-green-200; }
         .status-closed { @apply bg-gray-100 text-gray-800 border-gray-200; }
         .card-hover { @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -740,13 +749,18 @@ if ($ticket) {
             const statusDiv = document.getElementById('notificationStatus');
             const ticketId = <?= $ticketId ?>;
             
-            // Check if notifications are already enabled
+            // Auto-start background checking for all users
+            console.log('Auto-starting notification system for ticket:', ticketId);
+            startUpdateChecker();
+            
+            // Check if browser notifications are manually enabled
             if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
                 updateButtonState(true);
-                statusDiv.classList.remove('hidden');
+                statusDiv?.classList.remove('hidden');
             }
             
-            enableBtn.addEventListener('click', function() {
+            // Handle manual notification enable/disable
+            enableBtn?.addEventListener('click', function() {
                 if (Notification.permission === 'denied') {
                     alert('Notifications are blocked. Please enable them in your browser settings and refresh the page.');
                     return;
@@ -772,28 +786,25 @@ if ($ticket) {
             function enableNotifications() {
                 localStorage.setItem(`notifications_ticket_${ticketId}`, 'enabled');
                 updateButtonState(true);
-                statusDiv.classList.remove('hidden');
+                statusDiv?.classList.remove('hidden');
                 
                 // Show confirmation notification
-                new Notification('IT Help Desk - Notifications Enabled', {
-                    body: `You'll now receive notifications for updates to Ticket #${ticketId}`,
-                    icon: '/assets/images/favicon.ico',
-                    tag: `ticket-${ticketId}-enabled`
-                });
+                if (Notification.permission === 'granted') {
+                    new Notification('IT Help Desk - Notifications Enabled', {
+                        body: `You'll now receive desktop notifications for updates to Ticket #${ticketId}`,
+                        icon: '/favicon.ico',
+                        tag: `ticket-${ticketId}-enabled`
+                    });
+                }
                 
-                // Start checking for updates
-                startUpdateChecker();
+                console.log('Browser notifications enabled for ticket:', ticketId);
             }
             
             function disableNotifications() {
                 localStorage.removeItem(`notifications_ticket_${ticketId}`);
                 updateButtonState(false);
-                statusDiv.classList.add('hidden');
-                
-                // Stop checking for updates
-                if (window.updateChecker) {
-                    clearInterval(window.updateChecker);
-                }
+                statusDiv?.classList.add('hidden');
+                console.log('Browser notifications disabled for ticket:', ticketId);
             }
             
             function updateButtonState(enabled) {
@@ -808,10 +819,41 @@ if ($ticket) {
                 }
             }
             
+            // Function to show in-page notification banner
+            function showInPageNotification(message) {
+                // Create notification banner
+                const banner = document.createElement('div');
+                banner.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+                banner.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-bell mr-3"></i>
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(banner);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (banner.parentNode) {
+                        banner.remove();
+                    }
+                }, 5000);
+            }
+            
             function startUpdateChecker() {
-                // Check for updates every 30 seconds if notifications are enabled
-                if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
-                    window.updateChecker = setInterval(checkForUpdates, 30000);
+                // Check for updates every 30 seconds
+                console.log('Starting update checker for ticket:', ticketId);
+                window.updateChecker = setInterval(checkForUpdates, 30000);
+            }
+            
+            function stopUpdateChecker() {
+                if (window.updateChecker) {
+                    clearInterval(window.updateChecker);
+                    console.log('Update checker stopped');
                 }
             }
             
@@ -821,11 +863,7 @@ if ($ticket) {
                 
                 console.log('Checking for updates on ticket:', ticketId);
                 
-                // Add timestamp parameter to help with timing issues
-                const lastClientCheck = localStorage.getItem(`last_client_check_${ticketId}`) || 0;
-                const url = `api/check_ticket_updates.php?id=${ticketId}&client_time=${lastClientCheck}`;
-                
-                fetch(url)
+                fetch(`api/simple_check_updates.php?id=${ticketId}`)
                     .then(response => {
                         console.log('API Response status:', response.status);
                         if (!response.ok) {
@@ -836,20 +874,27 @@ if ($ticket) {
                     .then(data => {
                         console.log('Update check data:', data);
                         if (data.hasUpdates) {
-                            console.log('New updates found, showing notification');
-                            if (Notification.permission === 'granted') {
+                            console.log('New updates found, showing notifications');
+                            
+                            // Always show in-page notification
+                            showInPageNotification(data.message);
+                            
+                            // Show browser notification only if explicitly enabled and permitted
+                            const browserNotificationsEnabled = localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled';
+                            if (browserNotificationsEnabled && Notification.permission === 'granted') {
                                 new Notification(`Ticket #${ticketId} - New Update`, {
                                     body: data.message || 'New activity on your ticket',
                                     icon: '/favicon.ico',
                                     tag: `ticket-${ticketId}-update`,
                                     requireInteraction: false
                                 });
-                                
-                                // Update client-side timestamp
-                                localStorage.setItem(`last_client_check_${ticketId}`, Math.floor(Date.now() / 1000));
-                            } else {
-                                console.log('Notification permission not granted:', Notification.permission);
+                                console.log('Desktop notification sent');
                             }
+                            
+                            // Refresh the responses section to show new content
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
                         } else {
                             console.log('No updates found');
                         }
