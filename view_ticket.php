@@ -1485,6 +1485,7 @@ if ($ticket) {
             
             // Expose functions globally for triggering after message send
             window.triggerFastPolling = switchToFastPolling;
+            window.addResponseToDisplay = addResponseToDisplay;
     </script>
     
     <!-- CSS for typing dots animation -->
@@ -1697,7 +1698,11 @@ if ($ticket) {
                     textarea.value = '';
                     
                     // Add the new response to chat
-                    addResponseToDisplay(data.response);
+                    if (window.addResponseToDisplay) {
+                        window.addResponseToDisplay(data.response);
+                    } else {
+                        console.error('addResponseToDisplay not available');
+                    }
                     
                     console.log('Message sent successfully');
                 } else {
