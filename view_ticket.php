@@ -1474,7 +1474,6 @@ if ($ticket) {
             
             // Expose functions globally for triggering after message send
             window.triggerFastPolling = switchToFastPolling;
-        }
     </script>
     
     <!-- CSS for typing dots animation -->
