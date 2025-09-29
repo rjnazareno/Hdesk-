@@ -143,13 +143,12 @@ class ChatSystem {
         
         if (this.chatContainer) {
             const responseHtml = `
-                <div class="flex justify-end mb-2" data-temp-id="${tempId}">
+                <div class="flex justify-end mb-4" data-temp-id="${tempId}">
                     <div class="max-w-xs lg:max-w-md">
                         <div class="chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm opacity-75">
                             <p class="text-sm leading-relaxed whitespace-pre-wrap">${messageText}</p>
-                            <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                <span class="font-medium">Employee</span>
-                                <span class="italic">Sending...</span>
+                            <div class="flex justify-start mt-2">
+                                <span class="text-xs opacity-75 italic">Sending...</span>
                             </div>
                         </div>
                     </div>
@@ -282,13 +281,12 @@ class ChatSystem {
         }
 
         const responseHtml = `
-            <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2" ${isTemp ? 'data-temp-message="true"' : ''}>
+            <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-4" ${isTemp ? 'data-temp-message="true"' : ''}>
                 <div class="max-w-xs lg:max-w-md">
-                    <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm ${isTemp ? 'opacity-75 border-dashed' : ''}">
+                    <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm">
                         <p class="text-sm leading-relaxed whitespace-pre-wrap">${response.message}</p>
-                        <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                            <span class="font-medium">${isStaff ? 'IT Support' : 'Employee'}</span>
-                            <span>${timeDisplay}</span>
+                        <div class="flex justify-start mt-2">
+                            <span class="text-xs opacity-75">${timeDisplay}</span>
                         </div>
                     </div>
                 </div>

@@ -653,7 +653,7 @@ if ($ticket) {
                                 <option value="">ðŸ‘¤ Unassigned</option>
                                 <?php foreach ($itStaff as $staff): ?>
                                     <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
-                                        ðŸ‘¨â€ðŸ’» <?= htmlspecialchars($staff['name']) ?>
+                                            <?= htmlspecialchars($staff['name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -718,7 +718,7 @@ if ($ticket) {
                             ?>
                             
                             <!-- Chat Bubble -->
-                            <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-2">
+                            <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-4">
                                 <div class="max-w-xs lg:max-w-md">
                                     <!-- Message Bubble -->
                                     <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : ($isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received') ?> px-4 py-3 shadow-sm">
@@ -728,12 +728,9 @@ if ($ticket) {
                                             <?= htmlspecialchars($response['message']) ?>
                                         </p>
                                         
-                                        <!-- Message Info Footer (Simple Design like JS) -->
-                                        <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                            <span class="font-medium">
-                                                <?= $isStaff ? 'IT Support' : 'Employee' ?>
-                                            </span>
-                                            <span>
+                                        <!-- Message Info Footer (Timestamp Left-Aligned) -->
+                                        <div class="flex justify-start mt-2">
+                                            <span class="text-xs opacity-75">
                                                 <?= date('g:i A', strtotime($response['created_at'])) ?>
                                             </span>
                                         </div>
