@@ -231,7 +231,7 @@ if ($ticket) {
 </head>
 <body class="bg-gray-100 min-h-screen">
     
-    <!-- Navigation -->
+    <!-- Enhanced Navigation -->
     <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-xl">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
@@ -243,7 +243,7 @@ if ($ticket) {
                 <!-- Breadcrumb -->
                 <div class="hidden md:flex items-center text-blue-200 text-sm">
                     <a href="dashboard.php" class="hover:text-white transition-colors">
-                        <i class="fas fa-home mr-1"></i>Dashboard
+                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
                     </a>
                     <i class="fas fa-chevron-right mx-2 text-xs"></i>
                     <span class="text-white font-medium">
@@ -259,8 +259,16 @@ if ($ticket) {
                             <div class="text-white font-medium"><?= htmlspecialchars($_SESSION['user_data']['name'] ?? $_SESSION['username'] ?? 'User') ?></div>
                         </div>
                     </div>
+                    <?php if ($userType === 'it_staff'): ?>
+                    <a href="ticket_history.php?id=<?= $ticketId ?>" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
+                        <i class="fas fa-history mr-2"></i>History
+                    </a>
+                    <?php endif; ?>
                     <a href="dashboard.php" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
                         <i class="fas fa-arrow-left mr-2"></i>Back
+                    </a>
+                    <a href="logout.php" class="bg-red-600 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </a>
                 </div>
             </div>
