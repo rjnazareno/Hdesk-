@@ -1644,7 +1644,8 @@ if ($ticket) {
         // Direct message submission function
         function submitMessage(event) {
             event.preventDefault();
-            console.log('submitMessage called - handling AJAX directly');
+            console.log('submitMessage called - handling AJAX directly [v2.0]');
+            console.log('Current timestamp:', new Date().toISOString());
             
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
@@ -1723,55 +1724,30 @@ if ($ticket) {
             .then(data => {
                 console.log('AJAX success:', data);
                 if (data.success) {
-                    // Remove temporary message
+                    // Update temporary message to confirmed (instead of removing and re-adding)
                     const tempElement = document.querySelector(`[data-temp-id="${tempId}"]`);
                     if (tempElement) {
-                        tempElement.remove();
+                        // Update the temporary message to show it's confirmed
+                        const bubbleElement = tempElement.querySelector('.chat-bubble');
+                        if (bubbleElement) {
+                            bubbleElement.classList.remove('opacity-75');
+                            const sendingSpan = tempElement.querySelector('span.italic');
+                            if (sendingSpan) {
+                                sendingSpan.textContent = data.response.formatted_date;
+                                sendingSpan.classList.remove('italic');
+                            }
+                        }
+                        // Remove the temp-id attribute
+                        tempElement.removeAttribute('data-temp-id');
                     }
                     
                     // Clear the textarea
                     textarea.value = '';
                     
-                    // Add the confirmed response to chat
-                    const chatContainer = document.getElementById('chatContainer');
-                    if (chatContainer) {
-                        const response = data.response;
-                        const isStaff = response.user_type === 'it_staff';
-                        const alignRight = !isStaff; // User messages on right, staff on left
-                        
-                        const responseHtml = `
-                            <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2">
-                                <div class="max-w-xs lg:max-w-md">
-                                    <!-- Message Bubble -->
-                                    <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm">
-                                        
-                                        <!-- Message Content -->
-                                        <p class="text-sm leading-relaxed whitespace-pre-wrap">
-                                            ${response.message}
-                                        </p>
-                                        
-                                        <!-- Message Info Footer -->
-                                        <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                            <div class="flex items-center space-x-2">
-                                                ${response.is_internal ? '<span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
-                                                <span class="font-medium">
-                                                    ${isStaff ? 'IT Support' : 'Employee'}
-                                                </span>
-                                            </div>
-                                            <span>
-                                                ${response.formatted_date}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
-                        chatContainer.insertAdjacentHTML('beforeend', responseHtml);
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        
-                        // Trigger fast polling to pick up any other new messages
-                        if (window.triggerFastPolling) {
-                            window.triggerFastPolling();
-                        }
+                    // Trigger fast polling to pick up any other new messages
+                    if (window.triggerFastPolling) {
+                        console.log('Triggering fast polling...');
+                        window.triggerFastPolling();
                     }
                     
                     console.log('Message sent successfully');
