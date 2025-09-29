@@ -719,7 +719,7 @@ if ($ticket) {
                             
                             <!-- Chat Bubble -->
                             <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-4">
-                                <div class="max-w-xs lg:max-w-md">
+                                <div class="max-w-xs">
                                     <!-- Message Bubble -->
                                     <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : ($isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received') ?> px-4 py-3 shadow-sm">
                                         
