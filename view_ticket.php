@@ -1486,7 +1486,7 @@ if ($ticket) {
             window.triggerFastPolling = switchToFastPolling;
             window.addResponseToDisplay = addResponseToDisplay;
         }
-        }
+    </script>
 
     <!-- CSS for typing dots animation -->
     <style>
