@@ -197,7 +197,7 @@
         });
         
         function checkForUpdates() {
-            fetch('api/check_ticket_updates.php?id=1')
+            fetch('api/simple_check_updates.php?id=1')
                 .then(response => {
                     if (response.status === 401) {
                         // Authentication required

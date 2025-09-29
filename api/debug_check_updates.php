@@ -48,14 +48,14 @@ try {
         SELECT COUNT(*) as new_responses,
                MAX(created_at) as latest_response_time
         FROM ticket_responses 
-        WHERE ticket_id = ? AND created_at > ? AND user_id != ?
+        WHERE ticket_id = ? AND created_at > ? AND responder_id != ?
     ");
     $stmt->execute([$ticketId, $lastCheck, $userId]);
     $result = $stmt->fetch();
     
     // Get all responses for debugging
     $stmt2 = $db->prepare("
-        SELECT id, user_id, user_type, created_at, LEFT(message, 50) as message_preview
+        SELECT response_id, responder_id, created_at, LEFT(message, 50) as message_preview
         FROM ticket_responses 
         WHERE ticket_id = ? 
         ORDER BY created_at DESC 
@@ -66,16 +66,12 @@ try {
     
     // Also get the latest response details for better messaging
     $stmt3 = $db->prepare("
-        SELECT tr.message, tr.user_id, tr.created_at,
-               CASE 
-                   WHEN tr.user_type = 'employee' THEN e.username
-                   WHEN tr.user_type = 'it_staff' THEN i.username
-                   ELSE 'Unknown User'
-               END as username
+        SELECT tr.message, tr.responder_id, tr.created_at,
+               COALESCE(e.username, i.username, 'Unknown User') as username
         FROM ticket_responses tr
-        LEFT JOIN employees e ON tr.user_id = e.employee_id AND tr.user_type = 'employee'
-        LEFT JOIN it_staff i ON tr.user_id = i.user_id AND tr.user_type = 'it_staff'
-        WHERE tr.ticket_id = ? AND tr.created_at > ? AND tr.user_id != ?
+        LEFT JOIN employees e ON tr.responder_id = e.id
+        LEFT JOIN it_staff i ON tr.responder_id = i.staff_id
+        WHERE tr.ticket_id = ? AND tr.created_at > ? AND tr.responder_id != ?
         ORDER BY tr.created_at DESC
         LIMIT 1
     ");
