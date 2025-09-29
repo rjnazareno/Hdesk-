@@ -147,6 +147,7 @@ try {
     error_log("Dashboard error: " . $e->getMessage());
     $tickets = [];
     $stats = [];
+    $totalTickets = 0;
 }
 
 // Helper functions
@@ -457,7 +458,7 @@ function timeAgo($datetime) {
             </div>
             
             <div class="text-sm text-gray-600">
-                <?php echo number_format($totalTickets); ?> ticket<?php echo $totalTickets !== 1 ? 's' : ''; ?> found
+                <?php echo number_format($totalTickets ?? 0); ?> ticket<?php echo ($totalTickets ?? 0) !== 1 ? 's' : ''; ?> found
             </div>
         </div>
 
