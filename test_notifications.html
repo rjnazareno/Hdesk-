@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-xl font-bold mb-4">Notification Test</h1>
+        
+        <div class="space-y-4">
+            <button id="checkPermission" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                Check Permission Status
+            </button>
+            
+            <button id="requestPermission" class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                Request Permission
+            </button>
+            
+            <button id="testNotification" class="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700">
+                Send Test Notification
+            </button>
+            
+            <button id="testApi" class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700">
+                Test API Call
+            </button>
+        </div>
+        
+        <div id="status" class="mt-4 p-3 bg-gray-100 rounded text-sm"></div>
+        
+        <div id="apiResult" class="mt-4 p-3 bg-gray-100 rounded text-sm hidden">
+            <h3 class="font-bold">API Result:</h3>
+            <pre id="apiData" class="mt-2 text-xs overflow-auto"></pre>
+        </div>
+    </div>
+
+    <script>
+        const status = document.getElementById('status');
+        const apiResult = document.getElementById('apiResult');
+        const apiData = document.getElementById('apiData');
+        
+        function updateStatus(message) {
+            status.textContent = message;
+            console.log(message);
+        }
+        
+        document.getElementById('checkPermission').addEventListener('click', function() {
+            updateStatus('Permission: ' + Notification.permission);
+        });
+        
+        document.getElementById('requestPermission').addEventListener('click', function() {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(function(result) {
+                    updateStatus('Permission request result: ' + result);
+                });
+            } else {
+                updateStatus('Permission already set: ' + Notification.permission);
+            }
+        });
+        
+        document.getElementById('testNotification').addEventListener('click', function() {
+            if (Notification.permission === 'granted') {
+                new Notification('Test Notification', {
+                    body: 'This is a test notification from IT Help Desk',
+                    icon: '/favicon.ico'
+                });
+                updateStatus('Test notification sent');
+            } else {
+                updateStatus('Notification permission not granted');
+            }
+        });
+        
+        document.getElementById('testApi').addEventListener('click', function() {
+            fetch('api/debug_check_updates.php?id=1')
+                .then(response => response.json())
+                .then(data => {
+                    apiData.textContent = JSON.stringify(data, null, 2);
+                    apiResult.classList.remove('hidden');
+                    updateStatus('API call successful');
+                })
+                .catch(error => {
+                    updateStatus('API call failed: ' + error.message);
+                    console.error('Error:', error);
+                });
+        });
+        
+        // Initial permission check
+        updateStatus('Initial permission: ' + Notification.permission);
+    </script>
+</body>
+</html>

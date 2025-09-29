@@ -652,9 +652,19 @@ if ($ticket) {
                 
                 <!-- Notification Status -->
                 <div id="notificationStatus" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
-                    <div class="flex items-center">
-                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                        <span class="text-sm text-gray-700 font-medium">Notifications are enabled for Ticket #<?= $ticketId ?></span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span class="text-sm text-gray-700 font-medium">Notifications are enabled for Ticket #<?= $ticketId ?></span>
+                        </div>
+                        <div class="space-x-2">
+                            <button id="testNotificationBtn" class="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                Test Notification
+                            </button>
+                            <button id="checkNowBtn" class="text-xs bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                Check Now
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -809,20 +819,36 @@ if ($ticket) {
                 // Check if page is visible to avoid unnecessary requests
                 if (document.hidden) return;
                 
+                console.log('Checking for updates on ticket:', ticketId);
+                
                 fetch(`api/check_ticket_updates.php?id=${ticketId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('API Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Update check data:', data);
                         if (data.hasUpdates) {
-                            new Notification(`Ticket #${ticketId} - New Update`, {
-                                body: data.message || 'New activity on your ticket',
-                                icon: '/assets/images/favicon.ico',
-                                tag: `ticket-${ticketId}-update`,
-                                requireInteraction: false
-                            });
+                            console.log('New updates found, showing notification');
+                            if (Notification.permission === 'granted') {
+                                new Notification(`Ticket #${ticketId} - New Update`, {
+                                    body: data.message || 'New activity on your ticket',
+                                    icon: '/favicon.ico',
+                                    tag: `ticket-${ticketId}-update`,
+                                    requireInteraction: false
+                                });
+                            } else {
+                                console.log('Notification permission not granted:', Notification.permission);
+                            }
+                        } else {
+                            console.log('No updates found');
                         }
                     })
                     .catch(error => {
-                        console.log('Update check failed:', error);
+                        console.error('Update check failed:', error);
                         // If API doesn't exist yet, stop checking to avoid spam
                         if (error.message.includes('404')) {
                             clearInterval(window.updateChecker);
@@ -841,6 +867,30 @@ if ($ticket) {
                     clearInterval(window.updateChecker);
                 }
             });
+            
+            // Test buttons functionality
+            document.getElementById('testNotificationBtn')?.addEventListener('click', function() {
+                if (Notification.permission === 'granted') {
+                    new Notification('Test Notification - IT Help Desk', {
+                        body: `This is a test notification for Ticket #${ticketId}`,
+                        icon: '/favicon.ico',
+                        tag: `ticket-${ticketId}-test`
+                    });
+                    console.log('Test notification sent');
+                } else {
+                    alert('Notifications not permitted. Permission: ' + Notification.permission);
+                }
+            });
+            
+            document.getElementById('checkNowBtn')?.addEventListener('click', function() {
+                console.log('Manual update check triggered');
+                checkForUpdates();
+            });
+            
+            // Debug info on page load
+            console.log('Notification system initialized for ticket:', ticketId);
+            console.log('Notification permission:', Notification.permission);
+            console.log('Notifications enabled:', localStorage.getItem(`notifications_ticket_${ticketId}`));
         });
     </script>
 </body>
