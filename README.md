@@ -1,6 +1,6 @@
-# IT Ticket Management System
+# IThelp - IT Ticket Management System
 
-A comprehensive, PHP-based IT support ticket management system designed for simplicity, reliability, and ease of use.
+This system is for ticketing system of RSS - A comprehensive, PHP-based IT support ticket management system designed for simplicity, reliability, and ease of use.
 
 ## 🎯 Overview
 
