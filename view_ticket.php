@@ -214,28 +214,54 @@ if ($ticket) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Ticket #<?= $ticketId ?> - IT Ticketing System</title>
+    <title><?= $ticket ? "Ticket #{$ticketId}: " . htmlspecialchars($ticket['subject']) : "View Ticket #$ticketId" ?> - IT Help Desk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .priority-low { @apply bg-green-100 text-green-800 border-green-200; }
+        .priority-medium { @apply bg-yellow-100 text-yellow-800 border-yellow-200; }
+        .priority-high { @apply bg-orange-100 text-orange-800 border-orange-200; }
+        .priority-critical { @apply bg-red-100 text-red-800 border-red-200; }
+        .status-open { @apply bg-red-100 text-red-800 border-red-200; }
+        .status-in_progress { @apply bg-blue-100 text-blue-800 border-blue-200; }
+        .status-resolved { @apply bg-green-100 text-green-800 border-green-200; }
+        .status-closed { @apply bg-gray-100 text-gray-800 border-gray-200; }
+        .card-hover { @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg border-b-4 border-blue-600">
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-xl">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center">
-                    <i class="fas fa-ticket-alt text-blue-600 text-2xl mr-3"></i>
-                    <h1 class="text-xl font-semibold text-gray-900">IT Ticketing System</h1>
+                    <i class="fas fa-headset text-white text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-white">IT Help Desk</h1>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="dashboard.php" class="text-blue-600 hover:text-blue-700 font-medium">
-                        <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                
+                <!-- Breadcrumb -->
+                <div class="hidden md:flex items-center text-blue-200 text-sm">
+                    <a href="dashboard.php" class="hover:text-white transition-colors">
+                        <i class="fas fa-home mr-1"></i>Dashboard
                     </a>
-                    <span class="text-sm text-gray-500">
-                        <?= $userType === 'it_staff' ? 'IT Staff' : 'Employee' ?>: 
-                        <span class="font-medium"><?= htmlspecialchars($_SESSION['user_data']['name'] ?? $_SESSION['username'] ?? 'User') ?></span>
+                    <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                    <span class="text-white font-medium">
+                        <?= $ticket ? "Ticket #{$ticketId}" : "View Ticket" ?>
                     </span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center bg-blue-700 px-3 py-2 rounded-lg">
+                        <i class="fas fa-user-circle text-blue-200 mr-2"></i>
+                        <div class="text-xs">
+                            <div class="text-blue-200"><?= $userType === 'it_staff' ? 'IT Staff' : 'Employee' ?></div>
+                            <div class="text-white font-medium"><?= htmlspecialchars($_SESSION['user_data']['name'] ?? $_SESSION['username'] ?? 'User') ?></div>
+                        </div>
+                    </div>
+                    <a href="dashboard.php" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </a>
                 </div>
             </div>
         </div>
@@ -268,185 +294,288 @@ if ($ticket) {
         
         <?php if ($ticket): ?>
             
-            <!-- Ticket Details -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <div class="flex justify-between items-start mb-6">
+            <!-- Ticket Header -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
                     <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                            Ticket #<?= $ticket['ticket_id'] ?>: <?= htmlspecialchars($ticket['subject']) ?>
-                        </h2>
+                        <div class="flex items-center mb-3">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                                <i class="fas fa-ticket-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold text-gray-900">
+                                    Ticket #<?= $ticket['ticket_id'] ?>
+                                </h1>
+                                <p class="text-gray-600 text-sm mt-1">
+                                    Created <?= date('M j, Y \a\t g:i A', strtotime($ticket['created_at'])) ?>
+                                </p>
+                            </div>
+                        </div>
                         
-                        <!-- Enhanced Ticket Information Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                            <!-- Employee Information -->
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-blue-900 mb-2">
-                                    <i class="fas fa-user mr-2"></i>Employee Details
-                                </h4>
-                                <div class="space-y-1 text-blue-800">
-                                    <div><strong>Name:</strong> <?= htmlspecialchars($ticket['employee_name'] ?? 'N/A') ?></div>
-                                    <div><strong>Username:</strong> <?= htmlspecialchars($ticket['employee_username'] ?? 'N/A') ?></div>
-                                    <div><strong>Email:</strong> <?= htmlspecialchars($ticket['employee_email'] ?? 'N/A') ?></div>
-                                    <div><strong>Employee ID:</strong> #<?= $ticket['employee_id'] ?></div>
-                                </div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <?= htmlspecialchars($ticket['subject']) ?>
+                        </h2>
+                    </div>
+                    
+                    <!-- Status and Priority Badges -->
+                    <div class="flex flex-wrap gap-3 lg:flex-col lg:items-end">
+                        <div class="flex items-center">
+                            <span class="status-<?= $ticket['status'] ?> px-4 py-2 rounded-full text-sm font-semibold border">
+                                <i class="fas fa-circle mr-2 text-xs"></i>
+                                <?= ucfirst(str_replace('_', ' ', $ticket['status'])) ?>
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="priority-<?= $ticket['priority'] ?> px-4 py-2 rounded-full text-sm font-semibold border">
+                                <i class="fas fa-flag mr-2"></i>
+                                <?= ucfirst($ticket['priority']) ?> Priority
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Information Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                    <!-- Employee Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fas fa-user"></i>
                             </div>
-                            
-                            <!-- Ticket Metadata -->
-                            <div class="bg-green-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-green-900 mb-2">
-                                    <i class="fas fa-info-circle mr-2"></i>Ticket Information
-                                </h4>
-                                <div class="space-y-1 text-green-800">
-                                    <div><strong>Created:</strong> <?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></div>
-                                    <div><strong>Last Updated:</strong> <?= date('M j, Y g:i A', strtotime($ticket['updated_at'])) ?></div>
-                                    <div><strong>Category:</strong> <?= htmlspecialchars($ticket['category'] ?? 'General') ?></div>
-                                    <div><strong>Priority:</strong> <span class="capitalize font-medium"><?= htmlspecialchars($ticket['priority']) ?></span></div>
-                                </div>
+                            <h3 class="font-bold text-blue-900">Requester</h3>
+                        </div>
+                        <div class="space-y-2 text-sm text-blue-800">
+                            <div class="flex items-center">
+                                <i class="fas fa-id-card w-4 mr-2 text-blue-600"></i>
+                                <span class="font-medium"><?= htmlspecialchars($ticket['employee_name'] ?? 'N/A') ?></span>
                             </div>
-                            
-                            <!-- Assignment & Status -->
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-purple-900 mb-2">
-                                    <i class="fas fa-tasks mr-2"></i>Assignment Status
-                                </h4>
-                                <div class="space-y-1 text-purple-800">
-                                    <div><strong>Status:</strong> 
-                                        <span class="inline-block px-2 py-1 rounded text-xs font-medium ml-1
-                                            <?php 
-                                            $statusColors = [
-                                                'open' => 'bg-red-100 text-red-800',
-                                                'in_progress' => 'bg-yellow-100 text-yellow-800',
-                                                'resolved' => 'bg-green-100 text-green-800',
-                                                'closed' => 'bg-gray-100 text-gray-800'
-                                            ];
-                                            echo $statusColors[$ticket['status']] ?? 'bg-gray-100 text-gray-800';
-                                            ?>">
-                                            <?= ucfirst(str_replace('_', ' ', $ticket['status'])) ?>
-                                        </span>
+                            <div class="flex items-center">
+                                <i class="fas fa-at w-4 mr-2 text-blue-600"></i>
+                                <span><?= htmlspecialchars($ticket['employee_username'] ?? 'N/A') ?></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope w-4 mr-2 text-blue-600"></i>
+                                <span class="text-xs"><?= htmlspecialchars($ticket['employee_email'] ?? 'N/A') ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category & Priority Card -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <h3 class="font-bold text-purple-900">Category</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="bg-white px-3 py-2 rounded-lg">
+                                <div class="text-xs text-purple-600 font-medium">Type</div>
+                                <div class="text-sm font-semibold text-purple-900"><?= htmlspecialchars($ticket['category'] ?? 'General') ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Assignment Card -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <h3 class="font-bold text-green-900">Assignment</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <?php if ($ticket['assigned_staff_name']): ?>
+                                <div class="bg-white px-3 py-2 rounded-lg">
+                                    <div class="text-xs text-green-600 font-medium">Assigned To</div>
+                                    <div class="text-sm font-semibold text-green-900 flex items-center">
+                                        <i class="fas fa-user-check mr-2 text-green-600"></i>
+                                        <?= htmlspecialchars($ticket['assigned_staff_name']) ?>
                                     </div>
-                                    <div><strong>Assigned To:</strong> 
-                                        <?= $ticket['assigned_staff_name'] ? htmlspecialchars($ticket['assigned_staff_name']) : 'Unassigned' ?>
-                                    </div>
-                                    <div><strong>Responses:</strong> <?= count($responses) ?> total</div>
                                 </div>
+                            <?php else: ?>
+                                <div class="bg-orange-50 px-3 py-2 rounded-lg border border-orange-200">
+                                    <div class="text-sm font-semibold text-orange-700 flex items-center">
+                                        <i class="fas fa-user-clock mr-2"></i>
+                                        Awaiting Assignment
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Card -->
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-gray-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-900">Activity</h3>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Responses</span>
+                                <span class="font-bold text-gray-900"><?= count($responses) ?></span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Last Update</span>
+                                <span class="font-medium text-gray-700 text-xs"><?= date('M j, g:i A', strtotime($ticket['updated_at'])) ?></span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="ticket_history.php?id=<?= $ticketId ?>" class="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center">
+                                    <i class="fas fa-history mr-1"></i>
+                                    View Full History
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Description Section -->
-                <div class="border-t pt-6">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-3">
-                        <i class="fas fa-file-text mr-2"></i>Description
-                    </h4>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-gray-700 whitespace-pre-wrap"><?= htmlspecialchars($ticket['description']) ?></p>
-                    </div>
-                </div>>
-                            <?= ucfirst(str_replace('_', ' ', $ticket['status'])) ?>
-                        </span>
-                        
-                        <div class="mt-2">
-                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                <?= ucfirst($ticket['priority']) ?>
-                            </span>
-                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded ml-1">
-                                <?= ucfirst($ticket['category']) ?>
-                            </span>
-                        </div>
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-file-text text-blue-600 mr-3"></i>
+                        Issue Description
+                    </h3>
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
+                        <p class="text-gray-800 whitespace-pre-wrap leading-relaxed"><?= htmlspecialchars($ticket['description']) ?></p>
                     </div>
                 </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-2">Description</h3>
-                    <p class="text-gray-700 whitespace-pre-wrap"><?= htmlspecialchars($ticket['description']) ?></p>
-                </div>
-                
-                <?php if ($ticket['assigned_to']): ?>
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-blue-900 mb-1">Assigned To</h3>
-                        <p class="text-blue-800"><?= htmlspecialchars($ticket['assigned_staff_name']) ?></p>
-                    </div>
-                <?php endif; ?>
             </div>
             
             <!-- Management Actions (IT Staff Only) -->
             <?php if ($userType === 'it_staff'): ?>
-            <div class="grid md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-tools text-blue-600 mr-3"></i>
+                    Management Tools
+                </h3>
                 
-                <!-- Status Update -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h3 class="font-semibold text-gray-900 mb-3">Update Status</h3>
-                    <form method="POST">
-                        <select name="status" class="w-full p-2 border rounded mb-3">
-                            <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
-                            <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                            <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Resolved</option>
-                            <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>Closed</option>
-                        </select>
-                        <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Status Update -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                        <h4 class="font-bold text-blue-900 mb-4 flex items-center">
+                            <i class="fas fa-edit mr-2"></i>
                             Update Status
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Assign Ticket -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h3 class="font-semibold text-gray-900 mb-3">Assign Ticket</h3>
-                    <form method="POST">
-                        <select name="assigned_to" class="w-full p-2 border rounded mb-3">
-                            <option value="">Unassigned</option>
-                            <?php foreach ($itStaff as $staff): ?>
-                                <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($staff['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" name="assign_ticket" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
-                            Assign
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h3 class="font-semibold text-gray-900 mb-3">Quick Actions</h3>
-                    <div class="space-y-2">
-                        <button onclick="document.getElementById('responseForm').scrollIntoView()" class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">
-                            Add Response
-                        </button>
-                        <a href="dashboard.php" class="block w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 text-center">
-                            Back to Dashboard
-                        </a>
+                        </h4>
+                        <form method="POST" class="space-y-4">
+                            <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>🔴 Open</option>
+                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔵 In Progress</option>
+                                <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>🟢 Resolved</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>⚪ Closed</option>
+                            </select>
+                            <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                                <i class="fas fa-save mr-2"></i>Update Status
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Assign Ticket -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                        <h4 class="font-bold text-green-900 mb-4 flex items-center">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Assign Ticket
+                        </h4>
+                        <form method="POST" class="space-y-4">
+                            <select name="assigned_to" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="">👤 Unassigned</option>
+                                <?php foreach ($itStaff as $staff): ?>
+                                    <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
+                                        👨‍💻 <?= htmlspecialchars($staff['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="submit" name="assign_ticket" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                <i class="fas fa-user-check mr-2"></i>Assign
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                        <h4 class="font-bold text-purple-900 mb-4 flex items-center">
+                            <i class="fas fa-bolt mr-2"></i>
+                            Quick Actions
+                        </h4>
+                        <div class="space-y-3">
+                            <button onclick="document.getElementById('responseForm').scrollIntoView({behavior: 'smooth'})" 
+                                    class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                                <i class="fas fa-reply mr-2"></i>Add Response
+                            </button>
+                            <a href="ticket_history.php?id=<?= $ticketId ?>" 
+                               class="block w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-center">
+                                <i class="fas fa-history mr-2"></i>View History
+                            </a>
+                        </div>
                     </div>
                 </div>
-                
             </div>
             <?php endif; ?>
             
             <!-- Responses -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                    Responses (<?= count($responses) ?>)
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-comments text-blue-600 mr-3"></i>
+                    Conversation
+                    <span class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"><?= count($responses) ?></span>
                 </h3>
                 
                 <?php if (empty($responses)): ?>
-                    <p class="text-gray-500 italic">No responses yet.</p>
+                    <div class="text-center py-12">
+                        <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500 text-lg font-medium">No responses yet</p>
+                        <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
+                    </div>
                 <?php else: ?>
-                    <div class="space-y-4">
-                        <?php foreach ($responses as $response): ?>
-                            <div class="border-l-4 border-blue-500 pl-4 py-2">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="text-sm text-gray-600">
-                                        <span class="font-medium">Staff Member</span>
-                                        <span class="mx-2">•</span>
-                                        <span><?= date('M j, Y g:i A', strtotime($response['created_at'])) ?></span>
-                                        <?php if ($response['is_internal']): ?>
-                                            <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">Internal Note</span>
-                                        <?php endif; ?>
+                    <div class="space-y-6">
+                        <?php foreach ($responses as $index => $response): ?>
+                            <div class="relative">
+                                <!-- Timeline connector -->
+                                <?php if ($index < count($responses) - 1): ?>
+                                    <div class="absolute left-6 top-16 w-0.5 h-full bg-gray-200"></div>
+                                <?php endif; ?>
+                                
+                                <div class="flex items-start space-x-4">
+                                    <!-- Avatar -->
+                                    <div class="flex-shrink-0">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Response Content -->
+                                    <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div class="flex items-center space-x-3">
+                                                <span class="font-bold text-gray-900">
+                                                    <?= $response['user_type'] === 'it_staff' ? 'IT Support' : 'Employee' ?>
+                                                </span>
+                                                <span class="text-gray-400">•</span>
+                                                <span class="text-sm text-gray-600">
+                                                    <?= date('M j, Y \a\t g:i A', strtotime($response['created_at'])) ?>
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="flex items-center space-x-2">
+                                                <?php if ($response['is_internal']): ?>
+                                                    <span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full border border-orange-200">
+                                                        <i class="fas fa-lock mr-1"></i>Internal
+                                                    </span>
+                                                <?php endif; ?>
+                                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                                                    <?= $response['user_type'] === 'it_staff' ? 'Staff' : 'User' ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="prose prose-sm max-w-none">
+                                            <p class="text-gray-800 whitespace-pre-wrap leading-relaxed m-0"><?= htmlspecialchars($response['message']) ?></p>
+                                        </div>
                                     </div>
                                 </div>
-                                <p class="text-gray-700 whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -454,28 +583,53 @@ if ($ticket) {
             </div>
             
             <!-- Add Response Form -->
-            <div id="responseForm" class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add Response</h3>
+            <div id="responseForm" class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-pen text-blue-600 mr-3"></i>
+                    Add Your Response
+                </h3>
                 
-                <form method="POST">
-                    <div class="mb-4">
-                        <textarea name="response_text" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                  placeholder="Type your response here..." required></textarea>
+                <form method="POST" class="space-y-6">
+                    <div>
+                        <label for="response_text" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Your Message
+                        </label>
+                        <textarea name="response_text" id="response_text" rows="5" 
+                                  class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                                  placeholder="Type your response here... Be detailed and clear to help resolve the issue quickly." 
+                                  required></textarea>
+                        <p class="text-xs text-gray-500 mt-2">Tip: Include any error messages, steps you've tried, or additional context</p>
                     </div>
                     
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
                         <?php if ($userType === 'it_staff'): ?>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="is_internal" class="mr-2">
-                            <span class="text-sm text-gray-700">Internal note (not visible to employee)</span>
-                        </label>
+                            <label class="flex items-center bg-orange-50 p-3 rounded-lg border border-orange-200">
+                                <input type="checkbox" name="is_internal" class="mr-3 w-4 h-4 text-orange-600 focus:ring-orange-500 border-orange-300 rounded">
+                                <div>
+                                    <span class="text-sm font-medium text-orange-900">Internal Note</span>
+                                    <div class="text-xs text-orange-700">Only visible to IT staff members</div>
+                                </div>
+                                <i class="fas fa-lock text-orange-600 ml-2"></i>
+                            </label>
                         <?php else: ?>
-                        <div></div>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                <div class="flex items-center">
+                                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                                    <span class="text-sm text-blue-800 font-medium">Your response will be visible to IT support staff</span>
+                                </div>
+                            </div>
                         <?php endif; ?>
                         
-                        <button type="submit" name="add_response" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <i class="fas fa-reply mr-2"></i>Add Response
-                        </button>
+                        <div class="flex space-x-3">
+                            <button type="button" onclick="document.getElementById('response_text').value = ''" 
+                                    class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                                <i class="fas fa-undo mr-2"></i>Clear
+                            </button>
+                            <button type="submit" name="add_response" 
+                                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium shadow-lg">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Response
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
