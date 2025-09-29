@@ -680,7 +680,7 @@ if ($ticket) {
                         </div>
                         <?php endif; ?>
                         
-                        <button type="button" onclick="submitMessage(event)" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
+                        <button type="button" id="messengerSendBtn" onclick="submitMessage(event)" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Send
                         </button>
@@ -1129,7 +1129,7 @@ if ($ticket) {
                 }
                 
                 // Disable form while sending
-                const submitBtn = form.querySelector('button[type="submit"]');
+                const submitBtn = document.getElementById('messengerSendBtn');
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
