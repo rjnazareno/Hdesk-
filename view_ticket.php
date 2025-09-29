@@ -880,7 +880,7 @@ if ($ticket) {
                 
                 console.log('Checking for updates on ticket:', ticketId);
                 
-                fetch(`api/simple_check_updates.php?id=${ticketId}`)
+                fetch(`api/safe_check_updates.php?id=${ticketId}`)
                     .then(response => {
                         console.log('API Response status:', response.status);
                         if (!response.ok) {
