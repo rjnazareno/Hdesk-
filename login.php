@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$username]);
                 $user = $stmt->fetch();
                 
-                // Simple password comparison (no hashing)
-                if ($user && $password === $user['password']) {
+                // Verify password using password_verify for hashed passwords
+                if ($user && password_verify($password, $user['password'])) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['user_type'] = 'it_staff';
@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$username]);
                 $user = $stmt->fetch();
                 
-                // Simple password comparison (no hashing)
-                if ($user && $password === $user['password']) {
+                // Verify password using password_verify for hashed passwords
+                if ($user && password_verify($password, $user['password'])) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['user_type'] = 'employee';
@@ -174,9 +174,10 @@ if (isset($_SESSION['user_id'])) {
                         <div class="text-blue-700">Username: admin | Password: admin123</div>
                     </div>
                     <div class="bg-green-50 p-3 rounded-lg">
-                        <strong class="text-green-800">Employee:</strong>
-                        <div class="text-green-700">Username: john | Password: password123</div>
-                        <div class="text-green-600 text-xs mt-1">Also try: jane, mike</div>
+                        <strong class="text-green-800">Employee Examples:</strong>
+                        <div class="text-green-700">Username: vincent.santos | Password: ?</div>
+                        <div class="text-green-600 text-xs mt-1">Try: shaina.dela cruz, renalyn.josafat, etc.</div>
+                        <div class="text-orange-600 text-xs mt-1">⚠️ Run test_passwords.php to find passwords</div>
                     </div>
                 </div>
             </div>
