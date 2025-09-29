@@ -23,7 +23,7 @@ try {
     }
     
     // Verify ticket exists and user has access
-    $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
+    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
     $stmt = $db->prepare($ticketQuery);
     $stmt->execute([$ticketId]);
     $ticket = $stmt->fetch();

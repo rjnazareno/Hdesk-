@@ -32,7 +32,7 @@ try {
     }
     
     // Verify ticket exists
-    $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
+    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
     $stmt = $db->prepare($ticketQuery);
     $stmt->execute([$ticketId]);
     $ticket = $stmt->fetch();
@@ -61,13 +61,13 @@ try {
     
     if ($result) {
         // Update ticket's updated_at timestamp
-        $updateTicket = "UPDATE tickets SET updated_at = NOW() WHERE id = ?";
+        $updateTicket = "UPDATE tickets SET updated_at = NOW() WHERE ticket_id = ?";
         $stmt = $db->prepare($updateTicket);
         $stmt->execute([$ticketId]);
         
         // Get the newly created response with formatting
         $getResponseQuery = "
-            SELECT tr.*, tr.created_at,
+            SELECT tr.response_id as id, tr.*, tr.created_at,
                    CASE 
                        WHEN tr.user_type = 'it_staff' THEN 'IT Support'
                        ELSE 'Employee'

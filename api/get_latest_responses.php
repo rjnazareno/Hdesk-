@@ -24,7 +24,7 @@ try {
     }
     
     // Verify ticket exists and user has access
-    $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
+    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
     $stmt = $db->prepare($ticketQuery);
     $stmt->execute([$ticketId]);
     $ticket = $stmt->fetch();
@@ -64,7 +64,7 @@ try {
     
     // Get new responses
     $responsesQuery = "
-        SELECT tr.*, tr.created_at,
+        SELECT tr.response_id as id, tr.*, tr.created_at,
                CASE 
                    WHEN tr.user_type = 'it_staff' THEN 'IT Support'
                    ELSE 'Employee'
