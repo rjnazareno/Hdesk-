@@ -1102,7 +1102,7 @@ if ($ticket) {
             const clearBtn = document.getElementById('clearBtn');
             const sendBtn = document.getElementById('sendBtn');
             const statusDiv = document.getElementById('responseStatus');
-            const responsesContainer = document.querySelector('.space-y-6');
+            const chatContainer = document.getElementById('chatContainer');
             
             // Handle form submission via AJAX
             form.addEventListener('submit', function(e) {
@@ -1247,8 +1247,8 @@ if ($ticket) {
         }
         
         function addResponseToDisplay(response) {
-            const responsesContainer = document.querySelector('.space-y-6');
-            const emptyState = document.querySelector('.text-center.py-12');
+            const chatContainer = document.getElementById('chatContainer');
+            const emptyState = document.querySelector('.text-center.py-16');
             
             // Remove empty state if present
             if (emptyState) {
@@ -1257,57 +1257,65 @@ if ($ticket) {
             
             // Check if this is a temporary message
             const isTemp = response.id && response.id.toString().startsWith('temp_');
+            const isStaff = response.user_type === 'it_staff';
+            const alignRight = !isStaff; // User messages on right, staff on left
             
-            // Create new response HTML
+            // Create new response HTML in messenger bubble format
             const responseHtml = `
-                <div class="relative" ${isTemp ? 'data-temp-message="true"' : ''}>
-                    <div class="flex items-start space-x-4">
-                        <!-- Avatar -->
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                <i class="fas fa-user"></i>
+                <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2" ${isTemp ? 'data-temp-message="true"' : ''}>
+                    <div class="max-w-xs lg:max-w-md">
+                        <!-- Message Bubble -->
+                        <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm ${isTemp ? 'opacity-75 border-dashed' : ''}">
+                            
+                            <!-- Message Content -->
+                            <p class="text-sm leading-relaxed whitespace-pre-wrap">
+                                ${response.message}
+                            </p>
+                            
+                            <!-- Message Info Footer -->
+                            <div class="flex items-center justify-between mt-2 text-xs opacity-75">
+                                <div class="flex items-center space-x-2">
+                                    ${response.is_internal ? '<span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
+                                    <span class="font-medium">
+                                        ${isStaff ? 'IT Support' : 'Employee'}
+                                    </span>
+                                    ${isTemp ? '<span class="italic">(sending...)</span>' : ''}
+                                </div>
+                                <span>
+                                    ${new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}
+                                </span>
                             </div>
                         </div>
                         
-                        <!-- Response Content -->
-                        <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200 ${isTemp ? 'opacity-75 border-dashed' : ''}">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center space-x-3">
-                                    <span class="font-bold text-gray-900">${response.display_name}</span>
-                                    <span class="text-gray-400">•</span>
-                                    <span class="text-sm text-gray-600">${response.formatted_date}</span>
-                                    ${isTemp ? '<span class="text-xs text-gray-500 italic">(sending...)</span>' : ''}
+                        <!-- Avatar and Date (only for received messages) -->
+                        ${!alignRight ? `
+                            <div class="flex items-center mt-1 ml-2">
+                                <div class="w-6 h-6 rounded-full ${isStaff ? 'bg-green-500' : 'bg-blue-500'} flex items-center justify-center mr-2">
+                                    <i class="fas ${isStaff ? 'fa-headset' : 'fa-user'} text-white text-xs"></i>
                                 </div>
-                                
-                                <div class="flex items-center space-x-2">
-                                    ${response.is_internal ? '<span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full border border-orange-200"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                                        ${response.user_type === 'it_staff' ? 'Staff' : 'User'}
-                                    </span>
-                                </div>
+                                <span class="text-xs text-gray-500">
+                                    ${new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                                </span>
                             </div>
-                            
-                            <div class="prose prose-sm max-w-none">
-                                <p class="text-gray-800 whitespace-pre-wrap leading-relaxed m-0">${response.message}</p>
+                        ` : `
+                            <div class="flex justify-end mt-1 mr-2">
+                                <span class="text-xs text-gray-500">
+                                    ${new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                                </span>
                             </div>
-                        </div>
+                        `}
                     </div>
                 </div>
             `;
             
-            // Add the new response
-            if (responsesContainer) {
-                responsesContainer.insertAdjacentHTML('beforeend', responseHtml);
+            // Add the new response to chat container
+            if (chatContainer) {
+                chatContainer.insertAdjacentHTML('beforeend', responseHtml);
                 
-                // Add timeline connector to previous response if it exists
-                const responses = responsesContainer.querySelectorAll('.relative');
-                if (responses.length > 1) {
-                    const previousResponse = responses[responses.length - 2];
-                    if (!previousResponse.querySelector('.absolute.left-6')) {
-                        const connector = document.createElement('div');
-                        connector.className = 'absolute left-6 top-16 w-0.5 h-full bg-gray-200';
-                        previousResponse.appendChild(connector);
-                    }
+                // Auto-scroll to bottom
+                setTimeout(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 100);
                 }
             }
         }
