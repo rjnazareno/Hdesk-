@@ -560,41 +560,22 @@ if ($ticket) {
             
             <!-- Responses -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                        <i class="fas fa-comments text-blue-600 mr-3"></i>
-                        Conversation
-                        <span id="responseCounter" class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"><?= count($responses) ?></span>
-                    </h3>
-                    
-                    <?php if (count($responses) > 10): ?>
-                    <button id="loadOlderBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium hidden">
-                        <i class="fas fa-chevron-up mr-1"></i>Load Older Messages
-                    </button>
-                    <?php endif; ?>
-                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-comments text-blue-600 mr-3"></i>
+                    Conversation
+                    <span class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"><?= count($responses) ?></span>
+                </h3>
                 
-                <!-- Scrollable Chat Container -->
-                <div id="chatContainer" class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
-                    <!-- Load More Button (top) -->
-                    <div id="loadMoreTop" class="text-center py-3 hidden">
-                        <button id="loadMoreBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium bg-white px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-50 transition-colors">
-                            <i class="fas fa-chevron-up mr-1"></i>Load More Messages
-                        </button>
+                <?php if (empty($responses)): ?>
+                    <div class="text-center py-12">
+                        <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500 text-lg font-medium">No responses yet</p>
+                        <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
                     </div>
-                    
-                    <!-- Messages Container -->
-                    <div id="messagesContainer" class="p-4">
-                        <?php if (empty($responses)): ?>
-                            <div id="emptyState" class="text-center py-12">
-                                <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                                    <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
-                                </div>
-                                <p class="text-gray-500 text-lg font-medium">No responses yet</p>
-                                <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
-                            </div>
-                        <?php else: ?>
-                            <div class="space-y-6" id="responsesList">
+                <?php else: ?>
+                    <div class="space-y-6">
                         <?php foreach ($responses as $index => $response): ?>
                             <div class="relative">
                                 <!-- Timeline connector -->
@@ -641,64 +622,9 @@ if ($ticket) {
                                     </div>
                                 </div>
                             </div>
-                            <?php 
-                            // Load only the last 10 responses initially
-                            $recentResponses = array_slice($responses, -10);
-                            foreach ($recentResponses as $index => $response): 
-                                $actualIndex = count($responses) - 10 + $index;
-                                if ($actualIndex < 0) $actualIndex = $index;
-                            ?>
-                                <div class="relative">
-                                    <!-- Timeline connector -->
-                                    <?php if ($index < count($recentResponses) - 1): ?>
-                                        <div class="absolute left-6 top-16 w-0.5 h-full bg-gray-200"></div>
-                                    <?php endif; ?>
-                                    
-                                    <div class="flex items-start space-x-4">
-                                        <!-- Avatar -->
-                                        <div class="flex-shrink-0">
-                                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Response Content -->
-                                        <div class="flex-1 bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                                            <div class="flex items-center justify-between mb-3">
-                                                <div class="flex items-center space-x-3">
-                                                    <span class="font-bold text-gray-900">
-                                                        <?= $response['user_type'] === 'it_staff' ? 'IT Support' : 'Employee' ?>
-                                                    </span>
-                                                    <span class="text-gray-400">•</span>
-                                                    <span class="text-sm text-gray-600">
-                                                        <?= date('M j, Y \a\t g:i A', strtotime($response['created_at'])) ?>
-                                                    </span>
-                                                </div>
-                                                
-                                                <div class="flex items-center space-x-2">
-                                                    <?php if ($response['is_internal']): ?>
-                                                        <span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full border border-orange-200">
-                                                            <i class="fas fa-lock mr-1"></i>Internal
-                                                        </span>
-                                                    <?php endif; ?>
-                                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                                                        <?= $response['user_type'] === 'it_staff' ? 'Staff' : 'User' ?>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="prose prose-sm max-w-none">
-                                                <p class="text-gray-800 whitespace-pre-wrap leading-relaxed m-0"><?= htmlspecialchars($response['message']) ?></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
             
             <!-- Device Notifications -->
@@ -1052,17 +978,12 @@ if ($ticket) {
             
             // AJAX Chat System
             initializeAjaxChat();
-            
-            // Initialize scroll functionality
-            initializeScrollableChat();
         });
         
         // Global variables for AJAX chat
         let lastResponseCount = <?= count($responses) ?>;
         let isTyping = false;
         let typingTimer;
-        let loadedResponseCount = <?= count($responses) ?>; // Track how many we've loaded
-        let totalResponseCount = <?= count($responses) ?>;
         
         // AJAX Chat Functions
         function initializeAjaxChat() {
@@ -1335,12 +1256,10 @@ if ($ticket) {
             // Check for typing indicators every 2 seconds
             const typingInterval = setInterval(checkForTypingIndicators, 2000);
             
-            let normalInterval = 5000; // Normal checking every 5 seconds when quiet
-            let fastInterval = 2000;   // Fast checking every 2 seconds after activity  
-            let slowInterval = 10000;  // Slow checking every 10 seconds when very quiet
+            let normalInterval = 3000; // Normal checking every 3 seconds
+            let fastInterval = 1000;   // Fast checking every 1 second after activity
             let currentInterval = normalInterval;
             let lastActivityTime = Date.now();
-            let consecutiveEmptyChecks = 0;
             
             function checkForNewResponses() {
                 console.log('Checking for new responses... Current count:', lastResponseCount);
@@ -1359,53 +1278,35 @@ if ($ticket) {
                             // Remove any temporary messages before adding real ones
                             document.querySelectorAll('[data-temp-message="true"]').forEach(temp => temp.remove());
                             
-                            // Check if any of the new messages are from OTHER users (not current user)
-                            const currentUserType = '<?= $_SESSION['user_type'] ?>';
-                            const currentUserId = <?= $_SESSION['user_id'] ?>;
-                            
-                            let hasMessagesFromOthers = false;
-                            
                             data.new_responses.forEach(response => {
                                 addResponseToDisplay(response);
-                                
-                                // Check if this message is from someone else
-                                if (response.user_type !== currentUserType || response.user_id !== currentUserId) {
-                                    hasMessagesFromOthers = true;
-                                }
                             });
                             
                             lastResponseCount += data.new_responses.length;
                             updateResponseCounter();
                             
-                            // Only show notification for messages from OTHER users
-                            if (hasMessagesFromOthers) {
-                                console.log('New message from another user - showing notification');
-                                showNewMessageNotification(data.new_responses.length);
-                            } else {
-                                console.log('New message from current user - no notification needed');
-                            }
+                            // Show notification for new messages from others
+                            const newMessageNotification = document.createElement('div');
+                            newMessageNotification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                            newMessageNotification.innerHTML = `<i class="fas fa-comment mr-2"></i>New message received!`;
+                            document.body.appendChild(newMessageNotification);
                             
-                            // Reset activity tracking and switch to fast polling
+                            setTimeout(() => {
+                                if (newMessageNotification.parentNode) {
+                                    newMessageNotification.remove();
+                                }
+                            }, 3000);
+                            
+                            // Switch to fast polling for 30 seconds after activity
                             lastActivityTime = Date.now();
-                            consecutiveEmptyChecks = 0;
-                            
                             if (currentInterval !== fastInterval) {
                                 switchToFastPolling();
                             }
                         } else {
                             console.log('No new responses found');
-                            consecutiveEmptyChecks++;
                             
-                            // Adaptive polling based on inactivity
-                            const timeSinceActivity = Date.now() - lastActivityTime;
-                            
-                            if (timeSinceActivity > 120000 && consecutiveEmptyChecks > 10) { 
-                                // Very quiet: 2+ minutes + 10 empty checks = slow polling
-                                if (currentInterval !== slowInterval) {
-                                    switchToSlowPolling();
-                                }
-                            } else if (timeSinceActivity > 30000 && currentInterval === fastInterval) {
-                                // Quiet: 30+ seconds since activity = normal polling  
+                            // Switch back to normal polling if no activity for 30 seconds
+                            if (Date.now() - lastActivityTime > 30000 && currentInterval !== normalInterval) {
                                 switchToNormalPolling();
                             }
                         }
@@ -1416,25 +1317,17 @@ if ($ticket) {
             }
             
             function switchToFastPolling() {
-                console.log('Switching to fast polling (2s) - recent activity detected');
+                console.log('Switching to fast polling (1s)');
                 clearInterval(window.chatIntervals.responses);
                 currentInterval = fastInterval;
-                consecutiveEmptyChecks = 0; // Reset counter
                 window.chatIntervals.responses = setInterval(checkForNewResponses, fastInterval);
             }
             
             function switchToNormalPolling() {
-                console.log('Switching to normal polling (5s) - moderate activity');
+                console.log('Switching to normal polling (3s)');
                 clearInterval(window.chatIntervals.responses);
                 currentInterval = normalInterval;
                 window.chatIntervals.responses = setInterval(checkForNewResponses, normalInterval);
-            }
-            
-            function switchToSlowPolling() {
-                console.log('Switching to slow polling (10s) - very quiet');
-                clearInterval(window.chatIntervals.responses);
-                currentInterval = slowInterval;
-                window.chatIntervals.responses = setInterval(checkForNewResponses, slowInterval);
             }
             
             // Start with normal polling
@@ -1448,56 +1341,6 @@ if ($ticket) {
             
             // Expose functions globally for triggering after message send
             window.triggerFastPolling = switchToFastPolling;
-        }
-        
-        // Notification management with cooldown
-        let lastNotificationTime = 0;
-        const notificationCooldown = 5000; // 5 seconds between notifications
-        
-        function showNewMessageNotification(messageCount) {
-            const now = Date.now();
-            
-            // Check cooldown to prevent notification spam
-            if (now - lastNotificationTime < notificationCooldown) {
-                console.log('Notification cooldown active - skipping notification');
-                return;
-            }
-            
-            lastNotificationTime = now;
-            
-            // Remove any existing notifications first
-            document.querySelectorAll('.chat-notification').forEach(notif => notif.remove());
-            
-            const notification = document.createElement('div');
-            notification.className = 'chat-notification fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-comment mr-2"></i>
-                    <span>${messageCount > 1 ? `${messageCount} new messages` : 'New message received!'}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white hover:text-gray-200">
-                        <i class="fas fa-times text-sm"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Slide in animation
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
-            
-            // Auto-remove after 4 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.add('translate-x-full');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.remove();
-                        }
-                    }, 300);
-                }
-            }, 4000);
         }
     </script>
     
@@ -1550,72 +1393,6 @@ if ($ticket) {
             }
         }
     </style>
-    
-    <script>
-        // Scrollable Chat Initialization
-        function initializeScrollableChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            const loadMoreTop = document.getElementById('loadMoreTop');
-            
-            if (!chatContainer) return;
-            
-            // Auto-scroll to bottom on load
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 100);
-            
-            // Show/hide load more button based on message count
-            if (typeof totalResponseCount !== 'undefined' && totalResponseCount > 10) {
-                if (loadMoreTop) loadMoreTop.classList.remove('hidden');
-            }
-            
-            // Load more messages functionality
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', function() {
-                    loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Loading...';
-                    loadMoreBtn.disabled = true;
-                    
-                    // Load older messages (simulation - you can implement API call here)
-                    setTimeout(() => {
-                        loadMoreBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>Load More Messages';
-                        loadMoreBtn.disabled = false;
-                        
-                        // If all messages loaded, hide button
-                        if (typeof loadedResponseCount !== 'undefined' && typeof totalResponseCount !== 'undefined' && 
-                            loadedResponseCount >= totalResponseCount) {
-                            if (loadMoreTop) loadMoreTop.classList.add('hidden');
-                        }
-                    }, 1000);
-                });
-            }
-            
-            // Auto-scroll to bottom when new messages arrive
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                        // Check if new message was added
-                        const addedNode = mutation.addedNodes[0];
-                        if (addedNode.nodeType === 1 && addedNode.classList && addedNode.classList.contains('relative')) {
-                            // Auto-scroll to bottom for new messages
-                            setTimeout(() => {
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                            }, 100);
-                        }
-                    }
-                });
-            });
-            
-            const responsesList = document.getElementById('responsesList');
-            if (responsesList) {
-                observer.observe(responsesList, { childList: true, subtree: true });
-            }
-        }
-        
-        // Initialize scrollable chat when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeScrollableChat();
-        });
     </script>
 </body>
 </html>
