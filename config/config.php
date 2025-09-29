@@ -6,9 +6,9 @@
 
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'it_ticketing_live');     // Match the live schema
-define('DB_USER', 'root');                  // Default XAMPP MySQL username
-define('DB_PASS', '');                      // Default XAMPP MySQL password (empty)
+define('DB_NAME', 'u816220874_ithelp');
+define('DB_USER', 'u816220874_IT');  // Default XAMPP MySQL username
+define('DB_PASS', 'F]n5HZgi$fK');      // Default XAMPP MySQL password (empty)
 define('DB_CHARSET', 'utf8mb4');
 
 // Application Configuration
