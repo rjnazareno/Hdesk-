@@ -662,7 +662,7 @@ if ($ticket) {
                 
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
-                    <form id="ajaxResponseForm" class="flex items-end space-x-3">
+                    <form id="messengerForm" class="flex items-end space-x-3">
                         <div class="flex-1">
                             <textarea name="response_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
@@ -1097,30 +1097,40 @@ if ($ticket) {
         
         // AJAX Chat Functions
         function initializeAjaxChat() {
-            const form = document.getElementById('ajaxResponseForm');
+            const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
             const clearBtn = document.getElementById('clearBtn');
             const sendBtn = document.getElementById('sendBtn');
             const statusDiv = document.getElementById('responseStatus');
             const chatContainer = document.getElementById('chatContainer');
             
+            // Make sure we have the form
+            if (!form) {
+                console.error('Messenger form not found');
+                return;
+            }
+            
             // Handle form submission via AJAX
             form.addEventListener('submit', function(e) {
-                e.preventDefault();
+                e.preventDefault(); // Prevent normal form submission
+                console.log('Messenger form submitted via AJAX');
                 
                 const formData = new FormData();
                 formData.append('ticket_id', <?= $ticketId ?>);
                 formData.append('response_text', textarea.value);
                 
                 // Add internal checkbox if it exists (IT staff only)
-                const internalCheckbox = document.getElementById('is_internal');
+                const internalCheckbox = document.querySelector('input[name="is_internal"]');
                 if (internalCheckbox && internalCheckbox.checked) {
                     formData.append('is_internal', '1');
                 }
                 
                 // Disable form while sending
-                sendBtn.disabled = true;
-                sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+                }
                 
                 fetch('api/add_response_ajax.php', {
                     method: 'POST',
@@ -1195,8 +1205,10 @@ if ($ticket) {
                 })
                 .finally(() => {
                     // Re-enable form
-                    sendBtn.disabled = false;
-                    sendBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Response';
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
+                    }
                 });
             });
             
@@ -1611,7 +1623,10 @@ if ($ticket) {
         function handleEnterKey(event) {
             if (event.ctrlKey && event.key === 'Enter') {
                 event.preventDefault();
-                document.getElementById('ajaxResponseForm').dispatchEvent(new Event('submit', { cancelable: true }));
+                const form = document.getElementById('messengerForm');
+                if (form) {
+                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                }
             }
         }
         
