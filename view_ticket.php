@@ -1333,7 +1333,7 @@ if ($ticket) {
                     </div>
                 </div>
             `;
-            <script>
+          
             // Add the new response to chat container
             if (chatContainer) {
                 chatContainer.insertAdjacentHTML('beforeend', responseHtml);
@@ -1486,8 +1486,8 @@ if ($ticket) {
             window.triggerFastPolling = switchToFastPolling;
             window.addResponseToDisplay = addResponseToDisplay;
         }
-    </script>
-    
+        }
+
     <!-- CSS for typing dots animation -->
     <style>
         .typing-dots {
