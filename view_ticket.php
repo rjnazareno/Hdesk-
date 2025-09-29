@@ -1333,7 +1333,7 @@ if ($ticket) {
                     </div>
                 </div>
             `;
-            
+            <script>
             // Add the new response to chat container
             if (chatContainer) {
                 chatContainer.insertAdjacentHTML('beforeend', responseHtml);
