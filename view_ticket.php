@@ -231,24 +231,47 @@ if ($ticket) {
 </head>
 <body class="bg-gray-100 min-h-screen">
     
-    <!-- Enhanced Navigation -->
-    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-xl">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-xl">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center">
-                    <i class="fas fa-headset text-white text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold text-white">IT Help Desk</h1>
-                </div>
-                
-                <!-- Breadcrumb -->
-                <div class="hidden md:flex items-center text-blue-200 text-sm">
-                    <a href="dashboard.php" class="hover:text-white transition-colors">
-                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                    </a>
-                    <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                    <span class="text-white font-medium">
-                        <?= $ticket ? "Ticket #{$ticketId}" : "View Ticket" ?>
-                    </span>
+            <!-- Top Navigation Bar -->
+            <div class="flex justify-between items-start py-4">
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-headset text-white text-2xl mr-3"></i>
+                        <h1 class="text-xl font-bold text-white">IT Help Desk</h1>
+                    </div>
+                    
+                    <!-- Breadcrumb Navigation -->
+                    <nav class="flex" aria-label="Breadcrumb">
+                        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                            <li class="inline-flex items-center">
+                                <a href="dashboard.php" class="inline-flex items-center text-blue-100 hover:text-white transition-colors text-sm">
+                                    <i class="fas fa-home w-4 h-4 mr-2"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <div class="flex items-center">
+                                    <i class="fas fa-chevron-right text-blue-200 mx-2 text-xs"></i>
+                                    <span class="text-white font-medium text-sm">
+                                        <i class="fas fa-ticket-alt mr-2"></i>
+                                        <?= $ticket ? "Ticket #{$ticketId}" : "View Ticket" ?>
+                                    </span>
+                                </div>
+                            </li>
+                            <?php if ($ticket): ?>
+                            <li>
+                                <div class="flex items-center">
+                                    <i class="fas fa-chevron-right text-blue-200 mx-2 text-xs"></i>
+                                    <span class="text-blue-100 text-sm truncate max-w-xs">
+                                        <?= htmlspecialchars($ticket['subject']) ?>
+                                    </span>
+                                </div>
+                            </li>
+                            <?php endif; ?>
+                        </ol>
+                    </nav>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -273,7 +296,7 @@ if ($ticket) {
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
     <div class="max-w-6xl mx-auto px-4 py-8">
         
