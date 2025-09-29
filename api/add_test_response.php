@@ -6,7 +6,14 @@ require_once '../config/database.php';
 require_once '../includes/security.php';
 
 session_start();
-requireLogin();
+
+// API-friendly authentication check
+if (!isset($_SESSION['user_id'])) {
+    header('Content-Type: application/json');
+    http_response_code(401);
+    echo json_encode(['error' => 'Authentication required', 'redirect' => 'simple_login.php']);
+    exit;
+}
 
 header('Content-Type: application/json');
 

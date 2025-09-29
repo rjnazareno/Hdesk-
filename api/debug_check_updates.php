@@ -1,6 +1,6 @@
 <?php
 /**
- * API endpoint to check for ticket updates for notifications
+ * Debug version of check ticket updates API
  */
 require_once '../config/database.php';
 require_once '../includes/security.php';
@@ -34,6 +34,15 @@ try {
     $sessionKey = "last_check_ticket_{$ticketId}";
     $lastCheck = $_SESSION[$sessionKey] ?? date('Y-m-d H:i:s', time() - 120);
     
+    // Debug: Show what we're checking
+    $debug = [
+        'ticket_id' => $ticketId,
+        'user_id' => $userId,
+        'last_check' => $lastCheck,
+        'current_time' => date('Y-m-d H:i:s'),
+        'session_key' => $sessionKey
+    ];
+    
     // Check for new responses since last check (excluding current user)
     $stmt = $db->prepare("
         SELECT COUNT(*) as new_responses,
@@ -44,8 +53,19 @@ try {
     $stmt->execute([$ticketId, $lastCheck, $userId]);
     $result = $stmt->fetch();
     
-    // Also get the latest response details for better messaging
+    // Get all responses for debugging
     $stmt2 = $db->prepare("
+        SELECT id, user_id, user_type, created_at, LEFT(message, 50) as message_preview
+        FROM ticket_responses 
+        WHERE ticket_id = ? 
+        ORDER BY created_at DESC 
+        LIMIT 5
+    ");
+    $stmt2->execute([$ticketId]);
+    $allResponses = $stmt2->fetchAll();
+    
+    // Also get the latest response details for better messaging
+    $stmt3 = $db->prepare("
         SELECT tr.message, tr.user_id, tr.created_at,
                CASE 
                    WHEN tr.user_type = 'employee' THEN e.username
@@ -59,8 +79,8 @@ try {
         ORDER BY tr.created_at DESC
         LIMIT 1
     ");
-    $stmt2->execute([$ticketId, $lastCheck, $userId]);
-    $latestResponse = $stmt2->fetch();
+    $stmt3->execute([$ticketId, $lastCheck, $userId]);
+    $latestResponse = $stmt3->fetch();
     
     // Check for status changes (use ticket_id consistently)
     $stmt = $db->prepare("
@@ -94,14 +114,13 @@ try {
             'open' => 'Open',
             'in_progress' => 'In Progress',
             'closed' => 'Closed',
-            'resolved' => 'Closed', // Map resolved to closed
+            'resolved' => 'Closed',
             default => ucfirst($statusUpdate['status'])
         };
         $message = "Status updated to: {$statusText}";
     }
     
     // Only update last check time if we're not immediately after posting
-    // This prevents the session from being updated too quickly
     $currentTime = date('Y-m-d H:i:s');
     if (!$hasUpdates || (time() - strtotime($lastCheck)) > 5) {
         $_SESSION[$sessionKey] = $currentTime;
@@ -110,11 +129,17 @@ try {
     echo json_encode([
         'hasUpdates' => $hasUpdates,
         'message' => $message,
-        'timestamp' => time()
+        'timestamp' => time(),
+        'debug' => $debug,
+        'new_responses_count' => $result['new_responses'],
+        'all_responses' => $allResponses,
+        'latest_response' => $latestResponse,
+        'status_update' => $statusUpdate,
+        'session_updated' => !$hasUpdates || (time() - strtotime($lastCheck)) > 5
     ]);
     
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error']);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
 ?>

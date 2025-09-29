@@ -132,7 +132,15 @@
         // Add same user response (should NOT notify)
         document.getElementById('addSameUserResponse').addEventListener('click', function() {
             fetch('api/add_test_response.php?id=1&other_user=0')
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        return response.json().then(data => {
+                            log('❌ Authentication required for adding response');
+                            throw new Error('Authentication required');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     log('📝 Same user response added - should NOT trigger notification');
                     log(`Response: ${JSON.stringify(data)}`);
@@ -145,7 +153,15 @@
         // Add other user response (SHOULD notify)
         document.getElementById('addOtherUserResponse').addEventListener('click', function() {
             fetch('api/add_test_response.php?id=1&other_user=1')
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        return response.json().then(data => {
+                            log('❌ Authentication required for adding response');
+                            throw new Error('Authentication required');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     log('📝 Other user response added - SHOULD trigger notification');
                     log(`Response: ${JSON.stringify(data)}`);
@@ -182,7 +198,20 @@
         
         function checkForUpdates() {
             fetch('api/check_ticket_updates.php?id=1')
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        // Authentication required
+                        return response.json().then(data => {
+                            log('❌ Authentication required - please login first');
+                            log(`Redirect to: ${data.redirect || 'simple_login.php'}`);
+                            throw new Error('Authentication required');
+                        });
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     log('📡 Update check response:');
                     log(JSON.stringify(data, null, 2));
