@@ -23,24 +23,15 @@ try {
         exit;
     }
     
-    // Verify ticket exists and user has access - try both id and ticket_id for compatibility
-    $ticket = null;
-    try {
-        $ticketQuery = "SELECT employee_id FROM tickets WHERE id = ?";
-        $stmt = $db->prepare($ticketQuery);
-        $stmt->execute([$ticketId]);
-        $ticket = $stmt->fetch();
-    } catch (Exception $e) {
-        // Try with ticket_id if id column doesn't exist
-        try {
-            $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
-            $stmt = $db->prepare($ticketQuery);
-            $stmt->execute([$ticketId]);
-            $ticket = $stmt->fetch();
-        } catch (Exception $e2) {
-            echo json_encode(['success' => false, 'error' => 'Database structure error']);
-            exit;
-        }
+    // Verify ticket exists and user has access
+    $ticketQuery = "SELECT employee_id FROM tickets WHERE ticket_id = ?";
+    $stmt = $db->prepare($ticketQuery);
+    $stmt->execute([$ticketId]);
+    $ticket = $stmt->fetch();
+    
+    if (!$ticket) {
+        echo json_encode(['success' => false, 'error' => 'Ticket not found']);
+        exit;
     }
     
     if (!$ticket) {
@@ -76,9 +67,9 @@ try {
         exit;
     }
     
-    // Get new responses - handle both ticket_id and id columns
+    // Get new responses
     $responsesQuery = "
-        SELECT tr.*, tr.created_at,
+        SELECT tr.response_id as id, tr.*, tr.created_at,
                CASE 
                    WHEN tr.user_type = 'it_staff' THEN 'IT Support'
                    ELSE 'Employee'
