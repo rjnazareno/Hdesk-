@@ -728,7 +728,7 @@ if ($ticket) {
                                             <?= htmlspecialchars($response['message']) ?>
                                         </p>
                                         
-                                        <!-- Message Info Footer -->
+                                        <!-- Message Info Footer (Inside Bubble) -->
                                         <div class="flex items-center justify-between mt-2 text-xs opacity-75">
                                             <div class="flex items-center space-x-2">
                                                 <?php if ($response['is_internal']): ?>
@@ -745,24 +745,6 @@ if ($ticket) {
                                             </span>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Avatar and Date (only for received messages) -->
-                                    <?php if (!$alignRight): ?>
-                                        <div class="flex items-center mt-1 ml-2">
-                                            <div class="w-6 h-6 rounded-full <?= $isStaff ? 'bg-green-500' : 'bg-blue-500' ?> flex items-center justify-center mr-2">
-                                                <i class="fas <?= $isStaff ? 'fa-headset' : 'fa-user' ?> text-white text-xs"></i>
-                                            </div>
-                                            <span class="text-xs text-gray-500">
-                                                <?= date('M j, Y', strtotime($response['created_at'])) ?>
-                                            </span>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="flex justify-end mt-1 mr-2">
-                                            <span class="text-xs text-gray-500">
-                                                <?= date('M j, Y', strtotime($response['created_at'])) ?>
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

@@ -268,6 +268,16 @@ class ChatSystem {
         const isStaff = response.user_type === 'it_staff';
         const alignRight = !isStaff;
 
+        // Format timestamp
+        let timeDisplay;
+        if (response.formatted_date) {
+            // Extract time from formatted date like "Dec 29, 2024 at 4:40 PM"
+            const timeMatch = response.formatted_date.match(/at\s(\d{1,2}:\d{2}\s[AP]M)/);
+            timeDisplay = timeMatch ? timeMatch[1] : new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+        } else {
+            timeDisplay = new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+        }
+
         const responseHtml = `
             <div class="flex ${alignRight ? 'justify-end' : 'justify-start'} mb-2" ${isTemp ? 'data-temp-message="true"' : ''}>
                 <div class="max-w-xs lg:max-w-md">
@@ -279,7 +289,7 @@ class ChatSystem {
                                 <span class="font-medium">${isStaff ? 'IT Support' : 'Employee'}</span>
                                 ${isTemp ? '<span class="italic">(sending...)</span>' : ''}
                             </div>
-                            <span>${new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}</span>
+                            <span>${timeDisplay}</span>
                         </div>
                     </div>
                 </div>
