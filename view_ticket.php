@@ -1087,7 +1087,9 @@ if ($ticket) {
             console.log('Notifications enabled:', localStorage.getItem(`notifications_ticket_${ticketId}`));
             
             // AJAX Chat System
+            console.log('About to call initializeAjaxChat...');
             initializeAjaxChat();
+            console.log('initializeAjaxChat called');
         });
         
         // Global variables for AJAX chat
@@ -1097,6 +1099,7 @@ if ($ticket) {
         
         // AJAX Chat Functions
         function initializeAjaxChat() {
+            console.log('initializeAjaxChat function started');
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
             const clearBtn = document.getElementById('clearBtn');
@@ -1114,12 +1117,13 @@ if ($ticket) {
             console.log('Setting up submit event listener');
 
             // Handle form submission via AJAX
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent normal form submission
-                e.stopPropagation(); // Stop event bubbling
-                console.log('AJAX form submit handler triggered');
-                console.log('Form element:', form);
-                console.log('Event prevented:', e.defaultPrevented);
+            try {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Prevent normal form submission
+                    e.stopPropagation(); // Stop event bubbling
+                    console.log('AJAX form submit handler triggered');
+                    console.log('Form element:', form);
+                    console.log('Event prevented:', e.defaultPrevented);
                 
                 const formData = new FormData();
                 formData.append('ticket_id', <?= $ticketId ?>);
@@ -1217,6 +1221,10 @@ if ($ticket) {
                     }
                 });
             });
+            console.log('Submit event listener attached successfully');
+            } catch (error) {
+                console.error('Error attaching submit event listener:', error);
+            }
             
             // Clear button functionality
             clearBtn.addEventListener('click', function() {
