@@ -270,15 +270,9 @@ class ChatSystem {
         const isStaff = response.user_type === 'it_staff';
         const currentUserIsStaff = window.CURRENT_USER_TYPE === 'it_staff';
         
-        // Your own messages go right (blue), other person's messages go left (green)
-        let alignRight;
-        if (currentUserIsStaff) {
-            // Admin view: Admin messages right (blue), Employee messages left (green)
-            alignRight = isStaff;
-        } else {
-            // Employee view: Employee messages right (blue), Admin messages left (green)
-            alignRight = !isStaff;
-        }
+        // Simple logic: Is this my message?
+        const isMyMessage = (currentUserIsStaff && isStaff) || (!currentUserIsStaff && !isStaff);
+        const alignRight = isMyMessage;
 
         // Format timestamp
         let timeDisplay;
