@@ -691,7 +691,19 @@ if ($ticket) {
                     Add Your Response
                 </h3>
                 
-                <form method="POST" class="space-y-6">
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="typing-dots mr-3">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="text-sm text-blue-700 font-medium">Someone is typing...</span>
+                    </div>
+                </div>
+                
+                <form id="ajaxResponseForm" class="space-y-6">
                     <div>
                         <label for="response_text" class="block text-sm font-semibold text-gray-700 mb-2">
                             Your Message
@@ -706,7 +718,7 @@ if ($ticket) {
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
                         <?php if ($userType === 'it_staff'): ?>
                             <label class="flex items-center bg-orange-50 p-3 rounded-lg border border-orange-200">
-                                <input type="checkbox" name="is_internal" class="mr-3 w-4 h-4 text-orange-600 focus:ring-orange-500 border-orange-300 rounded">
+                                <input type="checkbox" name="is_internal" id="is_internal" class="mr-3 w-4 h-4 text-orange-600 focus:ring-orange-500 border-orange-300 rounded">
                                 <div>
                                     <span class="text-sm font-medium text-orange-900">Internal Note</span>
                                     <div class="text-xs text-orange-700">Only visible to IT staff members</div>
@@ -723,17 +735,20 @@ if ($ticket) {
                         <?php endif; ?>
                         
                         <div class="flex space-x-3">
-                            <button type="button" onclick="document.getElementById('response_text').value = ''" 
+                            <button type="button" id="clearBtn" 
                                     class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                                 <i class="fas fa-undo mr-2"></i>Clear
                             </button>
-                            <button type="submit" name="add_response" 
+                            <button type="submit" id="sendBtn" 
                                     class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium shadow-lg">
                                 <i class="fas fa-paper-plane mr-2"></i>Send Response
                             </button>
                         </div>
                     </div>
                 </form>
+                
+                <!-- Status Messages -->
+                <div id="responseStatus" class="hidden mt-4"></div>
             </div>
             
         <?php else: ?>
@@ -960,7 +975,308 @@ if ($ticket) {
             console.log('Notification system initialized for ticket:', ticketId);
             console.log('Notification permission:', Notification.permission);
             console.log('Notifications enabled:', localStorage.getItem(`notifications_ticket_${ticketId}`));
+            
+            // AJAX Chat System
+            initializeAjaxChat();
         });
+        
+        // AJAX Chat Functions
+        function initializeAjaxChat() {
+            const form = document.getElementById('ajaxResponseForm');
+            const textarea = document.getElementById('response_text');
+            const clearBtn = document.getElementById('clearBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const statusDiv = document.getElementById('responseStatus');
+            const responsesContainer = document.querySelector('.space-y-6');
+            
+            let isTyping = false;
+            let typingTimer;
+            let lastResponseCount = <?= count($responses) ?>;
+            
+            // Handle form submission via AJAX
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('ticket_id', <?= $ticketId ?>);
+                formData.append('response_text', textarea.value);
+                
+                // Add internal checkbox if it exists (IT staff only)
+                const internalCheckbox = document.getElementById('is_internal');
+                if (internalCheckbox && internalCheckbox.checked) {
+                    formData.append('is_internal', '1');
+                }
+                
+                // Disable form while sending
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+                
+                fetch('api/add_response_ajax.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus('Response sent successfully!', 'success');
+                        textarea.value = '';
+                        
+                        // Add the new response to the display
+                        if (data.response) {
+                            addResponseToDisplay(data.response);
+                        }
+                        
+                        // Update response counter
+                        lastResponseCount++;
+                        updateResponseCounter();
+                        
+                        // Clear typing status
+                        clearTypingStatus();
+                        
+                    } else {
+                        showStatus(data.error || 'Failed to send response', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('AJAX error:', error);
+                    showStatus('Network error occurred', 'error');
+                })
+                .finally(() => {
+                    // Re-enable form
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Response';
+                });
+            });
+            
+            // Clear button functionality
+            clearBtn.addEventListener('click', function() {
+                textarea.value = '';
+                clearTypingStatus();
+            });
+            
+            // Typing indicator functionality
+            textarea.addEventListener('input', function() {
+                if (!isTyping) {
+                    isTyping = true;
+                    sendTypingStatus(true);
+                }
+                
+                // Reset the typing timer
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    isTyping = false;
+                    sendTypingStatus(false);
+                }, 2000); // Stop typing after 2 seconds of inactivity
+            });
+            
+            // Stop typing when user leaves textarea
+            textarea.addEventListener('blur', function() {
+                if (isTyping) {
+                    clearTimeout(typingTimer);
+                    isTyping = false;
+                    sendTypingStatus(false);
+                }
+            });
+            
+            // Start checking for new responses and typing indicators
+            startRealtimeUpdates();
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('responseStatus');
+            statusDiv.className = `mt-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 border border-green-300 text-green-700' : 'bg-red-100 border border-red-300 text-red-700'}`;
+            statusDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
+            statusDiv.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+        
+        function addResponseToDisplay(response) {
+            const responsesContainer = document.querySelector('.space-y-6');
+            const emptyState = document.querySelector('.text-center.py-12');
+            
+            // Remove empty state if present
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            // Create new response HTML
+            const responseHtml = `
+                <div class="relative">
+                    <div class="flex items-start space-x-4">
+                        <!-- Avatar -->
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Response Content -->
+                        <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-bold text-gray-900">${response.display_name}</span>
+                                    <span class="text-gray-400">•</span>
+                                    <span class="text-sm text-gray-600">${response.formatted_date}</span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2">
+                                    ${response.is_internal ? '<span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full border border-orange-200"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                                        ${response.user_type === 'it_staff' ? 'Staff' : 'User'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="prose prose-sm max-w-none">
+                                <p class="text-gray-800 whitespace-pre-wrap leading-relaxed m-0">${response.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add the new response
+            if (responsesContainer) {
+                responsesContainer.insertAdjacentHTML('beforeend', responseHtml);
+                
+                // Add timeline connector to previous response if it exists
+                const responses = responsesContainer.querySelectorAll('.relative');
+                if (responses.length > 1) {
+                    const previousResponse = responses[responses.length - 2];
+                    if (!previousResponse.querySelector('.absolute.left-6')) {
+                        const connector = document.createElement('div');
+                        connector.className = 'absolute left-6 top-16 w-0.5 h-full bg-gray-200';
+                        previousResponse.appendChild(connector);
+                    }
+                }
+            }
+        }
+        
+        function updateResponseCounter() {
+            const counter = document.querySelector('.bg-blue-100.text-blue-800.px-3.py-1.rounded-full');
+            if (counter) {
+                counter.textContent = lastResponseCount;
+            }
+            
+            const activityCounter = document.querySelector('.font-bold.text-gray-900');
+            if (activityCounter && activityCounter.textContent.match(/^\d+$/)) {
+                activityCounter.textContent = lastResponseCount;
+            }
+        }
+        
+        function sendTypingStatus(isTyping) {
+            fetch('api/typing_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ticket_id: <?= $ticketId ?>,
+                    is_typing: isTyping
+                })
+            }).catch(error => {
+                console.error('Typing status error:', error);
+            });
+        }
+        
+        function clearTypingStatus() {
+            sendTypingStatus(false);
+        }
+        
+        function checkForTypingIndicators() {
+            fetch(`api/get_typing_status.php?ticket_id=<?= $ticketId ?>`)
+                .then(response => response.json())
+                .then(data => {
+                    const typingIndicator = document.getElementById('typingIndicator');
+                    
+                    if (data.someone_typing) {
+                        typingIndicator.classList.remove('hidden');
+                    } else {
+                        typingIndicator.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Typing check error:', error);
+                });
+        }
+        
+        function startRealtimeUpdates() {
+            // Check for typing indicators every 2 seconds
+            setInterval(checkForTypingIndicators, 2000);
+            
+            // Check for new responses every 5 seconds (separate from notifications)
+            setInterval(() => {
+                fetch(`api/get_latest_responses.php?ticket_id=<?= $ticketId ?>&after_count=${lastResponseCount}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.new_responses && data.new_responses.length > 0) {
+                            data.new_responses.forEach(response => {
+                                addResponseToDisplay(response);
+                            });
+                            lastResponseCount += data.new_responses.length;
+                            updateResponseCounter();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Response check error:', error);
+                    });
+            }, 5000);
+        }
+    </script>
+    
+    <!-- CSS for typing dots animation -->
+    <style>
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #3B82F6;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
     </script>
 </body>
 </html>
