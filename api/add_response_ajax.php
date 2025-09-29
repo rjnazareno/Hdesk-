@@ -1,8 +1,19 @@
 <?php
+// Clean output buffer to ensure clean JSON response
+ob_start();
+
+// Suppress error display for clean JSON output
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config/database.php';
 session_start();
 
+// Clear any previous output
+ob_clean();
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
 // Verify user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {
@@ -112,6 +123,7 @@ try {
     
 } catch (Exception $e) {
     error_log("Add response AJAX error: " . $e->getMessage());
+    ob_clean(); // Clear any previous output
     echo json_encode([
         'success' => false, 
         'error' => 'Server error occurred',
@@ -125,4 +137,8 @@ try {
         ]
     ]);
 }
+
+// Ensure no additional output after JSON
+ob_end_flush();
+exit;
 ?>

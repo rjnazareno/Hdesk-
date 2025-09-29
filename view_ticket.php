@@ -1015,8 +1015,23 @@ if ($ticket) {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.text().then(text => {
+                        console.log('Raw response:', text);
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            throw new Error('Invalid JSON response: ' + text.substring(0, 200));
+                        }
+                    });
+                })
                 .then(data => {
+                    console.log('Parsed data:', data);
                     if (data.success) {
                         showStatus('Response sent successfully!', 'success');
                         textarea.value = '';
@@ -1035,11 +1050,14 @@ if ($ticket) {
                         
                     } else {
                         showStatus(data.error || 'Failed to send response', 'error');
+                        if (data.debug) {
+                            console.error('Server debug info:', data.debug);
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('AJAX error:', error);
-                    showStatus('Network error occurred', 'error');
+                    showStatus('Error: ' + error.message, 'error');
                 })
                 .finally(() => {
                     // Re-enable form
