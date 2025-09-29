@@ -575,7 +575,8 @@ if ($ticket) {
                         <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
                     </div>
                 <?php else: ?>
-                    <div class="space-y-6">
+                    <!-- Scrollable Chat Container -->
+                    <div id="chatContainer" class="max-h-96 overflow-y-auto pr-2 space-y-6 border border-gray-200 rounded-lg p-4 bg-gray-50">
                         <?php foreach ($responses as $index => $response): ?>
                             <div class="relative">
                                 <!-- Timeline connector -->
@@ -770,9 +771,9 @@ if ($ticket) {
             const statusDiv = document.getElementById('notificationStatus');
             const ticketId = <?= $ticketId ?>;
             
-            // Auto-start background checking for all users
-            console.log('Auto-starting notification system for ticket:', ticketId);
-            startUpdateChecker();
+            // Don't auto-start notifications - let users choose when to enable them
+            console.log('Notification system ready for ticket:', ticketId);
+            // startUpdateChecker(); // Removed auto-start - only enable when user clicks button
             
             // Check if a response was just added (from PHP session)
             <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
@@ -785,10 +786,12 @@ if ($ticket) {
             }, 3000);
             <?php endif; ?>
             
-            // Check if browser notifications are manually enabled
+            // Check if browser notifications are manually enabled and start checker if needed
             if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
                 updateButtonState(true);
                 statusDiv?.classList.remove('hidden');
+                // Only start update checker if notifications were previously enabled
+                startUpdateChecker();
             }
             
             // Handle manual notification enable/disable
@@ -820,6 +823,9 @@ if ($ticket) {
                 updateButtonState(true);
                 statusDiv?.classList.remove('hidden');
                 
+                // Start the update checker when notifications are enabled
+                startUpdateChecker();
+                
                 // Show confirmation notification
                 if (Notification.permission === 'granted') {
                     new Notification('IT Help Desk - Notifications Enabled', {
@@ -836,6 +842,10 @@ if ($ticket) {
                 localStorage.removeItem(`notifications_ticket_${ticketId}`);
                 updateButtonState(false);
                 statusDiv?.classList.add('hidden');
+                
+                // Stop the update checker when notifications are disabled
+                stopUpdateChecker();
+                
                 console.log('Browser notifications disabled for ticket:', ticketId);
             }
             
@@ -1392,7 +1402,57 @@ if ($ticket) {
                 transform: translateY(0);
             }
         }
+        
+        /* Scrollable chat container styles */
+        #chatContainer {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+        
+        #chatContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        #chatContainer::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
     </style>
+    
+    <script>
+        // Initialize scrollable chat functionality
+        function initScrollableChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            if (chatContainer) {
+                // Auto-scroll to bottom on page load
+                setTimeout(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 100);
+                
+                // Observe for new messages and auto-scroll
+                const observer = new MutationObserver(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
+                
+                observer.observe(chatContainer, { 
+                    childList: true, 
+                    subtree: true 
+                });
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initScrollableChat);
+    </script>
     </script>
 </body>
 </html>
