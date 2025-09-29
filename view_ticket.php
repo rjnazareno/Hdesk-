@@ -105,7 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
                 // Log the activity
                 $logger->logResponseAdded($userId, $userType, $ticketId, $responseId, $is_internal);
                 
+                // Clear notification session to allow immediate detection by other users
+                unset($_SESSION["last_check_ticket_{$ticketId}"]);
+                
                 $message = 'Response added successfully.';
+                
+                // Add flag to trigger immediate notification check for other users
+                $_SESSION["response_added_ticket_{$ticketId}"] = time();
                 
                 // Refresh page to show new response
                 header("Location: view_ticket.php?id=$ticketId&success=response_added");
@@ -752,6 +758,17 @@ if ($ticket) {
             // Auto-start background checking for all users
             console.log('Auto-starting notification system for ticket:', ticketId);
             startUpdateChecker();
+            
+            // Check if a response was just added (from PHP session)
+            <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
+            console.log('Response was just added, clearing notification cache for other users');
+            // Clear the session flag
+            <?php unset($_SESSION["response_added_ticket_{$ticketId}"]); ?>
+            // Force an immediate check after 3 seconds to allow other users to be notified
+            setTimeout(() => {
+                console.log('Triggering immediate notification check for other users');
+            }, 3000);
+            <?php endif; ?>
             
             // Check if browser notifications are manually enabled
             if (localStorage.getItem(`notifications_ticket_${ticketId}`) === 'enabled') {
