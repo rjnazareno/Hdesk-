@@ -1342,7 +1342,6 @@ if ($ticket) {
                 setTimeout(() => {
                     chatContainer.scrollTop = chatContainer.scrollHeight;
                 }, 100);
-                }
             }
     
         
@@ -1486,6 +1485,7 @@ if ($ticket) {
             // Expose functions globally for triggering after message send
             window.triggerFastPolling = switchToFastPolling;
             window.addResponseToDisplay = addResponseToDisplay;
+        }
     </script>
     
     <!-- CSS for typing dots animation -->
