@@ -1100,7 +1100,7 @@ if ($ticket) {
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
             const clearBtn = document.getElementById('clearBtn');
-            const sendBtn = document.getElementById('sendBtn');
+            const sendBtn = document.getElementById('messengerSendBtn');
             const statusDiv = document.getElementById('responseStatus');
             const chatContainer = document.getElementById('chatContainer');
             
@@ -1110,6 +1110,9 @@ if ($ticket) {
                 return;
             }
             
+            console.log('Form found:', form);
+            console.log('Setting up submit event listener');
+
             // Handle form submission via AJAX
             form.addEventListener('submit', function(e) {
                 e.preventDefault(); // Prevent normal form submission
@@ -1636,12 +1639,15 @@ if ($ticket) {
             
             const form = document.getElementById('messengerForm');
             if (form) {
+                console.log('Form found in submitMessage:', form);
+                console.log('Dispatching submit event...');
                 // Trigger the form's submit event which will be handled by AJAX
                 const submitEvent = new Event('submit', { 
                     cancelable: true, 
                     bubbles: true 
                 });
                 form.dispatchEvent(submitEvent);
+                console.log('Submit event dispatched');
             } else {
                 console.error('messengerForm not found');
             }
