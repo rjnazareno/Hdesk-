@@ -728,18 +728,11 @@ if ($ticket) {
                                             <?= htmlspecialchars($response['message']) ?>
                                         </p>
                                         
-                                        <!-- Message Info Footer (Inside Bubble) -->
+                                        <!-- Message Info Footer (Simple Design like JS) -->
                                         <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                            <div class="flex items-center space-x-2">
-                                                <?php if ($response['is_internal']): ?>
-                                                    <span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs">
-                                                        <i class="fas fa-lock mr-1"></i>Internal
-                                                    </span>
-                                                <?php endif; ?>
-                                                <span class="font-medium">
-                                                    <?= $isStaff ? 'IT Support' : 'Employee' ?>
-                                                </span>
-                                            </div>
+                                            <span class="font-medium">
+                                                <?= $isStaff ? 'IT Support' : 'Employee' ?>
+                                            </span>
                                             <span>
                                                 <?= date('g:i A', strtotime($response['created_at'])) ?>
                                             </span>

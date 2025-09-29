@@ -148,9 +148,7 @@ class ChatSystem {
                         <div class="chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm opacity-75">
                             <p class="text-sm leading-relaxed whitespace-pre-wrap">${messageText}</p>
                             <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-medium">Employee</span>
-                                </div>
+                                <span class="font-medium">Employee</span>
                                 <span class="italic">Sending...</span>
                             </div>
                         </div>
@@ -289,11 +287,7 @@ class ChatSystem {
                     <div class="chat-bubble relative ${alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : (isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received')} px-4 py-3 shadow-sm ${isTemp ? 'opacity-75 border-dashed' : ''}">
                         <p class="text-sm leading-relaxed whitespace-pre-wrap">${response.message}</p>
                         <div class="flex items-center justify-between mt-2 text-xs opacity-75">
-                            <div class="flex items-center space-x-2">
-                                ${response.is_internal ? '<span class="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-lock mr-1"></i>Internal</span>' : ''}
-                                <span class="font-medium">${isStaff ? 'IT Support' : 'Employee'}</span>
-                                ${isTemp ? '<span class="italic">(sending...)</span>' : ''}
-                            </div>
+                            <span class="font-medium">${isStaff ? 'IT Support' : 'Employee'}</span>
                             <span>${timeDisplay}</span>
                         </div>
                     </div>
