@@ -340,8 +340,13 @@ if ($ticket) {
         
         <?php if ($ticket): ?>
             
-            <!-- Ticket Header -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
+            <!-- Main Content Layout -->
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                <!-- Main Content Area -->
+                <div class="xl:col-span-3 space-y-6">
+                    
+                    <!-- Ticket Header -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
                     <div class="flex-1">
                         <div class="flex items-center mb-3">
@@ -558,25 +563,32 @@ if ($ticket) {
             </div>
             <?php endif; ?>
             
-            <!-- Responses -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-comments text-blue-600 mr-3"></i>
-                    Conversation
-                    <span class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"><?= count($responses) ?></span>
-                </h3>
+            <!-- Integrated Chat Interface -->
+            <div class="bg-white rounded-xl shadow-lg card-hover overflow-hidden">
+                <!-- Chat Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <h3 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-comments mr-3"></i>
+                        Conversation
+                        <span class="ml-3 bg-blue-500 bg-opacity-50 px-3 py-1 rounded-full text-sm font-medium"><?= count($responses) ?></span>
+                        <div class="ml-auto flex items-center space-x-2">
+                            <span class="text-blue-200 text-sm">Ticket #<?= $ticketId ?></span>
+                        </div>
+                    </h3>
+                </div>
                 
+                <!-- Chat Messages Area -->
                 <?php if (empty($responses)): ?>
-                    <div class="text-center py-12">
+                    <div class="text-center py-16 px-6">
                         <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
                         </div>
-                        <p class="text-gray-500 text-lg font-medium">No responses yet</p>
-                        <p class="text-gray-400 text-sm mt-1">Be the first to respond to this ticket</p>
+                        <p class="text-gray-500 text-lg font-medium">No messages yet</p>
+                        <p class="text-gray-400 text-sm mt-1">Start the conversation by sending a message below</p>
                     </div>
                 <?php else: ?>
                     <!-- Messenger-Style Chat Container -->
-                    <div id="chatContainer" class="max-h-96 overflow-y-auto p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+                    <div id="chatContainer" class="h-96 overflow-y-auto p-4 bg-gray-50 space-y-3">
                         <?php foreach ($responses as $index => $response): ?>
                             <?php 
                             $isStaff = $response['user_type'] === 'it_staff';
@@ -635,64 +647,143 @@ if ($ticket) {
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+                
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="hidden mx-4 mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="typing-dots mr-3">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="text-sm text-blue-700 font-medium">Someone is typing...</span>
+                    </div>
+                </div>
+                
+                <!-- Integrated Message Input -->
+                <div class="border-t border-gray-200 bg-white p-4">
+                    <form id="ajaxResponseForm" class="flex items-end space-x-3">
+                        <div class="flex-1">
+                            <textarea name="response_text" id="response_text" rows="2" 
+                                      class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
+                                      placeholder="Type your message..."
+                                      onkeydown="handleEnterKey(event)"
+                                      required></textarea>
+                        </div>
+                        
+                        <?php if ($userType === 'it_staff'): ?>
+                        <div class="flex items-center">
+                            <label class="inline-flex items-center text-sm">
+                                <input type="checkbox" name="is_internal" class="mr-2 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                <span class="text-gray-700">Internal</span>
+                            </label>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Send
+                        </button>
+                    </form>
+                    
+                    <div class="mt-2 text-xs text-gray-500 text-center">
+                        Press Ctrl+Enter to send • Include details to help resolve the issue
+                    </div>
+                </div>
             </div>
             
-            <!-- Device Notifications -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-bell text-blue-600 mr-3"></i>
-                    Device Notifications
-                    <span class="ml-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Beta</span>
-                </h3>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="xl:col-span-1 space-y-4">
                 
-                <div class="grid md:grid-cols-2 gap-6">
+                <!-- Device Notifications -->
+                <div class="bg-white rounded-xl shadow-lg p-4 card-hover">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-bell text-blue-600 mr-2"></i>
+                        Notifications
+                        <span class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">Beta</span>
+                    </h3>
+                    
                     <!-- Browser Notifications -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-900 mb-2 flex items-center text-sm">
                             <i class="fas fa-desktop mr-2 text-blue-600"></i>
-                            Browser Notifications
+                            Browser Alerts
                         </h4>
-                        <p class="text-sm text-gray-600 mb-4">Get real-time notifications when there are updates to this ticket</p>
-                        <button id="enableNotifications" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium w-full">
-                            <i class="fas fa-bell mr-2"></i>Enable Browser Notifications
+                        <p class="text-xs text-gray-600 mb-3">Get real-time notifications for updates</p>
+                        <button id="enableNotifications" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium w-full">
+                            <i class="fas fa-bell mr-1"></i>Enable Notifications
                         </button>
                     </div>
                     
                     <!-- Email Notifications -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition-colors">
-                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <h4 class="font-semibold text-gray-900 mb-2 flex items-center text-sm">
                             <i class="fas fa-envelope mr-2 text-green-600"></i>
-                            Email Notifications
+                            Email Updates
                         </h4>
-                        <p class="text-sm text-gray-600 mb-4">Receive email updates for ticket status changes and responses</p>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input type="checkbox" id="emailNotif" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                                <label for="emailNotif" class="text-sm text-gray-700">Email enabled</label>
+                                <label for="emailNotif" class="text-xs text-gray-700">Email enabled</label>
                             </div>
                             <span class="text-xs text-green-600 font-medium">✓ Active</span>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Notification Status -->
-                <div id="notificationStatus" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                            <span class="text-sm text-gray-700 font-medium">Notifications are enabled for Ticket #<?= $ticketId ?></span>
-                        </div>
-                        <div class="space-x-2">
-                            <button id="testNotificationBtn" class="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                                Test Notification
-                            </button>
-                            <button id="checkNowBtn" class="text-xs bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                                Check Now
-                            </button>
+                    
+                    <!-- Notification Status -->
+                    <div id="notificationStatus" class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                <span class="text-xs text-gray-700 font-medium">Notifications enabled</span>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button id="testNotificationBtn" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                                    Test
+                                </button>
+                                <button id="checkNowBtn" class="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                                    Check
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-lg p-4 card-hover">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-bolt text-yellow-600 mr-2"></i>
+                        Quick Actions
+                    </h3>
+                    
+                    <?php if ($userType === 'it_staff'): ?>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 text-sm bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                Mark Resolved
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200">
+                                <i class="fas fa-user-plus text-blue-600 mr-2"></i>
+                                Assign Ticket
+                            </button>
+                            <button class="w-full text-left px-3 py-2 text-sm bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200">
+                                <i class="fas fa-flag text-orange-600 mr-2"></i>
+                                Change Priority
+                            </button>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-4">
+                            <i class="fas fa-info-circle text-blue-600 text-2xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Additional options available to IT staff</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            
             </div>
+            
+        </div>
             
             <!-- Add Response Form -->
             <div id="responseForm" class="bg-white rounded-xl shadow-lg p-6 card-hover">
@@ -1508,9 +1599,16 @@ if ($ticket) {
             }
         }
         
+        // Handle Enter key in textarea (Ctrl+Enter to send)
+        function handleEnterKey(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('ajaxResponseForm').dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        }
+        
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initScrollableChat);
-    </script>
     </script>
 </body>
 </html>
