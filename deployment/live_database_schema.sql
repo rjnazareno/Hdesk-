@@ -13,10 +13,8 @@
 -- =====================================================
 
 -- Employees Table (existing structure preserved)
--- Note: This assumes you already have an employees table
--- If not, uncomment and modify the structure below:
+-- Note: This table is required for the foreign key constraints in tickets table
 
-/*
 CREATE TABLE IF NOT EXISTS `employees` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `fname` varchar(255) DEFAULT NULL,
@@ -39,7 +37,6 @@ CREATE TABLE IF NOT EXISTS `employees` (
     KEY `idx_status` (`status`),
     KEY `idx_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-*/
 
 -- IT Staff Table
 CREATE TABLE IF NOT EXISTS `it_staff` (
@@ -185,6 +182,14 @@ INSERT INTO `it_staff` (`name`, `email`, `username`, `password`, `role`, `is_act
 VALUES 
 ('System Administrator', 'admin@company.com', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1)
 ON DUPLICATE KEY UPDATE `updated_at` = current_timestamp();
+
+-- Insert sample employees
+INSERT INTO `employees` (`fname`, `lname`, `email`, `username`, `password`, `position`, `status`, `role`) 
+VALUES 
+('John', 'Doe', 'john.doe@company.com', 'john', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Software Developer', 'active', 'employee'),
+('Jane', 'Smith', 'jane.smith@company.com', 'jane', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Marketing Manager', 'active', 'employee'),
+('Mike', 'Johnson', 'mike.johnson@company.com', 'mike', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'HR Specialist', 'active', 'employee')
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
 
 -- Insert default ticket categories
 INSERT INTO `ticket_categories` (`category_name`, `description`, `color`, `sort_order`) 

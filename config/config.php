@@ -6,14 +6,14 @@
 
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'rss');
-define('DB_USER', 'root');  // Default XAMPP MySQL username
-define('DB_PASS', '');      // Default XAMPP MySQL password (empty)
+define('DB_NAME', 'u816220874_ithelp');
+define('DB_USER', 'u816220874_IT');  // Default XAMPP MySQL username
+define('DB_PASS', 'F]n5HZgi$fK');      // Default XAMPP MySQL password (empty)
 define('DB_CHARSET', 'utf8mb4');
 
 // Application Configuration
-define('APP_NAME', 'IT Ticketing System');
-define('APP_URL', 'http://localhost/ticketing%20System/');
+define('APP_NAME', 'IThelp - IT Ticketing System');
+define('APP_URL', 'http://localhost/IThelp/');
 define('UPLOAD_DIR', __DIR__ . '/../uploads/tickets/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 define('ALLOWED_FILE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'txt', 'zip']);
