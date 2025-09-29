@@ -321,6 +321,15 @@ if ($ticket) {
             animation: messageSlideIn 0.3s ease-out;
         }
         
+        .chat-bubble p {
+            text-align: left !important;
+            margin: 0;
+        }
+        
+        .chat-bubble {
+            text-align: left !important;
+        }
+        
         .chat-bubble:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -720,19 +729,10 @@ if ($ticket) {
                             <!-- Chat Bubble -->
                             <div class="flex <?= $alignRight ? 'justify-end' : 'justify-start' ?> mb-4">
                                 <div class="max-w-xs">
-                                    <!-- Message Bubble -->
                                     <div class="chat-bubble relative <?= $alignRight ? 'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' : ($isStaff ? 'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff' : 'bg-white border border-gray-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-received') ?> px-4 py-3 shadow-sm">
-                                        
-                                        <!-- Message Content -->
-                                        <p class="text-sm leading-relaxed whitespace-pre-wrap">
-                                            <?= htmlspecialchars($response['message']) ?>
-                                        </p>
-                                        
-                                        <!-- Message Info Footer (Timestamp Left-Aligned) -->
+                                        <p class="text-sm leading-relaxed whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
                                         <div class="flex justify-start mt-2">
-                                            <span class="text-xs opacity-75">
-                                                <?= date('g:i A', strtotime($response['created_at'])) ?>
-                                            </span>
+                                            <span class="text-xs opacity-75"><?= date('g:i A', strtotime($response['created_at'])) ?></span>
                                         </div>
                                     </div>
                                 </div>
