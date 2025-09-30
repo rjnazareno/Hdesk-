@@ -7,6 +7,7 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 require_once '../config/database.php';
+require_once '../includes/firebase_notifications.php';
 session_start();
 
 // Clear any previous output
@@ -109,10 +110,34 @@ try {
                 'formatted_date' => date('M j, Y \a\t g:i A', strtotime($newResponse['created_at']))
             ];
             
+            // Send Firebase notification for new reply (only for non-internal messages)
+            if (!$isInternal) {
+                try {
+                    $notificationSender = new FirebaseNotificationSender();
+                    $notificationResult = $notificationSender->sendNewReplyNotification(
+                        $ticketId, 
+                        $userId, 
+                        $userType, 
+                        $responseText
+                    );
+                    
+                    // Log notification result but don't fail the response if notification fails
+                    if ($notificationResult['success']) {
+                        error_log("Firebase notification sent successfully for ticket {$ticketId}");
+                    } else {
+                        error_log("Firebase notification failed for ticket {$ticketId}: " . $notificationResult['error']);
+                    }
+                    
+                } catch (Exception $e) {
+                    error_log("Firebase notification error: " . $e->getMessage());
+                }
+            }
+            
             echo json_encode([
                 'success' => true, 
                 'message' => 'Response added successfully',
-                'response' => $formattedResponse
+                'response' => $formattedResponse,
+                'notification_sent' => !$isInternal
             ]);
         } else {
             echo json_encode(['success' => true, 'message' => 'Response added successfully']);

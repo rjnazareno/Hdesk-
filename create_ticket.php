@@ -2,7 +2,7 @@
 require_once 'config/database.php';
 require_once 'includes/security.php';
 require_once 'includes/activity_logger.php';
-require_once 'includes/activity_logger.php';
+require_once 'includes/firebase_notifications.php';
 
 // Start session and require login
 session_start();
@@ -83,6 +83,20 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'create_ticket') {
             // Log the ticket creation activity
             $logger = new ActivityLogger($db);
             $logger->logTicketCreated(getUserId(), 'employee', $ticketId, $subject, $priority, $category);
+            
+            // Send Firebase notification to IT staff
+            try {
+                $notificationSender = new FirebaseNotificationSender();
+                $notificationResult = $notificationSender->sendNewTicketNotification($ticketId);
+                
+                if ($notificationResult['success']) {
+                    error_log("New ticket notification sent successfully for ticket {$ticketId}");
+                } else {
+                    error_log("New ticket notification failed for ticket {$ticketId}: " . $notificationResult['error']);
+                }
+            } catch (Exception $e) {
+                error_log("New ticket notification error: " . $e->getMessage());
+            }
             
             // Handle file uploads if any
             if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {

@@ -835,7 +835,7 @@ if ($ticket) {
                                 <input type="checkbox" id="emailNotif" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
                                 <label for="emailNotif" class="text-xs text-gray-700">Email enabled</label>
                             </div>
-                            <span class="text-xs text-green-600 font-medium">âœ“ Active</span>
+                            <span class="text-xs text-green-600 font-medium">Active</span>
                         </div>
                     </div>
                     
@@ -978,6 +978,7 @@ if ($ticket) {
         window.INITIAL_RESPONSE_COUNT = <?= count($responses) ?>;
         window.CURRENT_USER_TYPE = '<?= $_SESSION['user_type'] ?>';
         window.CURRENT_USER_NAME = '<?= htmlspecialchars(getUserName(), ENT_QUOTES) ?>';
+        window.USER_ID = <?= $_SESSION['user_id'] ?>;
         window.SESSION_RESPONSE_ADDED = <?= isset($_SESSION["response_added_ticket_{$ticketId}"]) ? 'true' : 'false' ?>;
         
         <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
@@ -995,6 +996,7 @@ if ($ticket) {
     <!-- Firebase Real-Time Chat System -->
     <script src="assets/js/firebase-config.js" type="module"></script>
     <script src="assets/js/firebase-chat.js" type="module"></script>
+    <script src="assets/js/firebase-notifications.js" type="module"></script>
     <script src="assets/js/enhanced-chat-system.js" type="module"></script>
     
     <!-- Legacy Notification System (for compatibility) -->
