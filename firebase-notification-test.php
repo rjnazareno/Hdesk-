@@ -202,8 +202,8 @@
                     // Try to get FCM token
                     if (messaging) {
                         try {
-                            // Note: You'll need to replace this with your actual VAPID key
-                            const vapidKey = 'BLC_your_vapid_key_here'; // TODO: Replace with real key
+                            // VAPID key from your Firebase project
+                            const vapidKey = 'BPLmZDFhZTTD890E4iVhN1MhlcNY4dBehh7r0BPNZrbqf6_Wfo5j6qvkE0QOXAUfGPh6c2VkDiqt2LhNXJgpsAw';
                             
                             if (vapidKey !== 'BLC_your_vapid_key_here') {
                                 const token = await getToken(messaging, { vapidKey });
