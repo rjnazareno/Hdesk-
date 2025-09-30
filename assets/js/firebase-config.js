@@ -28,8 +28,34 @@ const database = getDatabase(app);
 let messaging = null;
 try {
   if ('serviceWorker' in navigator && 'Notification' in window) {
-    messaging = getMessaging(app);
-    console.log('🔔 Firebase Messaging initialized');
+    // Detect environment and use appropriate service worker
+    const isLive = window.location.hostname === 'ithelp.resourcestaffonline.com';
+    const swPath = isLive 
+      ? '/firebase-messaging-sw.js'  // Root level for live server
+      : './firebase-messaging-sw.js'; // Local path for development
+    
+    // Register service worker with environment-specific path
+    navigator.serviceWorker.register(swPath)
+      .then((registration) => {
+        console.log('✅ Service Worker registered:', registration);
+        messaging = getMessaging(app);
+        console.log('🔔 Firebase Messaging initialized');
+      })
+      .catch((error) => {
+        console.error('❌ Service Worker registration failed:', error);
+        // Try fallback path
+        const fallbackPath = isLive ? './firebase-messaging-sw.js' : '/firebase-messaging-sw.js';
+        return navigator.serviceWorker.register(fallbackPath);
+      })
+      .then((registration) => {
+        if (registration) {
+          console.log('✅ Service Worker registered (fallback):', registration);
+          messaging = getMessaging(app);
+        }
+      })
+      .catch((error) => {
+        console.error('❌ Service Worker fallback also failed:', error);
+      });
   }
 } catch (error) {
   console.log('⚠️ Firebase Messaging not supported:', error.message);

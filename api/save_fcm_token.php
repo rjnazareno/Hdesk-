@@ -49,24 +49,23 @@ try {
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         user_type ENUM('employee', 'it_staff') NOT NULL,
-        token VARCHAR(500) NOT NULL,
+        token TEXT NOT NULL,
+        device_info VARCHAR(255) DEFAULT NULL,
+        is_active TINYINT(1) DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        last_used TIMESTAMP NULL,
-        is_active TINYINT(1) DEFAULT 1,
-        UNIQUE KEY unique_user_token (user_id, user_type, token),
-        INDEX idx_user (user_id, user_type),
-        INDEX idx_active (is_active)
+        UNIQUE KEY unique_user_token (user_id, user_type, token(100)),
+        INDEX idx_user_type_active (user_type, is_active),
+        INDEX idx_user_id_type (user_id, user_type)
     )";
     
     $db->exec($createTable);
     
     // Insert or update token
-    $sql = "INSERT INTO fcm_tokens (user_id, user_type, token, last_used) 
-            VALUES (?, ?, ?, NOW()) 
+    $sql = "INSERT INTO fcm_tokens (user_id, user_type, token) 
+            VALUES (?, ?, ?) 
             ON DUPLICATE KEY UPDATE 
             updated_at = NOW(), 
-            last_used = NOW(), 
             is_active = 1";
     
     $stmt = $db->prepare($sql);

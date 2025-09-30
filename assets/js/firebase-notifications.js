@@ -70,12 +70,29 @@ class FirebaseNotificationService {
     
     async getToken() {
         try {
-            // VAPID key for your Firebase project (you'll need to generate this)
-            const vapidKey = 'BPLmZDFhZTTD890E4iVhN1MhlcNY4dBehh7r0BPNZrbqf6_Wfo5j6qvkE0QOXAUfGPh6c2VkDiqt2LhNXJgpsAw'; // TODO: Replace with actual VAPID key
+            // Register service worker first
+            let swRegistration;
+            try {
+                swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                console.log('✅ Service Worker registered:', swRegistration);
+            } catch (swError) {
+                console.warn('⚠️ Service Worker registration failed:', swError);
+                // Continue without custom service worker
+            }
             
-            const currentToken = await getToken(messaging, { 
-                vapidKey: vapidKey 
-            });
+            // VAPID key for your Firebase project
+            const vapidKey = 'BPLmZDFhZTTD890E4iVhN1MhlcNY4dBehh7r0BPNZrbqf6_Wfo5j6qvkE0QOXAUfGPh6c2VkDiqt2LhNXJgpsAw';
+            
+            const tokenOptions = { 
+                vapidKey: vapidKey
+            };
+            
+            // Include service worker registration if available
+            if (swRegistration) {
+                tokenOptions.serviceWorkerRegistration = swRegistration;
+            }
+            
+            const currentToken = await getToken(messaging, tokenOptions);
             
             if (currentToken) {
                 console.log('🔑 FCM Token received:', currentToken.substring(0, 20) + '...');
