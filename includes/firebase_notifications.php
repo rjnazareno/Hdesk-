@@ -385,8 +385,8 @@ class FirebaseNotificationSender {
                         'data' => [
                             'type' => 'new_reply',
                             'action' => 'new_reply',
-                            'ticket_id' => $ticketId,
-                            'from_user_type' => $fromUserType,
+                            'ticket_id' => (string)$ticketId,
+                            'from_user_type' => (string)$fromUserType,
                             'action_url' => "view_ticket.php?id={$ticketId}"
                         ]
                     ], $fromUserId);
@@ -411,7 +411,7 @@ class FirebaseNotificationSender {
                 'data' => [
                     'type' => 'new_reply',
                     'action' => 'new_reply',
-                    'ticket_id' => $ticketId,
+                    'ticket_id' => (string)$ticketId,
                     'from_user_type' => $fromUserType,
                     'action_url' => "view_ticket.php?id={$ticketId}"
                 ]
@@ -459,8 +459,8 @@ class FirebaseNotificationSender {
                 'data' => [
                     'type' => 'status_change',
                     'action' => 'status_change',
-                    'ticket_id' => $ticketId,
-                    'new_status' => $newStatus,
+                    'ticket_id' => (string)$ticketId,
+                    'new_status' => (string)$newStatus,
                     'action_url' => "view_ticket.php?id={$ticketId}"
                 ]
             ];
@@ -499,9 +499,9 @@ class FirebaseNotificationSender {
                 'data' => [
                     'type' => 'new_ticket',
                     'action' => 'new_ticket',
-                    'ticket_id' => $ticketId,
-                    'priority' => $ticket['priority'],
-                    'subject' => $ticket['subject'],
+                    'ticket_id' => (string)$ticketId,
+                    'priority' => (string)($ticket['priority'] ?? ''),
+                    'subject' => (string)($ticket['subject'] ?? ''),
                     'action_url' => "view_ticket.php?id={$ticketId}"
                 ]
             ];

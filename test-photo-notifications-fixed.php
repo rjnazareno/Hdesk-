@@ -106,8 +106,8 @@ if ($tokens) {
         'requireInteraction' => true,
         'data' => [
             'type' => 'photo_test',
-            'user_id' => $userId,
-            'user_type' => $userType,
+            'user_id' => (string)$userId,          // Convert to string
+            'user_type' => (string)$userType,      // Convert to string  
             'action_url' => 'dashboard.php'
         ]
     ];
