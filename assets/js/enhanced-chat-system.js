@@ -114,13 +114,13 @@ class EnhancedChatSystem {
     }
 
     async sendMessage(messageText) {
-        console.log('📤 Sending message:', messageText);
+        console.log('📤 Enhanced Chat: Sending message:', messageText);
         
         // Disable send button
         this.setSendButtonState(true, 'Sending...');
         
         try {
-            if (this.firebaseChat) {
+            if (this.firebaseChat && this.firebaseChat.isInitialized) {
                 // Send via Firebase for instant messaging
                 console.log('🔥 Using Firebase for instant send...');
                 
@@ -145,17 +145,21 @@ class EnhancedChatSystem {
                     this.clearTypingStatus();
                     
                 } else {
-                    throw new Error('Firebase send failed');
+                    throw new Error('Firebase send failed - no success flag');
                 }
                 
             } else {
                 // Fallback to AJAX if Firebase not available
                 console.log('⚠️ Firebase not available, using AJAX fallback');
+                console.log('🔧 Firebase state:', {
+                    firebaseChat: !!this.firebaseChat,
+                    isInitialized: this.firebaseChat ? this.firebaseChat.isInitialized : 'N/A'
+                });
                 await this.sendViaAJAX(messageText);
             }
             
         } catch (error) {
-            console.error('❌ Send error:', error);
+            console.error('❌ Enhanced Chat send error:', error);
             
             // Remove optimistic message on error
             const ownMessages = document.querySelectorAll('[data-own-message="true"]');
@@ -164,8 +168,19 @@ class EnhancedChatSystem {
                 lastOwnMessage.remove();
             }
             
-            // Show error message
-            this.showErrorMessage('Failed to send message. Please try again.');
+            // Try fallback to AJAX
+            if (this.firebaseChat) {
+                console.log('🔄 Trying AJAX fallback after Firebase failure...');
+                try {
+                    await this.sendViaAJAX(messageText);
+                    console.log('✅ AJAX fallback successful');
+                } catch (ajaxError) {
+                    console.error('❌ AJAX fallback also failed:', ajaxError);
+                    this.showErrorMessage(`Failed to send message: ${error.message}`);
+                }
+            } else {
+                this.showErrorMessage(`Failed to send message: ${error.message}`);
+            }
             
         } finally {
             // Re-enable send button

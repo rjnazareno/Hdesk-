@@ -45,11 +45,18 @@ class FirebaseChat {
      */
     async sendMessage(messageText) {
         if (!this.isInitialized) {
+            console.error('❌ Firebase Chat not initialized');
             throw new Error('Firebase Chat not initialized');
         }
         
         try {
             console.log('🔥 Sending message via Firebase...', messageText);
+            console.log('🔧 Firebase config:', {
+                ticketId: this.ticketId,
+                userType: this.currentUserType,
+                userName: this.currentUserName,
+                messagesRef: this.messagesRef.toString()
+            });
             
             const timestamp = new Date();
             const messageData = {
@@ -70,9 +77,15 @@ class FirebaseChat {
                 sender_id: `${this.currentUserType}_${Date.now()}`
             };
             
+            console.log('📤 Message data prepared:', messageData);
+            
             // Send to Firebase Realtime Database (instant sync)
+            console.log('🔥 Pushing to Firebase...');
             const firebaseResult = await push(this.messagesRef, messageData);
             console.log('✅ Message sent to Firebase:', firebaseResult.key);
+            
+            // Show success notification
+            this.showSendStatus(true, 'Message sent via Firebase!');
             
             // Also save to MySQL for permanent storage (background)
             this.saveToMySQL(messageText).catch(error => {
@@ -87,6 +100,14 @@ class FirebaseChat {
             
         } catch (error) {
             console.error('❌ Firebase send error:', error);
+            console.error('❌ Error details:', {
+                name: error.name,
+                message: error.message,
+                code: error.code,
+                stack: error.stack
+            });
+            
+            this.showSendStatus(false, `Send failed: ${error.message}`);
             throw new Error(`Failed to send message: ${error.message}`);
         }
     }
@@ -291,6 +312,37 @@ class FirebaseChat {
             statusDiv.innerHTML = '<i class="fas fa-wifi text-red-500 mr-1"></i><span class="text-red-600 text-xs">Connection lost</span>';
             statusDiv.className = 'fixed bottom-4 right-4 bg-white border border-red-200 px-2 py-1 rounded shadow-sm z-40';
         }
+    }
+    
+    /**
+     * Show send status feedback
+     */
+    showSendStatus(success, message) {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = success 
+            ? 'fixed top-4 left-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+            : 'fixed top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        
+        statusDiv.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas ${success ? 'fa-check' : 'fa-exclamation-triangle'} mr-2"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-3 opacity-75 hover:opacity-100">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(statusDiv);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (statusDiv.parentNode) {
+                statusDiv.remove();
+            }
+        }, 3000);
+        
+        console.log(success ? '✅ Send status: SUCCESS' : '❌ Send status: FAILED', message);
     }
     
     createStatusDiv() {

@@ -641,9 +641,9 @@ if ($ticket) {
                         </h4>
                         <form method="POST" class="space-y-4">
                             <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>ðŸ”´ Open</option>
-                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>ðŸ”µ In Progress</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>âœ… Closed (Resolved)</option>
+                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
+                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Closed (Resolved)</option>
                             </select>
                             <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                 <i class="fas fa-save mr-2"></i>Update Status
@@ -659,7 +659,7 @@ if ($ticket) {
                         </h4>
                         <form method="POST" class="space-y-4">
                             <select name="assigned_to" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">ðŸ‘¤ Unassigned</option>
+                                <option value="">Unassigned</option>
                                 <?php foreach ($itStaff as $staff): ?>
                                     <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($staff['name']) ?>
@@ -770,12 +770,11 @@ if ($ticket) {
                 
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
-                    <form id="messengerForm" action="#" method="post" onsubmit="return false;" class="flex items-end space-x-3">
+                    <form id="messengerForm" method="post" class="flex items-end space-x-3">
                         <div class="flex-1">
                             <textarea name="response_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
                                       placeholder="Type your message..."
-                                      onkeydown="handleEnterKey(event)"
                                       required></textarea>
                         </div>
                         
@@ -788,7 +787,7 @@ if ($ticket) {
                         </div>
                         <?php endif; ?>
                         
-                        <button type="button" id="messengerSendBtn" onclick="submitMessage(event)" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
+                        <button type="submit" id="messengerSendBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Send
                         </button>
@@ -1007,7 +1006,15 @@ if ($ticket) {
         
         // Wait for DOM and Firebase to be ready
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 DOM loaded, initializing chat system...');
+            
             setTimeout(() => {
+                console.log('🔍 Checking enhanced chat system...', {
+                    enhancedChatSystem: !!window.enhancedChatSystem,
+                    firebaseChat: window.enhancedChatSystem ? !!window.enhancedChatSystem.firebaseChat : 'N/A',
+                    isInitialized: window.enhancedChatSystem?.firebaseChat?.isInitialized || 'N/A'
+                });
+                
                 if (window.enhancedChatSystem) {
                     console.log('✅ Firebase Real-Time Chat is active!');
                     
@@ -1018,19 +1025,42 @@ if ($ticket) {
                     statusDiv.id = 'firebaseStatusIndicator';
                     document.body.appendChild(statusDiv);
                     
-                    // Auto-hide status after 3 seconds
+                    // Add debug button for testing
+                    const debugBtn = document.createElement('button');
+                    debugBtn.innerHTML = '🔧 Test Send';
+                    debugBtn.className = 'fixed bottom-16 left-4 bg-blue-600 text-white px-2 py-1 rounded text-xs z-40';
+                    debugBtn.onclick = () => {
+                        console.log('🔧 Debug test send triggered');
+                        if (window.enhancedChatSystem?.firebaseChat?.isInitialized) {
+                            window.enhancedChatSystem.sendMessage('Debug test message ' + Date.now());
+                        } else {
+                            console.error('❌ Firebase chat not ready for debug test');
+                        }
+                    };
+                    document.body.appendChild(debugBtn);
+                    
+                    // Auto-hide status after 5 seconds
                     setTimeout(() => {
                         if (statusDiv.parentNode) {
                             statusDiv.style.opacity = '0';
                             statusDiv.style.transform = 'translateY(10px)';
                             setTimeout(() => statusDiv.remove(), 300);
                         }
-                    }, 3000);
+                        if (debugBtn.parentNode) {
+                            debugBtn.remove();
+                        }
+                    }, 10000);
                     
                 } else {
                     console.warn('⚠️ Enhanced chat system not loaded, using fallback');
+                    
+                    // Show error status
+                    const errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = '⚠️ <span class="text-red-600 text-xs font-medium">Chat system not loaded</span>';
+                    errorDiv.className = 'fixed bottom-4 left-4 bg-white border border-red-200 px-3 py-2 rounded-lg shadow-sm z-40';
+                    document.body.appendChild(errorDiv);
                 }
-            }, 1000);
+            }, 2000);
         });
         
         // Handle page visibility for connection management
@@ -1039,6 +1069,38 @@ if ($ticket) {
                 console.log('📱 Page hidden - maintaining Firebase connection');
             } else {
                 console.log('👁️ Page visible - Firebase connection active');
+            }
+        });
+        
+        // Add form debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('messengerForm');
+            const textarea = document.getElementById('response_text');
+            const sendBtn = document.getElementById('messengerSendBtn');
+            
+            console.log('🔧 Form elements found:', {
+                form: !!form,
+                textarea: !!textarea,
+                sendBtn: !!sendBtn
+            });
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('📝 Form submit event triggered!', {
+                        message: textarea?.value,
+                        enhancedChatSystem: !!window.enhancedChatSystem,
+                        firebaseReady: window.enhancedChatSystem?.firebaseChat?.isInitialized
+                    });
+                });
+            }
+            
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function(e) {
+                    console.log('🖱️ Send button clicked!', {
+                        message: textarea?.value,
+                        enhancedChatSystem: !!window.enhancedChatSystem
+                    });
+                });
             }
         });
     </script>
