@@ -305,10 +305,12 @@ class ChatSystem {
     }
 
     startRealtimeUpdates() {
-        console.log('Starting real-time updates...');
+        console.log('Legacy polling disabled - Firebase handles real-time updates');
         
+        // Only keep typing indicators - Firebase handles message updates
         const typingInterval = setInterval(() => this.checkForTypingIndicators(), 2000);
         
+        /* LEGACY POLLING DISABLED - Firebase Real-time Database handles this
         let normalInterval = 2000;
         let fastInterval = 500;
         let currentInterval = normalInterval;
@@ -384,6 +386,12 @@ class ChatSystem {
         this.chatIntervals = {
             typing: typingInterval,
             responses: responseInterval
+        };
+        */ // END LEGACY POLLING CODE
+        
+        // Only keep typing interval - Firebase handles all message updates
+        this.chatIntervals = {
+            typing: typingInterval
         };
 
         // Expose functions globally

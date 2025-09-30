@@ -146,8 +146,9 @@ class NotificationSystem {
     }
     
     startUpdateChecker() {
-        console.log('Starting update checker for ticket:', this.ticketId);
-        this.updateChecker = setInterval(() => this.checkForUpdates(), 30000);
+        console.log('Update checker disabled - Firebase FCM handles real-time notifications');
+        // Polling disabled - Firebase FCM provides real-time notifications
+        // this.updateChecker = setInterval(() => this.checkForUpdates(), 30000);
     }
     
     stopUpdateChecker() {
@@ -158,6 +159,10 @@ class NotificationSystem {
     }
     
     checkForUpdates() {
+        console.log('Polling disabled - Firebase FCM handles real-time notifications');
+        return; // Firebase FCM handles notifications
+        
+        /* LEGACY POLLING CODE DISABLED
         if (document.hidden) return;
         
         console.log('Checking for updates on ticket:', this.ticketId);
@@ -201,6 +206,7 @@ class NotificationSystem {
                     clearInterval(this.updateChecker);
                 }
             });
+        */ // END LEGACY POLLING CODE
     }
 }
 
