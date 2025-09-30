@@ -2,7 +2,10 @@
 require_once 'config/database.php';
 require_once 'includes/security.php';
 require_once 'includes/activity_logger.php';
-require_once 'includes/firebase_notifications.php';
+// Firebase notifications (optional)
+if (file_exists('includes/firebase_notifications.php')) {
+    require_once 'includes/firebase_notifications.php';
+}
 
 // Start session and require login
 session_start();
@@ -84,15 +87,17 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'create_ticket') {
             $logger = new ActivityLogger($db);
             $logger->logTicketCreated(getUserId(), 'employee', $ticketId, $subject, $priority, $category);
             
-            // Send Firebase notification to IT staff
+            // Send Firebase notification to IT staff (if available)
             try {
-                $notificationSender = new FirebaseNotificationSender();
-                $notificationResult = $notificationSender->sendNewTicketNotification($ticketId);
-                
-                if ($notificationResult['success']) {
-                    error_log("New ticket notification sent successfully for ticket {$ticketId}");
-                } else {
-                    error_log("New ticket notification failed for ticket {$ticketId}: " . $notificationResult['error']);
+                if (class_exists('FirebaseNotificationSender')) {
+                    $notificationSender = new FirebaseNotificationSender();
+                    $notificationResult = $notificationSender->sendNewTicketNotification($ticketId);
+                    
+                    if ($notificationResult['success']) {
+                        error_log("New ticket notification sent successfully for ticket {$ticketId}");
+                    } else {
+                        error_log("New ticket notification failed for ticket {$ticketId}: " . $notificationResult['error']);
+                    }
                 }
             } catch (Exception $e) {
                 error_log("New ticket notification error: " . $e->getMessage());

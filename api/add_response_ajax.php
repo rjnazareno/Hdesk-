@@ -7,7 +7,10 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 require_once '../config/database.php';
-require_once '../includes/firebase_notifications.php';
+// Firebase notifications (optional)
+if (file_exists('../includes/firebase_notifications.php')) {
+    require_once '../includes/firebase_notifications.php';
+}
 session_start();
 
 // Clear any previous output

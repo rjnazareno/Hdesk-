@@ -8,7 +8,10 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 require_once '../config/database.php';
-require_once '../includes/firebase_notifications.php';
+// Firebase notifications (optional)
+if (file_exists('../includes/firebase_notifications.php')) {
+    require_once '../includes/firebase_notifications.php';
+}
 session_start();
 
 // Verify user is logged in
