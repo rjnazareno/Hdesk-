@@ -58,6 +58,7 @@ function getNotificationConfig(type, payload) {
       options: {
         body: baseBody,
         icon: iconUrl,
+        image: payload.notification?.image || payload.data?.image,
         badge: iconUrl,
         tag: `reply-${data.ticket_id}`,
         requireInteraction: true,
@@ -76,6 +77,7 @@ function getNotificationConfig(type, payload) {
       options: {
         body: baseBody,
         icon: iconUrl,
+        image: payload.notification?.image || payload.data?.image,
         badge: iconUrl,
         tag: `status-${data.ticket_id}`,
         requireInteraction: false,
@@ -93,6 +95,7 @@ function getNotificationConfig(type, payload) {
       options: {
         body: baseBody,
         icon: iconUrl,
+        image: payload.notification?.image || payload.data?.image,
         badge: iconUrl,
         tag: `ticket-${data.ticket_id}`,
         requireInteraction: true,
@@ -111,6 +114,7 @@ function getNotificationConfig(type, payload) {
       options: {
         body: baseBody,
         icon: iconUrl,
+        image: payload.notification?.image || payload.data?.image,
         badge: iconUrl,
         tag: `assign-${data.ticket_id}`,
         requireInteraction: true,

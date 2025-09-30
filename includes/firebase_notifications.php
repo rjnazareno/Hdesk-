@@ -193,14 +193,17 @@ class FirebaseNotificationSender {
                         'token' => $token,
                         'notification' => [
                             'title' => $notification['title'],
-                            'body' => $notification['body']
+                            'body' => $notification['body'],
+                            'image' => $notification['image'] ?? null // Large photo
                         ],
                         'data' => $notification['data'] ?? [],
                         'webpush' => [
                             'notification' => [
                                 'icon' => $notification['icon'] ?? '/favicon.ico',
+                                'image' => $notification['image'] ?? null, // Large photo
                                 'badge' => '/favicon.ico',
-                                'click_action' => $notification['click_action'] ?? 'FLUTTER_NOTIFICATION_CLICK'
+                                'click_action' => $notification['click_action'] ?? 'FLUTTER_NOTIFICATION_CLICK',
+                                'requireInteraction' => $notification['requireInteraction'] ?? false
                             ]
                         ]
                     ]
@@ -218,6 +221,7 @@ class FirebaseNotificationSender {
                         'title' => $notification['title'],
                         'body' => $notification['body'],
                         'icon' => $notification['icon'] ?? '/favicon.ico',
+                        'image' => $notification['image'] ?? null, // Large photo
                         'badge' => '/favicon.ico',
                         'click_action' => $notification['click_action'] ?? 'FLUTTER_NOTIFICATION_CLICK'
                     ],
@@ -269,6 +273,59 @@ class FirebaseNotificationSender {
     }
     
     /**
+     * Generate user avatar/photo URL
+     */
+    private function getUserPhoto($userId, $userName) {
+        // Option 1: Check if user has uploaded profile photo
+        $uploadsPath = __DIR__ . '/../uploads/profiles/' . $userId . '.jpg';
+        if (file_exists($uploadsPath)) {
+            $baseUrl = $this->getBaseUrl();
+            return $baseUrl . '/uploads/profiles/' . $userId . '.jpg';
+        }
+        
+        // Option 2: Generate avatar from name using external service
+        $initials = $this->getInitials($userName);
+        return "https://ui-avatars.com/api/?name=" . urlencode($initials) . "&size=200&background=0D8ABC&color=fff&bold=true";
+        
+        // Option 3: Use Gravatar (if email available)
+        // $email = $this->getUserEmail($userId); 
+        // return "https://www.gravatar.com/avatar/" . md5(strtolower(trim($email))) . "?s=200&d=identicon";
+    }
+    
+    /**
+     * Get user initials from name
+     */
+    private function getInitials($name) {
+        $words = explode(' ', trim($name));
+        $initials = '';
+        foreach ($words as $word) {
+            if (!empty($word)) {
+                $initials .= strtoupper(substr($word, 0, 1));
+                if (strlen($initials) >= 2) break;
+            }
+        }
+        return $initials ?: 'U';
+    }
+    
+    /**
+     * Get base URL for images
+     */
+    private function getBaseUrl() {
+        // Auto-detect environment
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            if (strpos($host, 'ithelp.resourcestaffonline.com') !== false) {
+                return 'https://ithelp.resourcestaffonline.com/IThelp';
+            }
+            return $protocol . '://' . $host . '/IThelp';
+        }
+        
+        // Fallback for CLI/cron jobs
+        return 'https://ithelp.resourcestaffonline.com/IThelp';
+    }
+    
+    /**
      * Deactivate invalid FCM token
      */
     private function deactivateToken($token) {
@@ -316,6 +373,7 @@ class FirebaseNotificationSender {
                         'title' => "New Reply - Ticket #{$ticketId}",
                         'body' => "{$fromName} replied: " . substr($message, 0, 100),
                         'icon' => '/favicon.ico',
+                        'image' => $this->getUserPhoto($fromUserId, $fromName),
                         'click_action' => "view_ticket.php?id={$ticketId}",
                         'data' => [
                             'type' => 'new_reply',
@@ -341,6 +399,7 @@ class FirebaseNotificationSender {
                 'title' => "New Reply - Ticket #{$ticketId}",
                 'body' => "{$fromName} replied: " . substr($message, 0, 100),
                 'icon' => '/favicon.ico',
+                'image' => $this->getUserPhoto($fromUserId, $fromName),
                 'click_action' => "view_ticket.php?id={$ticketId}",
                 'data' => [
                     'type' => 'new_reply',
@@ -388,6 +447,7 @@ class FirebaseNotificationSender {
                 'title' => "Status Update - Ticket #{$ticketId}",
                 'body' => "Your ticket {$statusMessage}",
                 'icon' => '/favicon.ico',
+                'image' => $this->getUserPhoto($changedBy, 'IT Support'),
                 'click_action' => "view_ticket.php?id={$ticketId}",
                 'data' => [
                     'type' => 'status_change',
