@@ -972,20 +972,76 @@ if ($ticket) {
         
     </div>
     
-    <!-- Global Variables for External Scripts -->
+    <!-- Global Variables for Firebase Chat System -->
     <script>
+        // Firebase Chat Configuration
         window.TICKET_ID = <?= $ticketId ?>;
         window.INITIAL_RESPONSE_COUNT = <?= count($responses) ?>;
         window.CURRENT_USER_TYPE = '<?= $_SESSION['user_type'] ?>';
+        window.CURRENT_USER_NAME = '<?= htmlspecialchars(getUserName(), ENT_QUOTES) ?>';
         window.SESSION_RESPONSE_ADDED = <?= isset($_SESSION["response_added_ticket_{$ticketId}"]) ? 'true' : 'false' ?>;
+        
         <?php if (isset($_SESSION["response_added_ticket_{$ticketId}"])): ?>
         <?php unset($_SESSION["response_added_ticket_{$ticketId}"]); ?>
         <?php endif; ?>
+        
+        console.log('🔧 Global variables loaded:', {
+            ticketId: window.TICKET_ID,
+            userType: window.CURRENT_USER_TYPE,
+            userName: window.CURRENT_USER_NAME,
+            responseCount: window.INITIAL_RESPONSE_COUNT
+        });
     </script>
     
-    <!-- External JavaScript Files -->
+    <!-- Firebase Real-Time Chat System -->
+    <script src="assets/js/firebase-config.js" type="module"></script>
+    <script src="assets/js/firebase-chat.js" type="module"></script>
+    <script src="assets/js/enhanced-chat-system.js" type="module"></script>
+    
+    <!-- Legacy Notification System (for compatibility) -->
     <script src="assets/js/notifications.js"></script>
-    <script src="assets/js/chat-system.js"></script>
+    
+    <!-- Firebase Initialization -->
+    <script type="module">
+        console.log('🚀 Initializing Firebase Real-Time Chat...');
+        
+        // Wait for DOM and Firebase to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.enhancedChatSystem) {
+                    console.log('✅ Firebase Real-Time Chat is active!');
+                    
+                    // Show Firebase status
+                    const statusDiv = document.createElement('div');
+                    statusDiv.innerHTML = '🔥 <span class="text-green-600 text-xs font-medium">Real-time messaging active</span>';
+                    statusDiv.className = 'fixed bottom-4 left-4 bg-white border border-green-200 px-3 py-2 rounded-lg shadow-sm z-40';
+                    statusDiv.id = 'firebaseStatusIndicator';
+                    document.body.appendChild(statusDiv);
+                    
+                    // Auto-hide status after 3 seconds
+                    setTimeout(() => {
+                        if (statusDiv.parentNode) {
+                            statusDiv.style.opacity = '0';
+                            statusDiv.style.transform = 'translateY(10px)';
+                            setTimeout(() => statusDiv.remove(), 300);
+                        }
+                    }, 3000);
+                    
+                } else {
+                    console.warn('⚠️ Enhanced chat system not loaded, using fallback');
+                }
+            }, 1000);
+        });
+        
+        // Handle page visibility for connection management
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('📱 Page hidden - maintaining Firebase connection');
+            } else {
+                console.log('👁️ Page visible - Firebase connection active');
+            }
+        });
+    </script>
     
 </body>
 </html>
