@@ -180,7 +180,7 @@ class FirebaseNotificationSender {
     /**
      * Send notification via Firebase FCM API
      */
-    private function sendNotification($token, $notification) {
+    public function sendNotification($token, $notification) {
         try {
             // Determine which API to use based on key type
             $isOAuth2 = strpos($this->serverKey, 'ya29.') === 0; // OAuth2 access tokens start with ya29.
@@ -323,6 +323,13 @@ class FirebaseNotificationSender {
         
         // Fallback for CLI/cron jobs
         return 'https://ithelp.resourcestaffonline.com/IThelp';
+    }
+    
+    /**
+     * Public method to test photo generation
+     */
+    public function testPhotoGeneration($userId, $userName) {
+        return $this->getUserPhoto($userId, $userName);
     }
     
     /**

@@ -3,19 +3,59 @@
  * Test Firebase Notifications with Photos
  */
 require_once __DIR__ . '/includes/firebase_notifications.php';
+require_once __DIR__ . '/config/database.php';
 
 // Test photo notification
 $notificationSender = new FirebaseNotificationSender();
 
 echo "<h2>🖼️ Testing Firebase Notifications with Photos</h2>";
 
+// Get real ticket data first
+$db = Database::getInstance()->getConnection();
+
+// Get a real ticket ID
+$stmt = $db->prepare("SELECT ticket_id FROM tickets LIMIT 1");
+$stmt->execute();
+$realTicketId = $stmt->fetchColumn();
+
+// Get real employee ID  
+$stmt = $db->prepare("SELECT id FROM employees LIMIT 1");
+$stmt->execute();
+$realEmployeeId = $stmt->fetchColumn();
+
+// Get real staff ID
+$stmt = $db->prepare("SELECT staff_id FROM it_staff LIMIT 1"); 
+$stmt->execute();
+$realStaffId = $stmt->fetchColumn();
+
+if (!$realTicketId) {
+    echo "<p>❌ No tickets found in database. Creating test data...</p>";
+    
+    // Create a test ticket
+    $stmt = $db->prepare("
+        INSERT INTO tickets (subject, description, priority, status, employee_id, created_at) 
+        VALUES (?, ?, ?, ?, ?, NOW())
+    ");
+    $stmt->execute([
+        'Test Notification Ticket',
+        'This is a test ticket for notification testing',
+        'medium',
+        'open',
+        $realEmployeeId ?: 1
+    ]);
+    $realTicketId = $db->lastInsertId();
+    echo "<p>✅ Created test ticket #{$realTicketId}</p>";
+}
+
+echo "<p><strong>Using:</strong> Ticket #{$realTicketId}, Employee #{$realEmployeeId}, Staff #{$realStaffId}</p>";
+
 // Test 1: New Reply Notification with Photo
 echo "<h3>Test 1: New Reply with User Photo</h3>";
 $result1 = $notificationSender->sendNewReplyNotification(
-    123, // ticket ID
-    1,   // from user ID (employee)
+    $realTicketId, // real ticket ID
+    $realEmployeeId ?: 1,   // real employee ID
     'employee', // from user type
-    'Hello, I need help with my computer. The screen keeps flickering and I cannot complete my work.'
+    'Hello, I need help with my computer. The screen keeps flickering and I cannot complete my work. Please help me ASAP!'
 );
 
 echo "<pre>";
@@ -25,14 +65,36 @@ echo "</pre>";
 // Test 2: Status Change Notification
 echo "<h3>Test 2: Status Change with IT Support Photo</h3>";
 $result2 = $notificationSender->sendStatusChangeNotification(
-    123, // ticket ID
+    $realTicketId, // real ticket ID
     'in_progress', // new status
-    2 // changed by (IT staff ID)
+    $realStaffId ?: 1 // real IT staff ID
 );
 
 echo "<pre>";
 print_r($result2);
 echo "</pre>";
+
+// Test 2.5: Photo Generation Test
+echo "<h3>Test 2.5: Photo URL Generation</h3>";
+echo "<div style='display: flex; gap: 20px; flex-wrap: wrap;'>";
+
+$testUsers = [
+    ['id' => 1, 'name' => 'John Doe'],
+    ['id' => 2, 'name' => 'Jane Smith'], 
+    ['id' => 3, 'name' => 'IT Support'],
+    ['id' => 4, 'name' => 'Admin User']
+];
+
+foreach ($testUsers as $user) {
+    $photoUrl = $notificationSender->testPhotoGeneration($user['id'], $user['name']);
+    echo "<div style='text-align: center; margin: 10px;'>";
+    echo "<img src='{$photoUrl}' alt='{$user['name']}' style='width: 80px; height: 80px; border-radius: 50%; border: 2px solid #0D8ABC;'>";
+    echo "<br><small>{$user['name']}</small>";
+    echo "<br><small style='color: #666;'>ID: {$user['id']}</small>";
+    echo "</div>";
+}
+
+echo "</div>";
 
 // Test 3: Manual Notification with Custom Photo
 echo "<h3>Test 3: Custom Notification with Specific Photo</h3>";
