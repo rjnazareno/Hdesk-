@@ -149,19 +149,27 @@
             const statusEl = document.getElementById('swStatus');
             
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
+                // Try to get existing registration first
+                navigator.serviceWorker.getRegistration('./firebase-messaging-sw.js')
                     .then(registration => {
                         if (registration) {
                             statusEl.innerHTML = '✅ <span class="text-green-600">Active</span>';
-                            log('✅ Service Worker registered', 'success');
+                            log('✅ Service Worker already registered', 'success');
                         } else {
-                            statusEl.innerHTML = '⚠️ <span class="text-yellow-600">Not found</span>';
-                            log('⚠️ Service Worker not found', 'warning');
+                            // Register the service worker
+                            return navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                        }
+                    })
+                    .then(registration => {
+                        if (registration) {
+                            statusEl.innerHTML = '✅ <span class="text-green-600">Active</span>';
+                            log('✅ Service Worker registered successfully', 'success');
                         }
                     })
                     .catch(error => {
                         statusEl.innerHTML = '❌ <span class="text-red-600">Error</span>';
                         log('❌ Service Worker error: ' + error.message, 'error');
+                        console.error('Service Worker registration failed:', error);
                     });
             } else {
                 statusEl.innerHTML = '❌ <span class="text-red-600">Not supported</span>';
