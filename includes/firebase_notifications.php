@@ -192,8 +192,8 @@ class FirebaseNotificationSender {
                     'message' => [
                         'token' => $token,
                         'notification' => [
-                            'title' => $notification['title'],
-                            'body' => $notification['body'],
+                            'title' => $notification['title'] ?? 'IT Help Desk',
+                            'body' => $notification['body'] ?? 'New notification',
                             'image' => $notification['image'] ?? null // Large photo
                         ],
                         'data' => $notification['data'] ?? [],
@@ -218,8 +218,8 @@ class FirebaseNotificationSender {
                 $payload = [
                     'to' => $token,
                     'notification' => [
-                        'title' => $notification['title'],
-                        'body' => $notification['body'],
+                        'title' => $notification['title'] ?? 'IT Help Desk',
+                        'body' => $notification['body'] ?? 'New notification', 
                         'icon' => $notification['icon'] ?? '/favicon.ico',
                         'image' => $notification['image'] ?? null, // Large photo
                         'badge' => '/favicon.ico',

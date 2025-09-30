@@ -58,11 +58,15 @@ echo "</details>";
 // Test 2: Rich format for service worker
 echo "<h4>✅ Test 2: Rich Format (Service Worker Processed)</h4>";
 $richNotification = [
-    // Remove title/body from root - let service worker handle it
+    // Must have title/body at root for Firebase
+    'title' => '📸 Rich Photo Test', 
+    'body' => 'This should show with photo via service worker',
+    'icon' => '/favicon.ico',
+    'image' => $photoUrl,
     'data' => [
         'type' => 'new_reply',
         'title' => '📸 Rich Photo Test',
-        'body' => 'This should show with photo via service worker',
+        'body' => 'This should show with photo via service worker', 
         'image' => $photoUrl,
         'icon' => '/favicon.ico',
         'user_id' => (string)$userId,
