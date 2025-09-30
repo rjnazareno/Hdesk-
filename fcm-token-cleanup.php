@@ -106,7 +106,7 @@ echo "<script>
 async function testToken(token, tokenId) {
     const shortToken = '...' + token.slice(-20);
     const results = document.getElementById('cleanup-results');
-    results.innerHTML = `<div class='info'><h4>🧪 Testing Token ${tokenId}: ${shortToken}</h4><p>Sending test notification...</p></div>`;
+    results.innerHTML = '<div class=\"info\"><h4>🧪 Testing Token ' + tokenId + ': ' + shortToken + '</h4><p>Sending test notification...</p></div>';
     
     try {
         const response = await fetch('test-token-validity.php', {
@@ -118,14 +118,14 @@ async function testToken(token, tokenId) {
         const result = await response.json();
         
         if (result.success) {
-            results.innerHTML = `<div class='success'><h4>✅ Token ${tokenId} is Valid</h4><p>Test notification sent successfully</p></div>`;
+            results.innerHTML = '<div class=\"success\"><h4>✅ Token ' + tokenId + ' is Valid</h4><p>Test notification sent successfully</p></div>';
         } else {
             let errorMsg = result.error || 'Unknown error';
             if (typeof errorMsg === 'object') errorMsg = JSON.stringify(errorMsg);
-            results.innerHTML = `<div class='error'><h4>❌ Token ${tokenId} is Invalid</h4><p>Error: ${errorMsg}</p><p>This token should be removed</p></div>`;
+            results.innerHTML = '<div class=\"error\"><h4>❌ Token ' + tokenId + ' is Invalid</h4><p>Error: ' + errorMsg + '</p><p>This token should be removed</p></div>';
         }
     } catch (error) {
-        results.innerHTML = `<div class='error'><h4>❌ Test Failed</h4><p>Error: ${error.message}</p></div>`;
+        results.innerHTML = '<div class=\"error\"><h4>❌ Test Failed</h4><p>Error: ' + error.message + '</p></div>';
     }
 }
 
@@ -138,13 +138,13 @@ async function cleanupInvalidTokens() {
         const result = await response.json();
         
         if (result.success) {
-            results.innerHTML = `<div class='success'><h4>✅ Cleanup Complete</h4><p>Removed ${result.removed} invalid token(s)</p><p>Kept ${result.kept} valid token(s)</p></div>`;
+            results.innerHTML = '<div class=\"success\"><h4>✅ Cleanup Complete</h4><p>Removed ' + result.removed + ' invalid token(s)</p><p>Kept ' + result.kept + ' valid token(s)</p></div>';
             setTimeout(() => location.reload(), 2000);
         } else {
-            results.innerHTML = `<div class='error'><h4>❌ Cleanup Failed</h4><p>${result.error}</p></div>`;
+            results.innerHTML = '<div class=\"error\"><h4>❌ Cleanup Failed</h4><p>' + result.error + '</p></div>';
         }
     } catch (error) {
-        results.innerHTML = `<div class='error'><h4>❌ Cleanup Error</h4><p>${error.message}</p></div>`;
+        results.innerHTML = '<div class=\"error\"><h4>❌ Cleanup Error</h4><p>' + error.message + '</p></div>';
     }
 }
 
@@ -152,20 +152,20 @@ async function deactivateAllTokens() {
     if (!confirm('Deactivate all FCM tokens? Users will need to re-enable notifications.')) return;
     
     const results = document.getElementById('cleanup-results');
-    results.innerHTML = `<div class='info'><h4>⏸️ Deactivating All Tokens</h4></div>`;
+    results.innerHTML = '<div class=\"info\"><h4>⏸️ Deactivating All Tokens</h4></div>';
     
     try {
         const response = await fetch('deactivate-all-tokens.php', {method: 'POST'});
         const result = await response.json();
         
         if (result.success) {
-            results.innerHTML = `<div class='success'><h4>✅ All Tokens Deactivated</h4><p>Deactivated ${result.count} token(s)</p></div>`;
+            results.innerHTML = '<div class=\"success\"><h4>✅ All Tokens Deactivated</h4><p>Deactivated ' + result.count + ' token(s)</p></div>';
             setTimeout(() => location.reload(), 2000);
         } else {
-            results.innerHTML = `<div class='error'><h4>❌ Deactivation Failed</h4><p>${result.error}</p></div>`;
+            results.innerHTML = '<div class=\"error\"><h4>❌ Deactivation Failed</h4><p>' + result.error + '</p></div>';
         }
     } catch (error) {
-        results.innerHTML = `<div class='error'><h4>❌ Error</h4><p>${error.message}</p></div>`;
+        results.innerHTML = '<div class=\"error\"><h4>❌ Error</h4><p>' + error.message + '</p></div>';
     }
 }
 
@@ -173,26 +173,26 @@ async function clearAllTokens() {
     if (!confirm('DELETE all FCM tokens? This cannot be undone!')) return;
     
     const results = document.getElementById('cleanup-results');
-    results.innerHTML = `<div class='warning'><h4>🗑️ Clearing All Tokens</h4></div>`;
+    results.innerHTML = '<div class=\"warning\"><h4>🗑️ Clearing All Tokens</h4></div>';
     
     try {
         const response = await fetch('clear-all-tokens.php', {method: 'POST'});
         const result = await response.json();
         
         if (result.success) {
-            results.innerHTML = `<div class='success'><h4>✅ All Tokens Cleared</h4><p>Deleted ${result.count} token(s)</p></div>`;
+            results.innerHTML = '<div class=\"success\"><h4>✅ All Tokens Cleared</h4><p>Deleted ' + result.count + ' token(s)</p></div>';
             setTimeout(() => location.reload(), 2000);
         } else {
-            results.innerHTML = `<div class='error'><h4>❌ Clear Failed</h4><p>${result.error}</p></div>`;
+            results.innerHTML = '<div class=\"error\"><h4>❌ Clear Failed</h4><p>' + result.error + '</p></div>';
         }
     } catch (error) {
-        results.innerHTML = `<div class='error'><h4>❌ Error</h4><p>${error.message}</p></div>`;
+        results.innerHTML = '<div class=\"error\"><h4>❌ Error</h4><p>' + error.message + '</p></div>';
     }
 }
 
 function regenerateTokens() {
     const results = document.getElementById('cleanup-results');
-    results.innerHTML = `<div class='info'><h4>🔄 Force Regenerate</h4><p>Go to dashboard and enable notifications to generate fresh tokens</p></div>`;
+    results.innerHTML = '<div class=\"info\"><h4>🔄 Force Regenerate</h4><p>Go to dashboard and enable notifications to generate fresh tokens</p></div>';
     setTimeout(() => window.open('dashboard.php', '_blank'), 1000);
 }
 </script>";
