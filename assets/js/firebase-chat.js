@@ -137,11 +137,18 @@ class FirebaseChat {
                         this.processedMessages.add(key);
                         
                         // Only display messages from other users to avoid duplicates
-                        if (message.user_type !== this.currentUserType || 
-                            message.display_name !== this.currentUserName) {
-                            console.log('📨 New message from other user:', message.display_name);
+                        // ✅ PREVENT SELF-NOTIFICATIONS: Check user ID first, then fallback to name/type
+                        const isSameUser = (
+                            (message.user_id && this.userId && message.user_id == this.userId) ||
+                            (message.user_type === this.currentUserType && message.display_name === this.currentUserName)
+                        );
+                        
+                        if (!isSameUser) {
+                            console.log('📨 New message from other user:', message.display_name, 'UserID:', message.user_id);
                             this.displayIncomingMessage(message);
                             this.showNewMessageNotification(message);
+                        } else {
+                            console.log('🚫 Skipping self-notification for user:', message.display_name, 'UserID:', message.user_id);
                         }
                     }
                 });

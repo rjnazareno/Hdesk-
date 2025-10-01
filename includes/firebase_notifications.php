@@ -387,7 +387,9 @@ class FirebaseNotificationSender {
                 $fromName = trim($ticket['fname'] . ' ' . $ticket['lname']);
                 
                 // ✅ PREVENT SELF-NOTIFICATION: Don't notify if employee is replying to their own ticket
+                error_log("DEBUG: Checking self-notification - fromUserId: {$fromUserId}, recipientId: {$recipientId}, fromUserType: {$fromUserType}");
                 if ($recipientId === $fromUserId) {
+                    error_log("SKIPPED: Self-notification prevented for user {$fromUserId}");
                     return ['success' => true, 'skipped' => true, 'reason' => 'Self-notification prevented'];
                 }
                 
@@ -415,7 +417,9 @@ class FirebaseNotificationSender {
                 $fromName = $ticket['name'] ?? 'IT Support';
                 
                 // ✅ PREVENT SELF-NOTIFICATION: Don't notify if IT staff is replying as the same user
-                if ($recipientId === $fromUserId && $fromUserType === 'employee') {
+                error_log("DEBUG: IT staff notification - fromUserId: {$fromUserId}, recipientId: {$recipientId}, fromUserType: {$fromUserType}");
+                if ($recipientId === $fromUserId) {
+                    error_log("SKIPPED: Self-notification prevented for IT staff user {$fromUserId}");
                     return ['success' => true, 'skipped' => true, 'reason' => 'Self-notification prevented'];
                 }
             }

@@ -480,24 +480,35 @@ if ($ticket) {
                         </div>
                     </div>
                     
-                    <div class="hidden sm:flex items-center bg-blue-700 px-3 py-2 rounded-lg">
-                        <i class="fas fa-user-circle text-blue-200 mr-2"></i>
-                        <div class="text-xs">
-                            <div class="text-blue-200"><?= $userType === 'it_staff' ? 'IT Staff' : 'Employee' ?></div>
-                            <div class="text-white font-medium"><?= htmlspecialchars($_SESSION['user_data']['name'] ?? $_SESSION['username'] ?? 'User') ?></div>
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="userProfileBtn" class="flex items-center space-x-2 bg-white bg-opacity-10 text-white px-3 py-2 rounded-lg hover:bg-opacity-20 transition-all border border-white border-opacity-20">
+                            <i class="fas fa-user-circle text-lg"></i>
+                            <div class="text-left hidden sm:block">
+                                <div class="text-xs text-blue-200"><?= $userType === 'it_staff' ? 'IT Staff' : 'Employee' ?></div>
+                                <div class="text-sm font-medium"><?= htmlspecialchars($_SESSION['user_data']['name'] ?? $_SESSION['username'] ?? 'User') ?></div>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- User Dropdown Menu -->
+                        <div id="userDropdown" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden">
+                            <?php if ($userType === 'it_staff'): ?>
+                            <a href="ticket_history.php?id=<?= $ticketId ?>" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                                <i class="fas fa-history text-gray-400 mr-3 w-4"></i>
+                                Ticket History
+                            </a>
+                            <?php endif; ?>
+                            <a href="dashboard.php" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                                <i class="fas fa-tachometer-alt text-gray-400 mr-3 w-4"></i>
+                                Dashboard
+                            </a>
+                            <a href="logout.php" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-b-lg">
+                                <i class="fas fa-sign-out-alt text-red-500 mr-3 w-4"></i>
+                                Logout
+                            </a>
                         </div>
                     </div>
-                    <?php if ($userType === 'it_staff'): ?>
-                    <a href="ticket_history.php?id=<?= $ticketId ?>" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
-                        <i class="fas fa-history mr-2"></i>History
-                    </a>
-                    <?php endif; ?>
-                    <a href="dashboard.php" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
-                        <i class="fas fa-arrow-left mr-2"></i>Back
-                    </a>
-                    <a href="logout.php" class="bg-red-600 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all font-medium">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                    </a>
                 </div>
             </div>
         </div>
