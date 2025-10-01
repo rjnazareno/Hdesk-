@@ -222,18 +222,31 @@ try {
         }
     }
     
-    // 📱 Send Firebase notifications for ticket closure
-    if (in_array($action, ['close', 'resolve'])) {
+    // 📱 Send Firebase notifications for status changes
+    if (in_array($action, ['close', 'resolve', 'update_status'])) {
         try {
-            if (class_exists('FirebaseNotificationSender')) {
-                $notificationSender = new FirebaseNotificationSender();
-                $result = $notificationSender->sendStatusChangeNotification($ticketId, $action === 'close' ? 'closed' : 'resolved', $auth->getUserId());
-                
-                if ($result['success']) {
-                    error_log("Firebase notification sent for ticket {$ticketId} status change: {$action}");
-                } else {
-                    error_log("Firebase notification failed for ticket {$ticketId}: " . ($result['error'] ?? 'Unknown error'));
+            require_once '../includes/firebase_notifications.php';
+            $notificationSender = new FirebaseNotificationSender();
+            
+            if ($action === 'close') {
+                // Use specialized closure notification
+                $result = $notificationSender->sendTicketClosedNotification($ticketId, $auth->getUserId(), $resolution ?? '');
+            } else {
+                // Use general status change notification
+                $notificationStatus = $action;
+                if ($action === 'update_status') {
+                    $notificationStatus = $newStatus;
+                } elseif ($action === 'resolve') {
+                    $notificationStatus = 'resolved';
                 }
+                
+                $result = $notificationSender->sendStatusChangeNotification($ticketId, $notificationStatus, $auth->getUserId());
+            }
+            
+            if ($result['success']) {
+                error_log("🔥 Firebase notification sent for ticket #{$ticketId} - Action: {$action}");
+            } else {
+                error_log("❌ Firebase notification failed for ticket #{$ticketId}: " . json_encode($result));
             }
         } catch (Exception $e) {
             error_log("Firebase notification error: " . $e->getMessage());

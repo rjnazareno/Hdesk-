@@ -141,6 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
                 // Log the activity
                 $logger->logStatusChange($userId, $userType, $ticketId, $old_status, $new_status);
                 
+                // Send Firebase notification for status change
+                try {
+                    require_once 'includes/firebase_notifications.php';
+                    $firebaseNotifier = new FirebaseNotificationSender();
+                    $firebaseNotifier->sendStatusChangeNotification($ticketId, $new_status, $userId);
+                } catch (Exception $e) {
+                    error_log("Firebase notification error for status change: " . $e->getMessage());
+                }
+                
                 $message = 'Status updated successfully.';
                 header("Location: view_ticket.php?id=$ticketId&success=status_updated");
                 exit;
@@ -652,7 +661,8 @@ if ($ticket) {
                             <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
                                 <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Close Ticket</option>
+                                <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Resolved</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>Close Ticket</option>
                             </select>
                             <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                 <i class="fas fa-save mr-2"></i>Update Status

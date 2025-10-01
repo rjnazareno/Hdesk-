@@ -472,20 +472,29 @@ class FirebaseNotificationSender {
             if (!$ticket) return ['success' => false, 'error' => 'Ticket not found'];
             
             $statusMessages = [
-                'open' => 'has been reopened',
-                'in_progress' => 'is now being worked on',
-                'resolved' => 'has been resolved',
-                'closed' => 'has been resolved and closed'
+                'open' => 'has been reopened 🔄',
+                'in_progress' => 'is now being worked on 🔧', 
+                'resolved' => 'has been resolved ✅',
+                'closed' => 'has been closed and completed ✅🔒'
+            ];
+            
+            $statusTitles = [
+                'open' => '🔄 Ticket Reopened',
+                'in_progress' => '🔧 Work Started',
+                'resolved' => '✅ Ticket Resolved', 
+                'closed' => '🎯 Ticket Closed'
             ];
             
             $statusMessage = $statusMessages[$newStatus] ?? "status changed to {$newStatus}";
+            $statusTitle = $statusTitles[$newStatus] ?? "Status Update";
             
             $notification = [
-                'title' => "Status Update - Ticket #{$ticketId}",
+                'title' => "{$statusTitle} - Ticket #{$ticketId}",
                 'body' => "Your ticket {$statusMessage}",
-                'icon' => '/favicon.ico',
+                'icon' => '/IThelp/favicon.ico',
                 'image' => $this->getUserPhoto($changedBy, 'IT Support'),
-                'click_action' => "view_ticket.php?id={$ticketId}",
+                'click_action' => "/IThelp/view_ticket.php?id={$ticketId}",
+                'requireInteraction' => $newStatus === 'closed', // Require interaction for closed tickets
                 'data' => [
                     'type' => 'status_change',
                     'action' => 'status_change',
@@ -503,6 +512,57 @@ class FirebaseNotificationSender {
         }
     }
     
+    public function sendTicketClosedNotification($ticketId, $closedBy, $resolutionNote = '') {
+        try {
+            $db = Database::getInstance()->getConnection();
+            
+            // Get ticket info
+            $stmt = $db->prepare("
+                SELECT t.*, e.fname, e.lname, e.id as employee_user_id,
+                       its.name as staff_name
+                FROM tickets t
+                LEFT JOIN employees e ON t.employee_id = e.id  
+                LEFT JOIN it_staff its ON its.staff_id = ?
+                WHERE t.ticket_id = ?
+            ");
+            $stmt->execute([$closedBy, $ticketId]);
+            $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$ticket) return ['success' => false, 'error' => 'Ticket not found'];
+            
+            $staffName = $ticket['staff_name'] ?? 'IT Support';
+            $bodyMessage = "Your ticket has been resolved and closed by {$staffName}";
+            
+            if ($resolutionNote) {
+                $bodyMessage .= ". Resolution: " . substr($resolutionNote, 0, 100);
+                if (strlen($resolutionNote) > 100) $bodyMessage .= '...';
+            }
+            
+            $notification = [
+                'title' => "🎯 Ticket Closed - #{$ticketId}",
+                'body' => $bodyMessage,
+                'icon' => '/IThelp/favicon.ico',
+                'image' => $this->getUserPhoto($closedBy, $staffName),
+                'click_action' => "/IThelp/view_ticket.php?id={$ticketId}",
+                'requireInteraction' => true, // Important notification for closure
+                'data' => [
+                    'type' => 'ticket_closed',
+                    'action' => 'ticket_closed', 
+                    'ticket_id' => (string)$ticketId,
+                    'closed_by' => (string)$closedBy,
+                    'staff_name' => (string)$staffName,
+                    'action_url' => "/IThelp/view_ticket.php?id={$ticketId}"
+                ]
+            ];
+            
+            return $this->sendToUser($ticket['employee_user_id'], 'employee', $notification);
+            
+        } catch (Exception $e) {
+            error_log("Ticket closed notification error: " . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
     public function sendNewTicketNotification($ticketId) {
         try {
             $db = Database::getInstance()->getConnection();
