@@ -65,8 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if tables exist
         $tables = ['message_read_status', 'notification_sent_log'];
         foreach ($tables as $table) {
-            $stmt = $db->query("SHOW TABLES LIKE '{$table}'");
-            if ($stmt->rowCount() > 0) {
+            $stmt = $db->prepare("SHOW TABLES LIKE ?");
+            $stmt->execute([$table]);
+            $result = $stmt->fetchAll();
+            if (count($result) > 0) {
                 echo '<div class="success"><h4>✅ Table Created: ' . $table . '</h4></div>';
             } else {
                 echo '<div class="error"><h4>❌ Table Missing: ' . $table . '</h4></div>';

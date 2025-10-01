@@ -16,8 +16,27 @@ class MessageTracker {
      */
     public function markTicketAsRead($ticketId, $userId, $userType) {
         try {
-            $stmt = $this->db->prepare("CALL MarkMessagesRead(?, ?, ?)");
-            $stmt->execute([$ticketId, $userId, $userType]);
+            // Get the latest response ID for this ticket
+            $stmt = $this->db->prepare("
+                SELECT response_id 
+                FROM ticket_responses 
+                WHERE ticket_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT 1
+            ");
+            $stmt->execute([$ticketId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $latestResponseId = $result['response_id'] ?? null;
+            
+            // Update or insert read status
+            $stmt = $this->db->prepare("
+                INSERT INTO message_read_status (ticket_id, user_id, user_type, last_read_response_id, last_read_at)
+                VALUES (?, ?, ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE
+                    last_read_response_id = VALUES(last_read_response_id),
+                    last_read_at = NOW()
+            ");
+            $stmt->execute([$ticketId, $userId, $userType, $latestResponseId]);
             
             error_log("Messages marked as read: Ticket {$ticketId}, User {$userId} ({$userType})");
             return true;
@@ -33,11 +52,52 @@ class MessageTracker {
      */
     public function hasUnreadMessages($ticketId, $userId, $userType) {
         try {
-            $stmt = $this->db->prepare("SELECT HasUnreadMessages(?, ?, ?) as has_unread");
+            // Get user's last read response ID
+            $stmt = $this->db->prepare("
+                SELECT last_read_response_id 
+                FROM message_read_status
+                WHERE ticket_id = ? AND user_id = ? AND user_type = ?
+            ");
             $stmt->execute([$ticketId, $userId, $userType]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $readStatus = $stmt->fetch(PDO::FETCH_ASSOC);
+            $lastReadResponseId = $readStatus['last_read_response_id'] ?? null;
             
-            return (bool)$result['has_unread'];
+            // Get the latest response in the ticket
+            if ($userType === 'employee') {
+                // Exclude internal messages for employees
+                $stmt = $this->db->prepare("
+                    SELECT response_id 
+                    FROM ticket_responses 
+                    WHERE ticket_id = ? AND is_internal = FALSE
+                    ORDER BY created_at DESC 
+                    LIMIT 1
+                ");
+            } else {
+                // IT staff can see all messages
+                $stmt = $this->db->prepare("
+                    SELECT response_id 
+                    FROM ticket_responses 
+                    WHERE ticket_id = ? 
+                    ORDER BY created_at DESC 
+                    LIMIT 1
+                ");
+            }
+            $stmt->execute([$ticketId]);
+            $latestResult = $stmt->fetch(PDO::FETCH_ASSOC);
+            $latestResponseId = $latestResult['response_id'] ?? null;
+            
+            // If no latest response, no unread messages
+            if (!$latestResponseId) {
+                return false;
+            }
+            
+            // If never read anything, has unread messages
+            if (!$lastReadResponseId) {
+                return true;
+            }
+            
+            // Compare response IDs
+            return $latestResponseId > $lastReadResponseId;
             
         } catch (Exception $e) {
             error_log("Error checking unread messages: " . $e->getMessage());
