@@ -157,8 +157,8 @@ class EnhancedChatSystem {
                 // Send via Firebase for instant messaging
                 console.log('🔥 Using Firebase for instant send...');
                 
-                // Show own message immediately (optimistic UI)
-                this.firebaseChat.displayOwnMessage(messageText);
+                // Don't show message optimistically to prevent duplicates
+                // Firebase will handle display once saved to database
                 
                 // Send to Firebase (will sync to other users instantly)
                 const result = await this.firebaseChat.sendMessage(messageText);
@@ -193,13 +193,6 @@ class EnhancedChatSystem {
             
         } catch (error) {
             console.error('❌ Enhanced Chat send error:', error);
-            
-            // Remove optimistic message on error
-            const ownMessages = document.querySelectorAll('[data-own-message="true"]');
-            const lastOwnMessage = ownMessages[ownMessages.length - 1];
-            if (lastOwnMessage) {
-                lastOwnMessage.remove();
-            }
             
             // Try fallback to AJAX
             if (this.firebaseChat) {

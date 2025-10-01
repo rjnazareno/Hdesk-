@@ -204,18 +204,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
 // Load additional data if ticket exists
 if ($ticket) {
     try {
-        // Get responses
+        // Get responses with seen status
         $responsesQuery = "
-            SELECT * FROM ticket_responses 
-            WHERE ticket_id = ?
+            SELECT r.*, 
+                   ms.seen_at,
+                   CASE WHEN ms.seen_at IS NOT NULL THEN 1 ELSE 0 END as is_seen
+            FROM ticket_responses r
+            LEFT JOIN message_seen ms ON (r.response_id = ms.response_id 
+                AND ((r.user_type = 'employee' AND ms.seen_by_user_type = 'it_staff') 
+                     OR (r.user_type = 'it_staff' AND ms.seen_by_user_type = 'employee')))
+            WHERE r.ticket_id = ?
         ";
         
         // Filter internal responses for employees
         if ($userType === 'employee') {
-            $responsesQuery .= " AND (is_internal = 0 OR is_internal IS NULL)";
+            $responsesQuery .= " AND (r.is_internal = 0 OR r.is_internal IS NULL)";
         }
         
-        $responsesQuery .= " ORDER BY created_at ASC";
+        $responsesQuery .= " ORDER BY r.created_at ASC";
         
         $stmt = $db->prepare($responsesQuery);
         $stmt->execute([$ticketId]);
@@ -938,15 +944,8 @@ if ($ticket) {
                                             <?php if ($alignRight): // Only show for my messages ?>
                                                 <div class="flex items-center space-x-1">
                                                     <i class="fas fa-check text-xs opacity-60" title="Sent"></i>
-                                                    <?php 
-                                                    // Check if message has been seen by calculating if it's been read
-                                                    $currentTime = new DateTime();
-                                                    $messageTime = new DateTime($response['created_at']);
-                                                    $timeDiff = $currentTime->diff($messageTime);
-                                                    $isOlderThanMinute = $timeDiff->i > 1 || $timeDiff->h > 0 || $timeDiff->days > 0;
-                                                    ?>
-                                                    <?php if ($isOlderThanMinute): ?>
-                                                        <i class="fas fa-check-double text-xs text-blue-400" title="Seen"></i>
+                                                    <?php if ($response['is_seen']): ?>
+                                                        <i class="fas fa-check-double text-xs text-blue-400" title="Seen by <?= $isStaff ? 'Employee' : 'IT Staff' ?>"></i>
                                                     <?php endif; ?>
                                                 </div>
                                             <?php endif; ?>
