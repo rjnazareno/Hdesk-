@@ -260,6 +260,21 @@ if ($ticket) {
             from { opacity: 0; transform: translateX(100px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
+        /* Fix notification dropdown overlapping */
+        #notificationDropdown {
+            z-index: 99999 !important;
+            position: fixed !important;
+            top: auto !important;
+            right: 1rem !important;
+            margin-top: 0.5rem !important;
+        }
+        
+        /* Ensure notification container creates proper stacking context */
+        .notification-container {
+            position: relative;
+            z-index: 9999;
+        }
     </style>
      <style>
         .typing-dots {
@@ -439,14 +454,14 @@ if ($ticket) {
                 
                 <div class="flex items-center space-x-3">
                     <!-- Notification Bell -->
-                    <div class="relative">
+                    <div class="relative notification-container">
                         <button id="notificationBell" class="relative bg-white bg-opacity-10 text-white p-2.5 rounded-lg hover:bg-opacity-20 transition-all border border-white border-opacity-20">
                             <i class="fas fa-bell text-base"></i>
                             <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
                         </button>
                         
                         <!-- Notification Dropdown -->
-                        <div id="notificationDropdown" class="absolute right-0 top-full mt-2 w-80 sm:w-96 md:w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 hidden max-w-[calc(100vw-2rem)] sm:max-w-none">
+                        <div id="notificationDropdown" class="absolute right-0 top-full mt-2 w-80 sm:w-96 md:w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-[9999] hidden max-w-[calc(100vw-2rem)] sm:max-w-none">
                             <!-- Header -->
                             <div class="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-xl">
                                 <div class="flex items-center justify-between">
@@ -1350,7 +1365,21 @@ if ($ticket) {
                     }
                     
                     // Toggle notification dropdown
-                    notificationDropdown.classList.toggle('hidden');
+                    if (notificationDropdown.classList.contains('hidden')) {
+                        // Calculate position based on bell button
+                        const bellRect = notificationBell.getBoundingClientRect();
+                        const dropdownWidth = 320; // w-80 = 320px
+                        
+                        // Position dropdown below the bell, aligned to the right
+                        notificationDropdown.style.top = (bellRect.bottom + 8) + 'px';
+                        notificationDropdown.style.right = (window.innerWidth - bellRect.right) + 'px';
+                        
+                        // Show dropdown
+                        notificationDropdown.classList.remove('hidden');
+                    } else {
+                        // Hide dropdown
+                        notificationDropdown.classList.add('hidden');
+                    }
                 });
             }
             
