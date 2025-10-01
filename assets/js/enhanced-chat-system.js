@@ -30,6 +30,11 @@ class EnhancedChatSystem {
         console.log('💬 Initializing chat system...');
         
         try {
+            // ✅ CRITICAL: Mark all messages as seen BEFORE Firebase starts listening
+            // This prevents notifications for existing messages when opening a ticket
+            console.log('📝 Marking existing messages as seen before Firebase initialization...');
+            await this.markAllMessagesAsSeenBeforeFirebase();
+            
             // Initialize Firebase chat for real-time messaging
             this.firebaseChat = new FirebaseChat(
                 this.ticketId,
@@ -49,6 +54,34 @@ class EnhancedChatSystem {
             // Fallback to basic functionality
             this.initializeElements();
             this.attachEventListeners();
+        }
+    }
+
+    /**
+     * Mark all existing messages as seen BEFORE Firebase initialization
+     * This prevents old message notifications from appearing
+     */
+    async markAllMessagesAsSeenBeforeFirebase() {
+        try {
+            const response = await fetch('/IThelp/api/mark_all_seen.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticket_id: this.ticketId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Pre-marked messages as seen:', result.marked_count, 'messages');
+            } else {
+                console.warn('⚠️ Failed to pre-mark messages:', result.error);
+            }
+        } catch (error) {
+            console.error('❌ Error pre-marking messages as seen:', error);
         }
     }
 

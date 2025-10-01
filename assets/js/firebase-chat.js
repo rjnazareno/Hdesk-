@@ -15,6 +15,7 @@ class FirebaseChat {
         this.listener = null;
         this.processedMessages = new Set();
         this.isInitialized = false;
+        this.isInitialLoad = true; // Prevent notifications during initial load
         
         console.log('🔥 Firebase Chat initializing...', {
             ticketId,
@@ -30,6 +31,12 @@ class FirebaseChat {
             await this.setupRealTimeListener();
             this.isInitialized = true;
             console.log('✅ Firebase Chat ready for instant messaging!');
+            
+            // Allow notifications after initial load (3 seconds)
+            setTimeout(() => {
+                this.isInitialLoad = false;
+                console.log('🔔 Firebase notifications now enabled (initial load complete)');
+            }, 3000);
             
             // Show connection status
             this.showConnectionStatus(true);
@@ -147,8 +154,12 @@ class FirebaseChat {
                             console.log('📨 New message from other user:', message.display_name, 'UserID:', message.user_id);
                             this.displayIncomingMessage(message);
                             
-                            // Only show notification for truly new messages (not already seen)
-                            this.checkAndShowNotification(message);
+                            // Only show notification for truly new messages (not during initial load or already seen)
+                            if (!this.isInitialLoad) {
+                                this.checkAndShowNotification(message);
+                            } else {
+                                console.log('🔕 Skipping notification during initial load');
+                            }
                         } else {
                             console.log('🚫 Skipping self-notification for user:', message.display_name, 'UserID:', message.user_id);
                         }
