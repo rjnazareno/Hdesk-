@@ -83,9 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 LEFT JOIN it_staff its ON t.assigned_to = its.staff_id
                 WHERE (e.id IS NOT NULL OR its.staff_id IS NOT NULL)";
         
-        $stmt = $db->prepare($sql3);
-        $stmt->execute();
-        $initialized = $stmt->rowCount();
+        $initialized = $db->exec($sql3);
         echo '<div class="success"><h4>✅ Initialized: ' . $initialized . ' read status records</h4></div>';
         
         // Test classes
