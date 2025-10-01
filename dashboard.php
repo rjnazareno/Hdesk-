@@ -6,7 +6,7 @@ require_once 'includes/security.php';
 session_start();
 requireLogin();
 
-// Debug: Check session data (remove in production)
+
 if (empty($_SESSION['user_id'])) {
     header('Location: login.php?error=session_expired');
     exit;

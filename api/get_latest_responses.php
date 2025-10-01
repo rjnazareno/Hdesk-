@@ -124,13 +124,8 @@ try {
     ob_clean(); // Clear any previous output
     echo json_encode([
         'success' => false, 
-        'error' => 'Server error occurred: ' . $e->getMessage(),
-        'new_responses' => [],
-        'debug' => [
-            'ticket_id' => $ticketId ?? 'not set',
-            'after_count' => $afterCount ?? 'not set',
-            'user_type' => $userType ?? 'not set'
-        ]
+        'error' => 'Server error occurred',
+        'new_responses' => []
     ]);
 }
 

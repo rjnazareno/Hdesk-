@@ -49,19 +49,7 @@ class NotificationSystem {
             }
         });
         
-        // Test buttons functionality
-        document.getElementById('testNotificationBtn')?.addEventListener('click', () => {
-            if (Notification.permission === 'granted') {
-                new Notification('Test Notification - IT Help Desk', {
-                    body: `This is a test notification for Ticket #${this.ticketId}`,
-                    icon: '/favicon.ico',
-                    tag: `ticket-${this.ticketId}-test`
-                });
-                console.log('Test notification sent');
-            } else {
-                alert('Notifications not permitted. Permission: ' + Notification.permission);
-            }
-        });
+
         
         document.getElementById('checkNowBtn')?.addEventListener('click', () => {
             console.log('Manual update check triggered');

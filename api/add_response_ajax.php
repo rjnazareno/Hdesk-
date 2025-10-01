@@ -154,15 +154,7 @@ try {
     ob_clean(); // Clear any previous output
     echo json_encode([
         'success' => false, 
-        'error' => 'Server error occurred',
-        'debug' => [
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'ticket_id' => $ticketId ?? 'not set',
-            'user_id' => $userId ?? 'not set',
-            'user_type' => $userType ?? 'not set'
-        ]
+        'error' => 'Server error occurred'
     ]);
 }
 

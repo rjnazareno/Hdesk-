@@ -352,21 +352,7 @@ class FirebaseNotificationService {
         return statusDiv;
     }
     
-    // Public method to send notification (for testing)
-    async testNotification(type = 'test') {
-        const testData = {
-            title: 'Test Notification',
-            body: 'This is a test notification from Firebase',
-            data: {
-                type: type,
-                ticket_id: window.TICKET_ID || '123',
-                action: 'test'
-            }
-        };
-        
-        this.showCustomNotification(testData);
-        console.log('🧪 Test notification sent');
-    }
+
 }
 
 // Export for global use

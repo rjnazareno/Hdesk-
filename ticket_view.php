@@ -4,9 +4,7 @@
  * This eliminates any potential corruption in the old file
  */
 
-// Error reporting for debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+
 
 // Start session and authentication
 session_start();

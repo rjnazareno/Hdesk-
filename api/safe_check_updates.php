@@ -23,7 +23,7 @@ try {
         echo json_encode([
             'error' => 'Authentication required', 
             'redirect' => 'login.php',
-            'debug' => 'No user_id in session'
+
         ]);
         exit;
     }
@@ -31,7 +31,7 @@ try {
     // Step 3: Validate input
     if (!isset($_GET['id'])) {
         http_response_code(400);
-        echo json_encode(['error' => 'Ticket ID required', 'debug' => 'No id parameter']);
+        echo json_encode(['error' => 'Ticket ID required']);
         exit;
     }
     
@@ -40,7 +40,7 @@ try {
     
     if ($ticketId <= 0) {
         http_response_code(400);
-        echo json_encode(['error' => 'Invalid ticket ID', 'debug' => 'Ticket ID must be positive integer']);
+        echo json_encode(['error' => 'Invalid ticket ID']);
         exit;
     }
     
@@ -102,15 +102,7 @@ try {
     echo json_encode([
         'hasUpdates' => $hasUpdates,
         'message' => $message,
-        'timestamp' => time(),
-        'debug' => [
-            'ticket_id' => $ticketId,
-            'user_id' => $userId,
-            'last_check' => $lastCheck,
-            'new_count' => $result['new_count'],
-            'php_version' => PHP_VERSION,
-            'session_active' => session_status() === PHP_SESSION_ACTIVE
-        ]
+        'timestamp' => time()
     ]);
     
 } catch (PDOException $e) {

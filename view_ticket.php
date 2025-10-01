@@ -652,7 +652,7 @@ if ($ticket) {
                             <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
                                 <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Closed (Resolved)</option>
+                                <option value="closed" <?= $ticket['status'] == 'closed' || $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Close Ticket</option>
                             </select>
                             <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                 <i class="fas fa-save mr-2"></i>Update Status
@@ -688,10 +688,16 @@ if ($ticket) {
                             Quick Actions
                         </h4>
                         <div class="space-y-3">
-                            <button onclick="document.getElementById('responseForm').scrollIntoView({behavior: 'smooth'})" 
-                                    class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                                <i class="fas fa-reply mr-2"></i>Add Response
-                            </button>
+                            <?php if ($ticket['status'] === 'closed' || $ticket['status'] === 'resolved'): ?>
+                                <div class="w-full bg-gray-400 text-white py-3 rounded-lg font-medium text-center cursor-not-allowed">
+                                    <i class="fas fa-lock mr-2"></i>Ticket Closed - Chat Disabled
+                                </div>
+                            <?php else: ?>
+                                <button onclick="document.getElementById('responseForm').scrollIntoView({behavior: 'smooth'})" 
+                                        class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                                    <i class="fas fa-reply mr-2"></i>Add Response
+                                </button>
+                            <?php endif; ?>
                             <a href="ticket_history.php?id=<?= $ticketId ?>" 
                                class="block w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-center">
                                 <i class="fas fa-history mr-2"></i>View History
@@ -762,6 +768,20 @@ if ($ticket) {
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                        
+                        <!-- Show closed indicator at end of chat if ticket is closed -->
+                        <?php if ($ticket['status'] === 'closed' || $ticket['status'] === 'resolved'): ?>
+                            <div class="text-center py-4 px-6">
+                                <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mx-4">
+                                    <div class="bg-red-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-lock text-red-500 text-lg"></i>
+                                    </div>
+                                    <p class="text-red-600 font-bold text-sm">🔒 Conversation Closed</p>
+                                    <p class="text-gray-500 text-xs mt-1">This ticket has been closed. No new messages can be added.</p>
+                                    <p class="text-gray-400 text-xs mt-1">To reopen, change the ticket status above.</p>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
                 
@@ -855,14 +875,7 @@ if ($ticket) {
                                 <i class="fas fa-check-circle text-green-600 mr-2"></i>
                                 <span class="text-xs text-gray-700 font-medium">Notifications enabled</span>
                             </div>
-                            <div class="flex space-x-1">
-                                <button id="testNotificationBtn" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
-                                    Test
-                                </button>
-                                <button id="checkNowBtn" class="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
-                                    Check
-                                </button>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -902,11 +915,23 @@ if ($ticket) {
         </div>
             
             <!-- Add Response Form (Hidden - Using Integrated Form Instead) -->
-            <div id="responseForm" class="hidden bg-white rounded-xl shadow-lg p-6 card-hover">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-pen text-blue-600 mr-3"></i>
-                    Add Your Response
-                </h3>
+            <?php if ($ticket['status'] === 'closed' || $ticket['status'] === 'resolved'): ?>
+                <div id="responseForm" class="hidden bg-gray-100 rounded-xl shadow-lg p-6 card-hover border-2 border-red-200">
+                    <div class="text-center py-8">
+                        <div class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-lock text-red-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-red-600 mb-2">🔒 Ticket Closed</h3>
+                        <p class="text-gray-600 text-sm">This conversation has been closed and cannot accept new messages.</p>
+                        <p class="text-gray-500 text-xs mt-2">To add a response, first reopen the ticket by changing its status to "Open" or "In Progress".</p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div id="responseForm" class="hidden bg-white rounded-xl shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-pen text-blue-600 mr-3"></i>
+                        Add Your Response
+                    </h3>
                 
                 <!-- Typing Indicator -->
                 <div id="typingIndicator" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -967,6 +992,7 @@ if ($ticket) {
                 <!-- Status Messages -->
                 <div id="responseStatus" class="hidden mt-4"></div>
             </div>
+            <?php endif; ?>
             
         <?php else: ?>
             <div class="bg-white rounded-lg shadow-lg p-6 text-center">
@@ -1036,19 +1062,7 @@ if ($ticket) {
                     statusDiv.id = 'firebaseStatusIndicator';
                     document.body.appendChild(statusDiv);
                     
-                    // Add debug button for testing
-                    const debugBtn = document.createElement('button');
-                    debugBtn.innerHTML = '🔧 Test Send';
-                    debugBtn.className = 'fixed bottom-16 left-4 bg-blue-600 text-white px-2 py-1 rounded text-xs z-40';
-                    debugBtn.onclick = () => {
-                        console.log('🔧 Debug test send triggered');
-                        if (window.enhancedChatSystem?.firebaseChat?.isInitialized) {
-                            window.enhancedChatSystem.sendMessage('Debug test message ' + Date.now());
-                        } else {
-                            console.error('❌ Firebase chat not ready for debug test');
-                        }
-                    };
-                    document.body.appendChild(debugBtn);
+
                     
                     // Auto-hide status after 5 seconds
                     setTimeout(() => {
@@ -1057,9 +1071,7 @@ if ($ticket) {
                             statusDiv.style.transform = 'translateY(10px)';
                             setTimeout(() => statusDiv.remove(), 300);
                         }
-                        if (debugBtn.parentNode) {
-                            debugBtn.remove();
-                        }
+
                     }, 10000);
                     
                 } else {
@@ -1083,7 +1095,7 @@ if ($ticket) {
             }
         });
         
-        // Add form debugging
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');

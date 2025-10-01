@@ -222,6 +222,25 @@ try {
         }
     }
     
+    // 📱 Send Firebase notifications for ticket closure
+    if (in_array($action, ['close', 'resolve'])) {
+        try {
+            if (class_exists('FirebaseNotificationSender')) {
+                $notificationSender = new FirebaseNotificationSender();
+                $result = $notificationSender->sendStatusChangeNotification($ticketId, $action === 'close' ? 'closed' : 'resolved', $auth->getUserId());
+                
+                if ($result['success']) {
+                    error_log("Firebase notification sent for ticket {$ticketId} status change: {$action}");
+                } else {
+                    error_log("Firebase notification failed for ticket {$ticketId}: " . ($result['error'] ?? 'Unknown error'));
+                }
+            }
+        } catch (Exception $e) {
+            error_log("Firebase notification error: " . $e->getMessage());
+            // Don't fail the action if notification fails
+        }
+    }
+    
     echo json_encode($response);
 
 } catch (Exception $e) {

@@ -85,13 +85,7 @@ try {
     echo json_encode([
         'hasUpdates' => $hasUpdates,
         'message' => $message,
-        'timestamp' => time(),
-        'debug' => [
-            'ticket_id' => $ticketId,
-            'user_id' => $userId,
-            'last_check' => $lastCheck,
-            'new_count' => $result['new_count']
-        ]
+        'timestamp' => time()
     ]);
     
 } catch (Exception $e) {
