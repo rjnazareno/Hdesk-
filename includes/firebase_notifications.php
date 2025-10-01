@@ -434,13 +434,13 @@ class FirebaseNotificationSender {
                 return ['success' => true, 'skipped' => true, 'reason' => 'Already notified for this message'];
             }
             
-            // ✅ CHECK IF MESSAGE WAS ALREADY SEEN
-            $stmt = $db->prepare("SELECT seen_at FROM message_seen WHERE ticket_id = ? AND user_id = ? AND response_id = ?");
-            $stmt->execute([$ticketId, $recipientId, $responseId]);
+            // ✅ CHECK IF MESSAGE WAS ALREADY SEEN  
+            $stmt = $db->prepare("SELECT seen_at FROM message_seen WHERE ticket_id = ? AND seen_by_user_id = ? AND seen_by_user_type = ? AND response_id = ?");
+            $stmt->execute([$ticketId, $recipientId, $recipientType, $responseId]);
             $seenRecord = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($seenRecord && $seenRecord['seen_at']) {
-                error_log("Skipping notification for already seen message: Ticket {$ticketId}, Response {$responseId}, User {$recipientId}");
+                error_log("Skipping FCM notification for already seen message: Ticket {$ticketId}, Response {$responseId}, User {$recipientId} ({$recipientType})");
                 return ['success' => true, 'skipped' => true, 'reason' => 'Message already seen by recipient'];
             }
             

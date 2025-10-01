@@ -32,11 +32,11 @@ class FirebaseChat {
             this.isInitialized = true;
             console.log('✅ Firebase Chat ready for instant messaging!');
             
-            // Allow notifications after initial load (3 seconds)
+            // Allow notifications after initial load (5 seconds - enough time for marking messages as seen)
             setTimeout(() => {
                 this.isInitialLoad = false;
                 console.log('🔔 Firebase notifications now enabled (initial load complete)');
-            }, 3000);
+            }, 5000);
             
             // Show connection status
             this.showConnectionStatus(true);

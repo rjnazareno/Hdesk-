@@ -22,7 +22,9 @@ try {
         throw new Exception('Invalid request method');
     }
     
-    $ticketId = intval($_POST['ticket_id'] ?? 0);
+    // Handle both JSON and form data
+    $input = json_decode(file_get_contents('php://input'), true);
+    $ticketId = intval($input['ticket_id'] ?? $_POST['ticket_id'] ?? 0);
     
     if (!$ticketId) {
         throw new Exception('Invalid ticket ID');
