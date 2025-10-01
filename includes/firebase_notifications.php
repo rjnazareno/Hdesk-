@@ -434,6 +434,16 @@ class FirebaseNotificationSender {
                 return ['success' => true, 'skipped' => true, 'reason' => 'Already notified for this message'];
             }
             
+            // ✅ CHECK IF MESSAGE WAS ALREADY SEEN
+            $stmt = $db->prepare("SELECT seen_at FROM message_seen WHERE ticket_id = ? AND user_id = ? AND response_id = ?");
+            $stmt->execute([$ticketId, $recipientId, $responseId]);
+            $seenRecord = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($seenRecord && $seenRecord['seen_at']) {
+                error_log("Skipping notification for already seen message: Ticket {$ticketId}, Response {$responseId}, User {$recipientId}");
+                return ['success' => true, 'skipped' => true, 'reason' => 'Message already seen by recipient'];
+            }
+            
             // ✅ CREATE NOTIFICATION WITH PHOTO
             $notification = [
                 'title' => "💬 New Reply - Ticket #{$ticketId}",

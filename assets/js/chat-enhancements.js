@@ -18,6 +18,7 @@ class ChatEnhancements {
     init() {
         this.setupTypingIndicator();
         this.setupSeenIndicators();
+        this.markAllMessagesAsSeenOnLoad(); // Auto-mark messages as seen when opening ticket
         this.startHeartbeat();
     }
     
@@ -181,6 +182,24 @@ class ChatEnhancements {
         });
     }
     
+    async markAllMessagesAsSeenOnLoad() {
+        try {
+            // Mark all messages in this ticket as seen when user opens it
+            const response = await fetch('api/mark_all_seen.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `ticket_id=${this.ticketId}`
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                console.log(`✅ Marked ${data.marked_count} messages as seen on ticket load`);
+            }
+        } catch (error) {
+            console.error('Error marking all messages as seen:', error);
+        }
+    }
+
     startHeartbeat() {
         // Send heartbeat every 30 seconds to maintain connection
         setInterval(() => {

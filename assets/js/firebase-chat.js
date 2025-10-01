@@ -146,7 +146,9 @@ class FirebaseChat {
                         if (!isSameUser) {
                             console.log('📨 New message from other user:', message.display_name, 'UserID:', message.user_id);
                             this.displayIncomingMessage(message);
-                            this.showNewMessageNotification(message);
+                            
+                            // Only show notification for truly new messages (not already seen)
+                            this.checkAndShowNotification(message);
                         } else {
                             console.log('🚫 Skipping self-notification for user:', message.display_name, 'UserID:', message.user_id);
                         }
@@ -258,6 +260,39 @@ class FirebaseChat {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
     
+    /**
+     * Check if message was seen and show notification only for new messages
+     */
+    async checkAndShowNotification(message) {
+        try {
+            // Check if message was already seen
+            const response = await fetch('/IThelp/api/check_message_seen.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticket_id: this.ticketId,
+                    message_id: message.id || Date.now() // Use message ID or timestamp
+                })
+            });
+            
+            const result = await response.json();
+            
+            // Only show notification if message was NOT already seen
+            if (result.success && !result.seen) {
+                console.log('📢 Showing notification for new unseen message');
+                this.showNewMessageNotification(message);
+            } else {
+                console.log('🔕 Message already seen, skipping notification');
+            }
+        } catch (error) {
+            console.error('Error checking message seen status:', error);
+            // Fallback: show notification if can't check status
+            this.showNewMessageNotification(message);
+        }
+    }
+
     /**
      * Show notification for new messages
      */
