@@ -437,12 +437,12 @@ if ($ticket) {
                     </nav>
                 </div>
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     <!-- Notification Bell -->
                     <div class="relative">
-                        <button id="notificationBell" class="relative bg-white bg-opacity-20 text-white p-3 rounded-lg hover:bg-opacity-30 transition-all">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold hidden">0</span>
+                        <button id="notificationBell" class="relative bg-white bg-opacity-10 text-white p-2.5 rounded-lg hover:bg-opacity-20 transition-all border border-white border-opacity-20">
+                            <i class="fas fa-bell text-base"></i>
+                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
                         </button>
                         
                         <!-- Notification Dropdown -->
@@ -532,40 +532,37 @@ if ($ticket) {
             
             <!-- Admin Controls (IT Staff Only) -->
             <?php if ($userType === 'it_staff'): ?>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-blue-100 rounded-lg p-2">
-                            <i class="fas fa-cog text-blue-600 text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-medium text-blue-900">Admin Controls</h3>
-                            <p class="text-sm text-blue-600">Manage ticket status and assignment</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                        <!-- Status Dropdown -->
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-600 whitespace-nowrap">Status:</label>
-                            <form method="POST" class="inline-flex">
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-tools text-blue-600 mr-2"></i>
+                        Administrative Controls
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage ticket status and assignment</p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Status Control -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Ticket Status</label>
+                            <form method="POST">
                                 <select name="status" onchange="this.form.submit()" 
-                                        class="bg-white border border-gray-300 text-gray-900 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-medium cursor-pointer">
-                                    <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>📋 Open</option>
-                                    <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔧 In Progress</option>
-                                    <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>✅ Resolved</option>
-                                    <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>🔒 Closed</option>
+                                        class="w-full bg-white border border-gray-300 text-gray-900 px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm cursor-pointer">
+                                    <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>🔵 Open</option>
+                                    <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🟡 In Progress</option>
+                                    <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>🟢 Resolved</option>
+                                    <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>🔴 Closed</option>
                                 </select>
                                 <input type="hidden" name="update_status" value="1">
                             </form>
                         </div>
                         
-                        <!-- Assign Dropdown -->
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-600 whitespace-nowrap">Assign:</label>
-                            <form method="POST" class="inline-flex">
+                        <!-- Assignment Control -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Assigned To</label>
+                            <form method="POST">
                                 <select name="assigned_to" onchange="this.form.submit()" 
-                                        class="bg-white border border-gray-300 text-gray-900 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-medium cursor-pointer">
+                                        class="w-full bg-white border border-gray-300 text-gray-900 px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm cursor-pointer">
                                     <option value="">👤 Unassigned</option>
                                     <?php foreach ($itStaff as $staff): ?>
                                         <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
@@ -583,42 +580,45 @@ if ($ticket) {
             
             <!-- Employee Ticket Status (Employees Only) -->
             <?php if ($userType === 'employee'): ?>
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-100 rounded-lg p-2">
-                            <i class="fas fa-ticket-alt text-green-600 text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-medium text-green-900">Ticket Status</h3>
-                            <p class="text-sm text-green-600">Track your ticket progress</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm font-medium text-gray-600">Status:</span>
-                            <span class="bg-white px-3 py-1 rounded-full text-sm font-medium border">
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        Ticket Information
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Current status and assignment details</p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Status Display -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Current Status</label>
+                            <div class="bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-lg flex items-center">
                                 <?php
                                 switch($ticket['status']) {
-                                    case 'open': echo '📋 Open'; break;
-                                    case 'in_progress': echo '🔧 In Progress'; break;
-                                    case 'resolved': echo '✅ Resolved'; break;
-                                    case 'closed': echo '🔒 Closed'; break;
-                                    default: echo '📋 ' . ucfirst($ticket['status']); break;
+                                    case 'open': echo '<div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div><span class="text-sm font-medium text-gray-900">Open</span>'; break;
+                                    case 'in_progress': echo '<div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div><span class="text-sm font-medium text-gray-900">In Progress</span>'; break;
+                                    case 'resolved': echo '<div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div><span class="text-sm font-medium text-gray-900">Resolved</span>'; break;
+                                    case 'closed': echo '<div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div><span class="text-sm font-medium text-gray-900">Closed</span>'; break;
+                                    default: echo '<div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div><span class="text-sm font-medium text-gray-900">' . ucfirst($ticket['status']) . '</span>'; break;
                                 }
                                 ?>
-                            </span>
+                            </div>
                         </div>
                         
-                        <?php if ($ticket['assigned_to']): ?>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm font-medium text-gray-600">Assigned to:</span>
-                            <span class="bg-white px-3 py-1 rounded-full text-sm font-medium border">
-                                👤 <?= htmlspecialchars($ticket['assigned_staff_name'] ?? 'IT Staff') ?>
-                            </span>
+                        <!-- Assignment Display -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Assigned To</label>
+                            <div class="bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-lg flex items-center">
+                                <?php if ($ticket['assigned_to']): ?>
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                                    <span class="text-sm font-medium text-gray-900"><?= htmlspecialchars($ticket['assigned_staff_name'] ?? 'IT Staff') ?></span>
+                                <?php else: ?>
+                                    <div class="w-3 h-3 bg-gray-400 rounded-full mr-3"></div>
+                                    <span class="text-sm font-medium text-gray-500">Unassigned</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -1319,6 +1319,61 @@ if ($ticket) {
     
     <!-- Chat Enhancements (Typing & Seen Indicators) -->
     <script src="assets/js/chat-enhancements.js"></script>
+    
+    <!-- Header Dropdown Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Notification Bell Dropdown
+            const notificationBell = document.getElementById('notificationBell');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close user dropdown if open
+                    const userDropdown = document.getElementById('userDropdown');
+                    if (userDropdown) {
+                        userDropdown.classList.add('hidden');
+                    }
+                    
+                    // Toggle notification dropdown
+                    notificationDropdown.classList.toggle('hidden');
+                });
+            }
+            
+            // User Profile Dropdown
+            const userProfileBtn = document.getElementById('userProfileBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userProfileBtn && userDropdown) {
+                userProfileBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close notification dropdown if open
+                    if (notificationDropdown) {
+                        notificationDropdown.classList.add('hidden');
+                    }
+                    
+                    // Toggle user dropdown
+                    userDropdown.classList.toggle('hidden');
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (notificationDropdown && !notificationBell?.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+                
+                if (userDropdown && !userProfileBtn?.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
     
 </body>
 </html>

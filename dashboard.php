@@ -275,12 +275,12 @@ function timeAgo($datetime) {
                     </nav>
                 </div>
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     <!-- Notification Bell -->
                     <div class="relative">
-                        <button id="notificationBell" class="relative bg-white bg-opacity-20 text-white p-3 rounded-lg hover:bg-opacity-30 transition-all">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold hidden">0</span>
+                        <button id="notificationBell" class="relative bg-white bg-opacity-10 text-white p-2.5 rounded-lg hover:bg-opacity-20 transition-all border border-white border-opacity-20">
+                            <i class="fas fa-bell text-base"></i>
+                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
                         </button>
                         
                         <!-- Notification Dropdown -->
@@ -318,21 +318,32 @@ function timeAgo($datetime) {
                         </div>
                     </div>
                     
-                    <div class="hidden sm:flex items-center bg-blue-700 px-3 py-2 rounded-lg">
-                        <i class="fas fa-user-circle text-blue-200 mr-2"></i>
-                        <div class="text-xs">
-                            <div class="text-blue-200"><?= $isITStaff ? 'IT Staff' : 'Employee' ?></div>
-                            <div class="text-white font-medium"><?= escape(getUserName()) ?></div>
-                        </div>
-                    </div>
+                    <!-- Create Ticket Button (Employees Only) -->
                     <?php if (!$isITStaff): ?>
-                    <a href="create_ticket.php" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all font-medium">
+                    <a href="create_ticket.php" class="bg-green-600 bg-opacity-90 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all font-medium border border-white border-opacity-20">
                         <i class="fas fa-plus mr-2"></i>New Ticket
                     </a>
                     <?php endif; ?>
-                    <a href="logout.php" class="bg-red-600 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all font-medium">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                    </a>
+                    
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="userProfileBtn" class="flex items-center space-x-2 bg-white bg-opacity-10 text-white px-3 py-2 rounded-lg hover:bg-opacity-20 transition-all border border-white border-opacity-20">
+                            <i class="fas fa-user-circle text-lg"></i>
+                            <div class="text-left hidden sm:block">
+                                <div class="text-xs text-blue-200"><?= $isITStaff ? 'IT Staff' : 'Employee' ?></div>
+                                <div class="text-sm font-medium"><?= escape(getUserName()) ?></div>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- User Dropdown Menu -->
+                        <div id="userDropdown" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden">
+                            <a href="logout.php" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg">
+                                <i class="fas fa-sign-out-alt text-red-500 mr-3 w-4"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -904,5 +915,58 @@ function timeAgo($datetime) {
     
     <!-- Notification System -->
     <script src="assets/js/notification-system.js"></script>
+    
+    <!-- Header Dropdown Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User Profile Dropdown
+            const userProfileBtn = document.getElementById('userProfileBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const notificationBell = document.getElementById('notificationBell');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            
+            if (userProfileBtn && userDropdown) {
+                userProfileBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close notification dropdown if open
+                    if (notificationDropdown) {
+                        notificationDropdown.classList.add('hidden');
+                    }
+                    
+                    // Toggle user dropdown
+                    userDropdown.classList.toggle('hidden');
+                });
+            }
+            
+            // Enhanced notification bell functionality
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close user dropdown if open
+                    if (userDropdown) {
+                        userDropdown.classList.add('hidden');
+                    }
+                    
+                    // Toggle notification dropdown
+                    notificationDropdown.classList.toggle('hidden');
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (notificationDropdown && !notificationBell?.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+                
+                if (userDropdown && !userProfileBtn?.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

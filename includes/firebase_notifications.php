@@ -386,6 +386,11 @@ class FirebaseNotificationSender {
                 $recipientType = 'it_staff';
                 $fromName = trim($ticket['fname'] . ' ' . $ticket['lname']);
                 
+                // ✅ PREVENT SELF-NOTIFICATION: Don't notify if employee is replying to their own ticket
+                if ($recipientId === $fromUserId) {
+                    return ['success' => true, 'skipped' => true, 'reason' => 'Self-notification prevented'];
+                }
+                
                 // Also notify all IT staff if not assigned
                 if (!$recipientId) {
                     return $this->sendToUserType('it_staff', [
@@ -408,6 +413,11 @@ class FirebaseNotificationSender {
                 $recipientId = $ticket['employee_user_id'];
                 $recipientType = 'employee';
                 $fromName = $ticket['name'] ?? 'IT Support';
+                
+                // ✅ PREVENT SELF-NOTIFICATION: Don't notify if IT staff is replying as the same user
+                if ($recipientId === $fromUserId && $fromUserType === 'employee') {
+                    return ['success' => true, 'skipped' => true, 'reason' => 'Self-notification prevented'];
+                }
             }
             
             if (!$recipientId) {
