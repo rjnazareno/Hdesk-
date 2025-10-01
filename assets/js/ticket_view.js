@@ -151,8 +151,11 @@ function displayTicket(ticket) {
     // Display attachments
     displayAttachments(ticket.attachments);
     
-    // Display responses
-    displayResponses(ticket.responses);
+    // Only display responses if we're using AJAX loading (when responsesList container exists)
+    // Skip if using PHP-rendered conversation (chatContainer)
+    if (document.getElementById('responsesList')) {
+        displayResponses(ticket.responses);
+    }
     
     // Setup forms
     setupForms();

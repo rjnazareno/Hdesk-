@@ -438,6 +438,48 @@ if ($ticket) {
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notificationBell" class="relative bg-white bg-opacity-20 text-white p-3 rounded-lg hover:bg-opacity-30 transition-all">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold hidden">0</span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div id="notificationDropdown" class="absolute right-0 top-full mt-2 w-80 sm:w-96 md:w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 hidden max-w-[calc(100vw-2rem)] sm:max-w-none">
+                            <!-- Header -->
+                            <div class="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-xl">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-gray-900">Notifications</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <button id="markAllRead" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>
+                                        <button id="clearAll" class="text-xs text-red-600 hover:text-red-800 font-medium">Clear all</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notifications List -->
+                            <div id="notificationsList" class="max-h-96 overflow-y-auto">
+                                <!-- Loading -->
+                                <div id="notificationsLoading" class="text-center py-8">
+                                    <i class="fas fa-spinner fa-spin text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm text-gray-500">Loading notifications...</p>
+                                </div>
+                                
+                                <!-- Empty state -->
+                                <div id="notificationsEmpty" class="text-center py-8 hidden">
+                                    <i class="fas fa-bell-slash text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm text-gray-500">No notifications yet</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div class="px-4 py-3 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                                <a href="dashboard.php" class="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="hidden sm:flex items-center bg-blue-700 px-3 py-2 rounded-lg">
                         <i class="fas fa-user-circle text-blue-200 mr-2"></i>
                         <div class="text-xs">
@@ -487,6 +529,72 @@ if ($ticket) {
         <?php endif; ?>
         
         <?php if ($ticket): ?>
+            
+            <!-- Admin Quick Actions Bar (IT Staff Only) -->
+            <?php if ($userType === 'it_staff'): ?>
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-3 sm:p-4 mb-6 text-white">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4">
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <i class="fas fa-tools text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg">Admin Controls</h3>
+                            <p class="text-xs sm:text-sm text-blue-100">Quick actions for ticket management</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+                        <!-- Status Dropdown -->
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <label class="text-xs sm:text-sm font-medium text-blue-100 sm:whitespace-nowrap">Status:</label>
+                            <form method="POST" class="inline-flex items-center">
+                                <select name="status" onchange="this.form.submit()" 
+                                        class="bg-white text-gray-900 px-2 sm:px-3 py-2 rounded-lg border-0 focus:ring-2 focus:ring-blue-300 text-xs sm:text-sm font-medium cursor-pointer w-full sm:w-auto">
+                                    <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>📋 Open</option>
+                                    <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔧 In Progress</option>
+                                    <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>✅ Resolved</option>
+                                    <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>🔒 Closed</option>
+                                </select>
+                                <input type="hidden" name="update_status" value="1">
+                            </form>
+                        </div>
+                        
+                        <!-- Assign Dropdown -->
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <label class="text-xs sm:text-sm font-medium text-blue-100 sm:whitespace-nowrap">Assign:</label>
+                            <form method="POST" class="inline-flex items-center">
+                                <select name="assigned_to" onchange="this.form.submit()" 
+                                        class="bg-white text-gray-900 px-2 sm:px-3 py-2 rounded-lg border-0 focus:ring-2 focus:ring-blue-300 text-xs sm:text-sm font-medium cursor-pointer w-full sm:w-auto">
+                                    <option value="">👤 Unassigned</option>
+                                    <?php foreach ($itStaff as $staff): ?>
+                                        <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
+                                            <?= $ticket['assigned_to'] == $staff['staff_id'] ? '✅ ' : '👤 ' ?><?= htmlspecialchars($staff['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <input type="hidden" name="assign_ticket" value="1">
+                            </form>
+                        </div>
+                        
+                        <!-- Quick Action Buttons -->
+                        <div class="flex items-center space-x-2">
+                            <button onclick="scrollToChat()" class="bg-green-500 hover:bg-green-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
+                                <i class="fas fa-comment mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Reply</span>
+                                <span class="sm:hidden">💬</span>
+                            </button>
+                            
+                            <button onclick="window.print()" class="bg-purple-500 hover:bg-purple-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
+                                <i class="fas fa-print mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Print</span>
+                                <span class="sm:hidden">🖨️</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
             
             <!-- Main Content Layout -->
             <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -771,8 +879,23 @@ if ($ticket) {
                                 <div class="max-w-xs">
                                     <div class="chat-bubble relative <?= $bubbleClasses ?> px-4 py-3 shadow-sm">
                                         <p class="text-sm leading-relaxed whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
-                                        <div class="flex justify-start mt-2">
+                                        <div class="flex justify-between items-center mt-2">
                                             <span class="text-xs opacity-75"><?= date('g:i A', strtotime($response['created_at'])) ?></span>
+                                            <?php if ($alignRight): // Only show for my messages ?>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-check text-xs opacity-60" title="Sent"></i>
+                                                    <?php 
+                                                    // Check if message has been seen by calculating if it's been read
+                                                    $currentTime = new DateTime();
+                                                    $messageTime = new DateTime($response['created_at']);
+                                                    $timeDiff = $currentTime->diff($messageTime);
+                                                    $isOlderThanMinute = $timeDiff->i > 1 || $timeDiff->h > 0 || $timeDiff->days > 0;
+                                                    ?>
+                                                    <?php if ($isOlderThanMinute): ?>
+                                                        <i class="fas fa-check-double text-xs text-blue-400" title="Seen"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -1036,6 +1159,18 @@ if ($ticket) {
             userName: window.CURRENT_USER_NAME,
             responseCount: window.INITIAL_RESPONSE_COUNT
         });
+        
+        // Admin toolbar helper functions
+        function scrollToChat() {
+            const responseForm = document.getElementById('response-form');
+            if (responseForm) {
+                responseForm.scrollIntoView({ behavior: 'smooth' });
+                const textarea = responseForm.querySelector('textarea');
+                if (textarea) {
+                    setTimeout(() => textarea.focus(), 500);
+                }
+            }
+        }
     </script>
     
     <!-- Firebase Real-Time Chat System -->
@@ -1137,6 +1272,12 @@ if ($ticket) {
             }
         });
     </script>
+    
+    <!-- Notification System -->
+    <script src="assets/js/notification-system.js"></script>
+    
+    <!-- Chat Enhancements (Typing & Seen Indicators) -->
+    <script src="assets/js/chat-enhancements.js"></script>
     
 </body>
 </html>

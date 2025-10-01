@@ -276,6 +276,48 @@ function timeAgo($datetime) {
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notificationBell" class="relative bg-white bg-opacity-20 text-white p-3 rounded-lg hover:bg-opacity-30 transition-all">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold hidden">0</span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div id="notificationDropdown" class="absolute right-0 top-full mt-2 w-80 sm:w-96 md:w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 hidden max-w-[calc(100vw-2rem)] sm:max-w-none">
+                            <!-- Header -->
+                            <div class="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-xl">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-gray-900">Notifications</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <button id="markAllRead" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>
+                                        <button id="clearAll" class="text-xs text-red-600 hover:text-red-800 font-medium">Clear all</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notifications List -->
+                            <div id="notificationsList" class="max-h-96 overflow-y-auto">
+                                <!-- Loading -->
+                                <div id="notificationsLoading" class="text-center py-8">
+                                    <i class="fas fa-spinner fa-spin text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm text-gray-500">Loading notifications...</p>
+                                </div>
+                                
+                                <!-- Empty state -->
+                                <div id="notificationsEmpty" class="text-center py-8 hidden">
+                                    <i class="fas fa-bell-slash text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm text-gray-500">No notifications yet</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div class="px-4 py-3 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                                <a href="#" class="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="hidden sm:flex items-center bg-blue-700 px-3 py-2 rounded-lg">
                         <i class="fas fa-user-circle text-blue-200 mr-2"></i>
                         <div class="text-xs">
@@ -643,9 +685,10 @@ function timeAgo($datetime) {
         </div>
     </div>
     
-    <!-- JavaScript for Quick Actions -->
+    <!-- JavaScript for Quick Actions and Notifications -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Quick Actions
             const quickActionsBtn = document.getElementById('quickActionsBtn');
             const quickActionsMenu = document.getElementById('quickActionsMenu');
             
@@ -654,15 +697,212 @@ function timeAgo($datetime) {
                     e.preventDefault();
                     quickActionsMenu.classList.toggle('hidden');
                 });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!quickActionsBtn.contains(e.target) && !quickActionsMenu.contains(e.target)) {
-                        quickActionsMenu.classList.add('hidden');
+            }
+            
+            // Notification System
+            const notificationBell = document.getElementById('notificationBell');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationBadge = document.getElementById('notificationBadge');
+            const notificationsList = document.getElementById('notificationsList');
+            const markAllReadBtn = document.getElementById('markAllRead');
+            const clearAllBtn = document.getElementById('clearAll');
+            
+            let notifications = [];
+            let isDropdownOpen = false;
+            
+            // Toggle notification dropdown
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    isDropdownOpen = !isDropdownOpen;
+                    notificationDropdown.classList.toggle('hidden', !isDropdownOpen);
+                    
+                    if (isDropdownOpen) {
+                        loadNotifications();
                     }
                 });
             }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (quickActionsBtn && quickActionsMenu && !quickActionsBtn.contains(e.target) && !quickActionsMenu.contains(e.target)) {
+                    quickActionsMenu.classList.add('hidden');
+                }
+                
+                if (notificationBell && notificationDropdown && !notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                    isDropdownOpen = false;
+                }
+            });
+            
+            // Load notifications
+            async function loadNotifications() {
+                try {
+                    document.getElementById('notificationsLoading').classList.remove('hidden');
+                    document.getElementById('notificationsEmpty').classList.add('hidden');
+                    
+                    const response = await fetch('api/notifications.php?action=get_notifications');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        notifications = data.notifications;
+                        updateNotificationBadge(data.unread_count);
+                        renderNotifications(notifications);
+                    } else {
+                        throw new Error(data.error || 'Failed to load notifications');
+                    }
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                    notificationsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i>
+                            <p class="text-sm text-red-600">Failed to load notifications</p>
+                        </div>
+                    `;
+                } finally {
+                    document.getElementById('notificationsLoading').classList.add('hidden');
+                }
+            }
+            
+            // Update notification badge
+            function updateNotificationBadge(count) {
+                if (count > 0) {
+                    notificationBadge.textContent = count > 99 ? '99+' : count;
+                    notificationBadge.classList.remove('hidden');
+                } else {
+                    notificationBadge.classList.add('hidden');
+                }
+            }
+            
+            // Render notifications
+            function renderNotifications(notifications) {
+                if (notifications.length === 0) {
+                    document.getElementById('notificationsEmpty').classList.remove('hidden');
+                    notificationsList.innerHTML = '';
+                    return;
+                }
+                
+                notificationsList.innerHTML = notifications.map(notification => `
+                    <div class="notification-item px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${notification.is_read ? '' : 'bg-blue-50'}" 
+                         data-id="${notification.id}">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 cursor-pointer" onclick="handleNotificationClick(${notification.id}, '${notification.action_url || '#'}')">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h4 class="font-medium text-gray-900 text-sm">${notification.title}</h4>
+                                    ${notification.is_read ? '' : '<div class="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>'}
+                                </div>
+                                <p class="text-gray-600 text-xs leading-relaxed">${notification.message}</p>
+                                <p class="text-gray-400 text-xs mt-1">${formatNotificationDate(notification.created_at)}</p>
+                            </div>
+                            <button onclick="markAsRead(${notification.id})" class="text-gray-400 hover:text-gray-600 ml-2" title="Mark as read">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Handle notification click
+            window.handleNotificationClick = function(id, actionUrl) {
+                markAsRead(id);
+                if (actionUrl && actionUrl !== '#') {
+                    window.location.href = actionUrl;
+                }
+            };
+            
+            // Mark single notification as read
+            window.markAsRead = async function(id) {
+                try {
+                    const response = await fetch('api/notifications.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: `action=mark_read&id=${id}`
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        // Update UI
+                        const item = document.querySelector(`[data-id="${id}"]`);
+                        if (item) {
+                            item.classList.remove('bg-blue-50');
+                            const dot = item.querySelector('.bg-blue-500');
+                            if (dot) dot.remove();
+                        }
+                        
+                        // Update badge count
+                        const currentBadge = parseInt(notificationBadge.textContent) || 0;
+                        updateNotificationBadge(Math.max(0, currentBadge - 1));
+                    }
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            };
+            
+            // Mark all as read
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', async function() {
+                    try {
+                        const response = await fetch('api/notifications.php', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                            body: 'action=mark_all_read'
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            loadNotifications(); // Reload to update UI
+                        }
+                    } catch (error) {
+                        console.error('Error marking all as read:', error);
+                    }
+                });
+            }
+            
+            // Clear all notifications
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', async function() {
+                    if (!confirm('Are you sure you want to clear all notifications? This action cannot be undone.')) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch('api/notifications.php', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                            body: 'action=clear_all'
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            loadNotifications(); // Reload to update UI
+                        }
+                    } catch (error) {
+                        console.error('Error clearing notifications:', error);
+                    }
+                });
+            }
+            
+            // Format notification date
+            function formatNotificationDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays < 7) return `${diffDays}d ago`;
+                
+                return date.toLocaleDateString();
+            }
+            
         });
     </script>
+    
+    <!-- Notification System -->
+    <script src="assets/js/notification-system.js"></script>
 </body>
 </html>
