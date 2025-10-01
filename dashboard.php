@@ -320,9 +320,6 @@ function timeAgo($datetime) {
                     
                     <!-- Create Ticket Button (Employees Only) -->
                     <?php if (!$isITStaff): ?>
-                    <a href="create_ticket.php" class="bg-green-600 bg-opacity-90 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all font-medium border border-white border-opacity-20">
-                        <i class="fas fa-plus mr-2"></i>New Ticket
-                    </a>
                     <?php endif; ?>
                     
                     <!-- User Profile Dropdown -->
