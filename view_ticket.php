@@ -530,27 +530,27 @@ if ($ticket) {
         
         <?php if ($ticket): ?>
             
-            <!-- Admin Quick Actions Bar (IT Staff Only) -->
+            <!-- Admin Controls (IT Staff Only) -->
             <?php if ($userType === 'it_staff'): ?>
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-3 sm:p-4 mb-6 text-white">
-                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4">
-                    <div class="flex items-center space-x-3 sm:space-x-4">
-                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                            <i class="fas fa-tools text-lg sm:text-xl"></i>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-blue-100 rounded-lg p-2">
+                            <i class="fas fa-cog text-blue-600 text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-base sm:text-lg">Admin Controls</h3>
-                            <p class="text-xs sm:text-sm text-blue-100">Quick actions for ticket management</p>
+                            <h3 class="font-medium text-blue-900">Admin Controls</h3>
+                            <p class="text-sm text-blue-600">Manage ticket status and assignment</p>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                         <!-- Status Dropdown -->
-                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                            <label class="text-xs sm:text-sm font-medium text-blue-100 sm:whitespace-nowrap">Status:</label>
-                            <form method="POST" class="inline-flex items-center">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-600 whitespace-nowrap">Status:</label>
+                            <form method="POST" class="inline-flex">
                                 <select name="status" onchange="this.form.submit()" 
-                                        class="bg-white text-gray-900 px-2 sm:px-3 py-2 rounded-lg border-0 focus:ring-2 focus:ring-blue-300 text-xs sm:text-sm font-medium cursor-pointer w-full sm:w-auto">
+                                        class="bg-white border border-gray-300 text-gray-900 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-medium cursor-pointer">
                                     <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>📋 Open</option>
                                     <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔧 In Progress</option>
                                     <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>✅ Resolved</option>
@@ -561,11 +561,11 @@ if ($ticket) {
                         </div>
                         
                         <!-- Assign Dropdown -->
-                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                            <label class="text-xs sm:text-sm font-medium text-blue-100 sm:whitespace-nowrap">Assign:</label>
-                            <form method="POST" class="inline-flex items-center">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-600 whitespace-nowrap">Assign:</label>
+                            <form method="POST" class="inline-flex">
                                 <select name="assigned_to" onchange="this.form.submit()" 
-                                        class="bg-white text-gray-900 px-2 sm:px-3 py-2 rounded-lg border-0 focus:ring-2 focus:ring-blue-300 text-xs sm:text-sm font-medium cursor-pointer w-full sm:w-auto">
+                                        class="bg-white border border-gray-300 text-gray-900 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-medium cursor-pointer">
                                     <option value="">👤 Unassigned</option>
                                     <?php foreach ($itStaff as $staff): ?>
                                         <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
@@ -576,45 +576,29 @@ if ($ticket) {
                                 <input type="hidden" name="assign_ticket" value="1">
                             </form>
                         </div>
-                        
-                        <!-- Quick Action Buttons -->
-                        <div class="flex items-center space-x-2">
-                            <button onclick="scrollToChat()" class="bg-green-500 hover:bg-green-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
-                                <i class="fas fa-comment mr-1 sm:mr-2"></i>
-                                <span class="hidden sm:inline">Reply</span>
-                                <span class="sm:hidden">💬</span>
-                            </button>
-                            
-                            <button onclick="window.print()" class="bg-purple-500 hover:bg-purple-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
-                                <i class="fas fa-print mr-1 sm:mr-2"></i>
-                                <span class="hidden sm:inline">Print</span>
-                                <span class="sm:hidden">🖨️</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
             <?php endif; ?>
             
-            <!-- Employee Quick Actions Bar (Employees Only) -->
+            <!-- Employee Ticket Status (Employees Only) -->
             <?php if ($userType === 'employee'): ?>
-            <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-xl shadow-lg p-3 sm:p-4 mb-6 text-white">
-                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4">
-                    <div class="flex items-center space-x-3 sm:space-x-4">
-                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                            <i class="fas fa-user text-lg sm:text-xl"></i>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-green-100 rounded-lg p-2">
+                            <i class="fas fa-ticket-alt text-green-600 text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-base sm:text-lg">My Ticket Actions</h3>
-                            <p class="text-xs sm:text-sm text-green-100">Quick actions for your ticket</p>
+                            <h3 class="font-medium text-green-900">Ticket Status</h3>
+                            <p class="text-sm text-green-600">Track your ticket progress</p>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
-                        <!-- Ticket Status Display (Read-only for employees) -->
-                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                            <label class="text-xs sm:text-sm font-medium text-green-100 sm:whitespace-nowrap">Current Status:</label>
-                            <div class="bg-white bg-opacity-20 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm font-medium text-gray-600">Status:</span>
+                            <span class="bg-white px-3 py-1 rounded-full text-sm font-medium border">
                                 <?php
                                 switch($ticket['status']) {
                                     case 'open': echo '📋 Open'; break;
@@ -624,39 +608,17 @@ if ($ticket) {
                                     default: echo '📋 ' . ucfirst($ticket['status']); break;
                                 }
                                 ?>
-                            </div>
+                            </span>
                         </div>
                         
-                        <!-- Assigned Staff Display (Read-only for employees) -->
                         <?php if ($ticket['assigned_to']): ?>
-                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                            <label class="text-xs sm:text-sm font-medium text-green-100 sm:whitespace-nowrap">Assigned to:</label>
-                            <div class="bg-white bg-opacity-20 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm font-medium text-gray-600">Assigned to:</span>
+                            <span class="bg-white px-3 py-1 rounded-full text-sm font-medium border">
                                 👤 <?= htmlspecialchars($ticket['assigned_staff_name'] ?? 'IT Staff') ?>
-                            </div>
+                            </span>
                         </div>
                         <?php endif; ?>
-                        
-                        <!-- Employee Action Buttons -->
-                        <div class="flex items-center space-x-2">
-                            <button onclick="scrollToChat()" class="bg-blue-500 hover:bg-blue-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
-                                <i class="fas fa-comment mr-1 sm:mr-2"></i>
-                                <span class="hidden sm:inline">Add Response</span>
-                                <span class="sm:hidden">💬</span>
-                            </button>
-                            
-                            <button onclick="window.print()" class="bg-gray-500 hover:bg-gray-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
-                                <i class="fas fa-print mr-1 sm:mr-2"></i>
-                                <span class="hidden sm:inline">Print</span>
-                                <span class="sm:hidden">🖨️</span>
-                            </button>
-                            
-                            <button onclick="refreshTicket()" class="bg-orange-500 hover:bg-orange-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
-                                <i class="fas fa-sync mr-1 sm:mr-2"></i>
-                                <span class="hidden sm:inline">Refresh</span>
-                                <span class="sm:hidden">🔄</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
