@@ -5,6 +5,7 @@
 require_once 'config/database.php';
 require_once 'includes/security.php';
 require_once 'includes/activity_logger.php';
+require_once 'includes/MessageTracker.php';
 
 session_start();
 requireLogin();
@@ -63,6 +64,14 @@ try {
     } elseif ($userType === 'employee' && $ticket['employee_id'] != $userId) {
         $error = 'You can only view your own tickets.';
         $ticket = null;
+    } else {
+        // ✅ MARK MESSAGES AS READ - User is viewing this ticket
+        try {
+            $messageTracker = new MessageTracker();
+            $messageTracker->markTicketAsRead($ticketId, $userId, $userType);
+        } catch (Exception $e) {
+            error_log("Error marking ticket as read: " . $e->getMessage());
+        }
     }
     
 } catch (Exception $e) {

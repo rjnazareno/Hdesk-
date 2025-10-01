@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/MessageTracker.php';
 
 class FirebaseNotificationSender {
     private $serverKey;
@@ -352,6 +353,17 @@ class FirebaseNotificationSender {
     public function sendNewReplyNotification($ticketId, $fromUserId, $fromUserType, $message) {
         try {
             $db = Database::getInstance()->getConnection();
+            $messageTracker = new MessageTracker();
+            
+            // Get the response ID of the message we're notifying about
+            $stmt = $db->prepare("SELECT response_id FROM ticket_responses WHERE ticket_id = ? ORDER BY created_at DESC LIMIT 1");
+            $stmt->execute([$ticketId]);
+            $latestResponse = $stmt->fetch(PDO::FETCH_ASSOC);
+            $responseId = $latestResponse['response_id'] ?? null;
+            
+            if (!$responseId) {
+                return ['success' => false, 'error' => 'No response found to notify about'];
+            }
             
             // Get ticket and recipient info
             $stmt = $db->prepare("
@@ -402,22 +414,40 @@ class FirebaseNotificationSender {
                 return ['success' => false, 'error' => 'No recipient found'];
             }
             
+            // ✅ CHECK FOR DUPLICATE NOTIFICATIONS
+            if ($messageTracker->wasNotificationSent($ticketId, $responseId, $recipientId, $recipientType)) {
+                error_log("Skipping duplicate notification: Ticket {$ticketId}, Response {$responseId}, User {$recipientId} ({$recipientType})");
+                return ['success' => true, 'skipped' => true, 'reason' => 'Already notified for this message'];
+            }
+            
+            // ✅ CREATE NOTIFICATION WITH PHOTO
             $notification = [
-                'title' => "New Reply - Ticket #{$ticketId}",
-                'body' => "{$fromName} replied: " . substr($message, 0, 100),
-                'icon' => '/favicon.ico',
-                'image' => $this->getUserPhoto($fromUserId, $fromName),
-                'click_action' => "view_ticket.php?id={$ticketId}",
+                'title' => "💬 New Reply - Ticket #{$ticketId}",
+                'body' => "{$fromName} replied: " . substr($message, 0, 100) . (strlen($message) > 100 ? '...' : ''),
+                'icon' => '/IThelp/favicon.ico',
+                'image' => $this->getUserPhoto($fromUserId, $fromName), // 📸 USER PHOTO HERE
+                'click_action' => "/IThelp/view_ticket.php?id={$ticketId}",
+                'requireInteraction' => true,
                 'data' => [
                     'type' => 'new_reply',
                     'action' => 'new_reply',
                     'ticket_id' => (string)$ticketId,
-                    'from_user_type' => $fromUserType,
-                    'action_url' => "view_ticket.php?id={$ticketId}"
+                    'response_id' => (string)$responseId,
+                    'from_user_id' => (string)$fromUserId,
+                    'from_user_type' => (string)$fromUserType,
+                    'action_url' => "/IThelp/view_ticket.php?id={$ticketId}"
                 ]
             ];
             
-            return $this->sendToUser($recipientId, $recipientType, $notification);
+            // ✅ SEND NOTIFICATION
+            $result = $this->sendToUser($recipientId, $recipientType, $notification);
+            
+            // ✅ LOG NOTIFICATION SENT (prevent duplicates)
+            if ($result['success']) {
+                $messageTracker->logNotificationSent($ticketId, $responseId, $recipientId, $recipientType, 'new_reply');
+            }
+            
+            return $result;
             
         } catch (Exception $e) {
             error_log("New reply notification error: " . $e->getMessage());
