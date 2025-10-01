@@ -596,6 +596,72 @@ if ($ticket) {
             </div>
             <?php endif; ?>
             
+            <!-- Employee Quick Actions Bar (Employees Only) -->
+            <?php if ($userType === 'employee'): ?>
+            <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-xl shadow-lg p-3 sm:p-4 mb-6 text-white">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4">
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <i class="fas fa-user text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg">My Ticket Actions</h3>
+                            <p class="text-xs sm:text-sm text-green-100">Quick actions for your ticket</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+                        <!-- Ticket Status Display (Read-only for employees) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <label class="text-xs sm:text-sm font-medium text-green-100 sm:whitespace-nowrap">Current Status:</label>
+                            <div class="bg-white bg-opacity-20 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium">
+                                <?php
+                                switch($ticket['status']) {
+                                    case 'open': echo '📋 Open'; break;
+                                    case 'in_progress': echo '🔧 In Progress'; break;
+                                    case 'resolved': echo '✅ Resolved'; break;
+                                    case 'closed': echo '🔒 Closed'; break;
+                                    default: echo '📋 ' . ucfirst($ticket['status']); break;
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        
+                        <!-- Assigned Staff Display (Read-only for employees) -->
+                        <?php if ($ticket['assigned_to']): ?>
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <label class="text-xs sm:text-sm font-medium text-green-100 sm:whitespace-nowrap">Assigned to:</label>
+                            <div class="bg-white bg-opacity-20 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium">
+                                👤 <?= htmlspecialchars($ticket['assigned_staff_name'] ?? 'IT Staff') ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Employee Action Buttons -->
+                        <div class="flex items-center space-x-2">
+                            <button onclick="scrollToChat()" class="bg-blue-500 hover:bg-blue-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
+                                <i class="fas fa-comment mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Add Response</span>
+                                <span class="sm:hidden">💬</span>
+                            </button>
+                            
+                            <button onclick="window.print()" class="bg-gray-500 hover:bg-gray-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
+                                <i class="fas fa-print mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Print</span>
+                                <span class="sm:hidden">🖨️</span>
+                            </button>
+                            
+                            <button onclick="refreshTicket()" class="bg-orange-500 hover:bg-orange-600 px-3 sm:px-4 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center justify-center flex-1 sm:flex-initial">
+                                <i class="fas fa-sync mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Refresh</span>
+                                <span class="sm:hidden">🔄</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+            
             <!-- Main Content Layout -->
             <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 <!-- Main Content Area -->
@@ -1160,7 +1226,7 @@ if ($ticket) {
             responseCount: window.INITIAL_RESPONSE_COUNT
         });
         
-        // Admin toolbar helper functions
+        // Toolbar helper functions
         function scrollToChat() {
             const responseForm = document.getElementById('response-form');
             if (responseForm) {
@@ -1170,6 +1236,19 @@ if ($ticket) {
                     setTimeout(() => textarea.focus(), 500);
                 }
             }
+        }
+        
+        function refreshTicket() {
+            // Show loading indicator
+            const refreshBtn = event.target.closest('button');
+            const originalContent = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span class="hidden sm:inline">Refreshing...</span>';
+            refreshBtn.disabled = true;
+            
+            // Reload the page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
     </script>
     
