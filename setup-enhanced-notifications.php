@@ -47,7 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($statement) || strpos($statement, '--') === 0) continue;
             
             try {
-                $db->exec($statement);
+                $stmt = $db->prepare($statement);
+                $stmt->execute();
+                $stmt = null; // Close statement immediately
                 $executedCount++;
             } catch (Exception $e) {
                 // Some statements may fail if tables already exist - that's okay
@@ -75,6 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
+        // Close any active statements to prevent buffering issues
+        $db = null;
+        $db = Database::getInstance()->getConnection();
+        
         // Test MessageTracker class
         try {
             require_once 'includes/MessageTracker.php';
@@ -84,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo '<div class="error"><h4>❌ MessageTracker Class Error</h4><p>' . htmlspecialchars($e->getMessage()) . '</p></div>';
         }
         
-        // Test Firebase notifications class
+        // Test Firebase notifications class  
         try {
             require_once 'includes/firebase_notifications.php';
             $firebase = new FirebaseNotificationSender();
