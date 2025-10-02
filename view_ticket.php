@@ -96,8 +96,9 @@ try {
     $error = 'Database error: ' . $e->getMessage();
 }
 
-// Handle form submissions (only if ticket exists)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
+// Handle form submissions (only if ticket exists and not AJAX)
+// Skip processing if this is an AJAX request (should go to api/add_response.php instead)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && !isset($_POST['ajax_request'])) {
     try {
         $logger = new ActivityLogger($db);
         
@@ -1046,8 +1047,8 @@ if ($ticket) {
                 
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
-                    <form id="messengerForm" method="post" class="flex items-end space-x-3">
-                        <input type="hidden" name="add_response" value="1">
+                    <form id="messengerForm" class="flex items-end space-x-3">
+                        <!-- Removed method="post" and hidden fields - using AJAX only -->
                         <div class="flex-1">
                             <textarea name="response_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
@@ -1381,7 +1382,9 @@ if ($ticket) {
             
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Prevent normal form submission
+                    // Prevent normal form submission immediately
+                    e.preventDefault();
+                    e.stopPropagation();
                     
                     const message = textarea?.value?.trim();
                     const isInternal = document.querySelector('input[name="is_internal"]:checked') ? '1' : '0';
@@ -1407,6 +1410,7 @@ if ($ticket) {
                     formData.append('ticket_id', '<?= $ticketId ?>');
                     formData.append('message', message);
                     formData.append('is_internal', isInternal);
+                    formData.append('ajax_request', '1'); // Prevent PHP form handler from processing
                     
                     fetch('api/add_response.php', {
                         method: 'POST',
@@ -1423,11 +1427,13 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Reload the page to show the new message
-                            // This ensures we get the properly formatted message with correct styling
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 500);
+                            // Add the message to the chat immediately
+                            addMessageToChat(message, isInternal === '1', new Date());
+                            
+                            // Scroll to bottom to show new message
+                            if (chatContainer) {
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
                         }
@@ -1452,6 +1458,67 @@ if ($ticket) {
                         form.dispatchEvent(new Event('submit'));
                     }
                 });
+            }
+            
+            // Function to add message to chat dynamically
+            function addMessageToChat(messageText, isInternal, timestamp) {
+                if (!chatContainer) return;
+                
+                // Remove "No messages yet" placeholder if it exists
+                const placeholder = chatContainer.querySelector('.text-center');
+                if (placeholder && placeholder.textContent.includes('No messages yet')) {
+                    placeholder.closest('.text-center').remove();
+                }
+                
+                // Create message element (always align right for current user's messages)
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex justify-end mb-4';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'max-w-xs';
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm';
+                
+                const messageP = document.createElement('p');
+                messageP.className = 'text-sm leading-relaxed whitespace-pre-wrap';
+                messageP.textContent = messageText;
+                
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'flex justify-between items-center mt-2';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'text-xs opacity-75';
+                timeSpan.textContent = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'flex items-center space-x-1';
+                
+                const sentIcon = document.createElement('i');
+                sentIcon.className = 'fas fa-check text-xs opacity-60';
+                sentIcon.title = 'Sent';
+                
+                statusDiv.appendChild(sentIcon);
+                
+                // Add internal indicator if applicable
+                if (isInternal) {
+                    const internalSpan = document.createElement('span');
+                    internalSpan.className = 'text-xs bg-orange-500 bg-opacity-20 text-orange-200 px-2 py-1 rounded-full ml-2';
+                    internalSpan.innerHTML = '<i class="fas fa-lock mr-1"></i>Internal';
+                    bubbleDiv.appendChild(internalSpan);
+                }
+                
+                metaDiv.appendChild(timeSpan);
+                metaDiv.appendChild(statusDiv);
+                
+                bubbleDiv.appendChild(messageP);
+                bubbleDiv.appendChild(metaDiv);
+                
+                messageContent.appendChild(bubbleDiv);
+                messageDiv.appendChild(messageContent);
+                
+                // Add to chat container
+                chatContainer.appendChild(messageDiv);
             }
             
             // Helper function to show notifications
