@@ -1428,7 +1428,10 @@ if ($ticket) {
                             showNotification('Message sent successfully!', 'success');
                             
                             // Refresh chat messages to show proper server time and correct order
-                            refreshChatMessages();
+                            // Add delay to ensure database transaction is complete
+                            setTimeout(() => {
+                                refreshChatMessages();
+                            }, 500);
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1601,10 +1604,13 @@ if ($ticket) {
             
             // Function to refresh chat messages with proper server timestamps
             function refreshChatMessages() {
+                console.log('🔄 Refreshing chat messages...');
                 fetch(`api/get_chat_messages.php?ticket_id=<?= $ticketId ?>`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('📨 Chat refresh response:', data);
                     if (data.success && data.messages) {
+                        console.log(`📝 Updating chat with ${data.messages.length} messages`);
                         updateChatContainer(data.messages);
                         
                         // Scroll to bottom to show new message
@@ -1613,18 +1619,28 @@ if ($ticket) {
                                 chatContainer.scrollTop = chatContainer.scrollHeight;
                             }, 100);
                         }
+                    } else {
+                        console.error('❌ Chat refresh failed:', data);
                     }
                 })
                 .catch(error => {
-                    console.error('Error refreshing chat:', error);
-                    // Fallback to page reload if API fails
-                    window.location.reload();
+                    console.error('❌ Error refreshing chat:', error);
+                    // Fallback: reload the page to ensure message appears
+                    console.log('🔄 Falling back to page reload');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 });
             }
             
             // Function to update chat container with server-provided messages
             function updateChatContainer(messages) {
-                if (!chatContainer) return;
+                if (!chatContainer) {
+                    console.error('❌ Chat container not found');
+                    return;
+                }
+                
+                console.log(`🔄 Updating chat container with ${messages.length} messages`);
                 
                 // Save current scroll position
                 const wasAtBottom = chatContainer.scrollTop >= (chatContainer.scrollHeight - chatContainer.offsetHeight - 50);
