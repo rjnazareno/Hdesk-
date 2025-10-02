@@ -1002,7 +1002,7 @@ if ($ticket) {
                                     <div class="chat-bubble relative <?= $bubbleClasses ?> px-4 py-3 shadow-sm">
                                         <p class="text-sm leading-relaxed whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
                                         <div class="flex justify-between items-center mt-2">
-                                            <span class="text-xs opacity-75"><?= date('g:i A', strtotime($response['created_at'])) ?></span>
+                                            <span class="text-xs opacity-75"><?= date('g:i:s A', strtotime($response['created_at'])) ?></span>
                                             <?php if ($alignRight): // Only show for my messages ?>
                                                 <div class="flex items-center space-x-1">
                                                     <i class="fas fa-check text-xs opacity-60" title="Sent"></i>
@@ -1763,12 +1763,11 @@ if ($ticket) {
                 
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'text-xs opacity-75';
-                // Use more precise formatting to show seconds when needed
-                const now = new Date();
+                // Always show seconds for immediate messages to ensure uniqueness
                 const formattedTime = timestamp.toLocaleTimeString([], {
                     hour: '2-digit', 
                     minute: '2-digit',
-                    second: now.getTime() - timestamp.getTime() < 60000 ? '2-digit' : undefined // Show seconds if recent
+                    second: '2-digit'
                 });
                 timeSpan.textContent = formattedTime;
                 console.log('📅 Immediate display time:', formattedTime, 'from:', timestamp);

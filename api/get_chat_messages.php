@@ -87,7 +87,7 @@ try {
             'is_internal' => $response['is_internal'],
             'is_seen' => (bool)$response['is_seen'],
             'created_at' => $response['created_at'],
-            'formatted_time' => date('g:i A', strtotime($response['created_at']))
+            'formatted_time' => date('g:i:s A', strtotime($response['created_at']))
         ];
     }
     
