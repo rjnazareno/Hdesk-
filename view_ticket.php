@@ -1430,8 +1430,8 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Refresh chat messages immediately to show proper server timestamps
-                            // This ensures all timestamps come from the database, maintaining accuracy
+                            // Refresh chat messages to show the new message with proper server timestamps
+                            console.log('🔄 Triggering chat refresh after message send');
                             refreshChatMessages();
                             
                         } else {
@@ -1603,9 +1603,19 @@ if ($ticket) {
                 });
             }
             
+            // Flag to prevent multiple simultaneous refreshes
+            let isRefreshing = false;
+            
             // Function to refresh chat messages with proper server timestamps
             function refreshChatMessages() {
+                if (isRefreshing) {
+                    console.log('⏳ Refresh already in progress, skipping...');
+                    return;
+                }
+                
+                isRefreshing = true;
                 console.log('🔄 Refreshing chat messages...');
+                
                 fetch(`api/get_chat_messages.php?ticket_id=<?= $ticketId ?>`)
                 .then(response => response.json())
                 .then(data => {
@@ -1623,6 +1633,10 @@ if ($ticket) {
                     } else {
                         console.error('❌ Chat refresh failed:', data);
                     }
+                })
+                .finally(() => {
+                    isRefreshing = false;
+                    console.log('✅ Chat refresh completed');
                 })
                 .catch(error => {
                     console.error('❌ Error refreshing chat:', error);
@@ -1642,13 +1656,9 @@ if ($ticket) {
                 // Save current scroll position
                 const wasAtBottom = chatContainer.scrollTop >= (chatContainer.scrollHeight - chatContainer.offsetHeight - 50);
                 
-                // Remove any temporary messages first
-                const tempMessages = chatContainer.querySelectorAll('[data-temp-message="true"]');
-                tempMessages.forEach(msg => msg.remove());
-                console.log(`🗑️ Removed ${tempMessages.length} temporary messages`);
-                
-                // Clear current messages
+                // Clear ALL existing content (both server-rendered and AJAX messages)
                 chatContainer.innerHTML = '';
+                console.log(`🗑️ Cleared entire chat container`);
                 
                 if (messages.length === 0) {
                     // Show no messages placeholder
