@@ -204,15 +204,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket) {
 // Load additional data if ticket exists
 if ($ticket) {
     try {
-        // Get responses with seen status
+        // Get responses with seen status using subquery to avoid duplicates
         $responsesQuery = "
             SELECT r.*, 
-                   ms.seen_at,
-                   CASE WHEN ms.seen_at IS NOT NULL THEN 1 ELSE 0 END as is_seen
+                   (SELECT COUNT(*) FROM message_seen ms 
+                    WHERE ms.response_id = r.response_id 
+                    AND ((r.user_type = 'employee' AND ms.seen_by_user_type = 'it_staff') 
+                         OR (r.user_type = 'it_staff' AND ms.seen_by_user_type = 'employee'))) > 0 as is_seen,
+                   (SELECT MAX(ms2.seen_at) FROM message_seen ms2 
+                    WHERE ms2.response_id = r.response_id 
+                    AND ((r.user_type = 'employee' AND ms2.seen_by_user_type = 'it_staff') 
+                         OR (r.user_type = 'it_staff' AND ms2.seen_by_user_type = 'employee'))) as seen_at
             FROM ticket_responses r
-            LEFT JOIN message_seen ms ON (r.response_id = ms.response_id 
-                AND ((r.user_type = 'employee' AND ms.seen_by_user_type = 'it_staff') 
-                     OR (r.user_type = 'it_staff' AND ms.seen_by_user_type = 'employee')))
             WHERE r.ticket_id = ?
         ";
         
@@ -221,7 +224,7 @@ if ($ticket) {
             $responsesQuery .= " AND (r.is_internal = 0 OR r.is_internal IS NULL)";
         }
         
-        $responsesQuery .= " ORDER BY r.created_at ASC";
+        $responsesQuery .= " ORDER BY r.response_id ASC, r.created_at ASC";
         
         $stmt = $db->prepare($responsesQuery);
         $stmt->execute([$ticketId]);
@@ -1245,9 +1248,6 @@ if ($ticket) {
     <script src="assets/js/firebase-notifications.js" type="module"></script>
     <script src="assets/js/enhanced-chat-system.js" type="module"></script>
     
-    <!-- Legacy Notification System (for compatibility) -->
-    <script src="assets/js/notifications.js"></script>
-    
     <!-- Firebase Initialization -->
     <script type="module">
         console.log('🚀 Initializing Firebase Real-Time Chat...');
@@ -1339,7 +1339,7 @@ if ($ticket) {
         });
     </script>
     
-    <!-- Notification System -->
+    <!-- Unified Notification System with Pictures -->
     <script src="assets/js/notification-system.js"></script>
     
     <!-- Chat Enhancements (Typing & Seen Indicators) -->

@@ -117,23 +117,38 @@ class NotificationSystem {
             <div class="notification-item px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${notification.is_read ? '' : 'bg-blue-50'}" 
                  data-id="${notification.id}"
                  onclick="notificationSystem.handleNotificationClick(${notification.id}, '${notification.action_url || '#'}')">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
+                <div class="flex items-start space-x-3">
+                    <!-- User Avatar -->
+                    <div class="flex-shrink-0">
+                        ${notification.user_photo ? 
+                            `<img src="${notification.user_photo}" alt="User" class="w-8 h-8 rounded-full object-cover border border-gray-200">` :
+                            `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center border border-gray-200">
+                                <i class="fas fa-user text-white text-xs"></i>
+                            </div>`
+                        }
+                    </div>
+                    
+                    <!-- Notification Content -->
+                    <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-1">
-                            <h4 class="font-medium text-gray-900 text-sm">${this.escapeHtml(notification.title)}</h4>
-                            ${notification.is_read ? '' : '<div class="w-2 h-2 bg-blue-500 rounded-full ml-2 animate-pulse"></div>'}
+                            <h4 class="font-medium text-gray-900 text-sm truncate">${this.escapeHtml(notification.title)}</h4>
+                            ${notification.is_read ? '' : '<div class="w-2 h-2 bg-blue-500 rounded-full ml-2 animate-pulse flex-shrink-0"></div>'}
                         </div>
-                        <p class="text-gray-600 text-xs leading-relaxed">${this.escapeHtml(notification.message)}</p>
+                        <p class="text-gray-600 text-xs leading-relaxed line-clamp-2">${this.escapeHtml(notification.message)}</p>
                         <p class="text-gray-400 text-xs mt-1 flex items-center">
                             <i class="fas fa-clock mr-1"></i>
                             ${this.formatDate(notification.created_at)}
                         </p>
                     </div>
-                    <button onclick="event.stopPropagation(); notificationSystem.markAsRead(${notification.id})" 
-                            class="text-gray-400 hover:text-gray-600 ml-2 p-1 rounded-full hover:bg-gray-100 transition-colors" 
-                            title="Mark as read">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
+                    
+                    <!-- Close Button -->
+                    <div class="flex-shrink-0">
+                        <button onclick="event.stopPropagation(); notificationSystem.markAsRead(${notification.id})" 
+                                class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors" 
+                                title="Mark as read">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
