@@ -5,7 +5,7 @@
  */
 
 // Database Configuration
-define('DB_HOST', 'localhost');
+define('DB_HOST', '153.92.15.63');
 define('DB_NAME', 'u816220874_ithelp');
 define('DB_USER', 'u816220874_IT');  // Default XAMPP MySQL username
 define('DB_PASS', 'F]n5HZgi$fK');      // Default XAMPP MySQL password (empty)

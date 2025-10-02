@@ -58,6 +58,7 @@ try {
     // Get responses with seen status using subquery to avoid duplicates
     $responsesSql = "
         SELECT r.*, 
+               DATE_FORMAT(r.created_at, '%h:%i:%s %p') as formatted_time,
                (SELECT COUNT(*) FROM message_seen ms 
                 WHERE ms.response_id = r.response_id 
                 AND ((r.user_type = 'employee' AND ms.seen_by_user_type = 'it_staff') 
@@ -80,7 +81,6 @@ try {
     // Format messages for frontend
     $messages = [];
     foreach ($responses as $response) {
-        $formattedTime = date('g:i:s A', strtotime($response['created_at']));
         $messages[] = [
             'response_id' => $response['response_id'],
             'message' => $response['message'],
@@ -88,9 +88,9 @@ try {
             'is_internal' => $response['is_internal'],
             'is_seen' => (bool)$response['is_seen'],
             'created_at' => $response['created_at'],
-            'formatted_time' => $formattedTime,
+            'formatted_time' => $response['formatted_time'],
             'debug_original_timestamp' => $response['created_at'],
-            'debug_formatted' => $formattedTime
+            'debug_formatted' => $response['formatted_time']
         ];
     }
     

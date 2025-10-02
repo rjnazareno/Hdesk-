@@ -160,15 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && !isset($_POST['ajax_requ
                 // Log the activity
                 $logger->logStatusChange($userId, $userType, $ticketId, $old_status, $new_status);
                 
-                // Send Firebase notification for status change
-                try {
-                    require_once 'includes/firebase_notifications.php';
-                    $firebaseNotifier = new FirebaseNotificationSender();
-                    $firebaseNotifier->sendStatusChangeNotification($ticketId, $new_status, $userId);
-                } catch (Exception $e) {
-                    error_log("Firebase notification error for status change: " . $e->getMessage());
-                }
-                
                 $message = 'Status updated successfully.';
                 header("Location: view_ticket.php?id=$ticketId&success=status_updated");
                 exit;
@@ -226,6 +217,7 @@ if ($ticket) {
         // Get responses with seen status using subquery to avoid duplicates
         $responsesQuery = "
             SELECT r.*, 
+                   DATE_FORMAT(r.created_at, '%h:%i:%s %p') as formatted_time,
                    (SELECT COUNT(*) FROM message_seen ms 
                     WHERE ms.response_id = r.response_id 
                     AND ((r.user_type = 'employee' AND ms.seen_by_user_type = 'it_staff') 
@@ -1002,7 +994,7 @@ if ($ticket) {
                                     <div class="chat-bubble relative <?= $bubbleClasses ?> px-4 py-3 shadow-sm">
                                         <p class="text-sm leading-relaxed whitespace-pre-wrap"><?= htmlspecialchars($response['message']) ?></p>
                                         <div class="flex justify-between items-center mt-2">
-                                            <span class="text-xs opacity-75"><?= date('g:i:s A', strtotime($response['created_at'])) ?></span>
+                                            <span class="text-xs opacity-75 message-timestamp"><?= htmlspecialchars($response['formatted_time']) ?></span>
                                             <?php if ($alignRight): // Only show for my messages ?>
                                                 <div class="flex items-center space-x-1">
                                                     <i class="fas fa-check text-xs opacity-60" title="Sent"></i>
@@ -1255,9 +1247,9 @@ if ($ticket) {
         
     </div>
     
-    <!-- Global Variables for Firebase Chat System -->
+    <!-- Global Variables for Chat System -->
     <script>
-        // Firebase Chat Configuration
+        // Chat Configuration
         window.TICKET_ID = <?= $ticketId ?>;
         window.INITIAL_RESPONSE_COUNT = <?= count($responses) ?>;
         window.CURRENT_USER_TYPE = '<?= $_SESSION['user_type'] ?>';
@@ -1302,71 +1294,8 @@ if ($ticket) {
         }
     </script>
     
-    <!-- Firebase Real-Time Chat System -->
-    <script src="assets/js/firebase-config.js" type="module"></script>
-    <script src="assets/js/firebase-chat.js" type="module"></script>
-    <script src="assets/js/firebase-notifications.js" type="module"></script>
-    <script src="assets/js/enhanced-chat-system.js" type="module"></script>
-    
-    <!-- Firebase Initialization -->
-    <script type="module">
-        console.log('🚀 Initializing Firebase Real-Time Chat...');
-        
-        // Wait for DOM and Firebase to be ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📱 DOM loaded, initializing chat system...');
-            
-            setTimeout(() => {
-                console.log('🔍 Checking enhanced chat system...', {
-                    enhancedChatSystem: !!window.enhancedChatSystem,
-                    firebaseChat: window.enhancedChatSystem ? !!window.enhancedChatSystem.firebaseChat : 'N/A',
-                    isInitialized: window.enhancedChatSystem?.firebaseChat?.isInitialized || 'N/A'
-                });
-                
-                if (window.enhancedChatSystem) {
-                    console.log('✅ Firebase Real-Time Chat is active!');
-                    
-                    // Show Firebase status
-                    const statusDiv = document.createElement('div');
-                    statusDiv.innerHTML = '🔥 <span class="text-green-600 text-xs font-medium">Real-time messaging active</span>';
-                    statusDiv.className = 'fixed bottom-4 left-4 bg-white border border-green-200 px-3 py-2 rounded-lg shadow-sm z-40';
-                    statusDiv.id = 'firebaseStatusIndicator';
-                    document.body.appendChild(statusDiv);
-                    
-
-                    
-                    // Auto-hide status after 5 seconds
-                    setTimeout(() => {
-                        if (statusDiv.parentNode) {
-                            statusDiv.style.opacity = '0';
-                            statusDiv.style.transform = 'translateY(10px)';
-                            setTimeout(() => statusDiv.remove(), 300);
-                        }
-
-                    }, 10000);
-                    
-                } else {
-                    console.warn('⚠️ Enhanced chat system not loaded, using fallback');
-                    
-                    // Show error status
-                    const errorDiv = document.createElement('div');
-                    errorDiv.innerHTML = '⚠️ <span class="text-red-600 text-xs font-medium">Chat system not loaded</span>';
-                    errorDiv.className = 'fixed bottom-4 left-4 bg-white border border-red-200 px-3 py-2 rounded-lg shadow-sm z-40';
-                    document.body.appendChild(errorDiv);
-                }
-            }, 2000);
-        });
-        
-        // Handle page visibility for connection management
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                console.log('📱 Page hidden - maintaining Firebase connection');
-            } else {
-                console.log('👁️ Page visible - Firebase connection active');
-            }
-        });
-        
-
+    <!-- Clean Chat System JavaScript -->
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
@@ -1842,9 +1771,6 @@ if ($ticket) {
     
     <!-- Unified Notification System with Pictures -->
     <script src="assets/js/notification-system.js"></script>
-    
-    <!-- Chat Enhancements (Typing & Seen Indicators) -->
-    <script src="assets/js/chat-enhancements.js"></script>
     
     <!-- Header Dropdown Functionality -->
     <script>
