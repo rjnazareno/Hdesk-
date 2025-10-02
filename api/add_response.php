@@ -128,7 +128,9 @@ try {
         'success' => true,
         'message' => 'Response added successfully',
         'response_id' => $responseId,
-        'timestamp' => $timestampResult['created_at']
+        'timestamp' => $timestampResult['created_at'],
+        'debug_time' => date('Y-m-d H:i:s.u'), // Current PHP time for comparison
+        'raw_timestamp' => $timestampResult['created_at']
     ]);
 
 } catch (Exception $e) {

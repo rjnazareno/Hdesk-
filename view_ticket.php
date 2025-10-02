@@ -1763,7 +1763,13 @@ if ($ticket) {
                 
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'text-xs opacity-75';
-                const formattedTime = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                // Use more precise formatting to show seconds when needed
+                const now = new Date();
+                const formattedTime = timestamp.toLocaleTimeString([], {
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: now.getTime() - timestamp.getTime() < 60000 ? '2-digit' : undefined // Show seconds if recent
+                });
                 timeSpan.textContent = formattedTime;
                 console.log('📅 Immediate display time:', formattedTime, 'from:', timestamp);
                 
