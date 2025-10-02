@@ -1421,15 +1421,19 @@ if ($ticket) {
                         console.log('✅ Response added:', data);
                         
                         if (data.success) {
+                            console.log('📝 Message sent successfully:', data);
+                            console.log('🕒 Server timestamp:', data.timestamp);
+                            
                             // Clear the textarea
                             textarea.value = '';
                             
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // First: Add message immediately for instant feedback
-                            const tempTimestamp = data.timestamp ? new Date(data.timestamp) : new Date();
-                            addMessageToChatImmediate(message, isInternal === '1', tempTimestamp, data.response_id);
+                            // First: Add message immediately for instant feedback using server timestamp
+                            const serverTimestamp = data.timestamp ? new Date(data.timestamp) : new Date();
+                            console.log('⏰ Using timestamp:', serverTimestamp.toLocaleTimeString());
+                            addMessageToChatImmediate(message, isInternal === '1', serverTimestamp, data.response_id);
                             
                             // Then: Refresh from server after a delay to ensure consistency
                             setTimeout(() => {
@@ -1671,7 +1675,12 @@ if ($ticket) {
                 }
                 
                 // Add each message with proper server styling
-                messages.forEach(msg => {
+                messages.forEach((msg, index) => {
+                    console.log(`📨 Message ${index + 1}:`, {
+                        text: msg.message.substring(0, 20) + '...',
+                        time: msg.formatted_time,
+                        created_at: msg.created_at
+                    });
                     const messageHtml = createMessageHtml(msg);
                     chatContainer.innerHTML += messageHtml;
                 });
@@ -1725,6 +1734,7 @@ if ($ticket) {
                 if (!chatContainer) return;
                 
                 console.log('⚡ Adding message immediately:', messageText);
+                console.log('📅 Timestamp received:', timestamp);
                 
                 // Remove "No messages yet" placeholder if it exists
                 const placeholder = chatContainer.querySelector('.text-center');
@@ -1753,7 +1763,9 @@ if ($ticket) {
                 
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'text-xs opacity-75';
-                timeSpan.textContent = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const formattedTime = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                timeSpan.textContent = formattedTime;
+                console.log('📅 Immediate display time:', formattedTime, 'from:', timestamp);
                 
                 const statusDiv = document.createElement('div');
                 statusDiv.className = 'flex items-center space-x-1';

@@ -87,11 +87,11 @@ try {
         $isInternal = false;
     }
     
-    // Insert response
+    // Insert response with microsecond precision
     $insertSql = "
         INSERT INTO ticket_responses 
         (ticket_id, user_id, user_type, message, is_internal, created_at)
-        VALUES (?, ?, ?, ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, NOW(6))
     ";
     
     $userType = $_SESSION['user_type'] === 'employee' ? 'employee' : 'it_staff';
