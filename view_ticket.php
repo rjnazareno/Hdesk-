@@ -224,7 +224,7 @@ if ($ticket) {
             $responsesQuery .= " AND (r.is_internal = 0 OR r.is_internal IS NULL)";
         }
         
-        $responsesQuery .= " ORDER BY r.response_id ASC, r.created_at ASC";
+        $responsesQuery .= " ORDER BY r.created_at ASC";
         
         $stmt = $db->prepare($responsesQuery);
         $stmt->execute([$ticketId]);
