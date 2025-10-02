@@ -1427,8 +1427,8 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Add the message to the chat immediately
-                            addMessageToChat(message, isInternal === '1', new Date());
+                            // Add the message to the chat immediately with response_id for tracking
+                            addMessageToChat(message, isInternal === '1', new Date(), data.response_id);
                             
                             // Scroll to bottom to show new message
                             if (chatContainer) {
@@ -1461,7 +1461,7 @@ if ($ticket) {
             }
             
             // Function to add message to chat dynamically
-            function addMessageToChat(messageText, isInternal, timestamp) {
+            function addMessageToChat(messageText, isInternal, timestamp, responseId = null) {
                 if (!chatContainer) return;
                 
                 // Remove "No messages yet" placeholder if it exists
@@ -1493,7 +1493,9 @@ if ($ticket) {
                 
                 const statusDiv = document.createElement('div');
                 statusDiv.className = 'flex items-center space-x-1';
+                statusDiv.setAttribute('data-response-id', responseId || Date.now()); // Use response_id for tracking
                 
+                // Single check (sent) - will be updated to double check when seen
                 const sentIcon = document.createElement('i');
                 sentIcon.className = 'fas fa-check text-xs opacity-60';
                 sentIcon.title = 'Sent';
@@ -1519,7 +1521,45 @@ if ($ticket) {
                 
                 // Add to chat container
                 chatContainer.appendChild(messageDiv);
+                
+                // Start polling for seen status for this new message
+                setTimeout(() => {
+                    pollForSeenStatus();
+                }, 2000); // Check after 2 seconds
             }
+            
+            // Function to poll for seen status updates
+            function pollForSeenStatus() {
+                fetch(`api/get_seen_status.php?ticket_id=<?= $ticketId ?>`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.seen_messages) {
+                        updateSeenIndicators(data.seen_messages);
+                    }
+                })
+                .catch(error => {
+                    console.log('Seen status check (silent):', error);
+                });
+            }
+            
+            // Function to update seen indicators to double check
+            function updateSeenIndicators(seenMessages) {
+                seenMessages.forEach(seenMessage => {
+                    // Find the specific message by response_id
+                    const statusDiv = document.querySelector(`[data-response-id="${seenMessage.response_id}"]`);
+                    if (statusDiv) {
+                        const singleCheck = statusDiv.querySelector('.fa-check:not(.fa-check-double)');
+                        if (singleCheck && !statusDiv.querySelector('.fa-check-double')) {
+                            // Replace single check with double check
+                            singleCheck.className = 'fas fa-check-double text-xs text-blue-400';
+                            singleCheck.title = `Seen by ${seenMessage.seen_by_name || 'recipient'}`;
+                        }
+                    }
+                });
+            }
+            
+            // Start periodic polling for seen status (every 10 seconds)
+            setInterval(pollForSeenStatus, 10000);
             
             // Helper function to show notifications
             function showNotification(message, type) {
