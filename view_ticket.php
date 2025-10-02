@@ -1427,13 +1427,9 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Add the message to the chat immediately with response_id for tracking
-                            addMessageToChat(message, isInternal === '1', new Date(), data.response_id);
+                            // Refresh chat messages to show proper server time and correct order
+                            refreshChatMessages();
                             
-                            // Scroll to bottom to show new message
-                            if (chatContainer) {
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                            }
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
                         }
@@ -1519,13 +1515,58 @@ if ($ticket) {
                 messageContent.appendChild(bubbleDiv);
                 messageDiv.appendChild(messageContent);
                 
-                // Add to chat container
-                chatContainer.appendChild(messageDiv);
+                // Add to chat container in chronological order
+                insertMessageInOrder(messageDiv, timestamp);
                 
                 // Start polling for seen status for this new message
                 setTimeout(() => {
                     pollForSeenStatus();
                 }, 2000); // Check after 2 seconds
+            }
+            
+            // Function to insert message in chronological order
+            function insertMessageInOrder(messageDiv, messageTimestamp) {
+                if (!chatContainer) return;
+                
+                const existingMessages = chatContainer.querySelectorAll('.flex.justify-start, .flex.justify-end');
+                let inserted = false;
+                
+                // Find the correct position based on timestamp
+                for (let i = existingMessages.length - 1; i >= 0; i--) {
+                    const existingMessage = existingMessages[i];
+                    const timeElement = existingMessage.querySelector('.text-xs.opacity-75');
+                    
+                    if (timeElement) {
+                        const existingTimeText = timeElement.textContent;
+                        const existingTime = parseTimeString(existingTimeText);
+                        
+                        if (messageTimestamp >= existingTime) {
+                            // Insert after this message
+                            existingMessage.parentNode.insertBefore(messageDiv, existingMessage.nextSibling);
+                            inserted = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // If not inserted, append at the end
+                if (!inserted) {
+                    chatContainer.appendChild(messageDiv);
+                }
+            }
+            
+            // Helper function to parse time string back to Date for comparison
+            function parseTimeString(timeString) {
+                const today = new Date();
+                const [time, period] = timeString.split(' ');
+                const [hours, minutes] = time.split(':');
+                
+                let hour24 = parseInt(hours);
+                if (period === 'PM' && hour24 !== 12) hour24 += 12;
+                if (period === 'AM' && hour24 === 12) hour24 = 0;
+                
+                today.setHours(hour24, parseInt(minutes), 0, 0);
+                return today;
             }
             
             // Function to poll for seen status updates
@@ -1556,6 +1597,103 @@ if ($ticket) {
                         }
                     }
                 });
+            }
+            
+            // Function to refresh chat messages with proper server timestamps
+            function refreshChatMessages() {
+                fetch(`api/get_chat_messages.php?ticket_id=<?= $ticketId ?>`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.messages) {
+                        updateChatContainer(data.messages);
+                        
+                        // Scroll to bottom to show new message
+                        if (chatContainer) {
+                            setTimeout(() => {
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }, 100);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error refreshing chat:', error);
+                    // Fallback to page reload if API fails
+                    window.location.reload();
+                });
+            }
+            
+            // Function to update chat container with server-provided messages
+            function updateChatContainer(messages) {
+                if (!chatContainer) return;
+                
+                // Save current scroll position
+                const wasAtBottom = chatContainer.scrollTop >= (chatContainer.scrollHeight - chatContainer.offsetHeight - 50);
+                
+                // Clear current messages
+                chatContainer.innerHTML = '';
+                
+                if (messages.length === 0) {
+                    // Show no messages placeholder
+                    chatContainer.innerHTML = `
+                        <div class="text-center py-16 px-6">
+                            <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
+                            </div>
+                            <p class="text-gray-500 text-lg font-medium">No messages yet</p>
+                            <p class="text-gray-400 text-sm mt-1">Start the conversation by sending a message below</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Add each message with proper server styling
+                messages.forEach(msg => {
+                    const messageHtml = createMessageHtml(msg);
+                    chatContainer.innerHTML += messageHtml;
+                });
+                
+                // Restore scroll position
+                if (wasAtBottom) {
+                    setTimeout(() => {
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 50);
+                }
+            }
+            
+            // Function to create message HTML (matches server-side styling)
+            function createMessageHtml(msg) {
+                const isMyMessage = (<?= json_encode($userType) ?> === 'it_staff' && msg.user_type === 'it_staff') || 
+                                   (<?= json_encode($userType) ?> === 'employee' && msg.user_type === 'employee');
+                
+                const alignClass = isMyMessage ? 'justify-end' : 'justify-start';
+                const bubbleClass = isMyMessage ? 
+                    'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' :
+                    'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff';
+                
+                const seenIcon = msg.is_seen ? 
+                    '<i class="fas fa-check-double text-xs text-blue-400" title="Seen"></i>' :
+                    '<i class="fas fa-check text-xs opacity-60" title="Sent"></i>';
+                
+                return `
+                    <div class="flex ${alignClass} mb-4">
+                        <div class="max-w-xs">
+                            <div class="chat-bubble relative ${bubbleClass} px-4 py-3 shadow-sm" data-response-id="${msg.response_id}">
+                                <p class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(msg.message)}</p>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs opacity-75">${msg.formatted_time}</span>
+                                    ${isMyMessage ? `<div class="flex items-center space-x-1">${seenIcon}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Helper function to escape HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
             
             // Start periodic polling for seen status (every 10 seconds)

@@ -119,10 +119,16 @@ try {
     $stmt = $db->prepare($updateSql);
     $stmt->execute([$ticketId]);
     
+    // Get the actual timestamp from the database
+    $stmt = $db->prepare("SELECT created_at FROM ticket_responses WHERE response_id = ?");
+    $stmt->execute([$responseId]);
+    $timestampResult = $stmt->fetch();
+    
     echo json_encode([
         'success' => true,
         'message' => 'Response added successfully',
-        'response_id' => $responseId
+        'response_id' => $responseId,
+        'timestamp' => $timestampResult['created_at']
     ]);
 
 } catch (Exception $e) {
