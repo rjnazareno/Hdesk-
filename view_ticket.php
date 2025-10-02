@@ -1370,30 +1370,105 @@ if ($ticket) {
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
             const sendBtn = document.getElementById('messengerSendBtn');
+            const chatContainer = document.getElementById('chatContainer');
             
             console.log('🔧 Form elements found:', {
                 form: !!form,
                 textarea: !!textarea,
-                sendBtn: !!sendBtn
+                sendBtn: !!sendBtn,
+                chatContainer: !!chatContainer
             });
             
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    console.log('📝 Form submit event triggered!', {
-                        message: textarea?.value,
-                        enhancedChatSystem: !!window.enhancedChatSystem,
-                        firebaseReady: window.enhancedChatSystem?.firebaseChat?.isInitialized
+                    e.preventDefault(); // Prevent normal form submission
+                    
+                    const message = textarea?.value?.trim();
+                    const isInternal = document.querySelector('input[name="is_internal"]:checked') ? '1' : '0';
+                    
+                    if (!message) {
+                        alert('Please enter a message');
+                        return;
+                    }
+                    
+                    console.log('📝 Sending message via AJAX:', {
+                        message: message,
+                        isInternal: isInternal,
+                        ticketId: <?= $ticketId ?>
+                    });
+                    
+                    // Disable send button and show loading
+                    sendBtn.disabled = true;
+                    const originalText = sendBtn.innerHTML;
+                    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+                    
+                    // Send via AJAX
+                    const formData = new FormData();
+                    formData.append('ticket_id', '<?= $ticketId ?>');
+                    formData.append('message', message);
+                    formData.append('is_internal', isInternal);
+                    
+                    fetch('api/add_response.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('✅ Response added:', data);
+                        
+                        if (data.success) {
+                            // Clear the textarea
+                            textarea.value = '';
+                            
+                            // Show success message
+                            showNotification('Message sent successfully!', 'success');
+                            
+                            // Reload the page to show the new message
+                            // This ensures we get the properly formatted message with correct styling
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error sending message:', error);
+                        showNotification('Error: Failed to send message', 'error');
+                    })
+                    .finally(() => {
+                        // Re-enable send button
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = originalText;
                     });
                 });
             }
             
-            if (sendBtn) {
-                sendBtn.addEventListener('click', function(e) {
-                    console.log('🖱️ Send button clicked!', {
-                        message: textarea?.value,
-                        enhancedChatSystem: !!window.enhancedChatSystem
-                    });
+            // Add Ctrl+Enter support for quick sending
+            if (textarea) {
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        e.preventDefault();
+                        form.dispatchEvent(new Event('submit'));
+                    }
                 });
+            }
+            
+            // Helper function to show notifications
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 
+                    'bg-red-100 border border-red-400 text-red-700'
+                }`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
             }
         });
     </script>
