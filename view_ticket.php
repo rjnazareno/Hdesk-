@@ -1675,6 +1675,7 @@ if ($ticket) {
                 }
                 
                 // Add each message with proper server styling
+                let messagesHtml = '';
                 messages.forEach((msg, index) => {
                     console.log(`📨 Message ${index + 1}:`, {
                         text: msg.message.substring(0, 20) + '...',
@@ -1682,8 +1683,11 @@ if ($ticket) {
                         created_at: msg.created_at
                     });
                     const messageHtml = createMessageHtml(msg);
-                    chatContainer.innerHTML += messageHtml;
+                    messagesHtml += messageHtml;
                 });
+                
+                // Set all content at once instead of appending
+                chatContainer.innerHTML = messagesHtml;
                 
                 // Restore scroll position
                 if (wasAtBottom) {
