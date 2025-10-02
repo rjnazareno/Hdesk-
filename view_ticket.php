@@ -1430,15 +1430,9 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // First: Add message immediately for instant feedback using server timestamp
-                            const serverTimestamp = data.timestamp ? new Date(data.timestamp) : new Date();
-                            console.log('⏰ Using timestamp:', serverTimestamp.toLocaleTimeString());
-                            addMessageToChatImmediate(message, isInternal === '1', serverTimestamp, data.response_id);
-                            
-                            // Then: Refresh from server after a delay to ensure consistency
-                            setTimeout(() => {
-                                refreshChatMessages();
-                            }, 1500);
+                            // Refresh chat messages immediately to show proper server timestamps
+                            // This ensures all timestamps come from the database, maintaining accuracy
+                            refreshChatMessages();
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1632,11 +1626,7 @@ if ($ticket) {
                 })
                 .catch(error => {
                     console.error('❌ Error refreshing chat:', error);
-                    // Fallback: reload the page to ensure message appears
-                    console.log('🔄 Falling back to page reload');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                    showNotification('Error loading messages. Please refresh the page.', 'error');
                 });
             }
             

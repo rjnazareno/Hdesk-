@@ -80,6 +80,7 @@ try {
     // Format messages for frontend
     $messages = [];
     foreach ($responses as $response) {
+        $formattedTime = date('g:i:s A', strtotime($response['created_at']));
         $messages[] = [
             'response_id' => $response['response_id'],
             'message' => $response['message'],
@@ -87,7 +88,9 @@ try {
             'is_internal' => $response['is_internal'],
             'is_seen' => (bool)$response['is_seen'],
             'created_at' => $response['created_at'],
-            'formatted_time' => date('g:i:s A', strtotime($response['created_at']))
+            'formatted_time' => $formattedTime,
+            'debug_original_timestamp' => $response['created_at'],
+            'debug_formatted' => $formattedTime
         ];
     }
     
