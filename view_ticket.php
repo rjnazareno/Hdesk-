@@ -36,6 +36,24 @@ $message = '';
 $error = '';
 $ticket = null;
 
+// Handle success messages from redirects
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'response_added':
+            $message = 'Response added successfully.';
+            break;
+        case 'status_updated':
+            $message = 'Status updated successfully.';
+            break;
+        case 'assigned':
+            $message = 'Ticket assignment updated successfully.';
+            break;
+        case 'priority_updated':
+            $message = 'Priority updated successfully.';
+            break;
+    }
+}
+
 // Load ticket data first
 try {
     require_once 'config/database.php';
@@ -1029,6 +1047,7 @@ if ($ticket) {
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
                     <form id="messengerForm" method="post" class="flex items-end space-x-3">
+                        <input type="hidden" name="add_response" value="1">
                         <div class="flex-1">
                             <textarea name="response_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
