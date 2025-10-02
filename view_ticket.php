@@ -1695,8 +1695,16 @@ if ($ticket) {
             
             // Function to create message HTML (matches server-side styling)
             function createMessageHtml(msg) {
-                const isMyMessage = (<?= json_encode($userType) ?> === 'it_staff' && msg.user_type === 'it_staff') || 
-                                   (<?= json_encode($userType) ?> === 'employee' && msg.user_type === 'employee');
+                const currentUserType = <?= json_encode($userType) ?>;
+                const isMyMessage = (currentUserType === 'it_staff' && msg.user_type === 'it_staff') || 
+                                   (currentUserType === 'employee' && msg.user_type === 'employee');
+                
+                console.log('💬 Creating message:', {
+                    message: msg.message.substring(0, 20) + '...',
+                    currentUser: currentUserType,
+                    messageUser: msg.user_type,
+                    isMyMessage: isMyMessage
+                });
                 
                 const alignClass = isMyMessage ? 'justify-end' : 'justify-start';
                 const bubbleClass = isMyMessage ? 
