@@ -705,68 +705,72 @@ if ($ticket) {
                 </div>
                 
                 <!-- Enhanced Information Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-                    <!-- Employee Card -->
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                    <!-- Requester Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200 hover:shadow-md transition-shadow">
                         <div class="flex items-center mb-4">
-                            <div class="bg-blue-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
-                                <i class="fas fa-user"></i>
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl w-12 h-12 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-user text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-blue-900">Requester</h3>
+                            <h3 class="font-bold text-blue-900 text-lg">Requester</h3>
                         </div>
-                        <div class="space-y-2 text-sm text-blue-800">
+                        <div class="space-y-3 text-sm text-blue-800">
                             <div class="flex items-center">
-                                <i class="fas fa-id-card w-4 mr-2 text-blue-600"></i>
-                                <span class="font-medium"><?= htmlspecialchars($ticket['employee_name'] ?? 'N/A') ?></span>
+                                <i class="fas fa-id-card w-4 mr-3 text-blue-600"></i>
+                                <span class="font-semibold truncate"><?= htmlspecialchars($ticket['employee_name'] ?? 'N/A') ?></span>
                             </div>
                             <div class="flex items-center">
-                                <i class="fas fa-at w-4 mr-2 text-blue-600"></i>
-                                <span><?= htmlspecialchars($ticket['employee_username'] ?? 'N/A') ?></span>
+                                <i class="fas fa-at w-4 mr-3 text-blue-600"></i>
+                                <span class="truncate"><?= htmlspecialchars($ticket['employee_username'] ?? 'N/A') ?></span>
                             </div>
                             <div class="flex items-center">
-                                <i class="fas fa-envelope w-4 mr-2 text-blue-600"></i>
-                                <span class="text-xs"><?= htmlspecialchars($ticket['employee_email'] ?? 'N/A') ?></span>
+                                <i class="fas fa-envelope w-4 mr-3 text-blue-600"></i>
+                                <span class="text-xs truncate"><?= htmlspecialchars($ticket['employee_email'] ?? 'N/A') ?></span>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Category & Priority Card -->
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200 hover:shadow-md transition-shadow">
                         <div class="flex items-center mb-4">
-                            <div class="bg-purple-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
-                                <i class="fas fa-tag"></i>
+                            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl w-12 h-12 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-tag text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-purple-900">Category</h3>
+                            <h3 class="font-bold text-purple-900 text-lg">Category</h3>
                         </div>
                         <div class="space-y-3">
-                            <div class="bg-white px-3 py-2 rounded-lg">
-                                <div class="text-xs text-purple-600 font-medium">Type</div>
-                                <div class="text-sm font-semibold text-purple-900"><?= htmlspecialchars($ticket['category'] ?? 'General') ?></div>
+                            <div class="bg-white bg-opacity-70 backdrop-blur-sm px-4 py-3 rounded-lg shadow-sm border border-purple-100">
+                                <div class="text-xs text-purple-600 font-medium uppercase tracking-wide mb-1">Type</div>
+                                <div class="text-sm font-bold text-purple-900"><?= htmlspecialchars($ticket['category'] ?? 'General') ?></div>
+                            </div>
+                            <div class="bg-white bg-opacity-70 backdrop-blur-sm px-4 py-3 rounded-lg shadow-sm border border-purple-100">
+                                <div class="text-xs text-purple-600 font-medium uppercase tracking-wide mb-1">Priority</div>
+                                <div class="text-sm font-bold text-purple-900 capitalize"><?= htmlspecialchars($ticket['priority'] ?? 'Medium') ?></div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Assignment Card -->
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200 hover:shadow-md transition-shadow">
                         <div class="flex items-center mb-4">
-                            <div class="bg-green-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
-                                <i class="fas fa-user-cog"></i>
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl w-12 h-12 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-user-cog text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-green-900">Assignment</h3>
+                            <h3 class="font-bold text-green-900 text-lg">Assignment</h3>
                         </div>
                         <div class="space-y-3">
                             <?php if ($ticket['assigned_staff_name']): ?>
-                                <div class="bg-white px-3 py-2 rounded-lg">
-                                    <div class="text-xs text-green-600 font-medium">Assigned To</div>
-                                    <div class="text-sm font-semibold text-green-900 flex items-center">
-                                        <i class="fas fa-user-check mr-2 text-green-600"></i>
+                                <div class="bg-white bg-opacity-70 backdrop-blur-sm px-4 py-3 rounded-lg shadow-sm border border-green-100">
+                                    <div class="text-xs text-green-600 font-medium uppercase tracking-wide mb-1">Assigned To</div>
+                                    <div class="text-sm font-bold text-green-900 flex items-center">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
                                         <?= htmlspecialchars($ticket['assigned_staff_name']) ?>
                                     </div>
                                 </div>
                             <?php else: ?>
-                                <div class="bg-orange-50 px-3 py-2 rounded-lg border border-orange-200">
-                                    <div class="text-sm font-semibold text-orange-700 flex items-center">
-                                        <i class="fas fa-user-clock mr-2"></i>
+                                <div class="bg-gradient-to-r from-orange-50 to-orange-100 px-4 py-3 rounded-lg border border-orange-200 shadow-sm">
+                                    <div class="text-sm font-bold text-orange-700 flex items-center">
+                                        <div class="w-2 h-2 bg-orange-500 rounded-full mr-2 animate-pulse"></div>
                                         Awaiting Assignment
                                     </div>
                                 </div>
@@ -775,26 +779,30 @@ if ($ticket) {
                     </div>
                     
                     <!-- Activity Card -->
-                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-5 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
                         <div class="flex items-center mb-4">
-                            <div class="bg-gray-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3">
-                                <i class="fas fa-chart-line"></i>
+                            <div class="bg-gradient-to-br from-slate-500 to-slate-600 text-white rounded-xl w-12 h-12 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-chart-line text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-gray-900">Activity</h3>
+                            <h3 class="font-bold text-slate-900 text-lg">Activity</h3>
                         </div>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Responses</span>
-                                <span class="font-bold text-gray-900"><?= count($responses) ?></span>
+                        <div class="space-y-4 text-sm">
+                            <div class="bg-white bg-opacity-70 backdrop-blur-sm px-4 py-3 rounded-lg shadow-sm border border-slate-100">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-600 font-medium">Responses</span>
+                                    <div class="flex items-center">
+                                        <div class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full"><?= count($responses) ?></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Last Update</span>
-                                <span class="font-medium text-gray-700 text-xs"><?= date('M j, g:i A', strtotime($ticket['updated_at'])) ?></span>
+                            <div class="bg-white bg-opacity-70 backdrop-blur-sm px-4 py-3 rounded-lg shadow-sm border border-slate-100">
+                                <div class="text-xs text-slate-600 font-medium uppercase tracking-wide mb-1">Last Update</div>
+                                <div class="font-bold text-slate-700 text-xs"><?= date('M j, g:i A', strtotime($ticket['updated_at'])) ?></div>
                             </div>
-                            <div class="pt-2">
-                                <a href="ticket_history.php?id=<?= $ticketId ?>" class="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center">
-                                    <i class="fas fa-history mr-1"></i>
-                                    View Full History
+                            <div class="pt-1">
+                                <a href="ticket_history.php?id=<?= $ticketId ?>" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs font-semibold hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors">
+                                    <i class="fas fa-history mr-2"></i>
+                                    View History
                                 </a>
                             </div>
                         </div>
@@ -802,87 +810,119 @@ if ($ticket) {
                 </div>
                 
                 <!-- Description Section -->
-                <div class="border-t border-gray-200 pt-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-file-text text-blue-600 mr-3"></i>
-                        Issue Description
-                    </h3>
-                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
-                        <p class="text-gray-800 whitespace-pre-wrap leading-relaxed"><?= htmlspecialchars($ticket['description']) ?></p>
+                <div class="border-t border-gray-200 pt-8">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 flex items-center">
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg w-8 h-8 flex items-center justify-center mr-3">
+                                <i class="fas fa-file-text text-sm"></i>
+                            </div>
+                            Issue Description
+                        </h3>
+                        <p class="text-gray-600 text-sm">Detailed information about the reported issue</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="prose max-w-none">
+                            <p class="text-gray-800 whitespace-pre-wrap leading-relaxed text-base"><?= htmlspecialchars($ticket['description']) ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- Management Actions (IT Staff Only) -->
             <?php if ($userType === 'it_staff'): ?>
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-tools text-blue-600 mr-3"></i>
-                    Management Tools
-                </h3>
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover border border-gray-100">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 flex items-center">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="fas fa-tools text-sm"></i>
+                        </div>
+                        Management Tools
+                    </h3>
+                    <p class="text-gray-600 text-sm">Update ticket status, assignment, and perform quick actions</p>
+                </div>
                 
                 <div class="grid md:grid-cols-3 gap-6">
                     <!-- Status Update -->
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
-                        <h4 class="font-bold text-blue-900 mb-4 flex items-center">
-                            <i class="fas fa-edit mr-2"></i>
-                            Update Status
-                        </h4>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-edit text-sm"></i>
+                            </div>
+                            <h4 class="font-bold text-blue-900 text-lg">Status</h4>
+                        </div>
                         <form method="POST" class="space-y-4">
-                            <select name="status" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
-                                <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>Resolved</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>Close Ticket</option>
-                            </select>
-                            <button type="submit" name="update_status" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            <div class="relative">
+                                <select name="status" class="w-full p-3 pr-10 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-gray-800 font-medium">
+                                    <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>🔴 Open</option>
+                                    <option value="in_progress" <?= $ticket['status'] == 'in_progress' ? 'selected' : '' ?>>🔵 In Progress</option>
+                                    <option value="resolved" <?= $ticket['status'] == 'resolved' ? 'selected' : '' ?>>🟢 Resolved</option>
+                                    <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>⚫ Closed</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-blue-400"></i>
+                                </div>
+                            </div>
+                            <button type="submit" name="update_status" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
                                 <i class="fas fa-save mr-2"></i>Update Status
                             </button>
                         </form>
                     </div>
                     
                     <!-- Assign Ticket -->
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
-                        <h4 class="font-bold text-green-900 mb-4 flex items-center">
-                            <i class="fas fa-user-plus mr-2"></i>
-                            Assign Ticket
-                        </h4>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 hover:shadow-md transition-all duration-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-user-plus text-sm"></i>
+                            </div>
+                            <h4 class="font-bold text-green-900 text-lg">Assignment</h4>
+                        </div>
                         <form method="POST" class="space-y-4">
-                            <select name="assigned_to" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">Unassigned</option>
-                                <?php foreach ($itStaff as $staff): ?>
-                                    <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($staff['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button type="submit" name="assign_ticket" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                                <i class="fas fa-user-check mr-2"></i>Assign
+                            <div class="relative">
+                                <select name="assigned_to" class="w-full p-3 pr-10 border-2 border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white text-gray-800 font-medium">
+                                    <option value="">👤 Unassigned</option>
+                                    <?php foreach ($itStaff as $staff): ?>
+                                        <option value="<?= $staff['staff_id'] ?>" <?= $ticket['assigned_to'] == $staff['staff_id'] ? 'selected' : '' ?>>
+                                                👨‍💻 <?= htmlspecialchars($staff['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-green-400"></i>
+                                </div>
+                            </div>
+                            <button type="submit" name="assign_ticket" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                                <i class="fas fa-user-check mr-2"></i>Assign Ticket
                             </button>
                         </form>
                     </div>
                     
                     <!-- Quick Actions -->
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
-                        <h4 class="font-bold text-purple-900 mb-4 flex items-center">
-                            <i class="fas fa-bolt mr-2"></i>
-                            Quick Actions
-                        </h4>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 hover:shadow-md transition-all duration-200">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg w-10 h-10 flex items-center justify-center mr-3 shadow-sm">
+                                <i class="fas fa-bolt text-sm"></i>
+                            </div>
+                            <h4 class="font-bold text-purple-900 text-lg">Quick Actions</h4>
+                        </div>
                         <div class="space-y-3">
                             <?php if ($ticket['status'] === 'closed' || $ticket['status'] === 'resolved'): ?>
-                                <div class="w-full bg-gray-400 text-white py-3 rounded-lg font-medium text-center cursor-not-allowed">
-                                    <i class="fas fa-lock mr-2"></i>Ticket Closed - Chat Disabled
+                                <div class="w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white py-3 px-4 rounded-lg font-semibold text-center cursor-not-allowed shadow-sm">
+                                    <i class="fas fa-lock mr-2"></i>Ticket Closed
                                 </div>
                             <?php else: ?>
-                                <button onclick="document.getElementById('responseForm').scrollIntoView({behavior: 'smooth'})" 
-                                        class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                                    <i class="fas fa-reply mr-2"></i>Add Response
+                                <button onclick="document.getElementById('messengerForm').scrollIntoView({behavior: 'smooth'}); document.getElementById('response_text').focus();" 
+                                        class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-4 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                                    <i class="fas fa-reply mr-2"></i>Reply Now
                                 </button>
                             <?php endif; ?>
                             <a href="ticket_history.php?id=<?= $ticketId ?>" 
-                               class="block w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-center">
+                               class="block w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-3 px-4 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all font-semibold text-center shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
                                 <i class="fas fa-history mr-2"></i>View History
                             </a>
+                            <button onclick="window.print()" 
+                                   class="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white py-3 px-4 rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                                <i class="fas fa-print mr-2"></i>Print Ticket
+                            </button>
                         </div>
                     </div>
                 </div>
