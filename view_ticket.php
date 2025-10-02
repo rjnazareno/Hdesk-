@@ -1427,11 +1427,14 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Refresh chat messages to show proper server time and correct order
-                            // Add delay to ensure database transaction is complete
+                            // First: Add message immediately for instant feedback
+                            const tempTimestamp = data.timestamp ? new Date(data.timestamp) : new Date();
+                            addMessageToChatImmediate(message, isInternal === '1', tempTimestamp, data.response_id);
+                            
+                            // Then: Refresh from server after a delay to ensure consistency
                             setTimeout(() => {
                                 refreshChatMessages();
-                            }, 500);
+                            }, 1500);
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1645,6 +1648,11 @@ if ($ticket) {
                 // Save current scroll position
                 const wasAtBottom = chatContainer.scrollTop >= (chatContainer.scrollHeight - chatContainer.offsetHeight - 50);
                 
+                // Remove any temporary messages first
+                const tempMessages = chatContainer.querySelectorAll('[data-temp-message="true"]');
+                tempMessages.forEach(msg => msg.remove());
+                console.log(`🗑️ Removed ${tempMessages.length} temporary messages`);
+                
                 // Clear current messages
                 chatContainer.innerHTML = '';
                 
@@ -1710,6 +1718,75 @@ if ($ticket) {
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
+            }
+            
+            // Function to add message immediately for instant feedback
+            function addMessageToChatImmediate(messageText, isInternal, timestamp, responseId) {
+                if (!chatContainer) return;
+                
+                console.log('⚡ Adding message immediately:', messageText);
+                
+                // Remove "No messages yet" placeholder if it exists
+                const placeholder = chatContainer.querySelector('.text-center');
+                if (placeholder && placeholder.textContent.includes('No messages yet')) {
+                    placeholder.closest('.text-center').remove();
+                }
+                
+                // Create message element for current user (always right-aligned)
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex justify-end mb-4';
+                messageDiv.setAttribute('data-temp-message', 'true'); // Mark as temporary
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'max-w-xs';
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm';
+                bubbleDiv.setAttribute('data-response-id', responseId);
+                
+                const messageP = document.createElement('p');
+                messageP.className = 'text-sm leading-relaxed whitespace-pre-wrap';
+                messageP.textContent = messageText;
+                
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'flex justify-between items-center mt-2';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'text-xs opacity-75';
+                timeSpan.textContent = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'flex items-center space-x-1';
+                statusDiv.setAttribute('data-response-id', responseId);
+                
+                const sentIcon = document.createElement('i');
+                sentIcon.className = 'fas fa-check text-xs opacity-60';
+                sentIcon.title = 'Sent';
+                
+                statusDiv.appendChild(sentIcon);
+                
+                // Add internal indicator if applicable
+                if (isInternal) {
+                    const internalSpan = document.createElement('span');
+                    internalSpan.className = 'text-xs bg-orange-500 bg-opacity-20 text-orange-200 px-2 py-1 rounded-full ml-2';
+                    internalSpan.innerHTML = '<i class="fas fa-lock mr-1"></i>Internal';
+                    bubbleDiv.appendChild(internalSpan);
+                }
+                
+                metaDiv.appendChild(timeSpan);
+                metaDiv.appendChild(statusDiv);
+                
+                bubbleDiv.appendChild(messageP);
+                bubbleDiv.appendChild(metaDiv);
+                
+                messageContent.appendChild(bubbleDiv);
+                messageDiv.appendChild(messageContent);
+                
+                // Add to chat container
+                chatContainer.appendChild(messageDiv);
+                
+                // Auto-scroll to show new message
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
             
             // Start periodic polling for seen status (every 10 seconds)
