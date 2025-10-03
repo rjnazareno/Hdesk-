@@ -1843,11 +1843,19 @@ if ($ticket) {
             function forceScrollToBottom() {
                 const chatContainer = document.getElementById('chatContainer');
                 if (chatContainer) {
-                    chatContainer.scrollTo({
-                        top: chatContainer.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                    console.log('📜 Force scrolled to bottom (smooth)');
+                    // Method 1: Find the last message and scroll to it
+                    const messages = chatContainer.querySelectorAll('.flex');
+                    if (messages.length > 0) {
+                        const lastMessage = messages[messages.length - 1];
+                        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                        console.log('📜 Scrolled last message into view');
+                    } else {
+                        // Fallback: scroll container to bottom
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        console.log('📜 Fallback: scrolled container to bottom');
+                    }
+                    
+                    console.log('📜 Chat height:', chatContainer.scrollHeight, 'Current scroll:', chatContainer.scrollTop);
                 }
             }
             
