@@ -1360,13 +1360,19 @@ if ($ticket) {
                             // Add only the new message instead of refreshing all (preserves original timestamps)
                             if (data.timestamp && data.response_id) {
                                 console.log('✅ Adding new message to chat with timestamp:', data.timestamp);
-                                addNewMessageToChat({
-                                    response_id: data.response_id,
-                                    message: message,
-                                    user_type: <?= json_encode($userType) ?>,
-                                    formatted_time: formatTimestamp(data.timestamp),
-                                    is_seen: false
-                                });
+                                console.log('🐛 DEBUG - message variable:', message);
+                                try {
+                                    addNewMessageToChat({
+                                        response_id: data.response_id,
+                                        message: message,
+                                        user_type: <?= json_encode($userType) ?>,
+                                        formatted_time: formatTimestamp(data.timestamp),
+                                        is_seen: false
+                                    });
+                                } catch (e) {
+                                    console.error('🐛 ERROR in addNewMessageToChat:', e);
+                                    console.log('🐛 Available variables:', {message, data, chatContainer});
+                                }
                                 
                                 // Scroll to bottom
                                 if (chatContainer) {

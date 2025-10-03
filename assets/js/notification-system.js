@@ -252,7 +252,9 @@ class NotificationSystem {
     hideLoading() {
         const loadingElement = document.getElementById('notificationsLoading');
         if (loadingElement) loadingElement.classList.add('hidden');
-    }    showError(message) {
+    }
+
+    showError(message) {
         const container = document.getElementById('notificationsList');
         if (!container) return; // Exit if element doesn't exist
         
