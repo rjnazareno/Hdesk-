@@ -1348,18 +1348,20 @@ if ($ticket) {
                         console.log('✅ Response added:', data);
                         
                         if (data.success) {
-                            console.log('📝 Message sent successfully:', data);
-                            console.log('🕒 Server timestamp:', data.timestamp);
+                            console.log('📝 Message sent successfully via AJAX:', data);
                             
-                            // Clear the textarea
+                            // Clear the textarea immediately
                             textarea.value = '';
                             
-                            // Show success message
-                            showNotification('Message sent successfully!', 'success');
+                            // Add message to chat immediately (no refresh needed!)
+                            const isInternal = internalCheckbox ? internalCheckbox.checked : false;
+                            const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
                             
-                            // Refresh chat messages and scroll to latest message
-                            console.log('✅ Message sent, refreshing chat and scrolling to bottom');
-                            refreshChatMessages(true); // Force scroll to bottom to show new message
+                            console.log('⚡ Adding message immediately to chat - no refresh!');
+                            addMessageToChatImmediate(messageText, isInternal, timestamp, data.response_id);
+                            
+                            // Show success notification
+                            showNotification('Message sent!', 'success');
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1916,47 +1918,20 @@ if ($ticket) {
                         console.log('✅ Response:', data);
                         
                         if (data.success) {
-                            console.log('✅ Message sent successfully');
+                            console.log('✅ Message sent successfully via AJAX (handler 2)');
+                            
+                            // Clear textarea
                             textarea.value = '';
                             
-                            // Immediate scroll before refresh
-                            forceScrollToBottom();
+                            // Add message immediately without refresh
+                            const isInternalMsg = isInternal || false;
+                            const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
                             
-                            // Refresh chat to show new message with auto-scroll
-                            if (typeof refreshChatMessages === 'function') {
-                                refreshChatMessages(true); // Force scroll to bottom
-                                
-                                // Multiple scroll attempts to ensure it works
-                                const chatContainer = document.getElementById('chatContainer');
-                                if (chatContainer) {
-                                    // Immediate scroll
-                                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                                    
-                                    // Delayed scroll (after DOM updates)
-                                    setTimeout(() => {
-                                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                                        console.log('📜 First auto-scroll attempt');
-                                    }, 100);
-                                    
-                                    // Another delayed scroll (safety net)
-                                    setTimeout(() => {
-                                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                                        console.log('📜 Second auto-scroll attempt');
-                                    }, 300);
-                                    
-                                    // Final scroll (ensures visibility)
-                                    setTimeout(() => {
-                                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                                        forceScrollToBottom();
-                                        console.log('📜 Final auto-scroll attempt');
-                                    }, 500);
-                                }
-                            } else {
-                                // Fallback: reload the page
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 500);
-                            }
+                            console.log('⚡ Adding message immediately (handler 2) - no refresh needed!');
+                            addMessageToChatImmediate(message, isInternalMsg, timestamp, data.response_id);
+                            
+                            // Show success notification
+                            showNotification('Message sent!', 'success');
                         } else {
                             console.error('❌ Send failed:', data.message);
                             alert('Error: ' + (data.message || 'Failed to send message'));
