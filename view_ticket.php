@@ -1357,9 +1357,9 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Refresh chat messages to show the new message
-                            console.log('✅ Message sent, refreshing chat');
-                            refreshChatMessages();
+                            // Refresh chat messages and scroll to latest message
+                            console.log('✅ Message sent, refreshing chat and scrolling to bottom');
+                            refreshChatMessages(true); // Force scroll to bottom to show new message
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1619,14 +1619,19 @@ if ($ticket) {
                 // Set all content at once instead of appending
                 chatContainer.innerHTML = messagesHtml;
                 
-                // Restore scroll position or force scroll to bottom - CHAT ONLY
+                // Force scroll to latest messages (bottom) after content loads
                 if (wasAtBottom || forceScrollToBottom) {
+                    // Multiple timeouts to ensure content is rendered
                     setTimeout(() => {
-                        // Only scroll chat container, prevent page scroll
-                        const maxScroll = chatContainer.scrollHeight - chatContainer.offsetHeight;
-                        chatContainer.scrollTop = Math.max(0, maxScroll);
-                        console.log('📜 Scrolled chat to bottom only (wasAtBottom: ' + wasAtBottom + ', forced: ' + forceScrollToBottom + ')');
-                    }, 50);
+                        console.log('🚀 Attempting to scroll to latest messages...');
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 10);
+                    
+                    setTimeout(() => {
+                        // Force scroll with large number to guarantee bottom
+                        chatContainer.scrollTop = 999999;
+                        console.log('📜 Final scroll to bottom - Height:', chatContainer.scrollHeight, 'ScrollTop:', chatContainer.scrollTop);
+                    }, 100);
                 }
             }
             
@@ -1712,8 +1717,11 @@ if ($ticket) {
                 // Add to chat container
                 chatContainer.appendChild(messageDiv);
                 
-                // Auto-scroll to show new message
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                // Force scroll to latest message (bottom) immediately
+                setTimeout(() => {
+                    chatContainer.scrollTop = 999999; // Force to bottom
+                    console.log('📱 New message added, scrolled to bottom:', chatContainer.scrollTop);
+                }, 10);
             }
             
             // Start periodic polling for seen status (every 10 seconds)
@@ -1843,26 +1851,32 @@ if ($ticket) {
             
             console.log('🔧 Chat system initialized', { form: !!form, textarea: !!textarea, sendBtn: !!sendBtn });
             
-            // Aggressive scroll to bottom function - CHAT ONLY
+            // Force scroll to LATEST messages (bottom) - CHAT ONLY
             function forceScrollToBottom() {
                 const chatContainer = document.getElementById('chatContainer');
                 if (chatContainer) {
-                    // Prevent any page scrolling by focusing only on chat container
-                    const currentScrollTop = chatContainer.scrollTop;
-                    const maxScroll = chatContainer.scrollHeight - chatContainer.offsetHeight;
+                    console.log('🔍 Before scroll - Height:', chatContainer.scrollHeight, 'ClientHeight:', chatContainer.clientHeight, 'ScrollTop:', chatContainer.scrollTop);
                     
-                    // Direct scroll to bottom (immediate)
-                    chatContainer.scrollTop = maxScroll;
+                    // Multiple methods to ensure we get to the bottom
+                    // Method 1: Set scrollTop to maximum possible value
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                     
-                    // Verify scroll worked
-                    console.log('📜 Chat scroll only - Height:', chatContainer.scrollHeight, 
-                               'ScrollTop:', chatContainer.scrollTop, 'Max:', maxScroll);
-                    
-                    // Ensure no page scroll occurred by preventing any scroll events on document
-                    document.body.style.overflow = 'hidden';
+                    // Method 2: Use a large number to ensure we reach the bottom
                     setTimeout(() => {
-                        document.body.style.overflow = '';
-                    }, 50);
+                        chatContainer.scrollTop = 999999;
+                        console.log('📜 After scroll attempt - ScrollTop:', chatContainer.scrollTop, 'Should be at bottom');
+                    }, 10);
+                    
+                    // Method 3: Find last message and ensure it's visible
+                    setTimeout(() => {
+                        const messages = chatContainer.querySelectorAll('.flex.justify-end, .flex.justify-start');
+                        if (messages.length > 0) {
+                            const lastMessage = messages[messages.length - 1];
+                            console.log('📍 Found', messages.length, 'messages, scrolling to last one');
+                            // Scroll to make last message visible at bottom
+                            lastMessage.scrollIntoView({ block: 'end', inline: 'nearest' });
+                        }
+                    }, 20);
                 }
             }
             
