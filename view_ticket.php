@@ -1357,33 +1357,9 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Add only the new message instead of refreshing all (preserves original timestamps)
-                            if (data.timestamp && data.response_id) {
-                                console.log('✅ Adding new message to chat with timestamp:', data.timestamp);
-                                try {
-                                    addNewMessageToChat({
-                                        response_id: data.response_id,
-                                        message: message,
-                                        user_type: <?= json_encode($userType) ?>,
-                                        formatted_time: formatTimestamp(data.timestamp),
-                                        is_seen: false
-                                    });
-                                    
-                                    // Scroll to bottom
-                                    if (chatContainer) {
-                                        setTimeout(() => {
-                                            chatContainer.scrollTop = chatContainer.scrollHeight;
-                                        }, 100);
-                                    }
-                                } catch (e) {
-                                    console.error('❌ Failed to add new message, refreshing chat instead:', e);
-                                    refreshChatMessages();
-                                }
-                            } else {
-                                // Fallback: only refresh if we don't have timestamp info
-                                console.log('⚠️ No timestamp info, falling back to refresh');
-                                refreshChatMessages();
-                            }
+                            // Refresh chat messages to show the new message
+                            console.log('✅ Message sent, refreshing chat');
+                            refreshChatMessages();
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1648,42 +1624,7 @@ if ($ticket) {
                 }
             }
             
-            // Function to create message HTML (matches server-side styling)
-            window.createMessageHtml = function createMessageHtml(msg) {
-                const currentUserType = <?= json_encode($userType) ?>;
-                const isMyMessage = (currentUserType === 'it_staff' && msg.user_type === 'it_staff') || 
-                                   (currentUserType === 'employee' && msg.user_type === 'employee');
-                
-                console.log('💬 Creating message:', {
-                    message: msg.message.substring(0, 20) + '...',
-                    currentUser: currentUserType,
-                    messageUser: msg.user_type,
-                    isMyMessage: isMyMessage
-                });
-                
-                const alignClass = isMyMessage ? 'justify-end' : 'justify-start';
-                const bubbleClass = isMyMessage ? 
-                    'bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent' :
-                    'bg-green-100 border border-green-200 rounded-r-2xl rounded-tl-2xl text-gray-800 bubble-staff';
-                
-                const seenIcon = msg.is_seen ? 
-                    '<i class="fas fa-check-double text-xs text-blue-400" title="Seen"></i>' :
-                    '<i class="fas fa-check text-xs opacity-60" title="Sent"></i>';
-                
-                return `
-                    <div class="flex ${alignClass} mb-4">
-                        <div class="max-w-xs">
-                            <div class="chat-bubble relative ${bubbleClass} px-4 py-3 shadow-sm" data-response-id="${msg.response_id}">
-                                <p class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(msg.message)}</p>
-                                <div class="flex justify-between items-center mt-2">
-                                    <span class="text-xs opacity-75">${msg.formatted_time}</span>
-                                    ${isMyMessage ? `<div class="flex items-center space-x-1">${seenIcon}</div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
+            // Message HTML is now created server-side via refreshChatMessages() for reliability
             
             // Helper function to escape HTML
             function escapeHtml(text) {
@@ -1812,27 +1753,7 @@ if ($ticket) {
         }
         }
 
-        // Helper function to add a single new message without refreshing all timestamps
-        window.addNewMessageToChat = function addNewMessageToChat(message) {
-            if (!chatContainer) {
-                console.error('❌ Chat container not found');
-                return;
-            }
-            
-            console.log('➕ Adding new message to chat:', message);
-            
-            // Remove "no messages" placeholder if present
-            const placeholder = chatContainer.querySelector('.text-center');
-            if (placeholder && placeholder.textContent.includes('No messages yet')) {
-                placeholder.remove();
-            }
-            
-            // Create the message HTML using the same format as server rendering
-            const messageHtml = createMessageHtml(message);
-            
-            // Add to end of chat
-            chatContainer.insertAdjacentHTML('beforeend', messageHtml);
-        }
+        // Note: Using refreshChatMessages() for reliable message updates
     </script>
     
     <!-- Unified Notification System with Pictures -->
