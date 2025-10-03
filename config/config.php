@@ -5,7 +5,7 @@
  */
 
 // Database Configuration
-define('DB_HOST', '153.92.15.63');
+define('DB_HOST', 'localhost');
 define('DB_NAME', 'u816220874_ithelp');
 define('DB_USER', 'u816220874_IT');  // Live server MySQL username
 define('DB_PASS', 'F]n5HZgi$fK');      // Live server MySQL password
@@ -13,7 +13,7 @@ define('DB_CHARSET', 'utf8mb4');
 
 // Application Configuration
 define('APP_NAME', 'IThelp - IT Ticketing System');
-define('APP_URL', 'https://your-domain.com/IThelp/'); // Update with your actual domain
+define('APP_URL', 'https://ithelp.resourcestaffonline.com/IThelp/'); // Update with your actual domain
 define('UPLOAD_DIR', __DIR__ . '/../uploads/tickets/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 define('ALLOWED_FILE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'txt', 'zip']);
