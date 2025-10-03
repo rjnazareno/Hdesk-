@@ -1294,8 +1294,8 @@ if ($ticket) {
     
     <!-- Clean Chat System JavaScript -->
     <script>
-        // Global function to add messages immediately (available to all scripts)
-        function addMessageToChatImmediate(messageText, isInternal, timestamp, responseId) {
+        // TRULY GLOBAL function - available to ALL script blocks
+        window.addMessageToChatImmediate = function(messageText, isInternal, timestamp, responseId) {
             const chatContainer = document.getElementById('chatContainer');
             if (!chatContainer) return;
             
@@ -1727,8 +1727,8 @@ if ($ticket) {
             // Start periodic polling for seen status (every 10 seconds)
             setInterval(pollForSeenStatus, 10000);
             
-            // Helper function to show notifications
-            function showNotification(message, type) {
+            // Helper function to show notifications (also made global)
+            window.showNotification = window.showNotification || function(message, type) {
                 const notification = document.createElement('div');
                 notification.className = `fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 ${
                     type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 
@@ -1742,7 +1742,7 @@ if ($ticket) {
                 setTimeout(() => {
                     notification.remove();
                 }, 3000);
-            }
+            };
         });
         
         // Helper function to format database timestamp to display format
