@@ -1368,7 +1368,7 @@ if ($ticket) {
                 chatContainer.scrollTop = 999999; // Force to bottom
                 console.log('📱 New message added, scrolled to bottom:', chatContainer.scrollTop);
             }, 10);
-        }
+        }; // End of window.addMessageToChatImmediate function
 
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('messengerForm');
