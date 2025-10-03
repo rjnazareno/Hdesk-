@@ -187,25 +187,6 @@ if (isset($_SESSION['user_id'])) {
                 </button>
             </form>
 
-            <!-- Demo Credentials -->
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-medium text-gray-700 mb-3">Test Login Credentials:</h3>
-                <div class="space-y-2 text-xs">
-                    <div class="bg-blue-50 p-3 rounded-lg">
-                        <strong class="text-blue-800">IT Staff:</strong>
-                        <div class="text-blue-700">Username: admin | Password: admin123</div>
-                        <div class="text-blue-600 text-xs mt-1">Note: Password can be plain text or hashed</div>
-                    </div>
-                    <div class="bg-green-50 p-3 rounded-lg">
-                        <strong class="text-green-800">Employee Examples:</strong>
-                        <div class="text-green-700">Username: vincent.santos | Password: ?</div>
-                        <div class="text-green-600 text-xs mt-1">Try: shaina.dela cruz, renalyn.josafat, etc.</div>
-                        <div class="text-orange-600 text-xs mt-1">⚠️ Run test_passwords.php to find passwords</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Footer -->
         <div class="text-center mt-6 text-sm text-gray-500">
             <i class="fas fa-shield-alt mr-1"></i>

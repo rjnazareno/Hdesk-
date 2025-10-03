@@ -57,10 +57,8 @@ if (isset($_GET['success'])) {
 // Load ticket data first
 try {
     require_once 'config/database.php';
-    $database = Database::getInstance();
-    $db = $database->getConnection();
-    
-    // Get ticket with employee info
+        $database = Database::getInstance();
+        $db = $database->getConnection();    // Get ticket with employee info
     $stmt = $db->prepare("
         SELECT 
             t.*,
@@ -1359,9 +1357,28 @@ if ($ticket) {
                             // Show success message
                             showNotification('Message sent successfully!', 'success');
                             
-                            // Refresh chat messages to show the new message with proper server timestamps
-                            console.log('🔄 Triggering chat refresh after message send');
-                            refreshChatMessages();
+                            // Add only the new message instead of refreshing all (preserves original timestamps)
+                            if (data.timestamp && data.response_id) {
+                                console.log('✅ Adding new message to chat with timestamp:', data.timestamp);
+                                addNewMessageToChat({
+                                    response_id: data.response_id,
+                                    message: messageText,
+                                    user_type: <?= json_encode($userType) ?>,
+                                    formatted_time: formatTimestamp(data.timestamp),
+                                    is_seen: false
+                                });
+                                
+                                // Scroll to bottom
+                                if (chatContainer) {
+                                    setTimeout(() => {
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    }, 100);
+                                }
+                            } else {
+                                // Fallback: only refresh if we don't have timestamp info
+                                console.log('⚠️ No timestamp info, falling back to refresh');
+                                refreshChatMessages();
+                            }
                             
                         } else {
                             showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
@@ -1767,6 +1784,49 @@ if ($ticket) {
                 }, 3000);
             }
         });
+        
+        // Helper function to format database timestamp to display format
+        function formatTimestamp(dbTimestamp) {
+            try {
+                const date = new Date(dbTimestamp);
+                return date.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                console.error('Error formatting timestamp:', e);
+                return new Date().toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            }
+        }
+        
+        // Helper function to add a single new message without refreshing all timestamps
+        function addNewMessageToChat(message) {
+            if (!chatContainer) {
+                console.error('❌ Chat container not found');
+                return;
+            }
+            
+            console.log('➕ Adding new message to chat:', message);
+            
+            // Remove "no messages" placeholder if present
+            const placeholder = chatContainer.querySelector('.text-center');
+            if (placeholder && placeholder.textContent.includes('No messages yet')) {
+                placeholder.remove();
+            }
+            
+            // Create the message HTML using the same format as server rendering
+            const messageHtml = createMessageHtml(message);
+            
+            // Add to end of chat
+            chatContainer.insertAdjacentHTML('beforeend', messageHtml);
+        }
     </script>
     
     <!-- Unified Notification System with Pictures -->
