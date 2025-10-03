@@ -96,7 +96,7 @@ try {
 
 // Handle form submissions (only if ticket exists and not AJAX)
 // Skip processing if this is an AJAX request (should go to api/add_response.php instead)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && isset($_POST['add_response'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && !isset($_POST['ajax_request'])) {
     try {
         $logger = new ActivityLogger($db);
         
@@ -1828,71 +1828,90 @@ if ($ticket) {
         });
     </script>
 
-    <!-- Firebase Real-time Chat System -->
-    <script type="module" src="assets/js/firebase-config.js"></script>
-    <script type="module" src="assets/js/firebase-chat.js"></script>
-    
-    <!-- Firebase Chat Integration -->
-    <script type="module">
-        // Wait for Firebase to initialize
-        setTimeout(() => {
-            if (window.firebaseDb && typeof window.FirebaseChat === 'function') {
-                console.log('🔥 Initializing Firebase chat...');
-                window.firebaseChat = new window.FirebaseChat(
-                    <?= $ticketId ?>,
-                    <?= $userId ?>,
-                    '<?= $userType ?>'
-                );
-                
-                // Update the form handler to use Firebase
-                const form = document.getElementById('messengerForm');
-                const textarea = document.getElementById('response_text');
-                
-                if (form && textarea) {
-                    form.addEventListener('submit', function(e) {
-                        e.preventDefault();
+    <!-- Simple Working Chat System -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('messengerForm');
+            const textarea = document.getElementById('response_text');
+            const sendBtn = document.getElementById('messengerSendBtn');
+            
+            console.log('🔧 Chat system initialized', { form: !!form, textarea: !!textarea, sendBtn: !!sendBtn });
+            
+            if (form && textarea && sendBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const message = textarea.value.trim();
+                    const isInternal = document.querySelector('input[name="is_internal"]:checked') ? '1' : '0';
+                    
+                    if (!message) {
+                        alert('Please enter a message');
+                        return;
+                    }
+                    
+                    console.log('� Sending message:', { message, isInternal });
+                    
+                    // Disable send button
+                    sendBtn.disabled = true;
+                    const originalText = sendBtn.innerHTML;
+                    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+                    
+                    // Send via AJAX to MySQL
+                    const formData = new FormData();
+                    formData.append('ticket_id', '<?= $ticketId ?>');
+                    formData.append('message', message);
+                    formData.append('is_internal', isInternal);
+                    formData.append('ajax_request', '1');
+                    
+                    fetch('api/add_response.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('✅ Response:', data);
                         
-                        const message = textarea.value.trim();
-                        const isInternal = document.querySelector('input[name="is_internal"]:checked') ? true : false;
-                        
-                        if (!message) {
-                            alert('Please enter a message');
-                            return;
-                        }
-                        
-                        console.log('🔥 Sending message via Firebase...');
-                        
-                        // Send via Firebase
-                        window.firebaseChat.sendMessage(message, isInternal).then(() => {
-                            console.log('🔥 Message sent successfully');
+                        if (data.success) {
+                            console.log('✅ Message sent successfully');
                             textarea.value = '';
                             
-                            // Also save to MySQL for backup
-                            const formData = new FormData();
-                            formData.append('ticket_id', '<?= $ticketId ?>');
-                            formData.append('message', message);
-                            formData.append('is_internal', isInternal ? '1' : '0');
-                            
-                            fetch('api/add_response.php', {
-                                method: 'POST',
-                                body: formData
-                            }).then(response => response.json()).then(data => {
-                                console.log('💾 Message saved to MySQL:', data);
-                            }).catch(error => {
-                                console.error('💾 MySQL save failed:', error);
-                            });
-                            
-                        }).catch((error) => {
-                            console.error('🔥 Firebase send failed:', error);
-                            alert('Failed to send message. Please try again.');
-                        });
+                            // Refresh chat to show new message
+                            if (typeof refreshChatMessages === 'function') {
+                                refreshChatMessages();
+                            } else {
+                                // Fallback: reload the page
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 500);
+                            }
+                        } else {
+                            console.error('❌ Send failed:', data.message);
+                            alert('Error: ' + (data.message || 'Failed to send message'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Network error:', error);
+                        alert('Network error. Please try again.');
+                    })
+                    .finally(() => {
+                        // Re-enable send button
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = originalText;
                     });
-                }
+                });
+                
+                // Add Ctrl+Enter support
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        e.preventDefault();
+                        form.dispatchEvent(new Event('submit'));
+                    }
+                });
             } else {
-                console.log('⚠️ Firebase not available, using fallback...');
-                // Fallback to original AJAX system
+                console.error('❌ Chat elements not found');
             }
-        }, 1000);
+        });
     </script>
     
 </body>
