@@ -1434,18 +1434,18 @@ if ($ticket) {
                             const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
                             
                             console.log('⚡ Adding message immediately to chat - no refresh!');
-                            addMessageToChatImmediate(messageText, isInternal, timestamp, data.response_id);
+                            window.addMessageToChatImmediate(messageText, isInternal, timestamp, data.response_id);
                             
                             // Show success notification
-                            showNotification('Message sent!', 'success');
+                            window.showNotification('Message sent!', 'success');
                             
                         } else {
-                            showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
+                            window.showNotification('Error: ' + (data.message || 'Failed to send message'), 'error');
                         }
                     })
                     .catch(error => {
                         console.error('❌ Error sending message:', error);
-                        showNotification('Error: Failed to send message', 'error');
+                        window.showNotification('Error: Failed to send message', 'error');
                     })
                     .finally(() => {
                         // Re-enable send button
@@ -1648,7 +1648,7 @@ if ($ticket) {
                 })
                 .catch(error => {
                     console.error('❌ Error refreshing chat:', error);
-                    showNotification('Error loading messages. Please refresh the page.', 'error');
+                    window.showNotification('Error loading messages. Please refresh the page.', 'error');
                 });
             }
             
@@ -1926,10 +1926,10 @@ if ($ticket) {
                             const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
                             
                             console.log('⚡ Adding message immediately (handler 2) - no refresh needed!');
-                            addMessageToChatImmediate(message, isInternalMsg, timestamp, data.response_id);
+                            window.addMessageToChatImmediate(message, isInternalMsg, timestamp, data.response_id);
                             
                             // Show success notification
-                            showNotification('Message sent!', 'success');
+                            window.showNotification('Message sent!', 'success');
                         } else {
                             console.error('❌ Send failed:', data.message);
                             alert('Error: ' + (data.message || 'Failed to send message'));
