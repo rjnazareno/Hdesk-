@@ -1360,19 +1360,24 @@ if ($ticket) {
                             // Add only the new message instead of refreshing all (preserves original timestamps)
                             if (data.timestamp && data.response_id) {
                                 console.log('✅ Adding new message to chat with timestamp:', data.timestamp);
-                                addNewMessageToChat({
-                                    response_id: data.response_id,
-                                    message: message,
-                                    user_type: <?= json_encode($userType) ?>,
-                                    formatted_time: formatTimestamp(data.timestamp),
-                                    is_seen: false
-                                });
-                                
-                                // Scroll to bottom
-                                if (chatContainer) {
-                                    setTimeout(() => {
-                                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                                    }, 100);
+                                try {
+                                    addNewMessageToChat({
+                                        response_id: data.response_id,
+                                        message: message,
+                                        user_type: <?= json_encode($userType) ?>,
+                                        formatted_time: formatTimestamp(data.timestamp),
+                                        is_seen: false
+                                    });
+                                    
+                                    // Scroll to bottom
+                                    if (chatContainer) {
+                                        setTimeout(() => {
+                                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                                        }, 100);
+                                    }
+                                } catch (e) {
+                                    console.error('❌ Failed to add new message, refreshing chat instead:', e);
+                                    refreshChatMessages();
                                 }
                             } else {
                                 // Fallback: only refresh if we don't have timestamp info
@@ -1644,7 +1649,7 @@ if ($ticket) {
             }
             
             // Function to create message HTML (matches server-side styling)
-            function createMessageHtml(msg) {
+            window.createMessageHtml = function createMessageHtml(msg) {
                 const currentUserType = <?= json_encode($userType) ?>;
                 const isMyMessage = (currentUserType === 'it_staff' && msg.user_type === 'it_staff') || 
                                    (currentUserType === 'employee' && msg.user_type === 'employee');
@@ -1808,7 +1813,7 @@ if ($ticket) {
         }
 
         // Helper function to add a single new message without refreshing all timestamps
-        function addNewMessageToChat(message) {
+        window.addNewMessageToChat = function addNewMessageToChat(message) {
             if (!chatContainer) {
                 console.error('❌ Chat container not found');
                 return;
