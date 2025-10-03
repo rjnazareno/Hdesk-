@@ -96,7 +96,7 @@ try {
 
 // Handle form submissions (only if ticket exists and not AJAX)
 // Skip processing if this is an AJAX request (should go to api/add_response.php instead)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && !isset($_POST['ajax_request'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && !isset($_POST['ajax_request']) && !isset($_POST['message'])) {
     try {
         $logger = new ActivityLogger($db);
         
@@ -1037,10 +1037,10 @@ if ($ticket) {
                 
                 <!-- Integrated Message Input -->
                 <div class="border-t border-gray-200 bg-white p-4">
-                    <form id="messengerForm" class="flex items-end space-x-3">
-                        <!-- Removed method="post" and hidden fields - using AJAX only -->
+                    <form id="messengerForm" class="flex items-end space-x-3" onsubmit="return false;">
+                        <!-- AJAX-only form - no POST method, no server submission -->
                         <div class="flex-1">
-                            <textarea name="response_text" id="response_text" rows="2" 
+                            <textarea name="message_text" id="response_text" rows="2" 
                                       class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" 
                                       placeholder="Type your message..."
                                       required></textarea>
