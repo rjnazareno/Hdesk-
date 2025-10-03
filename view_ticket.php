@@ -1551,11 +1551,13 @@ if ($ticket) {
                         console.log(`📝 Updating chat with ${data.messages.length} messages`);
                         updateChatContainer(data.messages, forceScrollToBottom);
                         
-                        // Additional scroll to bottom for new messages
+                        // Additional scroll to bottom for new messages - CHAT ONLY
                         if (forceScrollToBottom && chatContainer) {
                             setTimeout(() => {
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                                console.log('📜 Force scrolled to bottom after message send');
+                                // Prevent page scroll, only chat container scroll
+                                const maxScroll = chatContainer.scrollHeight - chatContainer.offsetHeight;
+                                chatContainer.scrollTop = Math.max(0, maxScroll);
+                                console.log('📜 Force scrolled chat to bottom after message send - no page scroll');
                             }, 150);
                         }
                     } else {
@@ -1617,11 +1619,13 @@ if ($ticket) {
                 // Set all content at once instead of appending
                 chatContainer.innerHTML = messagesHtml;
                 
-                // Restore scroll position or force scroll to bottom
+                // Restore scroll position or force scroll to bottom - CHAT ONLY
                 if (wasAtBottom || forceScrollToBottom) {
                     setTimeout(() => {
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        console.log('📜 Scrolled to bottom (wasAtBottom: ' + wasAtBottom + ', forced: ' + forceScrollToBottom + ')');
+                        // Only scroll chat container, prevent page scroll
+                        const maxScroll = chatContainer.scrollHeight - chatContainer.offsetHeight;
+                        chatContainer.scrollTop = Math.max(0, maxScroll);
+                        console.log('📜 Scrolled chat to bottom only (wasAtBottom: ' + wasAtBottom + ', forced: ' + forceScrollToBottom + ')');
                     }, 50);
                 }
             }
@@ -1839,20 +1843,26 @@ if ($ticket) {
             
             console.log('🔧 Chat system initialized', { form: !!form, textarea: !!textarea, sendBtn: !!sendBtn });
             
-            // Aggressive scroll to bottom function
+            // Aggressive scroll to bottom function - CHAT ONLY
             function forceScrollToBottom() {
                 const chatContainer = document.getElementById('chatContainer');
                 if (chatContainer) {
-                    // Method 1: Direct scroll to bottom (most reliable)
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    // Prevent any page scrolling by focusing only on chat container
+                    const currentScrollTop = chatContainer.scrollTop;
+                    const maxScroll = chatContainer.scrollHeight - chatContainer.offsetHeight;
                     
-                    // Method 2: Smooth scroll alternative
-                    chatContainer.scrollTo({
-                        top: chatContainer.scrollHeight,
-                        behavior: 'smooth'
-                    });
+                    // Direct scroll to bottom (immediate)
+                    chatContainer.scrollTop = maxScroll;
                     
-                    console.log('📜 Force scrolled to bottom - Height:', chatContainer.scrollHeight, 'ScrollTop:', chatContainer.scrollTop);
+                    // Verify scroll worked
+                    console.log('📜 Chat scroll only - Height:', chatContainer.scrollHeight, 
+                               'ScrollTop:', chatContainer.scrollTop, 'Max:', maxScroll);
+                    
+                    // Ensure no page scroll occurred by preventing any scroll events on document
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(() => {
+                        document.body.style.overflow = '';
+                    }, 50);
                 }
             }
             
