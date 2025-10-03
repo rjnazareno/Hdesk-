@@ -1839,6 +1839,18 @@ if ($ticket) {
             
             console.log('🔧 Chat system initialized', { form: !!form, textarea: !!textarea, sendBtn: !!sendBtn });
             
+            // Aggressive scroll to bottom function
+            function forceScrollToBottom() {
+                const chatContainer = document.getElementById('chatContainer');
+                if (chatContainer) {
+                    chatContainer.scrollTo({
+                        top: chatContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                    console.log('📜 Force scrolled to bottom (smooth)');
+                }
+            }
+            
             if (form && textarea && sendBtn) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -1878,9 +1890,38 @@ if ($ticket) {
                             console.log('✅ Message sent successfully');
                             textarea.value = '';
                             
+                            // Immediate scroll before refresh
+                            forceScrollToBottom();
+                            
                             // Refresh chat to show new message with auto-scroll
                             if (typeof refreshChatMessages === 'function') {
                                 refreshChatMessages(true); // Force scroll to bottom
+                                
+                                // Multiple scroll attempts to ensure it works
+                                const chatContainer = document.getElementById('chatContainer');
+                                if (chatContainer) {
+                                    // Immediate scroll
+                                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    
+                                    // Delayed scroll (after DOM updates)
+                                    setTimeout(() => {
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                        console.log('📜 First auto-scroll attempt');
+                                    }, 100);
+                                    
+                                    // Another delayed scroll (safety net)
+                                    setTimeout(() => {
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                        console.log('📜 Second auto-scroll attempt');
+                                    }, 300);
+                                    
+                                    // Final scroll (ensures visibility)
+                                    setTimeout(() => {
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                        forceScrollToBottom();
+                                        console.log('📜 Final auto-scroll attempt');
+                                    }, 500);
+                                }
                             } else {
                                 // Fallback: reload the page
                                 setTimeout(() => {
