@@ -1294,6 +1294,82 @@ if ($ticket) {
     
     <!-- Clean Chat System JavaScript -->
     <script>
+        // Global function to add messages immediately (available to all scripts)
+        function addMessageToChatImmediate(messageText, isInternal, timestamp, responseId) {
+            const chatContainer = document.getElementById('chatContainer');
+            if (!chatContainer) return;
+            
+            console.log('⚡ Adding message immediately:', messageText);
+            console.log('📅 Timestamp received:', timestamp);
+            
+            // Remove "No messages yet" placeholder if it exists
+            const placeholder = chatContainer.querySelector('.text-center');
+            if (placeholder && placeholder.textContent.includes('No messages yet')) {
+                placeholder.closest('.text-center').remove();
+            }
+            
+            // Create message element for current user (always right-aligned)
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex justify-end mb-4';
+            messageDiv.setAttribute('data-temp-message', 'true'); // Mark as temporary
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'max-w-xs';
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm';
+            
+            const messageP = document.createElement('p');
+            messageP.className = 'text-sm leading-relaxed whitespace-pre-wrap';
+            messageP.textContent = messageText;
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'flex justify-between items-center mt-2';
+            
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'text-xs opacity-75 message-timestamp';
+            
+            // Format timestamp for display
+            const formattedTime = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            timeSpan.textContent = formattedTime;
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'flex items-center space-x-1';
+            statusDiv.setAttribute('data-response-id', responseId);
+            
+            const sentIcon = document.createElement('i');
+            sentIcon.className = 'fas fa-check text-xs opacity-60';
+            sentIcon.title = 'Sent';
+            
+            statusDiv.appendChild(sentIcon);
+            
+            // Add internal indicator if applicable
+            if (isInternal) {
+                const internalSpan = document.createElement('span');
+                internalSpan.className = 'text-xs bg-orange-500 bg-opacity-20 text-orange-200 px-2 py-1 rounded-full ml-2';
+                internalSpan.innerHTML = '<i class="fas fa-lock mr-1"></i>Internal';
+                bubbleDiv.appendChild(internalSpan);
+            }
+            
+            metaDiv.appendChild(timeSpan);
+            metaDiv.appendChild(statusDiv);
+            
+            bubbleDiv.appendChild(messageP);
+            bubbleDiv.appendChild(metaDiv);
+            
+            messageContent.appendChild(bubbleDiv);
+            messageDiv.appendChild(messageContent);
+            
+            // Add to chat container
+            chatContainer.appendChild(messageDiv);
+            
+            // Force scroll to latest message (bottom) immediately
+            setTimeout(() => {
+                chatContainer.scrollTop = 999999; // Force to bottom
+                console.log('📱 New message added, scrolled to bottom:', chatContainer.scrollTop);
+            }, 10);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('messengerForm');
             const textarea = document.getElementById('response_text');
@@ -1646,85 +1722,7 @@ if ($ticket) {
                 return div.innerHTML;
             }
             
-            // Function to add message immediately for instant feedback
-            function addMessageToChatImmediate(messageText, isInternal, timestamp, responseId) {
-                if (!chatContainer) return;
-                
-                console.log('⚡ Adding message immediately:', messageText);
-                console.log('📅 Timestamp received:', timestamp);
-                
-                // Remove "No messages yet" placeholder if it exists
-                const placeholder = chatContainer.querySelector('.text-center');
-                if (placeholder && placeholder.textContent.includes('No messages yet')) {
-                    placeholder.closest('.text-center').remove();
-                }
-                
-                // Create message element for current user (always right-aligned)
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex justify-end mb-4';
-                messageDiv.setAttribute('data-temp-message', 'true'); // Mark as temporary
-                
-                const messageContent = document.createElement('div');
-                messageContent.className = 'max-w-xs';
-                
-                const bubbleDiv = document.createElement('div');
-                bubbleDiv.className = 'chat-bubble relative bg-blue-500 text-white rounded-l-2xl rounded-tr-2xl bubble-sent px-4 py-3 shadow-sm';
-                bubbleDiv.setAttribute('data-response-id', responseId);
-                
-                const messageP = document.createElement('p');
-                messageP.className = 'text-sm leading-relaxed whitespace-pre-wrap';
-                messageP.textContent = messageText;
-                
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'flex justify-between items-center mt-2';
-                
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'text-xs opacity-75';
-                // Always show seconds for immediate messages to ensure uniqueness
-                const formattedTime = timestamp.toLocaleTimeString([], {
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                timeSpan.textContent = formattedTime;
-                console.log('📅 Immediate display time:', formattedTime, 'from:', timestamp);
-                
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'flex items-center space-x-1';
-                statusDiv.setAttribute('data-response-id', responseId);
-                
-                const sentIcon = document.createElement('i');
-                sentIcon.className = 'fas fa-check text-xs opacity-60';
-                sentIcon.title = 'Sent';
-                
-                statusDiv.appendChild(sentIcon);
-                
-                // Add internal indicator if applicable
-                if (isInternal) {
-                    const internalSpan = document.createElement('span');
-                    internalSpan.className = 'text-xs bg-orange-500 bg-opacity-20 text-orange-200 px-2 py-1 rounded-full ml-2';
-                    internalSpan.innerHTML = '<i class="fas fa-lock mr-1"></i>Internal';
-                    bubbleDiv.appendChild(internalSpan);
-                }
-                
-                metaDiv.appendChild(timeSpan);
-                metaDiv.appendChild(statusDiv);
-                
-                bubbleDiv.appendChild(messageP);
-                bubbleDiv.appendChild(metaDiv);
-                
-                messageContent.appendChild(bubbleDiv);
-                messageDiv.appendChild(messageContent);
-                
-                // Add to chat container
-                chatContainer.appendChild(messageDiv);
-                
-                // Force scroll to latest message (bottom) immediately
-                setTimeout(() => {
-                    chatContainer.scrollTop = 999999; // Force to bottom
-                    console.log('📱 New message added, scrolled to bottom:', chatContainer.scrollTop);
-                }, 10);
-            }
+            // Function removed - now defined globally above
             
             // Start periodic polling for seen status (every 10 seconds)
             setInterval(pollForSeenStatus, 10000);
