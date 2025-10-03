@@ -7,13 +7,13 @@
 // Database Configuration
 define('DB_HOST', '153.92.15.63');
 define('DB_NAME', 'u816220874_ithelp');
-define('DB_USER', 'u816220874_IT');  // Default XAMPP MySQL username
-define('DB_PASS', 'F]n5HZgi$fK');      // Default XAMPP MySQL password (empty)
+define('DB_USER', 'u816220874_IT');  // Live server MySQL username
+define('DB_PASS', 'F]n5HZgi$fK');      // Live server MySQL password
 define('DB_CHARSET', 'utf8mb4');
 
 // Application Configuration
 define('APP_NAME', 'IThelp - IT Ticketing System');
-define('APP_URL', 'http://localhost/IThelp/');
+define('APP_URL', 'https://your-domain.com/IThelp/'); // Update with your actual domain
 define('UPLOAD_DIR', __DIR__ . '/../uploads/tickets/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 define('ALLOWED_FILE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'txt', 'zip']);
@@ -39,7 +39,8 @@ define('TICKETS_PER_PAGE', 10);
 // Timezone
 date_default_timezone_set('America/New_York'); // Adjust to your timezone
 
-// Error reporting (set to 0 in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Error reporting (production settings)
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 ?>
