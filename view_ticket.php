@@ -1362,7 +1362,7 @@ if ($ticket) {
                                 console.log('✅ Adding new message to chat with timestamp:', data.timestamp);
                                 addNewMessageToChat({
                                     response_id: data.response_id,
-                                    message: messageText,
+                                    message: message,
                                     user_type: <?= json_encode($userType) ?>,
                                     formatted_time: formatTimestamp(data.timestamp),
                                     is_seen: false

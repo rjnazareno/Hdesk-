@@ -89,6 +89,8 @@ class NotificationSystem {
     
     updateBadge(count) {
         const badge = document.getElementById('notificationBadge');
+        if (!badge) return; // Exit if element doesn't exist
+        
         if (count > 0) {
             badge.textContent = count > 99 ? '99+' : count;
             badge.classList.remove('hidden');
@@ -105,13 +107,16 @@ class NotificationSystem {
         const container = document.getElementById('notificationsList');
         const emptyState = document.getElementById('notificationsEmpty');
         
+        // Exit early if elements don't exist (e.g., on employee pages)
+        if (!container) return;
+        
         if (notifications.length === 0) {
             container.innerHTML = '';
-            emptyState.classList.remove('hidden');
+            if (emptyState) emptyState.classList.remove('hidden');
             return;
         }
         
-        emptyState.classList.add('hidden');
+        if (emptyState) emptyState.classList.add('hidden');
         
         container.innerHTML = notifications.map(notification => `
             <div class="notification-item px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${notification.is_read ? '' : 'bg-blue-50'}" 
@@ -184,8 +189,10 @@ class NotificationSystem {
                 
                 // Update badge
                 const badge = document.getElementById('notificationBadge');
-                const currentCount = parseInt(badge.textContent) || 0;
-                this.updateBadge(Math.max(0, currentCount - 1));
+                if (badge) {
+                    const currentCount = parseInt(badge.textContent) || 0;
+                    this.updateBadge(Math.max(0, currentCount - 1));
+                }
             }
         } catch (error) {
             console.error('Error marking notification as read:', error);
@@ -235,16 +242,20 @@ class NotificationSystem {
     }
     
     showLoading() {
-        document.getElementById('notificationsLoading').classList.remove('hidden');
-        document.getElementById('notificationsEmpty').classList.add('hidden');
+        const loadingElement = document.getElementById('notificationsLoading');
+        const emptyElement = document.getElementById('notificationsEmpty');
+        
+        if (loadingElement) loadingElement.classList.remove('hidden');
+        if (emptyElement) emptyElement.classList.add('hidden');
     }
-    
+
     hideLoading() {
-        document.getElementById('notificationsLoading').classList.add('hidden');
-    }
-    
-    showError(message) {
+        const loadingElement = document.getElementById('notificationsLoading');
+        if (loadingElement) loadingElement.classList.add('hidden');
+    }    showError(message) {
         const container = document.getElementById('notificationsList');
+        if (!container) return; // Exit if element doesn't exist
+        
         container.innerHTML = `
             <div class="text-center py-8">
                 <i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i>
