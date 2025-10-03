@@ -1534,14 +1534,14 @@ if ($ticket) {
             let isRefreshing = false;
             
             // Function to refresh chat messages with proper server timestamps
-            function refreshChatMessages() {
+            function refreshChatMessages(forceScrollToBottom = false) {
                 if (isRefreshing) {
                     console.log('⏳ Refresh already in progress, skipping...');
                     return;
                 }
                 
                 isRefreshing = true;
-                console.log('🔄 Refreshing chat messages...');
+                console.log('🔄 Refreshing chat messages...', forceScrollToBottom ? '(with auto-scroll)' : '');
                 
                 fetch(`api/get_chat_messages.php?ticket_id=<?= $ticketId ?>`)
                 .then(response => response.json())
@@ -1549,13 +1549,14 @@ if ($ticket) {
                     console.log('📨 Chat refresh response:', data);
                     if (data.success && data.messages) {
                         console.log(`📝 Updating chat with ${data.messages.length} messages`);
-                        updateChatContainer(data.messages);
+                        updateChatContainer(data.messages, forceScrollToBottom);
                         
-                        // Scroll to bottom to show new message
-                        if (chatContainer) {
+                        // Additional scroll to bottom for new messages
+                        if (forceScrollToBottom && chatContainer) {
                             setTimeout(() => {
                                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                            }, 100);
+                                console.log('📜 Force scrolled to bottom after message send');
+                            }, 150);
                         }
                     } else {
                         console.error('❌ Chat refresh failed:', data);
@@ -1572,7 +1573,7 @@ if ($ticket) {
             }
             
             // Function to update chat container with server-provided messages
-            function updateChatContainer(messages) {
+            function updateChatContainer(messages, forceScrollToBottom = false) {
                 if (!chatContainer) {
                     console.error('❌ Chat container not found');
                     return;
@@ -1616,10 +1617,11 @@ if ($ticket) {
                 // Set all content at once instead of appending
                 chatContainer.innerHTML = messagesHtml;
                 
-                // Restore scroll position
-                if (wasAtBottom) {
+                // Restore scroll position or force scroll to bottom
+                if (wasAtBottom || forceScrollToBottom) {
                     setTimeout(() => {
                         chatContainer.scrollTop = chatContainer.scrollHeight;
+                        console.log('📜 Scrolled to bottom (wasAtBottom: ' + wasAtBottom + ', forced: ' + forceScrollToBottom + ')');
                     }, 50);
                 }
             }
@@ -1876,9 +1878,9 @@ if ($ticket) {
                             console.log('✅ Message sent successfully');
                             textarea.value = '';
                             
-                            // Refresh chat to show new message
+                            // Refresh chat to show new message with auto-scroll
                             if (typeof refreshChatMessages === 'function') {
-                                refreshChatMessages();
+                                refreshChatMessages(true); // Force scroll to bottom
                             } else {
                                 // Fallback: reload the page
                                 setTimeout(() => {
