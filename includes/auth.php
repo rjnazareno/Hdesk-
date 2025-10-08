@@ -1,169 +1,162 @@
 <?php
 /**
- * Authentication and Session Management
- * Ticketing System - PHP 8+
+ * Authentication Handler
+ * Handles user login, logout, and session management
  */
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/config.php';
 
 class Auth {
-    private $db;
+    private $userModel;
     
     public function __construct() {
-        $this->db = getDB();
-        $this->startSession();
-    }
-    
-    private function startSession() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        $this->userModel = new User();
     }
     
     /**
-     * Login employee user
+     * Process login
      */
-    public function loginEmployee($username, $password) {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT id, username, password, fname, lname, email
-                FROM employees 
-                WHERE username = ? AND status = 'active'
-            ");
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
+    public function login($username, $password) {
+        $result = $this->verifyLogin($username, $password);
+        
+        if ($result) {
+            $user = $result['user'];
+            $type = $result['type'];
             
-            if ($user && password_verify($password, $user['password'])) {
-                $userData = [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'name' => $user['fname'] . ' ' . $user['lname'],
-                    'email' => $user['email']
-                ];
-                $this->setSession($user['id'], 'employee', $userData);
-                $this->logLogin($user['id'], 'employee');
-                return true;
+            // Set session variables
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_type'] = $type;
+            $_SESSION['username'] = $user['username'] ?? '';
+            $_SESSION['logged_in'] = true;
+            $_SESSION['last_activity'] = time();
+            
+            if ($type === 'user') {
+                // IT staff or admin
+                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['department'] = $user['department'] ?? '';
+            } else {
+                // Employee
+                $employeeModel = new Employee();
+                $_SESSION['full_name'] = $employeeModel->getFullName($user);
+                $_SESSION['email'] = $user['email'] ?? $user['personal_email'] ?? '';
+                $_SESSION['role'] = 'employee';
+                $_SESSION['department'] = $user['company'] ?? '';
             }
             
-            return false;
-        } catch (PDOException $e) {
-            error_log("Login error: " . $e->getMessage());
-            return false;
+            return true;
         }
-    }
-    
-    /**
-     * Login IT staff user
-     */
-    public function loginITStaff($username, $password) {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT staff_id, name, email, username, password 
-                FROM it_staff 
-                WHERE username = ? AND is_active = 1
-            ");
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
-            
-            if ($user && password_verify($password, $user['password'])) {
-                $this->setSession($user['staff_id'], 'it_staff', $user);
-                $this->logLogin($user['staff_id'], 'it_staff');
-                return true;
-            }
-            
-            return false;
-        } catch (PDOException $e) {
-            error_log("IT Login error: " . $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Set session data
-     */
-    private function setSession($userId, $userType, $userData) {
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['user_type'] = $userType;
-        $_SESSION['user_data'] = $userData;
-        $_SESSION['login_time'] = time();
-        $_SESSION['last_activity'] = time();
         
-        // Generate and store session token
-        $sessionToken = bin2hex(random_bytes(32));
-        $_SESSION['session_token'] = $sessionToken;
+        return false;
+    }
+    
+    /**
+     * Verify login credentials
+     * Checks both users and employees tables
+     */
+    private function verifyLogin($username, $password) {
+        // Try users table first (IT staff/admin)
+        $user = $this->userModel->findByUsername($username);
         
-        // Store session in database
-        $this->storeSession($sessionToken, $userId, $userType);
-    }
-    
-    /**
-     * Store session in database
-     */
-    private function storeSession($sessionToken, $userId, $userType) {
-        try {
-            $expiresAt = date('Y-m-d H:i:s', time() + SESSION_TIMEOUT);
-            $stmt = $this->db->prepare("
-                INSERT INTO user_sessions 
-                (session_id, user_id, user_type, ip_address, user_agent, expires_at) 
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                ip_address = VALUES(ip_address),
-                user_agent = VALUES(user_agent),
-                last_activity = CURRENT_TIMESTAMP,
-                expires_at = VALUES(expires_at)
-            ");
-            
-            $stmt->execute([
-                $sessionToken,
-                $userId,
-                $userType,
-                $_SERVER['REMOTE_ADDR'] ?? '',
-                $_SERVER['HTTP_USER_AGENT'] ?? '',
-                $expiresAt
-            ]);
-        } catch (PDOException $e) {
-            error_log("Session storage error: " . $e->getMessage());
+        if ($user && $user['is_active'] && password_verify($password, $user['password'])) {
+            return [
+                'user' => $user,
+                'type' => 'user'
+            ];
         }
+        
+        // Try employees table
+        require_once __DIR__ . '/../models/Employee.php';
+        $employeeModel = new Employee();
+        $employee = $employeeModel->verifyLogin($username, $password);
+        
+        if ($employee) {
+            return [
+                'user' => $employee,
+                'type' => 'employee'
+            ];
+        }
+        
+        return false;
     }
     
     /**
-     * Log login attempt
+     * Process logout
      */
-    private function logLogin($userId, $userType) {
-        // You can implement login logging here if needed
-        error_log("User login: {$userType} ID {$userId} from " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    public function logout() {
+        // Unset all session variables
+        $_SESSION = array();
+        
+        // Destroy the session cookie
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time() - 3600, '/');
+        }
+        
+        // Destroy the session
+        session_destroy();
+        
+        return true;
     }
     
     /**
      * Check if user is logged in
      */
     public function isLoggedIn() {
-        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {
+        return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+    }
+    
+    /**
+     * Check if session is valid
+     */
+    public function checkSession() {
+        if (!$this->isLoggedIn()) {
             return false;
         }
         
-        // Check session timeout
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+        // Check for session timeout (30 minutes of inactivity)
+        $timeout = 1800; // 30 minutes in seconds
+        
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
             $this->logout();
             return false;
         }
         
+        // Update last activity timestamp
         $_SESSION['last_activity'] = time();
+        
         return true;
     }
     
     /**
-     * Check if user is employee
+     * Require login
      */
-    public function isEmployee() {
-        return $this->isLoggedIn() && $_SESSION['user_type'] === 'employee';
+    public function requireLogin() {
+        if (!$this->checkSession()) {
+            redirect('login.php');
+        }
     }
     
     /**
-     * Check if user is IT staff
+     * Require specific role
      */
-    public function isITStaff() {
-        return $this->isLoggedIn() && $_SESSION['user_type'] === 'it_staff';
+    public function requireRole($role) {
+        $this->requireLogin();
+        
+        if ($_SESSION['role'] !== $role) {
+            redirect('dashboard.php');
+        }
+    }
+    
+    /**
+     * Require IT staff or admin
+     */
+    public function requireITStaff() {
+        $this->requireLogin();
+        
+        if ($_SESSION['role'] !== 'it_staff' && $_SESSION['role'] !== 'admin') {
+            redirect('dashboard.php');
+        }
     }
     
     /**
@@ -174,104 +167,27 @@ class Auth {
     }
     
     /**
-     * Get current user type
+     * Get current user role
      */
-    public function getUserType() {
-        return $_SESSION['user_type'] ?? null;
+    public function getUserRole() {
+        return $_SESSION['role'] ?? null;
     }
     
     /**
      * Get current user data
      */
-    public function getUserData() {
-        return $_SESSION['user_data'] ?? null;
-    }
-    
-    /**
-     * Logout user
-     */
-    public function logout() {
-        // Remove session from database
-        if (isset($_SESSION['session_token'])) {
-            try {
-                $stmt = $this->db->prepare("DELETE FROM user_sessions WHERE session_id = ?");
-                $stmt->execute([$_SESSION['session_token']]);
-            } catch (PDOException $e) {
-                error_log("Session cleanup error: " . $e->getMessage());
-            }
-        }
-        
-        // Clear session
-        session_unset();
-        session_destroy();
-        
-        // Start new session
-        session_start();
-        session_regenerate_id(true);
-    }
-    
-    /**
-     * Require login (redirect if not logged in)
-     */
-    public function requireLogin() {
+    public function getCurrentUser() {
         if (!$this->isLoggedIn()) {
-            // For testing purposes, set a default session if none exists
-            if (!isset($_SESSION['user_id'])) {
-                $_SESSION['user_id'] = 1;
-                $_SESSION['user_type'] = 'it_staff';
-                $_SESSION['username'] = 'admin';
-                $_SESSION['name'] = 'Test Admin';
-                $_SESSION['user_data'] = [
-                    'id' => 1,
-                    'username' => 'admin',
-                    'name' => 'Test Admin',
-                    'email' => 'admin@company.com'
-                ];
-                $_SESSION['last_activity'] = time();
-            }
-            // Still redirect if not properly logged in through the interface
-            if (!$this->isLoggedIn()) {
-                header('Location: simple_login.php');
-                exit;
-            }
+            return null;
         }
-    }
-    
-    /**
-     * Require employee access
-     */
-    public function requireEmployee() {
-        $this->requireLogin();
-        if (!$this->isEmployee()) {
-            header('Location: dashboard.php');
-            exit;
-        }
-    }
-    
-    /**
-     * Require IT staff access
-     */
-    public function requireITStaff() {
-        $this->requireLogin();
-        if (!$this->isITStaff()) {
-            header('Location: dashboard.php');
-            exit;
-        }
-    }
-    
-    /**
-     * Clean up expired sessions
-     */
-    public function cleanupSessions() {
-        try {
-            $stmt = $this->db->prepare("DELETE FROM user_sessions WHERE expires_at < NOW()");
-            $stmt->execute();
-        } catch (PDOException $e) {
-            error_log("Session cleanup error: " . $e->getMessage());
-        }
+        
+        return [
+            'id' => $_SESSION['user_id'],
+            'username' => $_SESSION['username'],
+            'full_name' => $_SESSION['full_name'],
+            'email' => $_SESSION['email'],
+            'role' => $_SESSION['role'],
+            'department' => $_SESSION['department']
+        ];
     }
 }
-
-// Global auth instance
-$auth = new Auth();
-?>

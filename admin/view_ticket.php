@@ -1,8 +1,9 @@
 <?php
-require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 $auth = new Auth();
 $auth->requireLogin();
+$auth->requireITStaff();
 
 $currentUser = $auth->getCurrentUser();
 $isITStaff = $currentUser['role'] === 'it_staff' || $currentUser['role'] === 'admin';
@@ -136,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
     <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
         <div class="flex items-center justify-center h-16 bg-gray-800">
             <i class="fas fa-layer-group text-xl mr-2"></i>
-            <span class="text-xl font-bold">Simply Web</span>
+            <span class="text-xl font-bold">ResolveIT</span>
         </div>
         
         <nav class="mt-6">

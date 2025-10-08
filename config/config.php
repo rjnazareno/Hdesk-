@@ -1,46 +1,144 @@
 <?php
 /**
- * Database Configuration
- * Ticketing System - PHP 8+ with MySQL
+ * Application Configuration
+ * Main configuration file for the IT Help Ticketing System
  */
 
-// Database Configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u816220874_ithelp');
-define('DB_USER', 'u816220874_IT');  // Live server MySQL username
-define('DB_PASS', 'F]n5HZgi$fK');      // Live server MySQL password
-define('DB_CHARSET', 'utf8mb4');
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Application Configuration
-define('APP_NAME', 'IThelp - IT Ticketing System');
-define('APP_URL', 'https://ithelp.resourcestaffonline.com/IThelp/'); // Update with your actual domain
-define('UPLOAD_DIR', __DIR__ . '/../uploads/tickets/');
-define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
-define('ALLOWED_FILE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'txt', 'zip']);
+// Base URL Configuration
+define('BASE_URL', 'http://localhost/IThelp/');
+define('ASSETS_URL', BASE_URL . 'assets/');
+
+// Application Settings
+define('APP_NAME', 'ResolveIT');
+define('APP_VERSION', '1.0.0');
+define('APP_TIMEZONE', 'UTC');
+
+// File Upload Settings
+define('UPLOAD_DIR', __DIR__ . '/../uploads/');
+define('MAX_FILE_SIZE', 5242880); // 5MB in bytes
+define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'xlsx', 'txt']);
 
 // Email Configuration (PHPMailer)
-define('SMTP_HOST', 'smtp.gmail.com');      // Replace with your SMTP host
-define('SMTP_PORT', 587);
-define('SMTP_USERNAME', 'your_email@company.com');  // Replace with your email
-define('SMTP_PASSWORD', 'your_email_password');     // Replace with your email password
-define('SMTP_FROM_EMAIL', 'noreply@company.com');
-define('SMTP_FROM_NAME', 'IT Support System');
-
-// Security Configuration
-define('CSRF_TOKEN_NAME', 'csrf_token');
-define('SESSION_TIMEOUT', 8 * 3600); // 8 hours in seconds
-
-// IT Staff notification emails (comma separated)
-define('IT_NOTIFICATION_EMAILS', 'it-support@company.com,admin@company.com');
+define('MAIL_HOST', 'smtp.gmail.com');
+define('MAIL_PORT', 587);
+define('MAIL_USERNAME', 'your-email@gmail.com');
+define('MAIL_PASSWORD', 'your-app-password');
+define('MAIL_FROM_EMAIL', 'noreply@company.com');
+define('MAIL_FROM_NAME', 'IT Help Desk');
+define('MAIL_ENCRYPTION', 'tls');
 
 // Pagination
-define('TICKETS_PER_PAGE', 10);
+define('ITEMS_PER_PAGE', 10);
+
+// Ticket Number Prefix
+define('TICKET_PREFIX', 'TKT');
 
 // Timezone
-date_default_timezone_set('America/New_York'); // Adjust to your timezone
+date_default_timezone_set(APP_TIMEZONE);
 
-// Error reporting (production settings)
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-?>
+// Error Reporting (set to 0 in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Autoload function for classes
+spl_autoload_register(function ($class) {
+    $directories = [
+        __DIR__ . '/../models/',
+        __DIR__ . '/../controllers/',
+        __DIR__ . '/../includes/',
+    ];
+    
+    foreach ($directories as $directory) {
+        $file = $directory . $class . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
+
+// Include database configuration
+require_once __DIR__ . '/database.php';
+
+/**
+ * Helper function to check if user is logged in
+ */
+function isLoggedIn() {
+    return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+}
+
+/**
+ * Helper function to check user role
+ */
+function hasRole($role) {
+    return isLoggedIn() && isset($_SESSION['role']) && $_SESSION['role'] === $role;
+}
+
+/**
+ * Helper function to check if user is IT staff or admin
+ */
+function isITStaff() {
+    return isLoggedIn() && isset($_SESSION['role']) && 
+           ($_SESSION['role'] === 'it_staff' || $_SESSION['role'] === 'admin');
+}
+
+/**
+ * Helper function to redirect
+ */
+function redirect($url) {
+    header("Location: " . BASE_URL . $url);
+    exit();
+}
+
+/**
+ * Helper function to sanitize input
+ */
+function sanitize($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
+}
+
+/**
+ * Helper function to format date
+ */
+function formatDate($date, $format = 'M d, Y H:i') {
+    return date($format, strtotime($date));
+}
+
+/**
+ * Helper function to get status badge color
+ */
+function getStatusColor($status) {
+    $colors = [
+        'pending' => 'yellow',
+        'open' => 'blue',
+        'in_progress' => 'purple',
+        'resolved' => 'green',
+        'closed' => 'gray'
+    ];
+    return $colors[$status] ?? 'gray';
+}
+
+/**
+ * Helper function to get priority color
+ */
+function getPriorityColor($priority) {
+    $colors = [
+        'low' => 'green',
+        'medium' => 'yellow',
+        'high' => 'orange',
+        'urgent' => 'red'
+    ];
+    return $colors[$priority] ?? 'gray';
+}
+
+/**
+ * Helper function to generate ticket number
+ */
+function generateTicketNumber() {
+    return TICKET_PREFIX . '-' . date('Y') . '-' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+}

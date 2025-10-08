@@ -1,26 +1,16 @@
 {
-    "name": "company/it-ticketing-system",
-    "description": "IT Support Ticketing System built with PHP, MySQL, and Tailwind CSS",
+    "name": "company/ithelp-ticketing",
+    "description": "IT Help Desk Ticketing System",
     "type": "project",
     "require": {
-        "php": "^8.0",
-        "phpmailer/phpmailer": "^6.8"
-    },
-    "require-dev": {
-        "php": "^8.0"
+        "php": ">=7.4",
+        "phpmailer/phpmailer": "^6.8",
+        "phpoffice/phpspreadsheet": "^1.29"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\Models\\": "models/",
+            "App\\Controllers\\": "controllers/"
         }
-    },
-    "config": {
-        "vendor-dir": "vendor"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "echo 'PHPMailer installed successfully!'",
-            "echo 'Please uncomment PHPMailer lines in includes/email.php'"
-        ]
     }
 }

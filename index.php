@@ -1,14 +1,12 @@
 <?php
 /**
- * Main Index Page - Redirects to Dashboard or Login
+ * Index/Home page - redirects to appropriate page
  */
-session_start();
 
-// Redirect based on authentication status
-if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
+require_once __DIR__ . '/config/config.php';
+
+if (isLoggedIn()) {
+    redirect('dashboard.php');
 } else {
-    header('Location: login.php');
+    redirect('login.php');
 }
-exit;
-?>
