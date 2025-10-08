@@ -52,60 +52,27 @@ $statusBreakdown = $ticketModel->getStatusBreakdown();
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    
+    <!-- Quick Wins CSS -->
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 <body class="bg-gray-50">
-    <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
-        <div class="flex items-center justify-center h-16 bg-gray-800">
-            <i class="fas fa-layer-group text-xl mr-2"></i>
-            <span class="text-xl font-bold">ResolveIT</span>
-        </div>
-        
-        <nav class="mt-6">
-            <a href="dashboard.php" class="flex items-center px-6 py-3 bg-gray-800 text-white">
-                <i class="fas fa-th-large w-6"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="tickets.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-ticket-alt w-6"></i>
-                <span>Tickets</span>
-            </a>
-            <a href="customers.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-users w-6"></i>
-                <span>Employees</span>
-            </a>
-            <a href="categories.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-folder w-6"></i>
-                <span>Categories</span>
-            </a>
-            <?php if ($currentUser['role'] === 'admin'): ?>
-            <a href="admin.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-cog w-6"></i>
-                <span>Admin Settings</span>
-            </a>
-            <?php endif; ?>
-            <a href="../article.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-newspaper w-6"></i>
-                <span>Article</span>
-                <span class="ml-auto bg-gray-700 px-2 py-1 rounded text-xs">6</span>
-            </a>
-            <a href="../logout.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition mt-8">
-                <i class="fas fa-sign-out-alt w-6"></i>
-                <span>Logout</span>
-            </a>
-        </nav>
-    </div>
+    <?php include __DIR__ . '/../includes/admin_nav.php'; ?>
 
     <!-- Main Content -->
-    <div class="ml-64 min-h-screen">
+    <div class="lg:ml-64 min-h-screen">
         <!-- Top Bar -->
         <div class="bg-white shadow-sm">
-            <div class="flex items-center justify-between px-8 py-4">
+            <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
-                    <p class="text-gray-600">Hello <?php echo htmlspecialchars($currentUser['full_name']); ?>, Good Morning!</p>
+                    <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Welcome Back</h1>
+                    <p class="text-sm lg:text-base text-gray-600">
+                        Hello <?php echo htmlspecialchars($currentUser['full_name']); ?>, Good Morning!
+                        <span class="ml-2" id="lastLoginDisplay"></span>
+                    </p>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="hidden lg:flex items-center space-x-4">
                     <div class="relative">
                         <input 
                             type="text" 
@@ -114,20 +81,24 @@ $statusBreakdown = $ticketModel->getStatusBreakdown();
                         >
                         <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     </div>
-                    <button class="p-2 text-gray-600 hover:text-gray-900">
+                    <button id="darkModeToggle" class="p-2 text-gray-600 hover:text-gray-900" title="Toggle dark mode">
+                        <i id="dark-mode-icon" class="fas fa-moon"></i>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-gray-900" title="Filters">
                         <i class="fas fa-sliders-h"></i>
                     </button>
-                    <button class="p-2 text-gray-600 hover:text-gray-900">
+                    <button class="p-2 text-gray-600 hover:text-gray-900" title="Bookmarks">
                         <i class="far fa-bookmark"></i>
                     </button>
-                    <button class="p-2 text-gray-600 hover:text-gray-900 relative">
+                    <button class="p-2 text-gray-600 hover:text-gray-900 relative" title="Notifications">
                         <i class="far fa-bell"></i>
                         <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                     </button>
                     <div class="flex items-center space-x-2">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
                              alt="User" 
-                             class="w-10 h-10 rounded-full">
+                             class="w-10 h-10 rounded-full"
+                             title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
                     </div>
                 </div>
             </div>
@@ -135,6 +106,20 @@ $statusBreakdown = $ticketModel->getStatusBreakdown();
 
         <!-- Dashboard Content -->
         <div class="p-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <span class="inline-flex items-center text-sm font-medium text-gray-600">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                            </svg>
+                            Dashboard
+                        </span>
+                    </li>
+                </ol>
+            </nav>
+            
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow-sm p-4">
@@ -343,9 +328,25 @@ $statusBreakdown = $ticketModel->getStatusBreakdown();
         </div>
     </div>
 
+    <!-- Quick Wins JavaScript -->
+    <script src="../assets/js/helpers.js"></script>
+    
     <script>
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Quick Wins features
+            initTooltips();
+            initDarkMode();
+            
+            // Update last login display (using current time as demo)
+            updateLastLogin('<?php echo date('Y-m-d H:i:s'); ?>');
+            
+            // Initialize time-ago elements
+            updateTimeAgo();
+            
+            // Update time-ago every minute
+            setInterval(updateTimeAgo, 60000);
+            
             // Daily Chart
             const dailyCtx = document.getElementById('dailyChart');
             if (dailyCtx) {

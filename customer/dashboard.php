@@ -38,56 +38,38 @@ $categories = $categoryModel->getAll();
     <title>Dashboard - IT Help Desk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Quick Wins CSS -->
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 <body class="bg-gray-50">
-    <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
-        <div class="flex items-center justify-center h-16 bg-gray-800">
-            <i class="fas fa-layer-group text-xl mr-2"></i>
-            <span class="text-xl font-bold">ResolveIT</span>
-        </div>
-        
-        <nav class="mt-6">
-            <a href="dashboard.php" class="flex items-center px-6 py-3 bg-gray-800 text-white">
-                <i class="fas fa-th-large w-6"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="tickets.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-ticket-alt w-6"></i>
-                <span>My Tickets</span>
-            </a>
-            <a href="create_ticket.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-plus-circle w-6"></i>
-                <span>Create Ticket</span>
-            </a>
-            <a href="../article.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-newspaper w-6"></i>
-                <span>Knowledge Base</span>
-            </a>
-            <a href="../logout.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition mt-8">
-                <i class="fas fa-sign-out-alt w-6"></i>
-                <span>Logout</span>
-            </a>
-        </nav>
-    </div>
+    <?php include __DIR__ . '/../includes/customer_nav.php'; ?>
 
     <!-- Main Content -->
-    <div class="ml-64 min-h-screen">
+    <div class="lg:ml-64 min-h-screen">
         <!-- Top Bar -->
         <div class="bg-white shadow-sm">
-            <div class="flex items-center justify-between px-8 py-4">
+            <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
-                    <p class="text-gray-600">Hello <?php echo htmlspecialchars($currentUser['full_name']); ?>, Good Morning!</p>
+                    <p class="text-gray-600">
+                        Hello <?php echo htmlspecialchars($currentUser['full_name']); ?>, Good Morning!
+                        <span class="ml-2" id="lastLoginDisplay"></span>
+                    </p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button class="p-2 text-gray-600 hover:text-gray-900 relative">
+                    <button id="darkModeToggle" class="p-2 text-gray-600 hover:text-gray-900" title="Toggle dark mode">
+                        <i id="dark-mode-icon" class="fas fa-moon"></i>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-gray-900 relative" title="Notifications">
                         <i class="far fa-bell"></i>
                         <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                     </button>
                     <div class="flex items-center space-x-2">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
-                             alt="User" 
+                             alt="User"
+                             title="<?php echo htmlspecialchars($currentUser['full_name']); ?>" 
                              class="w-10 h-10 rounded-full">
                     </div>
                 </div>
@@ -221,10 +203,12 @@ $categories = $categoryModel->getAll();
                                             </span>
                                         </td>
                                         <td class="py-4 text-gray-600">
-                                            <?php echo date('M d, Y', strtotime($ticket['created_at'])); ?>
+                                            <span class="time-ago" data-timestamp="<?php echo $ticket['created_at']; ?>">
+                                                <?php echo date('M d, Y', strtotime($ticket['created_at'])); ?>
+                                            </span>
                                         </td>
                                         <td class="py-4">
-                                            <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" class="text-blue-600 hover:text-blue-800">
+                                            <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" class="text-blue-600 hover:text-blue-800" title="View ticket details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
@@ -238,5 +222,17 @@ $categories = $categoryModel->getAll();
             </div>
         </div>
     </div>
+    
+    <!-- Quick Wins JavaScript -->
+    <script src="../assets/js/helpers.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initTooltips();
+            initDarkMode();
+            updateLastLogin('<?php echo date('Y-m-d H:i:s'); ?>');
+            updateTimeAgo();
+            setInterval(updateTimeAgo, 60000);
+        });
+    </script>
 </body>
 </html>

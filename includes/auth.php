@@ -144,7 +144,12 @@ class Auth {
         $this->requireLogin();
         
         if ($_SESSION['role'] !== $role) {
-            redirect('dashboard.php');
+            // Redirect to appropriate dashboard
+            if ($_SESSION['user_type'] === 'employee') {
+                redirect('customer/dashboard.php');
+            } else {
+                redirect('admin/dashboard.php');
+            }
         }
     }
     
@@ -155,7 +160,8 @@ class Auth {
         $this->requireLogin();
         
         if ($_SESSION['role'] !== 'it_staff' && $_SESSION['role'] !== 'admin') {
-            redirect('dashboard.php');
+            // Redirect employees to their dashboard
+            redirect('customer/dashboard.php');
         }
     }
     

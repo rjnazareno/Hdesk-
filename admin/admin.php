@@ -73,61 +73,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin Settings - IT Help Desk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Quick Wins CSS -->
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 <body class="bg-gray-50">
-    <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
-        <div class="flex items-center justify-center h-16 bg-gray-800">
-            <i class="fas fa-layer-group text-xl mr-2"></i>
-            <span class="text-xl font-bold">ResolveIT</span>
-        </div>
-        
-        <nav class="mt-6">
-            <a href="dashboard.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-th-large w-6"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="tickets.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-ticket-alt w-6"></i>
-                <span>Tickets</span>
-            </a>
-            <a href="customers.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-users w-6"></i>
-                <span>Employees</span>
-            </a>
-            <a href="categories.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-folder w-6"></i>
-                <span>Categories</span>
-            </a>
-            <a href="admin.php" class="flex items-center px-6 py-3 bg-gray-800 text-white">
-                <i class="fas fa-cog w-6"></i>
-                <span>Admin Settings</span>
-            </a>
-            <a href="../article.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition">
-                <i class="fas fa-newspaper w-6"></i>
-                <span>Article</span>
-            </a>
-            <a href="../logout.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition mt-8">
-                <i class="fas fa-sign-out-alt w-6"></i>
-                <span>Logout</span>
-            </a>
-        </nav>
-    </div>
+    <?php include __DIR__ . '/../includes/admin_nav.php'; ?>
 
     <!-- Main Content -->
-    <div class="ml-64 min-h-screen">
+    <div class="lg:ml-64 min-h-screen">
         <!-- Top Bar -->
         <div class="bg-white shadow-sm">
-            <div class="flex items-center justify-between px-8 py-4">
+            <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Admin Settings</h1>
                     <p class="text-gray-600">Manage system users and settings</p>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <button id="darkModeToggle" class="p-2 text-gray-600 hover:text-gray-900" title="Toggle dark mode">
+                        <i id="dark-mode-icon" class="fas fa-moon"></i>
+                    </button>
                     <div class="flex items-center space-x-2">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
                              alt="User" 
-                             class="w-10 h-10 rounded-full">
+                             class="w-10 h-10 rounded-full"
+                             title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
                         <div>
                             <div class="text-sm font-medium"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
                             <div class="text-xs text-gray-500"><?php echo htmlspecialchars($currentUser['role']); ?></div>
@@ -139,6 +110,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Content -->
         <div class="p-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-600">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="ml-1 text-sm font-medium text-gray-700">Admin Settings</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
             <?php if (isset($_GET['success'])): ?>
                 <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
                     <?php
@@ -467,6 +459,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 closePasswordModal();
             }
         }
+    </script>
+    
+    <!-- Quick Wins JavaScript -->
+    <script src="../assets/js/helpers.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initTooltips();
+            initDarkMode();
+            updateTimeAgo();
+            setInterval(updateTimeAgo, 60000);
+        });
     </script>
 </body>
 </html>

@@ -14,7 +14,16 @@ class LoginController {
     public function login() {
         // Check if already logged in
         if (isLoggedIn()) {
-            redirect('dashboard.php');
+            // Redirect to appropriate dashboard
+            if (isset($_SESSION['user_type'])) {
+                if ($_SESSION['user_type'] === 'employee') {
+                    redirect('customer/dashboard.php');
+                } else {
+                    redirect('admin/dashboard.php');
+                }
+            } else {
+                redirect('admin/dashboard.php');
+            }
         }
 
         // Check if form is submitted
@@ -29,7 +38,7 @@ class LoginController {
             $auth = new Auth();
             
             if ($auth->login($username, $password)) {
-                // Check user type and redirect accordingly
+                // Redirect based on user type
                 if (isset($_SESSION['user_type'])) {
                     if ($_SESSION['user_type'] === 'employee') {
                         redirect('customer/dashboard.php');
@@ -37,7 +46,9 @@ class LoginController {
                         redirect('admin/dashboard.php');
                     }
                 } else {
-                    redirect('dashboard.php');
+                    // Fallback: logout and show error if user_type not set
+                    $auth->logout();
+                    redirect('login.php?error=session');
                 }
             } else {
                 redirect('login.php?error=invalid');
