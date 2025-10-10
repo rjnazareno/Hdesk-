@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 p-8">
+    <h1 class="text-2xl font-bold mb-6">Notification Dropdown Test</h1>
+    
+    <!-- Test notification button -->
+    <div class="bg-white p-8 rounded-lg shadow">
+        <h2 class="text-lg font-semibold mb-4">This is what your notification should look like:</h2>
+        
+        <div class="flex items-center space-x-4" style="position: relative;">
+            <button id="test-notif-btn" class="p-2 text-gray-600 hover:text-gray-900 relative" title="Notifications">
+                <i class="far fa-bell text-2xl"></i>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <!-- Dropdown -->
+            <div id="test-dropdown" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden" style="top: 100%;">
+                <div class="p-4 border-b border-gray-200">
+                    <h3 class="font-semibold text-gray-900">Notifications</h3>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-ticket-alt text-blue-500 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Ticket #123 assigned to you</p>
+                            <p class="text-xs text-gray-500">2 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-comment text-green-500 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">New comment on Ticket #456</p>
+                            <p class="text-xs text-gray-500">5 hours ago</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 border-t border-gray-200 text-center">
+                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        View All Notifications <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-4 text-sm text-gray-600">Click the bell icon above ↑ to see the dropdown</p>
+    </div>
+    
+    <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold mb-2">Debugging Info:</h3>
+        <div id="debug-info" class="font-mono text-sm"></div>
+    </div>
+    
+    <script>
+        const btn = document.getElementById('test-notif-btn');
+        const dropdown = document.getElementById('test-dropdown');
+        const debugInfo = document.getElementById('debug-info');
+        let isOpen = false;
+        
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                dropdown.classList.remove('hidden');
+                debugInfo.innerHTML = `
+                    ✅ Dropdown opened<br>
+                    Dropdown classes: ${dropdown.className}<br>
+                    Dropdown display: ${window.getComputedStyle(dropdown).display}<br>
+                    Dropdown visibility: ${window.getComputedStyle(dropdown).visibility}<br>
+                    Dropdown position: ${window.getComputedStyle(dropdown).position}<br>
+                    Dropdown z-index: ${window.getComputedStyle(dropdown).zIndex}
+                `;
+            } else {
+                dropdown.classList.add('hidden');
+                debugInfo.innerHTML = '❌ Dropdown closed';
+            }
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (isOpen && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                isOpen = false;
+                debugInfo.innerHTML = '❌ Dropdown closed (clicked outside)';
+            }
+        });
+        
+        // Initial debug info
+        debugInfo.innerHTML = `
+            Initial state:<br>
+            Dropdown element exists: ${dropdown ? '✅ Yes' : '❌ No'}<br>
+            Dropdown classes: ${dropdown.className}<br>
+            Has 'hidden' class: ${dropdown.classList.contains('hidden') ? '✅ Yes' : '❌ No'}<br>
+            Dropdown in DOM: ${document.body.contains(dropdown) ? '✅ Yes' : '❌ No'}
+        `;
+    </script>
+</body>
+</html>

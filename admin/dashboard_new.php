@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * New Admin Dashboard Entry Point
  * Uses MVC architecture with DashboardController

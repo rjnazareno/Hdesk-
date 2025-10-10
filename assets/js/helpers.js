@@ -218,31 +218,96 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 
 /**
- * Initialize tooltips for elements with data-tooltip attribute
+ * Initialize tooltips for elements with title attribute
+ * Works with standard HTML title attribute for better compatibility
  */
 function initTooltips() {
-    document.querySelectorAll('[data-tooltip]').forEach(element => {
+    // Add CSS for tooltips
+    const style = document.createElement('style');
+    style.textContent = `
+        .custom-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            white-space: nowrap;
+            max-width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+        .custom-tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(0, 0, 0, 0.9);
+        }
+    `;
+    if (!document.getElementById('tooltip-styles')) {
+        style.id = 'tooltip-styles';
+        document.head.appendChild(style);
+    }
+
+    // Find all elements with title attribute
+    document.querySelectorAll('[title]').forEach(element => {
+        const originalTitle = element.getAttribute('title');
+        if (!originalTitle || originalTitle.trim() === '') return;
+        
+        // Store original title and remove it to prevent native tooltip
+        element.setAttribute('data-original-title', originalTitle);
+        element.removeAttribute('title');
+        
         element.addEventListener('mouseenter', function(e) {
-            const text = this.getAttribute('data-tooltip');
+            const text = this.getAttribute('data-original-title');
+            if (!text) return;
+            
             const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip-popup fixed bg-gray-900 text-white text-xs px-3 py-2 rounded shadow-lg z-50 pointer-events-none';
+            tooltip.className = 'custom-tooltip';
             tooltip.textContent = text;
             tooltip.id = 'active-tooltip';
             document.body.appendChild(tooltip);
             
-            // Position tooltip
+            // Position tooltip above element
             const rect = this.getBoundingClientRect();
-            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
-            tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
+            const tooltipRect = tooltip.getBoundingClientRect();
             
-            // Fade in
-            setTimeout(() => tooltip.style.opacity = '1', 10);
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.top - tooltipRect.height - 10;
+            
+            // Keep tooltip on screen
+            if (left < 5) left = 5;
+            if (left + tooltipRect.width > window.innerWidth - 5) {
+                left = window.innerWidth - tooltipRect.width - 5;
+            }
+            if (top < 5) {
+                top = rect.bottom + 10; // Show below if no room above
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+            
+            // Show tooltip
+            setTimeout(() => tooltip.classList.add('show'), 10);
         });
         
         element.addEventListener('mouseleave', function() {
             const tooltip = document.getElementById('active-tooltip');
             if (tooltip) {
-                tooltip.style.opacity = '0';
+                tooltip.classList.remove('show');
                 setTimeout(() => tooltip.remove(), 200);
             }
         });

@@ -37,8 +37,11 @@ class User {
     /**
      * Find user by ID
      */
-    public function findById($id) {
-        $sql = "SELECT * FROM users WHERE id = :id AND is_active = 1";
+    public function findById($id, $activeOnly = false) {
+        $sql = "SELECT * FROM users WHERE id = :id";
+        if ($activeOnly) {
+            $sql .= " AND is_active = 1";
+        }
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
@@ -126,7 +129,7 @@ class User {
         $fields = [];
         $params = [':id' => $id];
         
-        $allowedFields = ['email', 'full_name', 'role', 'department', 'phone', 'is_active'];
+        $allowedFields = ['username', 'email', 'full_name', 'role', 'department', 'phone', 'is_active'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {

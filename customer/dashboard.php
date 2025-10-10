@@ -49,14 +49,35 @@ $categories = $categoryModel->getAll();
     <!-- Main Content -->
     <div class="lg:ml-64 min-h-screen">
         <!-- Top Bar -->
-        <div class="bg-white shadow-sm">
-            <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
-                    <p class="text-gray-600">
-                        Hello <?php echo htmlspecialchars($currentUser['full_name']); ?>, Good Morning!
-                        <span class="ml-2" id="lastLoginDisplay"></span>
-                    </p>
+        <div class="bg-gradient-to-r from-white to-blue-50 shadow-sm border-b border-blue-100">
+            <div class="flex items-center justify-between px-4 lg:px-8 py-6 pt-20 lg:pt-6">
+                <div class="flex items-center space-x-4">
+                    <div class="hidden lg:block">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg ring-4 ring-blue-100">
+                            <?php echo strtoupper(substr($currentUser['full_name'], 0, 1)); ?>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2 mb-1">
+                            <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                                <span id="greetingText">Good Morning</span>, <?php echo htmlspecialchars(explode(' ', $currentUser['full_name'])[0]); ?>! 👋
+                            </h1>
+                        </div>
+                        <div class="flex items-center space-x-4 text-sm text-gray-600">
+                            <span class="flex items-center">
+                                <i class="far fa-clock mr-1.5 text-blue-500"></i>
+                                <span id="lastLoginDisplay">Last login: Loading...</span>
+                            </span>
+                            <span class="hidden md:flex items-center">
+                                <i class="fas fa-user mr-1.5 text-blue-500"></i>
+                                Employee
+                            </span>
+                            <span class="hidden md:flex items-center">
+                                <i class="far fa-calendar mr-1.5 text-blue-500"></i>
+                                <span id="currentDate"></span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button id="darkModeToggle" class="p-2 text-gray-600 hover:text-gray-900" title="Toggle dark mode">
@@ -225,13 +246,47 @@ $categories = $categoryModel->getAll();
     
     <!-- Quick Wins JavaScript -->
     <script src="../assets/js/helpers.js"></script>
+    <script src="../assets/js/notifications.js"></script>
     <script>
+        // Dynamic greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingText = document.getElementById('greetingText');
+            
+            if (hour >= 5 && hour < 12) {
+                greetingText.textContent = 'Good Morning';
+            } else if (hour >= 12 && hour < 17) {
+                greetingText.textContent = 'Good Afternoon';
+            } else if (hour >= 17 && hour < 22) {
+                greetingText.textContent = 'Good Evening';
+            } else {
+                greetingText.textContent = 'Welcome Back';
+            }
+        }
+        
+        // Update current date display
+        function updateCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+                dateElement.textContent = new Date().toLocaleDateString('en-US', options);
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             initTooltips();
             initDarkMode();
+            
+            // Update greeting and date
+            updateGreeting();
+            updateCurrentDate();
+            
             updateLastLogin('<?php echo date('Y-m-d H:i:s'); ?>');
             updateTimeAgo();
             setInterval(updateTimeAgo, 60000);
+            
+            // Update greeting every minute
+            setInterval(updateGreeting, 60000);
         });
     </script>
 </body>
