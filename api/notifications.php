@@ -21,10 +21,23 @@ if (!isset($_SESSION['user_id'])) {
 try {
     $db = Database::getInstance()->getConnection();
     $notification = new Notification($db);
-    $userId = $_SESSION['user_id'];
     
-    // Determine user type: 'user' for admin/IT staff, 'employee' for employees
-    $userType = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'user';
+    // Get user ID based on user type
+    $sessionUserType = $_SESSION['user_type'] ?? 'employee';
+    
+    // For employees, use employee_id from session; for admin/IT, use user_id
+    if ($sessionUserType === 'employee') {
+        $userId = $_SESSION['employee_id'] ?? $_SESSION['user_id'];
+        $userType = 'employee';
+    } else {
+        $userId = $_SESSION['user_id'];
+        $userType = 'user';
+    }
+    
+    // Debug logging
+    error_log("Notifications API - Session User Type: " . $sessionUserType);
+    error_log("Notifications API - User ID: " . $userId);
+    error_log("Notifications API - User Type for query: " . $userType);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database error', 'message' => $e->getMessage()]);
@@ -40,10 +53,19 @@ switch ($action) {
         $notifications = $notification->getRecentByUser($userId, 10, $userType);
         $unreadCount = $notification->getUnreadCount($userId, $userType);
         
+        // Debug logging
+        error_log("Notifications API - Found " . count($notifications) . " notifications for user_id={$userId}, type={$userType}");
+        
         echo json_encode([
             'success' => true,
             'notifications' => $notifications,
-            'unread_count' => $unreadCount
+            'unread_count' => $unreadCount,
+            'debug' => [
+                'user_id' => $userId,
+                'user_type' => $userType,
+                'session_user_type' => $_SESSION['user_type'] ?? 'not set',
+                'count' => count($notifications)
+            ]
         ]);
         break;
         

@@ -51,6 +51,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff) {
             'comment' => 'Status changed from ' . $oldTicket['status'] . ' to ' . $updateData['status']
         ]);
         
+        // Create notification for ticket submitter
+        try {
+            $db = Database::getInstance()->getConnection();
+            $notificationModel = new Notification($db);
+            
+            // Determine notification type based on new status
+            $notifType = 'status_changed';
+            if ($updateData['status'] === 'resolved' || $updateData['status'] === 'closed') {
+                $notifType = 'ticket_resolved';
+            }
+            
+            $statusLabels = [
+                'pending' => 'Pending',
+                'open' => 'Open',
+                'in_progress' => 'In Progress',
+                'resolved' => 'Resolved',
+                'closed' => 'Closed'
+            ];
+            
+            $newStatusLabel = $statusLabels[$updateData['status']] ?? ucfirst($updateData['status']);
+            
+            // Notify based on submitter type
+            if ($ticket['submitter_type'] === 'employee') {
+                // Employee submitted - use employee_id
+                $notificationModel->create([
+                    'user_id' => null,
+                    'employee_id' => $ticket['submitter_id'],
+                    'type' => $notifType,
+                    'title' => 'Ticket Status Updated',
+                    'message' => "Your ticket #{$ticket['ticket_number']} status changed to: {$newStatusLabel}",
+                    'ticket_id' => $ticketId,
+                    'related_user_id' => $currentUser['id']
+                ]);
+            } else {
+                // User submitted - use user_id
+                $notificationModel->create([
+                    'user_id' => $ticket['submitter_id'],
+                    'employee_id' => null,
+                    'type' => $notifType,
+                    'title' => 'Ticket Status Updated',
+                    'message' => "Ticket #{$ticket['ticket_number']} status changed to: {$newStatusLabel}",
+                    'ticket_id' => $ticketId,
+                    'related_user_id' => $currentUser['id']
+                ]);
+            }
+        } catch (Exception $e) {
+            error_log("Failed to create notification: " . $e->getMessage());
+        }
+        
         // Send notification
         try {
             $mailer = new Mailer();
@@ -76,6 +125,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff) {
                 'new_value' => $assignee['full_name'],
                 'comment' => 'Ticket assigned to ' . $assignee['full_name']
             ]);
+            
+            // Create notification for assigned IT staff
+            try {
+                $db = Database::getInstance()->getConnection();
+                $notificationModel = new Notification($db);
+                
+                $notificationModel->create([
+                    'user_id' => $assignee['id'],
+                    'employee_id' => null,
+                    'type' => 'ticket_assigned',
+                    'title' => 'Ticket Assigned to You',
+                    'message' => "You have been assigned to ticket #{$ticket['ticket_number']}: {$ticket['title']}",
+                    'ticket_id' => $ticketId,
+                    'related_user_id' => $currentUser['id']
+                ]);
+            } catch (Exception $e) {
+                error_log("Failed to create notification: " . $e->getMessage());
+            }
             
             // Send notification
             try {
@@ -118,6 +185,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
             'action_type' => 'comment',
             'comment' => $comment
         ]);
+        
+        // Create notification for ticket submitter (if IT staff commented)
+        if ($isITStaff && $ticket['submitter_id'] != $currentUser['id']) {
+            try {
+                $db = Database::getInstance()->getConnection();
+                $notificationModel = new Notification($db);
+                
+                // Notify based on submitter type
+                if ($ticket['submitter_type'] === 'employee') {
+                    // Employee submitted - use employee_id
+                    $notificationModel->create([
+                        'user_id' => null,
+                        'employee_id' => $ticket['submitter_id'],
+                        'type' => 'comment_added',
+                        'title' => 'New Comment on Your Ticket',
+                        'message' => "IT staff added a comment on ticket #{$ticket['ticket_number']}",
+                        'ticket_id' => $ticketId,
+                        'related_user_id' => $currentUser['id']
+                    ]);
+                } else {
+                    // User submitted - use user_id
+                    $notificationModel->create([
+                        'user_id' => $ticket['submitter_id'],
+                        'employee_id' => null,
+                        'type' => 'comment_added',
+                        'title' => 'New Comment on Ticket',
+                        'message' => "A comment was added to ticket #{$ticket['ticket_number']}",
+                        'ticket_id' => $ticketId,
+                        'related_user_id' => $currentUser['id']
+                    ]);
+                }
+            } catch (Exception $e) {
+                error_log("Failed to create notification: " . $e->getMessage());
+            }
+        }
         
         redirect('view_ticket.php?id=' . $ticketId . '&success=commented');
     }

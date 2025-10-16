@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notifications API Direct Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Notifications API Direct Test</h1>
+    <button onclick="testAPI()">Test API Call</button>
+    <button onclick="checkDatabase()">Check Database Direct</button>
+    <div id="result"></div>
+
+    <script>
+        function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            fetch('/IThelp/api/notifications.php?action=get_recent')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data);
+                    resultDiv.innerHTML = `
+                        <h2>API Response:</h2>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                });
+        }
+
+        function checkDatabase() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Checking database...</p>';
+            
+            fetch('/IThelp/admin/test_notifications_api.php')
+                .then(response => response.text())
+                .then(html => {
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(html);
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                });
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

@@ -50,6 +50,8 @@ spl_autoload_register(function ($class) {
     $directories = [
         __DIR__ . '/../models/',
         __DIR__ . '/../controllers/',
+        __DIR__ . '/../controllers/admin/',
+        __DIR__ . '/../controllers/customer/',
         __DIR__ . '/../includes/',
     ];
     

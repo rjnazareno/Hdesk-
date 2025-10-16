@@ -8,22 +8,22 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen">
-    <!-- Enhanced Top Bar -->
-    <div class="bg-gradient-to-r from-white to-blue-50 shadow-sm border-b border-blue-100">
+<div class="lg:ml-64 min-h-screen bg-gray-50">
+    <!-- Top Bar -->
+    <div class="bg-white border-b border-gray-200">
         <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <!-- Left Section: Title & Stats -->
             <div class="flex items-center space-x-4">
-                <div class="hidden lg:flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
-                    <i class="fas fa-folder-open text-white text-2xl"></i>
+                <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gray-900 text-white">
+                    <i class="fas fa-folder-open text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">
                         Ticket Categories
                     </h1>
-                    <div class="flex items-center space-x-3 mt-1">
-                        <p class="text-sm text-gray-600">Organize and manage ticket categories</p>
-                        <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <div class="flex items-center space-x-3 mt-0.5">
+                        <p class="text-sm text-gray-500">Organize and manage ticket categories</p>
+                        <span class="hidden md:inline-flex items-center px-2 py-0.5 text-xs font-medium border border-gray-300 text-gray-700">
                             <i class="fas fa-layer-group mr-1"></i>
                             <?php echo count($categories); ?> Categories
                         </span>
@@ -87,10 +87,10 @@ include __DIR__ . '/../layouts/header.php';
 
                 <!-- User Avatar with Dropdown -->
                 <div class="relative" id="userMenuDropdown">
-                    <button class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-lg transition" id="userMenuBtn">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
+                    <button class="flex items-center space-x-2 p-1 hover:bg-gray-100 transition" id="userMenuBtn">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
                              alt="User" 
-                             class="w-10 h-10 rounded-full ring-2 ring-blue-200"
+                             class="w-10 h-10 rounded-full"
                              title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
                         <div class="hidden lg:block text-left">
                             <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(explode(' ', $currentUser['full_name'])[0]); ?></div>
@@ -98,7 +98,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
                         <i class="fas fa-chevron-down text-xs text-gray-500 hidden lg:block"></i>
                     </button>
-                    <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 hidden z-50" id="userMenu">
+                    <div class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 hidden z-50" id="userMenu">
                         <div class="p-4 border-b border-gray-200">
                             <div class="font-medium text-gray-900"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
                             <div class="text-sm text-gray-500"><?php echo htmlspecialchars($currentUser['email']); ?></div>
@@ -162,20 +162,20 @@ include __DIR__ . '/../layouts/header.php';
         </nav>
         
         <!-- Category Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($categories as $category): ?>
-            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition">
+            <div class="bg-white border border-gray-200 p-6 hover:border-gray-300 transition">
                 <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: <?php echo $category['color']; ?>20;">
-                        <i class="fas fa-folder text-xl" style="color: <?php echo $category['color']; ?>;"></i>
+                    <div class="w-10 h-10 flex items-center justify-center" style="background-color: <?php echo $category['color']; ?>20;">
+                        <i class="fas fa-folder text-sm" style="color: <?php echo $category['color']; ?>;"></i>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span class="px-3 py-1 text-xs font-medium border border-gray-300 text-gray-700">
                         <?php echo $category['ticket_count']; ?> tickets
                     </span>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2"><?php echo htmlspecialchars($category['name']); ?></h3>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-600">Open Tickets:</span>
+                    <span class="text-gray-500">Open Tickets:</span>
                     <span class="font-semibold text-gray-900"><?php echo $category['open_tickets']; ?></span>
                 </div>
             </div>
@@ -215,9 +215,18 @@ include __DIR__ . '/../layouts/header.php';
         }
 
         // Close dropdowns when clicking outside
-        document.addEventListener('click', function() {
-            if (quickActionsMenu) quickActionsMenu.classList.add('hidden');
-            if (userMenu) userMenu.classList.add('hidden');
+        document.addEventListener('click', function(e) {
+            // Check if click is outside quick actions dropdown
+            const quickActionsDropdown = document.getElementById('quickActionsDropdown');
+            if (quickActionsMenu && quickActionsDropdown && !quickActionsDropdown.contains(e.target)) {
+                quickActionsMenu.classList.add('hidden');
+            }
+            
+            // Check if click is outside user menu dropdown
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && userMenuDropdown && !userMenuDropdown.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
         });
 
         // Quick Search Functionality

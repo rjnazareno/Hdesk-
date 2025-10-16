@@ -41,11 +41,23 @@ class Ticket {
     public function findById($id) {
         $sql = "SELECT t.*, 
                 c.name as category_name, c.color as category_color,
-                u1.full_name as submitter_name, u1.email as submitter_email, u1.department as submitter_department,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN CONCAT(e.fname, ' ', e.lname)
+                    ELSE u1.full_name
+                END as submitter_name,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN e.email
+                    ELSE u1.email
+                END as submitter_email,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN e.position
+                    ELSE u1.department
+                END as submitter_department,
                 u2.full_name as assigned_name, u2.email as assigned_email
                 FROM tickets t
                 LEFT JOIN categories c ON t.category_id = c.id
-                LEFT JOIN users u1 ON t.submitter_id = u1.id
+                LEFT JOIN employees e ON t.submitter_id = e.id AND t.submitter_type = 'employee'
+                LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'
                 LEFT JOIN users u2 ON t.assigned_to = u2.id
                 WHERE t.id = :id";
         
@@ -60,11 +72,23 @@ class Ticket {
     public function findByTicketNumber($ticketNumber) {
         $sql = "SELECT t.*, 
                 c.name as category_name, c.color as category_color,
-                u1.full_name as submitter_name, u1.email as submitter_email,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN CONCAT(e.fname, ' ', e.lname)
+                    ELSE u1.full_name
+                END as submitter_name,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN e.email
+                    ELSE u1.email
+                END as submitter_email,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN e.position
+                    ELSE u1.department
+                END as submitter_department,
                 u2.full_name as assigned_name, u2.email as assigned_email
                 FROM tickets t
                 LEFT JOIN categories c ON t.category_id = c.id
-                LEFT JOIN users u1 ON t.submitter_id = u1.id
+                LEFT JOIN employees e ON t.submitter_id = e.id AND t.submitter_type = 'employee'
+                LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'
                 LEFT JOIN users u2 ON t.assigned_to = u2.id
                 WHERE t.ticket_number = :ticket_number";
         
@@ -79,11 +103,15 @@ class Ticket {
     public function getAll($filters = []) {
         $sql = "SELECT t.*, 
                 c.name as category_name, c.color as category_color,
-                u1.full_name as submitter_name,
+                CASE 
+                    WHEN t.submitter_type = 'employee' THEN CONCAT(e.fname, ' ', e.lname)
+                    ELSE u1.full_name
+                END as submitter_name,
                 u2.full_name as assigned_name
                 FROM tickets t
                 LEFT JOIN categories c ON t.category_id = c.id
-                LEFT JOIN users u1 ON t.submitter_id = u1.id
+                LEFT JOIN employees e ON t.submitter_id = e.id AND t.submitter_type = 'employee'
+                LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'
                 LEFT JOIN users u2 ON t.assigned_to = u2.id
                 WHERE 1=1";
         
@@ -279,5 +307,21 @@ class Ticket {
         $stmt->execute($params);
         $result = $stmt->fetch();
         return $result['total'];
+    }
+    
+    /**
+     * Get today's ticket statistics
+     */
+    public function getTodayStats() {
+        $sql = "SELECT 
+                SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as new,
+                SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'closed' AND DATE(updated_at) = CURDATE() THEN 1 ELSE 0 END) as closed,
+                SUM(CASE WHEN status IN ('open', 'pending', 'in_progress') THEN 1 ELSE 0 END) as open
+                FROM tickets";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
     }
 }

@@ -20,16 +20,25 @@ class DashboardController {
         $this->auth->requireLogin();
         $this->auth->requireITStaff();
 
+        // Get current user
+        $this->currentUser = $this->auth->getCurrentUser();
+        $this->isITStaff = $this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin';
+
+        // Redirect IT staff to their own dashboard
+        if ($this->currentUser['role'] === 'it_staff') {
+            header('Location: it_dashboard.php');
+            exit;
+        }
+
+        // Only admins continue here
+        $this->auth->requireRole('admin');
+
         // Initialize models
         $this->ticketModel = new Ticket();
         $this->userModel = new User();
         $this->employeeModel = new Employee();
         $this->categoryModel = new Category();
         $this->activityModel = new TicketActivity();
-
-        // Get current user
-        $this->currentUser = $this->auth->getCurrentUser();
-        $this->isITStaff = $this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin';
     }
 
     /**

@@ -80,11 +80,13 @@
         function initDropdowns() {
             // Close dropdowns when clicking outside
             document.addEventListener('click', function(event) {
-                const dropdowns = document.querySelectorAll('[id$="Dropdown"]');
-                dropdowns.forEach(dropdown => {
-                    const button = dropdown.previousElementSibling;
-                    if (!dropdown.contains(event.target) && !button.contains(event.target)) {
-                        dropdown.classList.add('hidden');
+                // Find dropdown MENUS (elements ending with "Menu" not "Dropdown")
+                const dropdownMenus = document.querySelectorAll('[id$="Menu"]');
+                dropdownMenus.forEach(menu => {
+                    // Get the parent container (the one with "Dropdown" ID)
+                    const container = menu.closest('[id$="Dropdown"]');
+                    if (container && !container.contains(event.target)) {
+                        menu.classList.add('hidden');
                     }
                 });
             });

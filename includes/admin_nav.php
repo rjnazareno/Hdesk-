@@ -45,6 +45,12 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
                 <span>Tickets</span>
             </a>
             
+            <a href="<?= $basePath ?>create_ticket.php" 
+               class="flex items-center px-6 py-3 <?= $currentPage === 'create_ticket.php' ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' ?> transition">
+                <i class="fas fa-plus-circle w-6"></i>
+                <span>Create Ticket</span>
+            </a>
+            
             <a href="<?= $basePath ?>customers.php" 
                class="flex items-center px-6 py-3 <?= $currentPage === 'customers.php' ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' ?> transition">
                 <i class="fas fa-users w-6"></i>

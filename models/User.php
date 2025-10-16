@@ -123,6 +123,13 @@ class User {
     }
     
     /**
+     * Get all admins and IT staff (alias for getITStaff)
+     */
+    public function getAllAdmins() {
+        return $this->getITStaff();
+    }
+    
+    /**
      * Update user
      */
     public function update($id, $data) {

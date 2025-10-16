@@ -5,22 +5,22 @@ $baseUrl = '../';
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
     <!-- Main Content -->
-    <div class="lg:ml-64 min-h-screen">
-        <!-- Enhanced Top Bar -->
-        <div class="bg-gradient-to-r from-white to-blue-50 shadow-sm border-b border-blue-100">
+    <div class="lg:ml-64 min-h-screen bg-gray-50">
+        <!-- Top Bar -->
+        <div class="bg-white border-b border-gray-200">
             <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
                 <!-- Left Section: Title & Stats -->
                 <div class="flex items-center space-x-4">
-                    <div class="hidden lg:flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
-                        <i class="fas fa-user-shield text-white text-2xl"></i>
+                    <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gray-900 text-white">
+                        <i class="fas fa-user-shield text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                        <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">
                             Admin Settings
                         </h1>
-                        <div class="flex items-center space-x-3 mt-1">
-                            <p class="text-sm text-gray-600">Manage system users and settings</p>
-                            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        <div class="flex items-center space-x-3 mt-0.5">
+                            <p class="text-sm text-gray-500">Manage system users and settings</p>
+                            <span class="hidden md:inline-flex items-center px-2 py-0.5 text-xs font-medium border border-gray-300 text-gray-700">
                                 <i class="fas fa-crown mr-1"></i>
                                 Admin Access
                             </span>
@@ -149,10 +149,10 @@ $baseUrl = '../';
 
                     <!-- User Avatar with Dropdown -->
                     <div class="relative" id="userMenuDropdown">
-                        <button class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-lg transition" id="userMenuBtn">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
+                        <button class="flex items-center space-x-2 p-1 hover:bg-gray-100 transition" id="userMenuBtn">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
                                  alt="User" 
-                                 class="w-10 h-10 rounded-full ring-2 ring-blue-200"
+                                 class="w-10 h-10 rounded-full"
                                  title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
                             <div class="hidden lg:block text-left">
                                 <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(explode(' ', $currentUser['full_name'])[0]); ?></div>
@@ -160,12 +160,12 @@ $baseUrl = '../';
                             </div>
                             <i class="fas fa-chevron-down text-xs text-gray-500 hidden lg:block"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 hidden z-50" id="userMenu">
+                        <div class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 hidden z-50" id="userMenu">
                             <div class="p-4 border-b border-gray-200">
                                 <div class="font-medium text-gray-900"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
                                 <div class="text-sm text-gray-500"><?php echo htmlspecialchars($currentUser['email']); ?></div>
                                 <div class="mt-1">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-gray-300 text-gray-700">
                                         <i class="fas fa-crown mr-1"></i>
                                         <?php echo ucfirst(str_replace('_', ' ', $currentUser['role'])); ?>
                                     </span>
@@ -662,10 +662,24 @@ $baseUrl = '../';
             }
 
             // Close dropdowns when clicking outside
-            document.addEventListener('click', function() {
-                if (quickActionsMenu) quickActionsMenu.classList.add('hidden');
-                if (userMenu) userMenu.classList.add('hidden');
-                if (notificationMenu) notificationMenu.classList.add('hidden');
+            document.addEventListener('click', function(e) {
+                // Check if click is outside quick actions dropdown
+                const quickActionsDropdown = document.getElementById('quickActionsDropdown');
+                if (quickActionsMenu && quickActionsDropdown && !quickActionsDropdown.contains(e.target)) {
+                    quickActionsMenu.classList.add('hidden');
+                }
+                
+                // Check if click is outside user menu dropdown
+                const userMenuDropdown = document.getElementById('userMenuDropdown');
+                if (userMenu && userMenuDropdown && !userMenuDropdown.contains(e.target)) {
+                    userMenu.classList.add('hidden');
+                }
+                
+                // Check if click is outside notification menu
+                const notificationBell = document.getElementById('notificationBell');
+                if (notificationMenu && notificationBell && !notificationBell.contains(e.target) && !notificationMenu.contains(e.target)) {
+                    notificationMenu.classList.add('hidden');
+                }
             });
 
             // Quick Search Functionality
