@@ -41,9 +41,28 @@ class EmployeesController {
         // Pagination settings
         $itemsPerPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
         $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $searchQuery = isset($_GET['search']) ? sanitize($_GET['search']) : '';
         
         // Get all employees
         $allEmployees = $this->employeeModel->getAll();
+        
+        // Filter by search query if provided
+        if (!empty($searchQuery)) {
+            $searchLower = strtolower($searchQuery);
+            $allEmployees = array_filter($allEmployees, function($emp) use ($searchLower) {
+                $fullName = strtolower(($emp['fname'] ?? '') . ' ' . ($emp['lname'] ?? ''));
+                $email = strtolower($emp['email'] ?? '');
+                $username = strtolower($emp['username'] ?? '');
+                $company = strtolower($emp['company'] ?? '');
+                
+                return strpos($fullName, $searchLower) !== false ||
+                       strpos($email, $searchLower) !== false ||
+                       strpos($username, $searchLower) !== false ||
+                       strpos($company, $searchLower) !== false;
+            });
+            // Reindex array after filtering
+            $allEmployees = array_values($allEmployees);
+        }
         
         // Sort employees
         usort($allEmployees, function($a, $b) use ($sortBy, $sortOrder) {
@@ -76,9 +95,13 @@ class EmployeesController {
         $employees = array_slice($allEmployees, $offset, $itemsPerPage);
         
         // Build sort URL helper function
-        $sortUrl = function($field) use ($sortBy, $sortOrder) {
+        $sortUrl = function($field) use ($sortBy, $sortOrder, $searchQuery) {
             $newOrder = ($sortBy === $field && $sortOrder === 'ASC') ? 'DESC' : 'ASC';
-            return '?sort_by=' . $field . '&sort_order=' . $newOrder;
+            $url = '?sort_by=' . $field . '&sort_order=' . $newOrder;
+            if (!empty($searchQuery)) {
+                $url .= '&search=' . urlencode($searchQuery);
+            }
+            return $url;
         };
         
         $data = [
@@ -87,6 +110,8 @@ class EmployeesController {
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
             'sortUrl' => $sortUrl,
+            'searchQuery' => $searchQuery,
+            'searchResults' => !empty($searchQuery),
             'pagination' => [
                 'currentPage' => $currentPage,
                 'totalPages' => $totalPages,

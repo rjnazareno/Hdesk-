@@ -33,15 +33,30 @@ include __DIR__ . '/../layouts/header.php';
 
             <!-- Right Section: Actions & User -->
             <div class="flex items-center space-x-3">
-                <!-- Search (Hidden on Mobile) -->
-                <div class="hidden md:block relative">
-                    <input 
-                        type="text" 
-                        placeholder="Search employees..." 
-                        class="pl-10 pr-4 py-2 w-48 lg:w-64 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm transition-all"
-                        id="quickSearch"
-                    >
-                    <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                <!-- Smart Search with Page Finder -->
+                <div class="hidden md:block relative" id="searchContainer">
+                    <form method="GET" action="" class="flex">
+                        <input 
+                            type="text" 
+                            name="search"
+                            placeholder="Search name, email..." 
+                            value="<?php echo htmlspecialchars($searchQuery); ?>"
+                            class="pl-10 pr-4 py-2 w-48 lg:w-64 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 rounded-l-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm transition-all"
+                            id="searchInput"
+                        >
+                        <button type="submit" class="px-4 py-2 bg-slate-700/50 border border-l-0 border-slate-600 text-slate-400 hover:text-cyan-400 rounded-r-lg transition">
+                            <i class="fas fa-search text-sm"></i>
+                        </button>
+                    </form>
+                    <!-- Search results indicator -->
+                    <?php if ($searchResults): ?>
+                    <div class="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-3 text-sm text-slate-300 z-50 hidden" id="searchResultsInfo">
+                        <div class="flex items-center justify-between">
+                            <span><i class="fas fa-check-circle text-cyan-400 mr-2"></i><?php echo $pagination['totalItems']; ?> result<?php echo $pagination['totalItems'] != 1 ? 's' : ''; ?> found</span>
+                            <span class="text-slate-500">Page <?php echo $pagination['currentPage']; ?> of <?php echo max(1, $pagination['totalPages']); ?></span>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Quick Actions Dropdown -->
@@ -134,6 +149,26 @@ include __DIR__ . '/../layouts/header.php';
 
     <!-- Content -->
     <div class="p-8">
+        <!-- Search Results Feedback Banner -->
+        <?php if ($searchResults && !empty($searchQuery)): ?>
+        <div class="mb-6 bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-search text-cyan-400 text-lg"></i>
+                <div>
+                    <p class="text-cyan-300 font-medium">
+                        Found <span class="font-bold text-cyan-400"><?php echo $pagination['totalItems']; ?></span> result<?php echo $pagination['totalItems'] != 1 ? 's' : ''; ?> for "<span class="font-bold text-cyan-400"><?php echo htmlspecialchars($searchQuery); ?></span>"
+                    </p>
+                    <p class="text-cyan-400/70 text-sm mt-1">
+                        Currently on page <span class="font-bold"><?php echo $pagination['currentPage']; ?></span> of <span class="font-bold"><?php echo max(1, $pagination['totalPages']); ?></span>
+                    </p>
+                </div>
+            </div>
+            <a href="customers.php<?php echo !empty($sortBy) ? '?sort_by=' . $sortBy . '&sort_order=' . $sortOrder : ''; ?>" class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600 text-slate-300 hover:text-cyan-400 rounded-lg transition text-sm font-medium whitespace-nowrap ml-4">
+                <i class="fas fa-times mr-2"></i>Clear Search
+            </a>
+        </div>
+        <?php endif; ?>
+        
         <!-- Breadcrumb -->
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -279,7 +314,7 @@ include __DIR__ . '/../layouts/header.php';
                     <div class="flex items-center space-x-1">
                         <!-- Previous Button -->
                         <?php if ($pagination['hasPrevious']): ?>
-                        <a href="?page=<?php echo $pagination['previousPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
+                        <a href="?page=<?php echo $pagination['previousPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <i class="fas fa-chevron-left"></i>
                         </a>
@@ -294,7 +329,7 @@ include __DIR__ . '/../layouts/header.php';
                         $pages = $pagination['pages'];
                         if ($pages[0] > 1): 
                         ?>
-                        <a href="?page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
+                        <a href="?page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">1</a>
                         <?php if ($pages[0] > 2): ?>
                         <span class="px-2 text-slate-400">...</span>
@@ -307,7 +342,7 @@ include __DIR__ . '/../layouts/header.php';
                             <?php echo $page; ?>
                         </button>
                         <?php else: ?>
-                        <a href="?page=<?php echo $page; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
+                        <a href="?page=<?php echo $page; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <?php echo $page; ?>
                         </a>
@@ -320,7 +355,7 @@ include __DIR__ . '/../layouts/header.php';
                         <?php if ($pages[count($pages)-1] < $pagination['totalPages'] - 1): ?>
                         <span class="px-2 text-slate-400">...</span>
                         <?php endif; ?>
-                        <a href="?page=<?php echo $pagination['totalPages']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
+                        <a href="?page=<?php echo $pagination['totalPages']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <?php echo $pagination['totalPages']; ?>
                         </a>
@@ -328,7 +363,7 @@ include __DIR__ . '/../layouts/header.php';
                         
                         <!-- Next Button -->
                         <?php if ($pagination['hasNext']): ?>
-                        <a href="?page=<?php echo $pagination['nextPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
+                        <a href="?page=<?php echo $pagination['nextPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <i class="fas fa-chevron-right"></i>
                         </a>
@@ -342,7 +377,7 @@ include __DIR__ . '/../layouts/header.php';
                     <!-- Items Per Page -->
                     <div class="flex items-center space-x-2">
                         <label class="text-sm text-slate-400">Per page:</label>
-                        <select onchange="window.location.href = '?page=1&per_page=' + this.value + '&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>'" 
+                        <select onchange="window.location.href = '?page=1&per_page=' + this.value + '&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?><?php if (!empty($searchQuery)): ?>&search=<?php echo urlencode($searchQuery); ?><?php endif; ?>'" 
                                 class="px-3 py-2 text-sm font-medium bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:border-cyan-500 transition">
                             <option value="10" <?php echo $pagination['itemsPerPage'] == 10 ? 'selected' : ''; ?>>10</option>
                             <option value="25" <?php echo $pagination['itemsPerPage'] == 25 ? 'selected' : ''; ?>>25</option>
