@@ -12,7 +12,7 @@
 // ============================================
 
 // IThelp webhook configuration
-$WEBHOOK_URL = 'http://localhost/IThelp/webhook_employee_sync.php'; // Change to your IThelp domain
+$WEBHOOK_URL = 'https://resolveit.resourcestaffonline.com/webhook_employee_sync.php'; // Production IThelp domain
 $API_KEY = '333e582f2e6eccbf4d12274296fa6c53779a0d15c135da1863721c1e2509dece'; // Must match webhook_employee_sync.php
 
 // Harley database configuration (already on Hostinger)
