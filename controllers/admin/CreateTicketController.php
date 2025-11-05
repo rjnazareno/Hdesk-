@@ -80,7 +80,15 @@ class CreateTicketController {
         }
         
         // Create ticket
-        $ticketId = $this->ticketModel->create($ticketData);
+        try {
+            error_log("Attempting to create ticket with data: " . print_r($ticketData, true));
+            $ticketId = $this->ticketModel->create($ticketData);
+            error_log("Ticket creation result - ID: " . ($ticketId ? $ticketId : 'FALSE'));
+        } catch (Exception $e) {
+            error_log("Ticket creation exception: " . $e->getMessage());
+            $_SESSION['error'] = "Database error: " . $e->getMessage();
+            redirect('admin/create_ticket.php');
+        }
         
         if ($ticketId) {
             // Create SLA tracking for this ticket
