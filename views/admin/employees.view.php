@@ -208,7 +208,96 @@ include __DIR__ . '/../layouts/header.php';
                     </tbody>
                 </table>
             </div>
-        </div>
+            
+            <!-- Pagination -->
+            <?php if (isset($pagination) && $pagination['totalPages'] > 1): ?>
+            <div class="bg-slate-900/50 border-t border-slate-700/50 px-6 py-4">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <!-- Info Text -->
+                    <div class="text-sm text-slate-400">
+                        Showing <span class="font-medium text-white"><?php echo $pagination['offset'] + 1; ?></span> 
+                        to <span class="font-medium text-white"><?php echo min($pagination['offset'] + $pagination['itemsPerPage'], $pagination['totalItems']); ?></span> 
+                        of <span class="font-medium text-white"><?php echo $pagination['totalItems']; ?></span> employees
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="flex items-center space-x-1">
+                        <!-- Previous Button -->
+                        <?php if ($pagination['hasPrevious']): ?>
+                        <a href="?page=<?php echo $pagination['previousPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                           class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <?php else: ?>
+                        <button disabled class="px-3 py-2 text-sm font-medium text-slate-500 bg-slate-700/20 border border-slate-600 rounded-lg opacity-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <?php endif; ?>
+                        
+                        <!-- Page Numbers -->
+                        <?php 
+                        $pages = $pagination['pages'];
+                        if ($pages[0] > 1): 
+                        ?>
+                        <a href="?page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                           class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">1</a>
+                        <?php if ($pages[0] > 2): ?>
+                        <span class="px-2 text-slate-400">...</span>
+                        <?php endif; ?>
+                        <?php endif; ?>
+                        
+                        <?php foreach ($pages as $page): ?>
+                        <?php if ($page == $pagination['currentPage']): ?>
+                        <button class="px-3 py-2 text-sm font-medium text-white bg-cyan-600/50 border border-cyan-600 rounded-lg">
+                            <?php echo $page; ?>
+                        </button>
+                        <?php else: ?>
+                        <a href="?page=<?php echo $page; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                           class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
+                            <?php echo $page; ?>
+                        </a>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+                        
+                        <?php 
+                        if ($pages[count($pages)-1] < $pagination['totalPages']): 
+                        ?>
+                        <?php if ($pages[count($pages)-1] < $pagination['totalPages'] - 1): ?>
+                        <span class="px-2 text-slate-400">...</span>
+                        <?php endif; ?>
+                        <a href="?page=<?php echo $pagination['totalPages']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                           class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
+                            <?php echo $pagination['totalPages']; ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <!-- Next Button -->
+                        <?php if ($pagination['hasNext']): ?>
+                        <a href="?page=<?php echo $pagination['nextPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                           class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <?php else: ?>
+                        <button disabled class="px-3 py-2 text-sm font-medium text-slate-500 bg-slate-700/20 border border-slate-600 rounded-lg opacity-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <!-- Items Per Page -->
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm text-slate-400">Per page:</label>
+                        <select onchange="window.location.href = '?page=1&per_page=' + this.value" 
+                                class="px-3 py-2 text-sm font-medium bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:border-cyan-500 transition">
+                            <option value="10" <?php echo $pagination['itemsPerPage'] == 10 ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?php echo $pagination['itemsPerPage'] == 25 ? 'selected' : ''; ?>>25</option>
+                            <option value="50" <?php echo $pagination['itemsPerPage'] == 50 ? 'selected' : ''; ?>>50</option>
+                            <option value="100" <?php echo $pagination['itemsPerPage'] == 100 ? 'selected' : ''; ?>>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
     </div>
 </div>
 

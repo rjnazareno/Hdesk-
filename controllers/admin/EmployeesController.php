@@ -23,13 +23,42 @@ class EmployeesController {
     }
 
     /**
-     * Display all employees
+     * Display all employees with pagination
      */
     public function index() {
+        // Pagination settings
+        $itemsPerPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        
         // Get all employees
+        $allEmployees = $this->employeeModel->getAll();
+        $totalEmployees = count($allEmployees);
+        $totalPages = ceil($totalEmployees / $itemsPerPage);
+        
+        // Ensure current page is valid
+        $currentPage = min($currentPage, max(1, $totalPages));
+        
+        // Calculate offset
+        $offset = ($currentPage - 1) * $itemsPerPage;
+        
+        // Get employees for current page
+        $employees = array_slice($allEmployees, $offset, $itemsPerPage);
+        
         $data = [
             'currentUser' => $this->currentUser,
-            'employees' => $this->employeeModel->getAll()
+            'employees' => $employees,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalEmployees,
+                'itemsPerPage' => $itemsPerPage,
+                'offset' => $offset,
+                'hasPrevious' => $currentPage > 1,
+                'hasNext' => $currentPage < $totalPages,
+                'previousPage' => $currentPage - 1,
+                'nextPage' => $currentPage + 1,
+                'pages' => range(max(1, $currentPage - 2), min($totalPages, $currentPage + 2))
+            ]
         ];
 
         // Load the view
