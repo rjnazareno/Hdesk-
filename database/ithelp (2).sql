@@ -655,6 +655,9 @@ ALTER TABLE `users`
 -- Constraints for dumped tables
 --
 
+-- Temporarily disable foreign key checks to avoid constraint errors
+SET FOREIGN_KEY_CHECKS = 0;
+
 --
 -- Constraints for table `notifications`
 --
@@ -687,6 +690,10 @@ ALTER TABLE `tickets`
 --
 ALTER TABLE `ticket_activity`
   ADD CONSTRAINT `ticket_activity_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE;
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
