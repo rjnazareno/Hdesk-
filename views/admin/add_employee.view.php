@@ -386,19 +386,19 @@ include __DIR__ . '/../layouts/header.php';
                 <!-- Important Notes -->
                 <div class="bg-amber-500/10 border border-amber-600/30 backdrop-blur-sm p-4 rounded-lg">
                     <h3 class="text-sm font-semibold text-amber-300 mb-3 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>Important
+                        <i class="fas fa-exclamation-triangle text-amber-400 mr-2"></i>Important
                     </h3>
                     <ul class="space-y-2 text-xs text-white">
                         <li class="flex items-start">
-                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-check text-amber-400 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Login credentials will be emailed to the employee</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-check text-amber-400 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Email addresses must be unique</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-check text-amber-400 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Changes can be edited later in the system</span>
                         </li>
                     </ul>
