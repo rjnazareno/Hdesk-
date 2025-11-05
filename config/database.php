@@ -28,6 +28,9 @@ class Database {
             ];
             
             $this->connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+            
+            // Set MySQL session timezone to Asia/Manila (UTC+8)
+            $this->connection->exec("SET SESSION time_zone = '+08:00'");
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
         }
