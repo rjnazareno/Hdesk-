@@ -18,12 +18,37 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Verify API key
-$headers = getallheaders();
-$apiKey = $headers['X-API-Key'] ?? '';
+// Try multiple methods to get the header (getallheaders() doesn't work on all servers)
+$apiKey = '';
+
+// Method 1: getallheaders() - Apache
+if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    $apiKey = $headers['X-API-Key'] ?? $headers['X-Api-Key'] ?? $headers['x-api-key'] ?? '';
+}
+
+// Method 2: $_SERVER - Works on most servers including Nginx
+if (empty($apiKey)) {
+    $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
+}
+
+// Method 3: apache_request_headers() - Alternative for Apache
+if (empty($apiKey) && function_exists('apache_request_headers')) {
+    $headers = apache_request_headers();
+    $apiKey = $headers['X-API-Key'] ?? $headers['X-Api-Key'] ?? $headers['x-api-key'] ?? '';
+}
 
 if ($apiKey !== WEBHOOK_SECRET_KEY) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized. Invalid API key.']);
+    echo json_encode([
+        'error' => 'Unauthorized. Invalid API key.',
+        'debug' => [
+            'received_key_length' => strlen($apiKey),
+            'expected_key_length' => strlen(WEBHOOK_SECRET_KEY),
+            'received_key_first_10' => substr($apiKey, 0, 10),
+            'expected_key_first_10' => substr(WEBHOOK_SECRET_KEY, 0, 10),
+        ]
+    ]);
     exit;
 }
 
