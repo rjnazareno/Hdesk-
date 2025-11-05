@@ -45,6 +45,12 @@ class CreateTicketController {
         
         $currentUser = $this->auth->getCurrentUser();
         
+        // Debug: Log all POST data
+        error_log("=== CREATE TICKET DEBUG ===");
+        error_log("POST data: " . print_r($_POST, true));
+        error_log("FILES data: " . print_r($_FILES, true));
+        error_log("Current user: " . print_r($currentUser, true));
+        
         // Validate required fields
         if (empty($_POST['submitter_id']) || $_POST['submitter_id'] === '0') {
             error_log("Ticket creation failed: No employee selected");
