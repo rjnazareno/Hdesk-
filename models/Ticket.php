@@ -15,24 +15,35 @@ class Ticket {
      * Create a new ticket
      */
     public function create($data) {
-        $sql = "INSERT INTO tickets (ticket_number, title, description, category_id, priority, status, submitter_id, submitter_type, assigned_to, attachments) 
-                VALUES (:ticket_number, :title, :description, :category_id, :priority, :status, :submitter_id, :submitter_type, :assigned_to, :attachments)";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':ticket_number' => $data['ticket_number'],
-            ':title' => $data['title'],
-            ':description' => $data['description'],
-            ':category_id' => $data['category_id'],
-            ':priority' => $data['priority'] ?? 'medium',
-            ':status' => $data['status'] ?? 'pending',
-            ':submitter_id' => $data['submitter_id'],
-            ':submitter_type' => $data['submitter_type'] ?? 'employee',
-            ':assigned_to' => $data['assigned_to'] ?? null,
-            ':attachments' => $data['attachments'] ?? null
-        ]);
-        
-        return $this->db->lastInsertId();
+        try {
+            $sql = "INSERT INTO tickets (ticket_number, title, description, category_id, priority, status, submitter_id, submitter_type, assigned_to, attachments) 
+                    VALUES (:ticket_number, :title, :description, :category_id, :priority, :status, :submitter_id, :submitter_type, :assigned_to, :attachments)";
+            
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([
+                ':ticket_number' => $data['ticket_number'],
+                ':title' => $data['title'],
+                ':description' => $data['description'],
+                ':category_id' => $data['category_id'],
+                ':priority' => $data['priority'] ?? 'medium',
+                ':status' => $data['status'] ?? 'pending',
+                ':submitter_id' => $data['submitter_id'],
+                ':submitter_type' => $data['submitter_type'] ?? 'employee',
+                ':assigned_to' => $data['assigned_to'] ?? null,
+                ':attachments' => $data['attachments'] ?? null
+            ]);
+            
+            if (!$result) {
+                error_log("Ticket creation failed - execute returned false");
+                return false;
+            }
+            
+            return $this->db->lastInsertId();
+        } catch (PDOException $e) {
+            error_log("Ticket creation error: " . $e->getMessage());
+            error_log("Data: " . print_r($data, true));
+            return false;
+        }
     }
     
     /**
