@@ -463,7 +463,39 @@ CREATE TABLE `v_sla_summary` (
 --
 DROP TABLE IF EXISTS `v_sla_summary`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`rootu816220874_AyrgoResolveIT`@`localhost` SQL SECURITY DEFINER VIEW `v_sla_summary`  AS SELECT `t`.`id` AS `ticket_id`, `t`.`ticket_number` AS `ticket_number`, `t`.`title` AS `title`, `t`.`priority` AS `priority`, `t`.`status` AS `ticket_status`, `t`.`sla_status` AS `sla_status`, `st`.`response_sla_status` AS `response_sla_status`, `st`.`resolution_sla_status` AS `resolution_sla_status`, `st`.`response_due_at` AS `response_due_at`, `st`.`resolution_due_at` AS `resolution_due_at`, `st`.`first_response_at` AS `first_response_at`, `st`.`resolved_at` AS `resolved_at`, `st`.`response_time_minutes` AS `response_time_minutes`, `st`.`resolution_time_minutes` AS `resolution_time_minutes`, `st`.`is_paused` AS `is_paused`, `sp`.`response_time` AS `target_response_minutes`, `sp`.`resolution_time` AS `target_resolution_minutes`, `sp`.`is_business_hours` AS `is_business_hours`, CASE WHEN `st`.`resolved_at` is not null THEN 0 WHEN `st`.`is_paused` = 1 THEN timestampdiff(MINUTE,current_timestamp(),`st`.`resolution_due_at`) ELSE timestampdiff(MINUTE,current_timestamp(),`st`.`resolution_due_at`) END AS `minutes_remaining`, CASE WHEN `st`.`resolved_at` is not null THEN 100 ELSE round(timestampdiff(MINUTE,`t`.`created_at`,current_timestamp()) / `sp`.`resolution_time` * 100,2) END AS `elapsed_percentage` FROM ((`tickets` `t` left join `sla_tracking` `st` on(`t`.`id` = `st`.`ticket_id`)) left join `sla_policies` `sp` on(`st`.`sla_policy_id` = `sp`.`id`)) WHERE `t`.`status` <> 'closed' ;
+CREATE VIEW `v_sla_summary` AS 
+SELECT 
+  `t`.`id` AS `ticket_id`, 
+  `t`.`ticket_number` AS `ticket_number`, 
+  `t`.`title` AS `title`, 
+  `t`.`priority` AS `priority`, 
+  `t`.`status` AS `ticket_status`, 
+  `t`.`sla_status` AS `sla_status`, 
+  `st`.`response_sla_status` AS `response_sla_status`, 
+  `st`.`resolution_sla_status` AS `resolution_sla_status`, 
+  `st`.`response_due_at` AS `response_due_at`, 
+  `st`.`resolution_due_at` AS `resolution_due_at`, 
+  `st`.`first_response_at` AS `first_response_at`, 
+  `st`.`resolved_at` AS `resolved_at`, 
+  `st`.`response_time_minutes` AS `response_time_minutes`, 
+  `st`.`resolution_time_minutes` AS `resolution_time_minutes`, 
+  `st`.`is_paused` AS `is_paused`, 
+  `sp`.`response_time` AS `target_response_minutes`, 
+  `sp`.`resolution_time` AS `target_resolution_minutes`, 
+  `sp`.`is_business_hours` AS `is_business_hours`, 
+  CASE 
+    WHEN `st`.`resolved_at` IS NOT NULL THEN 0 
+    WHEN `st`.`is_paused` = 1 THEN TIMESTAMPDIFF(MINUTE, CURRENT_TIMESTAMP(), `st`.`resolution_due_at`) 
+    ELSE TIMESTAMPDIFF(MINUTE, CURRENT_TIMESTAMP(), `st`.`resolution_due_at`) 
+  END AS `minutes_remaining`, 
+  CASE 
+    WHEN `st`.`resolved_at` IS NOT NULL THEN 100 
+    ELSE ROUND(TIMESTAMPDIFF(MINUTE, `t`.`created_at`, CURRENT_TIMESTAMP()) / `sp`.`resolution_time` * 100, 2) 
+  END AS `elapsed_percentage` 
+FROM `tickets` `t` 
+LEFT JOIN `sla_tracking` `st` ON `t`.`id` = `st`.`ticket_id` 
+LEFT JOIN `sla_policies` `sp` ON `st`.`sla_policy_id` = `sp`.`id` 
+WHERE `t`.`status` <> 'closed';
 
 --
 -- Indexes for dumped tables
