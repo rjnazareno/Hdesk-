@@ -93,7 +93,8 @@ foreach ($data['employees'] as $emp) {
             'lname' => sanitize($emp['lname']),
             'email' => filter_var($emp['email'], FILTER_VALIDATE_EMAIL),
             'phone' => isset($emp['phone']) ? sanitize($emp['phone']) : null,
-            'department' => isset($emp['department']) ? sanitize($emp['department']) : null,
+            'contact' => isset($emp['phone']) ? sanitize($emp['phone']) : null,
+            'company' => isset($emp['department']) ? sanitize($emp['department']) : (isset($emp['company']) ? sanitize($emp['company']) : null),
             'position' => isset($emp['position']) ? sanitize($emp['position']) : null,
             'username' => isset($emp['username']) ? sanitize($emp['username']) : strtolower($emp['fname'] . '.' . $emp['lname']),
         ];

@@ -15,22 +15,27 @@ class Employee {
      * Create a new employee
      */
     public function create($data) {
-        $sql = "INSERT INTO employees (username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, status, profile_picture) 
-                VALUES (:username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :status, :profile_picture)";
+        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, status, profile_picture) 
+                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :status, :profile_picture)";
         
         $stmt = $this->db->prepare($sql);
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+        
+        // Hash password if provided, otherwise use the already hashed password
+        $password = isset($data['password']) ? 
+                    (password_get_info($data['password'])['algo'] === null ? password_hash($data['password'], PASSWORD_DEFAULT) : $data['password']) 
+                    : password_hash('Welcome123!', PASSWORD_DEFAULT);
         
         $stmt->execute([
+            ':employee_id' => $data['employee_id'] ?? null,
             ':username' => $data['username'] ?? null,
             ':email' => $data['email'] ?? null,
             ':personal_email' => $data['personal_email'] ?? null,
-            ':password' => $hashedPassword,
+            ':password' => $password,
             ':fname' => $data['fname'] ?? null,
             ':lname' => $data['lname'] ?? null,
             ':company' => $data['company'] ?? null,
             ':position' => $data['position'] ?? null,
-            ':contact' => $data['contact'] ?? null,
+            ':contact' => $data['contact'] ?? $data['phone'] ?? null,
             ':official_sched' => $data['official_sched'] ?? null,
             ':role' => $data['role'] ?? 'employee',
             ':status' => $data['status'] ?? 'active',
@@ -131,18 +136,28 @@ class Employee {
         $fields = [];
         $params = [':id' => $id];
         
-        $allowedFields = ['username', 'email', 'personal_email', 'fname', 'lname', 'company', 'position', 'contact', 'official_sched', 'role', 'status', 'profile_picture'];
+        $allowedFields = ['employee_id', 'username', 'email', 'personal_email', 'fname', 'lname', 'company', 'position', 'contact', 'official_sched', 'role', 'status', 'profile_picture'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
                 $fields[] = "$field = :$field";
-                $params[":$field"] = $data[$field];
+                // Map 'phone' to 'contact' if needed
+                $params[":$field"] = ($field === 'contact' && isset($data['phone'])) ? $data['phone'] : $data[$field];
             }
+        }
+        
+        // Handle phone mapping for contact
+        if (isset($data['phone']) && !isset($data['contact'])) {
+            $fields[] = "contact = :contact";
+            $params[':contact'] = $data['phone'];
         }
         
         if (isset($data['password']) && !empty($data['password'])) {
             $fields[] = "password = :password";
-            $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            // Check if already hashed
+            $params[':password'] = password_get_info($data['password'])['algo'] === null ? 
+                                   password_hash($data['password'], PASSWORD_DEFAULT) : 
+                                   $data['password'];
         }
         
         if (empty($fields)) {

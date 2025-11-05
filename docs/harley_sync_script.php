@@ -20,9 +20,9 @@ $API_KEY = '333e582f2e6eccbf4d12274296fa6c53779a0d15c135da1863721c1e2509dece'; /
 // If so, include that file instead: require_once '../config/database.php';
 
 $DB_HOST = 'localhost'; // Usually localhost on Hostinger
-$DB_NAME = 'your_harley_database_name';
-$DB_USER = 'your_database_username';
-$DB_PASS = 'your_database_password';
+$DB_NAME = 'u816220874_harleyrss';
+$DB_USER = 'u816220874_harley';
+$DB_PASS = 'Z&e#mtcW3';
 
 // ============================================
 // SCRIPT START - NO NEED TO EDIT BELOW
