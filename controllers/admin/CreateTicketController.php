@@ -117,7 +117,8 @@ class CreateTicketController {
             error_log("Ticket creation result - ID: " . ($ticketId ? $ticketId : 'FALSE'));
         } catch (Exception $e) {
             error_log("Ticket creation exception: " . $e->getMessage());
-            $_SESSION['error'] = "Database error: " . $e->getMessage();
+            error_log("Stack trace: " . $e->getTraceAsString());
+            $_SESSION['error'] = "Database error: " . $e->getMessage() . " | Data: " . json_encode($ticketData);
             redirect('admin/create_ticket.php');
         }
         
@@ -203,7 +204,9 @@ class CreateTicketController {
             
             redirect('admin/tickets.php?success=created');
         } else {
-            $_SESSION['error'] = "Failed to create ticket. Please try again.";
+            error_log("Ticket creation returned FALSE/NULL - ticketId: " . var_export($ticketId, true));
+            error_log("Ticket data was: " . json_encode($ticketData));
+            $_SESSION['error'] = "Failed to create ticket. Data submitted: " . json_encode($ticketData);
             redirect('admin/create_ticket.php');
         }
     }
