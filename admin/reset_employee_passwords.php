@@ -87,7 +87,8 @@ foreach ($employees as $emp) {
     }
 }
 
-include __DIR__ . '/../layouts/header.php';
+// Set page variables for header
+include_once __DIR__ . '/../views/layouts/header.php';
 ?>
 
 <div class="lg:ml-64 min-h-screen bg-gray-50">
@@ -240,4 +241,4 @@ include __DIR__ . '/../layouts/header.php';
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include_once __DIR__ . '/../views/layouts/footer.php'; ?>
