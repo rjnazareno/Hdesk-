@@ -23,8 +23,14 @@ if (file_exists($env_file)) {
 // Environment Configuration
 define('ENVIRONMENT', getenv('APP_ENV') ?? 'development');
 
-// Base URL Configuration
-define('BASE_URL', 'http://localhost/ResolveIT/');
+// Base URL Configuration - Auto-detect environment
+$isProduction = (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'resourcestaffonline.com') !== false);
+
+if ($isProduction) {
+    define('BASE_URL', 'https://resolveit.resourcestaffonline.com/');
+} else {
+    define('BASE_URL', 'http://localhost/ResolveIT/');
+}
 define('ASSETS_URL', BASE_URL . 'assets/');
 
 // Application Settings
