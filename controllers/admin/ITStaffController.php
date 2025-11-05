@@ -7,6 +7,7 @@
 class ITStaffController {
     private $auth;
     private $ticketModel;
+    private $slaModel;
     private $currentUser;
 
     public function __construct() {
@@ -17,6 +18,7 @@ class ITStaffController {
 
         // Initialize models
         $this->ticketModel = new Ticket();
+        $this->slaModel = new SLA();
 
         // Get current user
         $this->currentUser = $this->auth->getCurrentUser();
@@ -34,7 +36,10 @@ class ITStaffController {
             'myTickets' => $this->getMyTickets(),
             'myPerformance' => $this->getMyPerformance(),
             'myWorkload' => $this->getMyWorkload(),
-            'myChartData' => $this->prepareMyChartData()
+            'myChartData' => $this->prepareMyChartData(),
+            'atRiskTickets' => $this->getAtRiskTickets(),
+            'breachedTickets' => $this->getBreachedTickets(),
+            'mySLACompliance' => $this->getMySLACompliance()
         ];
 
         // Load the IT staff dashboard view
@@ -153,6 +158,90 @@ class ITStaffController {
             'assigned' => $assignedData,
             'resolved' => $resolvedData
         ];
+    }
+
+    /**
+     * Get tickets at risk of breaching SLA (assigned to this IT staff)
+     */
+    private function getAtRiskTickets() {
+        $userId = $this->currentUser['id'];
+        $db = Database::getInstance()->getConnection();
+        
+        $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
+                st.resolution_due_at,
+                TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) as minutes_remaining
+                FROM tickets t
+                JOIN sla_tracking st ON t.id = st.ticket_id
+                WHERE t.assigned_to = :user_id
+                AND t.status NOT IN ('closed', 'resolved')
+                AND st.is_paused = 0
+                AND st.resolved_at IS NULL
+                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= 60
+                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) > 0
+                ORDER BY st.resolution_due_at ASC
+                LIMIT 5";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get breached tickets (assigned to this IT staff)
+     */
+    private function getBreachedTickets() {
+        $userId = $this->currentUser['id'];
+        $db = Database::getInstance()->getConnection();
+        
+        $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
+                st.resolution_due_at,
+                TIMESTAMPDIFF(MINUTE, st.resolution_due_at, NOW()) as minutes_overdue
+                FROM tickets t
+                JOIN sla_tracking st ON t.id = st.ticket_id
+                WHERE t.assigned_to = :user_id
+                AND t.status NOT IN ('closed', 'resolved')
+                AND st.is_paused = 0
+                AND st.resolved_at IS NULL
+                AND NOW() > st.resolution_due_at
+                ORDER BY st.resolution_due_at ASC
+                LIMIT 5";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get SLA compliance stats for this IT staff
+     */
+    private function getMySLACompliance() {
+        $userId = $this->currentUser['id'];
+        $db = Database::getInstance()->getConnection();
+        
+        $sql = "SELECT 
+                COUNT(*) as total_tickets,
+                SUM(CASE WHEN st.response_sla_status = 'met' THEN 1 ELSE 0 END) as response_met,
+                SUM(CASE WHEN st.response_sla_status = 'breached' THEN 1 ELSE 0 END) as response_breached,
+                SUM(CASE WHEN st.resolution_sla_status = 'met' THEN 1 ELSE 0 END) as resolution_met,
+                SUM(CASE WHEN st.resolution_sla_status = 'breached' THEN 1 ELSE 0 END) as resolution_breached,
+                ROUND((SUM(CASE WHEN st.response_sla_status = 'met' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 1) as response_compliance_rate,
+                ROUND((SUM(CASE WHEN st.resolution_sla_status = 'met' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 1) as resolution_compliance_rate
+                FROM tickets t
+                JOIN sla_tracking st ON t.id = st.ticket_id
+                WHERE t.assigned_to = :user_id
+                AND st.resolved_at IS NOT NULL";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        $result = $stmt->fetch();
+        
+        // Handle case where no tickets resolved yet
+        if ($result['total_tickets'] == 0) {
+            $result['response_compliance_rate'] = 0;
+            $result['resolution_compliance_rate'] = 0;
+        }
+        
+        return $result;
     }
 
     /**

@@ -180,6 +180,25 @@ class Auth {
     }
     
     /**
+     * Check if current user is admin
+     */
+    public function isAdmin() {
+        return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    }
+    
+    /**
+     * Require admin role (for sensitive operations)
+     */
+    public function requireAdmin() {
+        $this->requireLogin();
+        
+        if (!$this->isAdmin()) {
+            $_SESSION['error'] = "Access denied. Admin privileges required.";
+            redirect('admin/dashboard.php');
+        }
+    }
+    
+    /**
      * Get current user data
      */
     public function getCurrentUser() {

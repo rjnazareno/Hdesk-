@@ -10,6 +10,7 @@ class CreateTicketController {
     private $categoryModel;
     private $employeeModel;
     private $activityModel;
+    private $slaModel;
     
     public function __construct() {
         $this->auth = new Auth();
@@ -19,6 +20,7 @@ class CreateTicketController {
         $this->categoryModel = new Category();
         $this->employeeModel = new Employee();
         $this->activityModel = new TicketActivity();
+        $this->slaModel = new SLA();
     }
     
     /**
@@ -81,6 +83,9 @@ class CreateTicketController {
         $ticketId = $this->ticketModel->create($ticketData);
         
         if ($ticketId) {
+            // Create SLA tracking for this ticket
+            $this->slaModel->createTracking($ticketId, $ticketData['priority']);
+            
             // Log activity
             $this->activityModel->log([
                 'ticket_id' => $ticketId,

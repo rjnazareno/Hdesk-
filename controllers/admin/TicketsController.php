@@ -8,6 +8,7 @@ class TicketsController {
     private $auth;
     private $ticketModel;
     private $categoryModel;
+    private $slaModel;
     private $currentUser;
     private $isITStaff;
 
@@ -20,6 +21,7 @@ class TicketsController {
         // Initialize models
         $this->ticketModel = new Ticket();
         $this->categoryModel = new Category();
+        $this->slaModel = new SLA();
 
         // Get current user
         $this->currentUser = $this->auth->getCurrentUser();

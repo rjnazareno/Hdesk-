@@ -6,25 +6,22 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gray-50">
+<div class="lg:ml-64 min-h-screen bg-slate-900/50">
     <!-- Top Bar -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
+    <div class="bg-slate-800/50 backdrop-blur-md border-b border-slate-700/50">
+        <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-gray-900 flex items-center justify-center text-white">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white rounded-lg">
                     <i class="fas fa-user-shield text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">
+                    <h1 class="text-xl lg:text-2xl font-semibold text-white">
                         <?php echo $selectedRole === 'admin' ? 'Add Administrator' : 'Add IT Staff'; ?>
                     </h1>
-                    <p class="text-sm text-gray-500 mt-0.5">Create a new system user account</p>
+                    <p class="text-sm text-slate-400 mt-0.5">Create a new system user account</p>
                 </div>
             </div>
             <div class="hidden lg:flex items-center space-x-2">
-                <button id="darkModeToggle" class="p-2 text-gray-500 hover:text-gray-900 transition" title="Toggle dark mode">
-                    <i id="dark-mode-icon" class="fas fa-moon text-sm"></i>
-                </button>
                 <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
                      alt="User" 
                      class="w-8 h-8 rounded-full"
@@ -39,7 +36,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -48,10 +45,10 @@ include __DIR__ . '/../layouts/header.php';
                 </li>
                 <li>
                     <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-700">
+                        <span class="ml-1 text-sm font-medium text-slate-300">
                             <?php echo $selectedRole === 'admin' ? 'Add Administrator' : 'Add IT Staff'; ?>
                         </span>
                     </div>
@@ -76,9 +73,9 @@ include __DIR__ . '/../layouts/header.php';
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Form Section -->
-            <div class="lg:col-span-2 bg-white border border-gray-200 p-6">
+            <div class="lg:col-span-2 bg-slate-800/50 backdrop-blur-md border border-slate-700/50 p-6">
                 <div class="mb-6">
-                    <div class="flex items-center space-x-2 text-sm text-gray-600 bg-blue-50 border border-blue-200 px-4 py-3">
+                    <div class="flex items-center space-x-2 text-sm text-slate-400 bg-blue-50 border border-blue-200 px-4 py-3">
                         <i class="fas fa-info-circle text-blue-600"></i>
                         <span>
                             <?php if ($selectedRole === 'admin'): ?>
@@ -94,11 +91,11 @@ include __DIR__ . '/../layouts/header.php';
                     
                     <!-- Role Selection (Hidden but can be toggled) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-900 mb-2">
-                            User Type <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            User Type <span class="text-red-400">*</span>
                         </label>
                         <div class="grid grid-cols-2 gap-4">
-                            <label class="relative flex items-center p-4 border-2 cursor-pointer transition <?php echo $selectedRole === 'it_staff' ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'; ?>">
+                            <label class="relative flex items-center p-4 border-2 cursor-pointer transition <?php echo $selectedRole === 'it_staff' ? 'border-gray-900 bg-slate-900/50' : 'border-slate-600 hover:border-slate-600'; ?>">
                                 <input 
                                     type="radio" 
                                     name="role" 
@@ -108,17 +105,17 @@ include __DIR__ . '/../layouts/header.php';
                                     onchange="updateRoleDescription()"
                                 >
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-headset text-gray-700"></i>
+                                    <div class="w-10 h-10 bg-slate-700/50 flex items-center justify-center">
+                                        <i class="fas fa-headset text-slate-300"></i>
                                     </div>
                                     <div>
-                                        <div class="font-semibold text-gray-900">IT Staff</div>
-                                        <div class="text-xs text-gray-500">Support role</div>
+                                        <div class="font-semibold text-white">IT Staff</div>
+                                        <div class="text-xs text-slate-400">Support role</div>
                                     </div>
                                 </div>
                             </label>
 
-                            <label class="relative flex items-center p-4 border-2 cursor-pointer transition <?php echo $selectedRole === 'admin' ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'; ?>">
+                            <label class="relative flex items-center p-4 border-2 cursor-pointer transition <?php echo $selectedRole === 'admin' ? 'border-gray-900 bg-slate-900/50' : 'border-slate-600 hover:border-slate-600'; ?>">
                                 <input 
                                     type="radio" 
                                     name="role" 
@@ -128,12 +125,12 @@ include __DIR__ . '/../layouts/header.php';
                                     onchange="updateRoleDescription()"
                                 >
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-user-shield text-gray-700"></i>
+                                    <div class="w-10 h-10 bg-slate-700/50 flex items-center justify-center">
+                                        <i class="fas fa-user-shield text-slate-300"></i>
                                     </div>
                                     <div>
-                                        <div class="font-semibold text-gray-900">Administrator</div>
-                                        <div class="text-xs text-gray-500">Full access</div>
+                                        <div class="font-semibold text-white">Administrator</div>
+                                        <div class="text-xs text-slate-400">Full access</div>
                                     </div>
                                 </div>
                             </label>
@@ -141,22 +138,22 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
 
                     <!-- Personal Information -->
-                    <div class="border-t border-gray-200 pt-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+                    <div class="border-t border-slate-700/50 pt-6">
+                        <h3 class="text-sm font-semibold text-white mb-4 uppercase tracking-wide">
                             Personal Information
                         </h3>
                         
                         <!-- Full Name -->
                         <div class="mb-4">
-                            <label for="full_name" class="block text-sm font-medium text-gray-900 mb-2">
-                                Full Name <span class="text-red-500">*</span>
+                            <label for="full_name" class="block text-sm font-medium text-white mb-2">
+                                Full Name <span class="text-red-400">*</span>
                             </label>
                             <input 
                                 type="text" 
                                 id="full_name" 
                                 name="full_name" 
                                 required
-                                class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                 placeholder="e.g., John Doe Smith"
                             >
                         </div>
@@ -164,27 +161,27 @@ include __DIR__ . '/../layouts/header.php';
                         <!-- Department and Phone -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="department" class="block text-sm font-medium text-gray-900 mb-2">
+                                <label for="department" class="block text-sm font-medium text-white mb-2">
                                     Department
                                 </label>
                                 <input 
                                     type="text" 
                                     id="department" 
                                     name="department"
-                                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                     placeholder="e.g., IT Department"
                                 >
                             </div>
 
                             <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-900 mb-2">
+                                <label for="phone" class="block text-sm font-medium text-white mb-2">
                                     Phone Number
                                 </label>
                                 <input 
                                     type="tel" 
                                     id="phone" 
                                     name="phone"
-                                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                     placeholder="+1 234 567 8900"
                                 >
                             </div>
@@ -192,25 +189,25 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
 
                     <!-- Account Credentials -->
-                    <div class="border-t border-gray-200 pt-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+                    <div class="border-t border-slate-700/50 pt-6">
+                        <h3 class="text-sm font-semibold text-white mb-4 uppercase tracking-wide">
                             Account Credentials
                         </h3>
 
                         <!-- Username -->
                         <div class="mb-4">
-                            <label for="username" class="block text-sm font-medium text-gray-900 mb-2">
-                                Username <span class="text-red-500">*</span>
+                            <label for="username" class="block text-sm font-medium text-white mb-2">
+                                Username <span class="text-red-400">*</span>
                             </label>
                             <input 
                                 type="text" 
                                 id="username" 
                                 name="username" 
                                 required
-                                class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                 placeholder="john.smith"
                             >
-                            <p class="text-sm text-gray-500 mt-1">
+                            <p class="text-sm text-slate-400 mt-1">
                                 <i class="fas fa-info-circle mr-1"></i>Used for logging into the system
                             </p>
                         </div>
@@ -218,22 +215,22 @@ include __DIR__ . '/../layouts/header.php';
                         <!-- Email and Password -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-900 mb-2">
-                                    Email Address <span class="text-red-500">*</span>
+                                <label for="email" class="block text-sm font-medium text-white mb-2">
+                                    Email Address <span class="text-red-400">*</span>
                                 </label>
                                 <input 
                                     type="email" 
                                     id="email" 
                                     name="email" 
                                     required
-                                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                     placeholder="john.smith@company.com"
                                 >
                             </div>
 
                             <div>
-                                <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
-                                    Password <span class="text-red-500">*</span>
+                                <label for="password" class="block text-sm font-medium text-white mb-2">
+                                    Password <span class="text-red-400">*</span>
                                 </label>
                                 <div class="relative">
                                     <input 
@@ -242,13 +239,13 @@ include __DIR__ . '/../layouts/header.php';
                                         name="password" 
                                         required
                                         minlength="8"
-                                        class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                                        class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
                                         placeholder="Min. 8 characters"
                                     >
                                     <button 
                                         type="button" 
                                         onclick="togglePassword('password')"
-                                        class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                                        class="absolute right-3 top-3 text-slate-400 hover:text-slate-400"
                                     >
                                         <i class="fas fa-eye" id="password-eye"></i>
                                     </button>
@@ -258,13 +255,13 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-                        <a href="dashboard.php" class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700/50">
+                        <a href="dashboard.php" class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-900/50 transition">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </a>
                         <button 
                             type="submit"
-                            class="px-6 py-3 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition"
+                            class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition rounded-lg"
                         >
                             <i class="fas fa-user-plus mr-2"></i>Create User
                         </button>
@@ -275,8 +272,8 @@ include __DIR__ . '/../layouts/header.php';
             <!-- Info Sidebar -->
             <div class="lg:col-span-1 space-y-6">
                 <!-- Role Description -->
-                <div class="bg-white border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
                         <i class="fas fa-info-circle mr-2"></i>Role Permissions
                     </h3>
                     <div id="roleDescription">
@@ -285,29 +282,29 @@ include __DIR__ . '/../layouts/header.php';
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Full System Access</strong>
-                                    <p class="text-sm text-gray-600">Manage all settings and configurations</p>
+                                    <strong class="text-white">Full System Access</strong>
+                                    <p class="text-sm text-slate-400">Manage all settings and configurations</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">User Management</strong>
-                                    <p class="text-sm text-gray-600">Add, edit, and remove users</p>
+                                    <strong class="text-white">User Management</strong>
+                                    <p class="text-sm text-slate-400">Add, edit, and remove users</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Ticket Management</strong>
-                                    <p class="text-sm text-gray-600">Full access to all tickets</p>
+                                    <strong class="text-white">Ticket Management</strong>
+                                    <p class="text-sm text-slate-400">Full access to all tickets</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Reports & Analytics</strong>
-                                    <p class="text-sm text-gray-600">View all system reports</p>
+                                    <strong class="text-white">Reports & Analytics</strong>
+                                    <p class="text-sm text-slate-400">View all system reports</p>
                                 </div>
                             </div>
                         </div>
@@ -316,29 +313,29 @@ include __DIR__ . '/../layouts/header.php';
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Ticket Management</strong>
-                                    <p class="text-sm text-gray-600">View, assign, and resolve tickets</p>
+                                    <strong class="text-white">Ticket Management</strong>
+                                    <p class="text-sm text-slate-400">View, assign, and resolve tickets</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Employee Support</strong>
-                                    <p class="text-sm text-gray-600">Assist employees with issues</p>
+                                    <strong class="text-white">Employee Support</strong>
+                                    <p class="text-sm text-slate-400">Assist employees with issues</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-900">Basic Reports</strong>
-                                    <p class="text-sm text-gray-600">View ticket statistics</p>
+                                    <strong class="text-white">Basic Reports</strong>
+                                    <p class="text-sm text-slate-400">View ticket statistics</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
-                                <i class="fas fa-times-circle text-gray-400 mr-2 mt-1"></i>
+                                <i class="fas fa-times-circle text-slate-400 mr-2 mt-1"></i>
                                 <div>
-                                    <strong class="text-gray-500">No Admin Access</strong>
-                                    <p class="text-sm text-gray-500">Cannot modify system settings</p>
+                                    <strong class="text-slate-400">No Admin Access</strong>
+                                    <p class="text-sm text-slate-400">Cannot modify system settings</p>
                                 </div>
                             </div>
                         </div>
@@ -372,8 +369,8 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Quick Stats -->
-                <div class="bg-white border border-gray-200 p-6">
-                    <h3 class="text-sm font-semibold text-gray-900 mb-3">
+                <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 p-6">
+                    <h3 class="text-sm font-semibold text-white mb-3">
                         <i class="fas fa-chart-bar mr-2"></i>Current Users
                     </h3>
                     <?php
@@ -381,16 +378,16 @@ include __DIR__ . '/../layouts/header.php';
                     ?>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Administrators:</span>
-                            <span class="font-semibold text-gray-900"><?php echo $userStats['admins'] ?? 0; ?></span>
+                            <span class="text-slate-400">Administrators:</span>
+                            <span class="font-semibold text-white"><?php echo $userStats['admins'] ?? 0; ?></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">IT Staff:</span>
-                            <span class="font-semibold text-gray-900"><?php echo $userStats['it_staff'] ?? 0; ?></span>
+                            <span class="text-slate-400">IT Staff:</span>
+                            <span class="font-semibold text-white"><?php echo $userStats['it_staff'] ?? 0; ?></span>
                         </div>
-                        <div class="flex justify-between pt-2 border-t border-gray-200">
-                            <span class="text-gray-600">Total Active:</span>
-                            <span class="font-semibold text-gray-900"><?php echo $userStats['active'] ?? 0; ?></span>
+                        <div class="flex justify-between pt-2 border-t border-slate-700/50">
+                            <span class="text-slate-400">Total Active:</span>
+                            <span class="font-semibold text-white"><?php echo $userStats['active'] ?? 0; ?></span>
                         </div>
                     </div>
                 </div>
@@ -427,29 +424,29 @@ function updateRoleDescription() {
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Full System Access</strong>
-                        <p class="text-sm text-gray-600">Manage all settings and configurations</p>
+                        <strong class="text-white">Full System Access</strong>
+                        <p class="text-sm text-slate-400">Manage all settings and configurations</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">User Management</strong>
-                        <p class="text-sm text-gray-600">Add, edit, and remove users</p>
+                        <strong class="text-white">User Management</strong>
+                        <p class="text-sm text-slate-400">Add, edit, and remove users</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Ticket Management</strong>
-                        <p class="text-sm text-gray-600">Full access to all tickets</p>
+                        <strong class="text-white">Ticket Management</strong>
+                        <p class="text-sm text-slate-400">Full access to all tickets</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Reports & Analytics</strong>
-                        <p class="text-sm text-gray-600">View all system reports</p>
+                        <strong class="text-white">Reports & Analytics</strong>
+                        <p class="text-sm text-slate-400">View all system reports</p>
                     </div>
                 </div>
             </div>
@@ -460,29 +457,29 @@ function updateRoleDescription() {
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Ticket Management</strong>
-                        <p class="text-sm text-gray-600">View, assign, and resolve tickets</p>
+                        <strong class="text-white">Ticket Management</strong>
+                        <p class="text-sm text-slate-400">View, assign, and resolve tickets</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Employee Support</strong>
-                        <p class="text-sm text-gray-600">Assist employees with issues</p>
+                        <strong class="text-white">Employee Support</strong>
+                        <p class="text-sm text-slate-400">Assist employees with issues</p>
                     </div>
                 </div>
                 <div class="flex items-start">
                     <i class="fas fa-check-circle text-blue-600 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-900">Basic Reports</strong>
-                        <p class="text-sm text-gray-600">View ticket statistics</p>
+                        <strong class="text-white">Basic Reports</strong>
+                        <p class="text-sm text-slate-400">View ticket statistics</p>
                     </div>
                 </div>
                 <div class="flex items-start">
-                    <i class="fas fa-times-circle text-gray-400 mr-2 mt-1"></i>
+                    <i class="fas fa-times-circle text-slate-400 mr-2 mt-1"></i>
                     <div>
-                        <strong class="text-gray-500">No Admin Access</strong>
-                        <p class="text-sm text-gray-500">Cannot modify system settings</p>
+                        <strong class="text-slate-400">No Admin Access</strong>
+                        <p class="text-sm text-slate-400">Cannot modify system settings</p>
                     </div>
                 </div>
             </div>
@@ -493,11 +490,11 @@ function updateRoleDescription() {
     document.querySelectorAll('input[name="role"]').forEach(input => {
         const label = input.closest('label');
         if (input.checked) {
-            label.classList.add('border-gray-900', 'bg-gray-50');
-            label.classList.remove('border-gray-300');
+            label.classList.add('border-gray-900', 'bg-slate-900/50');
+            label.classList.remove('border-slate-600');
         } else {
-            label.classList.remove('border-gray-900', 'bg-gray-50');
-            label.classList.add('border-gray-300');
+            label.classList.remove('border-gray-900', 'bg-slate-900/50');
+            label.classList.add('border-slate-600');
         }
     });
 }
@@ -542,3 +539,4 @@ document.getElementById('addUserForm').addEventListener('submit', function(e) {
 // Include layout footer
 include __DIR__ . '/../layouts/footer.php'; 
 ?>
+

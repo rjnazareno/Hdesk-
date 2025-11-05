@@ -22,7 +22,7 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/customer/') !== false ? '' : 'custome
         <!-- Logo/Header -->
         <div class="flex items-center justify-between h-16 bg-blue-600 text-white px-6">
             <div class="flex items-center">
-                <i class="fas fa-layer-group text-xl mr-2"></i>
+                <img src="<?= strpos($_SERVER['PHP_SELF'], '/customer/') !== false ? '../' : '' ?>img/ResolveIT Logo Only without Background.png" alt="ResolveIT" class="h-8 w-auto mr-2 filter brightness-0 invert">
                 <span class="text-xl font-bold">ResolveIT</span>
             </div>
             <!-- Close button for mobile -->

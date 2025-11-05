@@ -9,6 +9,20 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Load environment variables from .env file
+$env_file = __DIR__ . '/../.env';
+if (file_exists($env_file)) {
+    $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        list($key, $value) = explode('=', $line, 2);
+        putenv(trim($key) . '=' . trim($value));
+    }
+}
+
+// Environment Configuration
+define('ENVIRONMENT', getenv('APP_ENV') ?? 'development');
+
 // Base URL Configuration
 define('BASE_URL', 'http://localhost/IThelp/');
 define('ASSETS_URL', BASE_URL . 'assets/');
@@ -144,3 +158,28 @@ function getPriorityColor($priority) {
 function generateTicketNumber() {
     return TICKET_PREFIX . '-' . date('Y') . '-' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
 }
+
+/**
+ * Helper function to load Tailwind CSS appropriately
+ * Development: Uses CDN (faster iteration)
+ * Production: Uses local compiled CSS with glass morphism support
+ * 
+ * @return string HTML string with Tailwind CSS
+ */
+function getTailwindCSS() {
+    if (ENVIRONMENT === 'production') {
+        // Production: Use local compiled CSS (includes glass morphism)
+        $css_file = __DIR__ . '/../assets/css/tailwind.min.css';
+        if (file_exists($css_file)) {
+            return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/tailwind.min.css">';
+        } else {
+            // Fallback if CSS not found
+            error_log('WARNING: tailwind.min.css not found. Falling back to CDN.');
+            return '<script src="https://cdn.tailwindcss.com"></script>';
+        }
+    } else {
+        // Development: Use CDN for faster iteration
+        return '<script src="https://cdn.tailwindcss.com"></script>';
+    }
+}
+

@@ -7,21 +7,21 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gray-50">
+<div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Top Bar -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md">
         <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
                 <div class="hidden lg:block">
-                    <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-semibold">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-semibold">
                         <?php echo strtoupper(substr($currentUser['full_name'], 0, 1)); ?>
                     </div>
                 </div>
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">
+                    <h1 class="text-xl lg:text-2xl font-semibold text-white">
                         <span id="greetingText">Good Morning</span>, <?php echo htmlspecialchars(explode(' ', $currentUser['full_name'])[0]); ?>
                     </h1>
-                    <div class="flex items-center space-x-3 text-sm text-gray-500 mt-0.5">
+                    <div class="flex items-center space-x-3 text-sm text-slate-400 mt-0.5">
                         <span class="flex items-center">
                             <span id="lastLoginDisplay">Last login: Loading...</span>
                         </span>
@@ -40,25 +40,22 @@ include __DIR__ . '/../layouts/header.php';
                         id="dashboardSearch"
                         type="text" 
                         placeholder="Search tickets..." 
-                        class="pl-8 pr-3 py-1.5 text-sm border border-gray-300 focus:outline-none focus:border-gray-400"
+                        class="pl-8 pr-3 py-1.5 text-sm border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition"
                         onkeyup="searchDashboard(this.value)"
                     >
-                    <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                    <i class="fas fa-search absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
                 </div>
-                <button id="darkModeToggle" class="p-2 text-gray-500 hover:text-gray-900 transition" title="Toggle dark mode">
-                    <i id="dark-mode-icon" class="fas fa-moon text-sm"></i>
-                </button>
-                <button class="p-2 text-gray-500 hover:text-gray-900 transition" title="Filters">
+                <button class="p-2 text-slate-400 hover:text-cyan-400 transition" title="Filters">
                     <i class="fas fa-sliders text-sm"></i>
                 </button>
-                <button class="p-2 text-gray-500 hover:text-gray-900 relative transition" title="Notifications">
+                <button class="p-2 text-slate-400 hover:text-cyan-400 relative transition" title="Notifications">
                     <i class="far fa-bell text-sm"></i>
                     <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
                 </button>
                 <div class="flex items-center space-x-2">
-                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
+                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=0f172a&color=06b6d4" 
                          alt="User" 
-                         class="w-8 h-8 rounded-full"
+                         class="w-8 h-8 rounded-full border border-cyan-500/30"
                          title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
                 </div>
             </div>
@@ -71,7 +68,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <span class="inline-flex items-center text-sm font-medium text-gray-600">
+                    <span class="inline-flex items-center text-sm font-medium text-cyan-400">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -82,73 +79,73 @@ include __DIR__ . '/../layouts/header.php';
         </nav>
         
         <!-- Analytics Overview -->
-        <div class="bg-white border border-gray-200 p-6 mb-6">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 p-6 mb-6 rounded-xl backdrop-blur">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900">Ticket Analytics</h2>
-                    <p class="text-sm text-gray-500 mt-0.5">Real-time overview of your helpdesk performance</p>
+                    <h2 class="text-lg font-semibold text-white">Ticket Analytics</h2>
+                    <p class="text-sm text-slate-400 mt-0.5">Real-time overview of your helpdesk performance</p>
                 </div>
             </div>
             
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <!-- Total Tickets -->
-                <div class="border border-gray-200 p-4 hover:border-gray-300 transition-colors cursor-pointer"
+                <div class="bg-gradient-to-br from-slate-700/50 to-slate-700/20 border border-slate-600/50 p-4 hover:border-cyan-500/50 transition-colors cursor-pointer rounded-lg"
                      data-stat-filter="all" 
                      onclick="filterByStatus('all')"
                      title="Click to show all tickets">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total</span>
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Total</span>
                     </div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo $stats['total'] ?? 0; ?></div>
-                    <div class="text-xs text-gray-500 mt-1">All tickets</div>
+                    <div class="text-2xl font-semibold text-white"><?php echo $stats['total'] ?? 0; ?></div>
+                    <div class="text-xs text-slate-400 mt-1">All tickets</div>
                 </div>
                 
                 <!-- Pending -->
-                <div class="border border-yellow-200 bg-yellow-50 p-4 hover:border-yellow-300 transition-colors cursor-pointer"
+                <div class="border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 p-4 hover:border-yellow-500/50 transition-colors cursor-pointer rounded-lg"
                      data-stat-filter="pending" 
                      onclick="filterByStatus('pending')"
                      title="Click to filter Pending tickets">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-yellow-700 uppercase tracking-wide">Pending</span>
+                        <span class="text-xs font-medium text-yellow-400 uppercase tracking-wide">Pending</span>
                     </div>
-                    <div class="text-2xl font-semibold text-yellow-900"><?php echo $stats['pending'] ?? 0; ?></div>
-                    <div class="text-xs text-yellow-600 mt-1">Awaiting</div>
+                    <div class="text-2xl font-semibold text-white"><?php echo $stats['pending'] ?? 0; ?></div>
+                    <div class="text-xs text-yellow-400 mt-1">Awaiting</div>
                 </div>
                 
                 <!-- Open -->
-                <div class="border border-blue-200 bg-blue-50 p-4 hover:border-blue-300 transition-colors cursor-pointer"
+                <div class="border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 hover:border-blue-500/50 transition-colors cursor-pointer rounded-lg"
                      data-stat-filter="open" 
                      onclick="filterByStatus('open')"
                      title="Click to filter Open tickets">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-blue-700 uppercase tracking-wide">Open</span>
+                        <span class="text-xs font-medium text-blue-400 uppercase tracking-wide">Open</span>
                     </div>
-                    <div class="text-2xl font-semibold text-blue-900"><?php echo $stats['open'] ?? 0; ?></div>
-                    <div class="text-xs text-blue-600 mt-1">Active</div>
+                    <div class="text-2xl font-semibold text-white"><?php echo $stats['open'] ?? 0; ?></div>
+                    <div class="text-xs text-blue-400 mt-1">Active</div>
                 </div>
                 
                 <!-- In Progress -->
-                <div class="border border-purple-200 bg-purple-50 p-4 hover:border-purple-300 transition-colors cursor-pointer"
+                <div class="border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-4 hover:border-purple-500/50 transition-colors cursor-pointer rounded-lg"
                      data-stat-filter="in_progress" 
                      onclick="filterByStatus('in_progress')"
                      title="Click to filter In Progress tickets">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-purple-700 uppercase tracking-wide">In Progress</span>
+                        <span class="text-xs font-medium text-purple-400 uppercase tracking-wide">In Progress</span>
                     </div>
-                    <div class="text-2xl font-semibold text-purple-900"><?php echo $stats['in_progress'] ?? 0; ?></div>
-                    <div class="text-xs text-purple-600 mt-1">Working</div>
+                    <div class="text-2xl font-semibold text-white"><?php echo $stats['in_progress'] ?? 0; ?></div>
+                    <div class="text-xs text-purple-400 mt-1">Working</div>
                 </div>
                 
                 <!-- Resolved/Closed -->
-                <div class="border border-green-200 bg-green-50 p-4 hover:border-green-300 transition-colors cursor-pointer"
+                <div class="border border-green-500/30 bg-gradient-to-br from-green-500/10 to-green-500/5 p-4 hover:border-green-500/50 transition-colors cursor-pointer rounded-lg"
                      data-stat-filter="closed" 
                      onclick="filterByStatus('closed')"
                      title="Click to filter Closed tickets">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-green-700 uppercase tracking-wide">Resolved</span>
+                        <span class="text-xs font-medium text-green-400 uppercase tracking-wide">Resolved</span>
                     </div>
-                    <div class="text-2xl font-semibold text-green-900"><?php echo $stats['closed'] ?? 0; ?></div>
-                    <div class="text-xs text-green-600 mt-1">
+                    <div class="text-2xl font-semibold text-white"><?php echo $stats['closed'] ?? 0; ?></div>
+                    <div class="text-xs text-green-400 mt-1">
                         <?php 
                         $resolveRate = $stats['total'] > 0 ? round(($stats['closed'] / $stats['total']) * 100) : 0;
                         echo $resolveRate . '%';
@@ -158,16 +155,16 @@ include __DIR__ . '/../layouts/header.php';
             </div>
         </div>
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
             <!-- Recent Activity Timeline -->
-            <div class="lg:col-span-1 bg-white border border-gray-200 p-6">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 p-6 rounded-lg">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                        <p class="text-sm text-gray-500 mt-0.5">Ticket trends overview</p>
+                        <h3 class="text-lg font-semibold text-white">Recent Activity</h3>
+                        <p class="text-sm text-slate-400 mt-0.5">Ticket trends overview</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <select id="activityPeriod" class="text-sm border border-gray-300 px-3 py-1.5 focus:outline-none focus:border-gray-400">
+                        <select id="activityPeriod" class="text-sm border border-slate-600 bg-slate-700/50 text-white px-3 py-1.5 focus:outline-none focus:border-cyan-500 rounded">
                             <option value="daily">Daily</option>
                             <option value="weekly" selected>Weekly</option>
                             <option value="monthly">Monthly</option>
@@ -186,18 +183,18 @@ include __DIR__ . '/../layouts/header.php';
                 ?>
                 
                 <!-- Today's Stats -->
-                <div class="border border-gray-200 p-5 mb-4">
+                <div class="border border-slate-600/50 bg-slate-700/30 p-5 mb-4 rounded-lg">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <div class="text-sm text-gray-500 mb-2">Today's Tickets</div>
-                            <div class="text-4xl font-semibold text-gray-900 mb-3"><?php echo $todayCount; ?></div>
+                            <div class="text-sm text-slate-400 mb-2">Today's Tickets</div>
+                            <div class="text-4xl font-semibold text-white mb-3"><?php echo $todayCount; ?></div>
                             <div class="flex items-center text-sm">
                                 <?php if ($changePercent >= 0): ?>
-                                    <i class="fas fa-arrow-up text-green-600 mr-1.5 text-xs"></i>
-                                    <span class="text-green-600 font-medium"><?php echo abs($changePercent); ?>% from yesterday</span>
+                                    <i class="fas fa-arrow-up text-green-400 mr-1.5 text-xs"></i>
+                                    <span class="text-green-400 font-medium"><?php echo abs($changePercent); ?>% from yesterday</span>
                                 <?php else: ?>
-                                    <i class="fas fa-arrow-down text-red-600 mr-1.5 text-xs"></i>
-                                    <span class="text-red-600 font-medium"><?php echo abs($changePercent); ?>% from yesterday</span>
+                                    <i class="fas fa-arrow-down text-red-400 mr-1.5 text-xs"></i>
+                                    <span class="text-red-400 font-medium"><?php echo abs($changePercent); ?>% from yesterday</span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -205,15 +202,15 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 
                 <!-- Yesterday's Comparison -->
-                <div class="border border-gray-200 p-4 mb-6">
+                <div class="border border-slate-600/50 bg-slate-700/30 p-4 mb-6 rounded-lg">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="text-xs text-gray-500 mb-1">Yesterday</div>
-                            <div class="text-xl font-semibold text-gray-900"><?php echo $yesterdayCount; ?></div>
+                            <div class="text-xs text-slate-400 mb-1">Yesterday</div>
+                            <div class="text-xl font-semibold text-white"><?php echo $yesterdayCount; ?></div>
                         </div>
                         <div class="text-right">
-                            <div class="text-xs text-gray-500 mb-1">This Week Total</div>
-                            <div class="text-xl font-semibold text-gray-900"><?php echo array_sum(array_column($last7Days, 'count')); ?></div>
+                            <div class="text-xs text-slate-400 mb-1">This Week Total</div>
+                            <div class="text-xl font-semibold text-white"><?php echo array_sum(array_column($last7Days, 'count')); ?></div>
                         </div>
                     </div>
                 </div>
@@ -225,31 +222,31 @@ include __DIR__ . '/../layouts/header.php';
                         $percentage = $maxCount > 0 ? ($day['count'] / $maxCount) * 100 : 0;
                     ?>
                     <div>
-                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
                             <span><?php echo date('D', strtotime($day['date'])); ?></span>
                             <span class="font-medium"><?php echo $day['count']; ?></span>
                         </div>
-                        <div class="w-full bg-gray-200 h-1.5">
-                            <div class="bg-gray-900 h-1.5 transition-all" style="width: <?php echo $percentage; ?>%;"></div>
+                        <div class="w-full bg-slate-700 h-1.5 rounded-full">
+                            <div class="bg-cyan-500 h-1.5 transition-all rounded-full" style="width: <?php echo $percentage; ?>%;"></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
                 
                 <!-- Weekly Summary -->
-                <div class="border border-gray-200 p-4">
+                <div class="border border-slate-600/50 bg-slate-700/30 p-4 rounded-lg">
                     <div class="flex justify-between items-center mb-3">
-                        <div class="text-sm font-medium text-gray-900">Average Daily Tickets</div>
-                        <div class="text-xl font-semibold text-gray-900"><?php echo round(array_sum(array_column($last7Days, 'count')) / count($last7Days), 1); ?></div>
+                        <div class="text-sm font-medium text-white">Average Daily Tickets</div>
+                        <div class="text-xl font-semibold text-white"><?php echo round(array_sum(array_column($last7Days, 'count')) / count($last7Days), 1); ?></div>
                     </div>
                     <div class="flex items-center justify-between text-xs">
-                        <div class="flex items-center text-gray-500">
+                        <div class="flex items-center text-slate-400">
                             <span>Last 7 days trend</span>
                         </div>
                         <div class="flex items-center">
                             <?php 
                             $weekTrend = $changePercent >= 0 ? 'up' : 'down';
-                            $trendColor = $changePercent >= 0 ? 'text-green-600' : 'text-red-600';
+                            $trendColor = $changePercent >= 0 ? 'text-green-400' : 'text-red-400';
                             ?>
                             <i class="fas fa-arrow-<?php echo $weekTrend; ?> mr-1 text-xs <?php echo $trendColor; ?>"></i>
                             <span class="<?php echo $trendColor; ?> font-semibold"><?php echo abs($changePercent); ?>%</span>
@@ -258,12 +255,21 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
             </div>
 
-            <!-- Daily Chart -->
-            <div class="lg:col-span-1 bg-white border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-1">Daily Ticket Volume</h3>
-                <p class="text-sm text-gray-500 mb-6">Last 10 days ticket trends</p>
-                <div class="h-64 mb-6">
-                    <canvas id="dailyChart"></canvas>
+            <!-- Daily Chart - Line Chart -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-white mb-1">Ticket Trends (Line)</h3>
+                <p class="text-sm text-slate-400 mb-3">Last 10 days ticket trends</p>
+                <div class="h-96 mb-2">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Daily Chart - Bar Chart -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-white mb-1">Daily Ticket Volume</h3>
+                <p class="text-sm text-slate-400 mb-3">Last 10 days ticket trends</p>
+                <div class="h-96 mb-2">
+                    <canvas id="barChart"></canvas>
                 </div>
                 
                 <!-- Category Trends -->
@@ -283,41 +289,41 @@ include __DIR__ . '/../layouts/header.php';
                         $percentage = $maxCategoryCount > 0 ? ($category['ticket_count'] / $maxCategoryCount) * 100 : 0;
                     ?>
                     <div>
-                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
                             <span class="truncate max-w-[150px]"><?php echo htmlspecialchars($category['name']); ?></span>
                             <span class="ml-2 font-medium"><?php echo $category['ticket_count']; ?></span>
                         </div>
-                        <div class="w-full bg-gray-200 h-1.5">
-                            <div class="bg-gray-900 h-1.5 transition-all" style="width: <?php echo $percentage; ?>%;"></div>
+                        <div class="w-full bg-slate-700 h-1.5 rounded-full">
+                            <div class="bg-cyan-500 h-1.5 transition-all rounded-full" style="width: <?php echo $percentage; ?>%;"></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
                 
                 <!-- Volume Summary -->
-                <div class="border border-gray-200 p-4">
+                <div class="border border-slate-600/50 bg-slate-700/30 p-4 rounded-lg">
                     <div class="grid grid-cols-3 gap-4">
                         <div class="text-center">
-                            <div class="text-gray-500 text-xs mb-1">Peak Day</div>
-                            <div class="text-lg font-semibold text-gray-900"><?php echo !empty($dailyStats) ? max(array_column($dailyStats, 'count')) : 0; ?></div>
+                            <div class="text-slate-400 text-xs mb-1">Peak Day</div>
+                            <div class="text-lg font-semibold text-white"><?php echo !empty($dailyStats) ? max(array_column($dailyStats, 'count')) : 0; ?></div>
                         </div>
-                        <div class="text-center border-l border-r border-gray-200">
-                            <div class="text-gray-500 text-xs mb-1">Average</div>
-                            <div class="text-lg font-semibold text-gray-900"><?php echo !empty($dailyStats) ? round(array_sum(array_column($dailyStats, 'count')) / count($dailyStats), 1) : 0; ?></div>
+                        <div class="text-center border-l border-r border-slate-600/50">
+                            <div class="text-slate-400 text-xs mb-1">Average</div>
+                            <div class="text-lg font-semibold text-white"><?php echo !empty($dailyStats) ? round(array_sum(array_column($dailyStats, 'count')) / count($dailyStats), 1) : 0; ?></div>
                         </div>
                         <div class="text-center">
-                            <div class="text-gray-500 text-xs mb-1">Total (10d)</div>
-                            <div class="text-lg font-semibold text-gray-900"><?php echo !empty($dailyStats) ? array_sum(array_column($dailyStats, 'count')) : 0; ?></div>
+                            <div class="text-slate-400 text-xs mb-1">Total (10d)</div>
+                            <div class="text-lg font-semibold text-white"><?php echo !empty($dailyStats) ? array_sum(array_column($dailyStats, 'count')) : 0; ?></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Status Distribution -->
-            <div class="lg:col-span-1 bg-white border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-1">Status Distribution</h3>
-                <p class="text-sm text-gray-500 mb-6">Tickets breakdown by status</p>
-                <div class="space-y-3">
+            <div class="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-white mb-1">Status Distribution</h3>
+                <p class="text-sm text-slate-400 mb-8">Tickets breakdown by status</p>
+                <div class="space-y-4">
                     <?php
                     $statusData = [
                         ['label' => 'Pending', 'count' => $stats['pending']],
@@ -329,28 +335,28 @@ include __DIR__ . '/../layouts/header.php';
                     foreach ($statusData as $data):
                         $percentage = $stats['total'] > 0 ? round(($data['count'] / $stats['total']) * 100) : 0;
                     ?>
-                    <div class="border border-gray-200 p-3 hover:border-gray-300 transition-colors">
-                        <div class="flex justify-between items-center mb-2">
+                    <div class="border border-slate-600/50 bg-slate-700/30 p-4 hover:border-cyan-500/50 transition-colors rounded-lg">
+                        <div class="flex justify-between items-center mb-3">
                             <span class="flex items-center">
                                 <div>
-                                    <span class="text-sm font-medium text-gray-900"><?php echo $data['label']; ?></span>
-                                    <span class="ml-2 text-white/60 text-xs">(<?php echo $data['count']; ?>)</span>
+                                    <span class="text-sm font-medium text-white"><?php echo $data['label']; ?></span>
+                                    <span class="ml-2 text-slate-400 text-xs">(<?php echo $data['count']; ?>)</span>
                                 </div>
                             </span>
-                            <span class="font-semibold text-sm text-gray-900"><?php echo $percentage; ?>%</span>
+                            <span class="font-semibold text-sm text-white"><?php echo $percentage; ?>%</span>
                         </div>
-                        <div class="w-full bg-gray-200 h-2">
-                            <div class="bg-gray-900 h-2 transition-all" style="width: <?php echo $percentage; ?>%"></div>
+                        <div class="w-full bg-slate-700 h-3 rounded-full">
+                            <div class="bg-cyan-500 h-3 transition-all rounded-full" style="width: <?php echo $percentage; ?>%"></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div class="mt-6 border border-gray-200 p-4">
+                <div class="mt-8 border border-slate-600/50 bg-slate-700/30 p-4 rounded-lg">
                     <div class="flex justify-between items-center mb-3">
-                        <div class="text-sm font-medium text-gray-900">Total Active Tickets</div>
-                        <div class="text-xl font-semibold text-gray-900"><?php echo $stats['open'] + $stats['in_progress']; ?></div>
+                        <div class="text-sm font-medium text-white">Total Active Tickets</div>
+                        <div class="text-2xl font-semibold text-white"><?php echo $stats['open'] + $stats['in_progress']; ?></div>
                     </div>
-                    <div class="flex items-center text-xs text-gray-600 bg-gray-50 px-3 py-2">
+                    <div class="flex items-center text-xs text-slate-400 bg-slate-700/50 px-3 py-2 rounded">
                         <span>
                         <?php 
                         $urgentCount = 2; // This should come from database
@@ -365,15 +371,15 @@ include __DIR__ . '/../layouts/header.php';
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Recent Tickets -->
-            <div class="lg:col-span-2 bg-white border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 rounded-lg">
+                <div class="px-6 py-4 border-b border-slate-700/50">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Recent Tickets</h3>
-                            <p class="text-sm text-gray-500 mt-0.5">Latest ticket submissions</p>
+                            <h3 class="text-lg font-semibold text-white">Recent Tickets</h3>
+                            <p class="text-sm text-slate-400 mt-0.5">Latest ticket submissions</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs text-gray-600 px-2 py-1 border border-gray-300">
+                            <span class="text-xs text-slate-400 px-2 py-1 border border-slate-600/50 rounded bg-slate-700/30">
                                 <?php echo count($recentTickets); ?> tickets
                             </span>
                         </div>
@@ -383,29 +389,29 @@ include __DIR__ . '/../layouts/header.php';
                     <div class="overflow-x-auto">
                         <table id="dashboardTable" class="w-full">
                             <thead>
-                                <tr class="text-left text-gray-500 text-xs uppercase tracking-wide border-b border-gray-200">
-                                    <th class="pb-3 cursor-pointer hover:text-gray-900 select-none transition-colors" onclick="sortTable(0)">
+                                <tr class="text-left text-slate-400 text-xs uppercase tracking-wide border-b border-slate-700/50">
+                                    <th class="pb-3 cursor-pointer hover:text-cyan-400 select-none transition-colors" onclick="sortTable(0)">
                                         <div class="flex items-center">
                                             <span>Title</span>
                                             <i class="fas fa-sort text-xs ml-1.5 opacity-50"></i>
                                         </div>
                                     </th>
-                                    <th class="pb-3 cursor-pointer hover:text-gray-900 select-none transition-colors" onclick="sortTable(1)">
+                                    <th class="pb-3 cursor-pointer hover:text-cyan-400 select-none transition-colors" onclick="sortTable(1)">
                                         <div class="flex items-center">
                                             <span>Status</span>
                                             <i class="fas fa-sort text-xs ml-2 opacity-50 group-hover:opacity-100"></i>
                                         </div>
                                     </th>
-                                    <th class="pb-4 cursor-pointer hover:text-blue-600 select-none transition-colors group" onclick="sortTable(2)">
+                                    <th class="pb-4 cursor-pointer hover:text-cyan-400 select-none transition-colors group" onclick="sortTable(2)">
                                         <div class="flex items-center">
-                                            <i class="fas fa-flag mr-2 text-blue-500"></i>
+                                            <i class="fas fa-flag mr-2 text-cyan-500"></i>
                                             <span>Priority</span>
                                             <i class="fas fa-sort text-xs ml-2 opacity-50 group-hover:opacity-100"></i>
                                         </div>
                                     </th>
-                                    <th class="pb-4 cursor-pointer hover:text-blue-600 select-none transition-colors group" onclick="sortTable(3)">
+                                    <th class="pb-4 cursor-pointer hover:text-cyan-400 select-none transition-colors group" onclick="sortTable(3)">
                                         <div class="flex items-center">
-                                            <i class="fas fa-calendar mr-2 text-blue-500"></i>
+                                            <i class="fas fa-calendar mr-2 text-cyan-500"></i>
                                             <span>Date</span>
                                             <i class="fas fa-sort text-xs ml-2 opacity-50 group-hover:opacity-100"></i>
                                         </div>
@@ -415,10 +421,10 @@ include __DIR__ . '/../layouts/header.php';
                             <tbody class="text-sm" id="dashboardTableBody">
                                 <?php foreach ($recentTickets as $ticket): 
                                     $statusColors = [
-                                        'pending' => 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300',
-                                        'open' => 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300',
-                                        'in_progress' => 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 border-purple-300',
-                                        'closed' => 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border-green-300'
+                                        'pending' => 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                                        'open' => 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                                        'in_progress' => 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                                        'closed' => 'bg-green-500/20 text-green-400 border-green-500/30'
                                     ];
                                     $statusIcons = [
                                         'pending' => 'fa-clock',
@@ -427,10 +433,10 @@ include __DIR__ . '/../layouts/header.php';
                                         'closed' => 'fa-check-circle'
                                     ];
                                     $priorityColors = [
-                                        'urgent' => 'text-red-600 bg-red-50 px-2 py-1 rounded-lg font-bold',
-                                        'high' => 'text-orange-600 bg-orange-50 px-2 py-1 rounded-lg font-bold',
-                                        'medium' => 'text-cyan-600 bg-cyan-50 px-2 py-1 rounded-lg font-semibold',
-                                        'low' => 'text-green-600 bg-green-50 px-2 py-1 rounded-lg font-medium'
+                                        'urgent' => 'text-red-400 bg-red-500/20 px-2 py-1 rounded-lg font-bold',
+                                        'high' => 'text-orange-400 bg-orange-500/20 px-2 py-1 rounded-lg font-bold',
+                                        'medium' => 'text-cyan-400 bg-cyan-500/20 px-2 py-1 rounded-lg font-semibold',
+                                        'low' => 'text-green-400 bg-green-500/20 px-2 py-1 rounded-lg font-medium'
                                     ];
                                     $priorityIcons = [
                                         'urgent' => 'fa-exclamation-triangle',
@@ -439,7 +445,7 @@ include __DIR__ . '/../layouts/header.php';
                                         'low' => 'fa-arrow-down'
                                     ];
                                 ?>
-                                <tr class="border-b border-blue-50 hover:bg-blue-50/50 transition-all duration-200 cursor-pointer group searchable-row" 
+                                <tr class="border-b border-slate-700/30 hover:bg-slate-700/30 transition-all duration-200 cursor-pointer group searchable-row" 
                                     data-ticket-row 
                                     data-ticket-id="<?php echo $ticket['id']; ?>"
                                     data-ticket-title="<?php echo htmlspecialchars($ticket['title']); ?>"
@@ -450,38 +456,38 @@ include __DIR__ . '/../layouts/header.php';
                                     title="Click to view ticket details">
                                     <td class="py-4 pr-4">
                                         <div class="flex items-start">
-                                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm mr-3 group-hover:scale-110 transition-transform">
+                                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm mr-3 group-hover:scale-110 transition-transform">
                                                 #<?php echo $ticket['id']; ?>
                                             </div>
                                             <div class="flex-1 min-w-0">
-                                                <div class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                                                <div class="font-semibold text-white group-hover:text-cyan-400 transition-colors truncate">
                                                     <?php echo htmlspecialchars($ticket['title']); ?>
                                                 </div>
-                                                <div class="flex items-center text-gray-500 text-xs mt-1">
-                                                    <i class="fas fa-folder text-blue-400 mr-1"></i>
+                                                <div class="flex items-center text-slate-400 text-xs mt-1">
+                                                    <i class="fas fa-folder text-cyan-400 mr-1"></i>
                                                     <?php echo htmlspecialchars($ticket['category_name']); ?>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="py-4 pr-4">
-                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border <?php echo $statusColors[$ticket['status']] ?? 'bg-gray-100 text-gray-800 border-gray-300'; ?> shadow-sm">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border <?php echo $statusColors[$ticket['status']] ?? 'bg-slate-700/50 text-slate-300 border-slate-600/50'; ?>">
                                             <i class="fas <?php echo $statusIcons[$ticket['status']] ?? 'fa-circle'; ?> mr-1.5"></i>
                                             <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
                                         </span>
                                     </td>
                                     <td class="py-4 pr-4">
-                                        <span class="inline-flex items-center <?php echo $priorityColors[$ticket['priority']] ?? 'text-gray-600 bg-gray-50 px-2 py-1 rounded-lg'; ?>">
+                                        <span class="inline-flex items-center <?php echo $priorityColors[$ticket['priority']] ?? 'text-slate-400 bg-slate-700/30 px-2 py-1 rounded-lg'; ?>">
                                             <i class="fas <?php echo $priorityIcons[$ticket['priority']] ?? 'fa-circle'; ?> mr-1.5 text-xs"></i>
                                             <?php echo ucfirst($ticket['priority']); ?>
                                         </span>
                                     </td>
-                                    <td class="py-4 text-gray-600">
+                                    <td class="py-4 text-slate-400">
                                         <div class="flex items-center">
-                                            <i class="far fa-calendar-alt mr-2 text-blue-400"></i>
+                                            <i class="far fa-calendar-alt mr-2 text-cyan-400"></i>
                                             <span class="font-medium"><?php echo date('M d, Y', strtotime($ticket['created_at'])); ?></span>
                                         </div>
-                                        <div class="text-xs text-gray-400 mt-1">
+                                        <div class="text-xs text-slate-500 mt-1">
                                             <?php echo date('h:i A', strtotime($ticket['created_at'])); ?>
                                         </div>
                                     </td>
@@ -492,8 +498,8 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
                     
                     <!-- View All Button -->
-                    <div class="mt-6 pt-4 border-t border-blue-100 text-center">
-                        <a href="tickets.php" class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                    <div class="mt-6 pt-4 border-t border-slate-700/50 text-center">
+                        <a href="tickets.php" class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
                             <i class="fas fa-list mr-2"></i>
                             View All Tickets
                             <i class="fas fa-arrow-right ml-2"></i>
@@ -503,14 +509,14 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Last Updates -->
-            <div class="lg:col-span-1 bg-white border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 rounded-lg">
+                <div class="px-6 py-4 border-b border-slate-700/50">
                     <div class="flex justify-between items-center">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Activity Feed</h3>
-                            <p class="text-sm text-gray-500 mt-0.5">Latest system updates</p>
+                            <h3 class="text-lg font-semibold text-white">Activity Feed</h3>
+                            <p class="text-sm text-slate-400 mt-0.5">Latest system updates</p>
                         </div>
-                        <select class="text-xs border border-gray-300 px-3 py-1.5 focus:outline-none focus:border-gray-400">
+                        <select class="text-xs border border-slate-600 bg-slate-700/50 text-white px-3 py-1.5 focus:outline-none focus:border-cyan-500 rounded">
                             <option value="today">Today</option>
                             <option value="week">This Week</option>
                             <option value="month">This Month</option>
@@ -520,99 +526,99 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="p-6">
                     <div class="space-y-2">
                         <!-- New Employee -->
-                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
+                        <div class="p-3 hover:bg-slate-700/30 transition-colors border border-slate-600/50 cursor-pointer rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-user-plus text-gray-700 text-sm"></i>
+                                    <div class="w-8 h-8 bg-slate-700/50 flex items-center justify-center rounded">
+                                        <i class="fas fa-user-plus text-cyan-400 text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="font-medium text-sm text-gray-900">New Employees</div>
-                                        <div class="text-xs text-gray-500">Total registered</div>
+                                        <div class="font-medium text-sm text-white">New Employees</div>
+                                        <div class="text-xs text-slate-400">Total registered</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="text-xl font-semibold text-gray-900"><?php echo $employeeStats['total']; ?></span>
+                                    <span class="text-xl font-semibold text-white"><?php echo $employeeStats['total']; ?></span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- New Messages -->
-                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
+                        <div class="p-3 hover:bg-slate-700/30 transition-colors border border-slate-600/50 cursor-pointer rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-envelope text-gray-700 text-sm"></i>
+                                    <div class="w-8 h-8 bg-slate-700/50 flex items-center justify-center rounded">
+                                        <i class="fas fa-envelope text-cyan-400 text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="font-medium text-sm text-gray-900">New Messages</div>
-                                        <div class="text-xs text-gray-500">Recent activities</div>
+                                        <div class="font-medium text-sm text-white">New Messages</div>
+                                        <div class="text-xs text-slate-400">Recent activities</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="text-xl font-semibold text-gray-900"><?php echo count($recentActivity); ?></span>
+                                    <span class="text-xl font-semibold text-white"><?php echo count($recentActivity); ?></span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Resources -->
-                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
+                        <div class="p-3 hover:bg-slate-700/30 transition-colors border border-slate-600/50 cursor-pointer rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-database text-gray-700 text-sm"></i>
+                                    <div class="w-8 h-8 bg-slate-700/50 flex items-center justify-center rounded">
+                                        <i class="fas fa-database text-cyan-400 text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="font-medium text-sm text-gray-900">Categories</div>
-                                        <div class="text-xs text-gray-500">Available resources</div>
+                                        <div class="font-medium text-sm text-white">Categories</div>
+                                        <div class="text-xs text-slate-400">Available resources</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="text-xl font-semibold text-gray-900"><?php echo count($categoryStats); ?></span>
+                                    <span class="text-xl font-semibold text-white"><?php echo count($categoryStats); ?></span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Active Tickets -->
-                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
+                        <div class="p-3 hover:bg-slate-700/30 transition-colors border border-slate-600/50 cursor-pointer rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-ticket-alt text-gray-700 text-sm"></i>
+                                    <div class="w-8 h-8 bg-slate-700/50 flex items-center justify-center rounded">
+                                        <i class="fas fa-ticket-alt text-cyan-400 text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="font-medium text-sm text-gray-900">Active Tickets</div>
-                                        <div class="text-xs text-gray-500">Pending & Open</div>
+                                        <div class="font-medium text-sm text-white">Active Tickets</div>
+                                        <div class="text-xs text-slate-400">Pending & Open</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="text-xl font-semibold text-gray-900"><?php echo $stats['pending'] + $stats['open']; ?></span>
+                                    <span class="text-xl font-semibold text-white"><?php echo $stats['pending'] + $stats['open']; ?></span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- New Articles -->
-                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
+                        <div class="p-3 hover:bg-slate-700/30 transition-colors border border-slate-600/50 cursor-pointer rounded-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-newspaper text-gray-700 text-sm"></i>
+                                    <div class="w-8 h-8 bg-slate-700/50 flex items-center justify-center rounded">
+                                        <i class="fas fa-newspaper text-cyan-400 text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="font-medium text-sm text-gray-900">Knowledge Base</div>
-                                        <div class="text-xs text-gray-500">New articles</div>
+                                        <div class="font-medium text-sm text-white">Knowledge Base</div>
+                                        <div class="text-xs text-slate-400">New articles</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="text-xl font-semibold text-gray-900">5</span>
+                                    <span class="text-xl font-semibold text-white">5</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quick Actions -->
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <a href="#" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 hover:border-gray-400 transition">
+                    <div class="mt-6 pt-4 border-t border-slate-700/50">
+                        <a href="#" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-slate-300 border border-slate-600/50 hover:border-cyan-500/50 hover:text-cyan-400 transition rounded">
                             View Full Report
                         </a>
                     </div>
@@ -699,155 +705,191 @@ include __DIR__ . '/../layouts/header.php';
         // TODO: Fetch and update data based on period
     }
     
-    // Initialize dashboard
+    // Initialize dashboard charts
     document.addEventListener('DOMContentLoaded', function() {
-        // Daily Chart
-        const dailyCtx = document.getElementById('dailyChart');
-        if (dailyCtx) {
-            const gradient = dailyCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+        const chartLabels = <?php echo json_encode($chartData['labels']); ?>;
+        const chartValues = <?php echo json_encode($chartData['data']); ?>;
+        
+        console.log('Chart Data Available:', chartLabels, chartValues);
+        
+        // LINE CHART
+        initLineChart(chartLabels, chartValues);
+        
+        // BAR CHART
+        initBarChart(chartLabels, chartValues);
+    });
+    
+    // Line Chart Initialization
+    function initLineChart(labels, data) {
+        const lineCtx = document.getElementById('lineChart');
+        if (!lineCtx || typeof Chart === 'undefined') {
+            console.warn('Line chart element or Chart.js not available');
+            return;
+        }
+        
+        try {
+            const ctx = lineCtx.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+            gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.2)');
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0.01)');
             
-            new Chart(dailyCtx, {
-                type: 'bar',
+            new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: <?php echo json_encode($chartData['labels']); ?>,
+                    labels: labels,
                     datasets: [{
                         label: 'Tickets',
-                        data: <?php echo json_encode($chartData['data']); ?>,
-                        backgroundColor: [
-                            '#ef4444', // Red
-                            '#f59e0b', // Orange
-                            '#eab308', // Yellow
-                            '#22c55e', // Green
-                            '#06b6d4', // Cyan
-                            '#60a5fa', // Light Blue
-                            '#8b5cf6', // Purple
-                            '#ec4899', // Pink
-                            '#f97316', // Deep Orange
-                            '#10b981'  // Emerald
-                        ],
-                        borderRadius: 8,
-                        borderSkipped: false,
-                        barThickness: 35,
-                        hoverBackgroundColor: [
-                            '#dc2626', // Darker Red
-                            '#ea580c', // Darker Orange
-                            '#ca8a04', // Darker Yellow
-                            '#16a34a', // Darker Green
-                            '#0891b2', // Darker Cyan
-                            '#3b82f6', // Darker Blue
-                            '#7c3aed', // Darker Purple
-                            '#db2777', // Darker Pink
-                            '#ea580c', // Darker Deep Orange
-                            '#059669'  // Darker Emerald
-                        ]
+                        data: data,
+                        borderColor: '#06b6d4',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#06b6d4',
+                        pointBorderColor: '#0f172a',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: '#0891b2',
+                        pointHoverBorderColor: '#ffffff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: {
-                        duration: 1000,
-                        easing: 'easeInOutQuart',
-                        delay: (context) => {
-                            let delay = 0;
-                            if (context.type === 'data' && context.mode === 'default') {
-                                delay = context.dataIndex * 100;
-                            }
-                            return delay;
-                        }
+                        duration: 800,
+                        easing: 'easeInOutQuart'
                     },
                     interaction: {
                         mode: 'index',
                         intersect: false
                     },
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1f2937',
-                            bodyColor: '#4b5563',
-                            borderColor: 'rgba(59, 130, 246, 0.3)',
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#cbd5e1',
+                            borderColor: 'rgba(6, 182, 212, 0.5)',
                             borderWidth: 1,
                             padding: 12,
-                            displayColors: true,
-                            boxPadding: 6,
-                            usePointStyle: true,
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label;
-                                },
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += context.parsed.y;
-                                    if (context.parsed.y === 1) {
-                                        label += ' ticket';
-                                    } else {
-                                        label += ' tickets';
-                                    }
-                                    return label;
-                                },
-                                afterLabel: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed.y / total) * 100).toFixed(1);
-                                    return percentage + '% of total';
-                                }
-                            }
+                            displayColors: false
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: '#6b7280',
-                                font: {
-                                    size: 12,
-                                    weight: '500'
-                                },
-                                padding: 8,
-                                stepSize: 1
+                                color: '#94a3b8',
+                                font: { size: 12, weight: '500' },
+                                padding: 8
                             },
-                            grid: {
-                                color: '#e5e7eb',
-                                drawBorder: false,
-                                lineWidth: 1
-                            },
-                            border: {
-                                display: false
-                            }
+                            grid: { color: '#334155', drawBorder: false },
+                            border: { display: false }
                         },
                         x: {
                             ticks: {
-                                color: '#6b7280',
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                },
+                                color: '#94a3b8',
+                                font: { size: 11, weight: '500' },
                                 padding: 8
                             },
-                            grid: {
-                                display: false
-                            },
-                            border: {
-                                display: false
-                            }
+                            grid: { display: false },
+                            border: { display: false }
                         }
-                    },
-                    onHover: (event, activeElements) => {
-                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                     }
                 }
             });
+        } catch (error) {
+            console.error('Line chart error:', error);
         }
-    });
+    }
+    
+    // Bar Chart Initialization
+    function initBarChart(labels, data) {
+        const barCtx = document.getElementById('barChart');
+        if (!barCtx || typeof Chart === 'undefined') {
+            console.warn('Bar chart element or Chart.js not available');
+            return;
+        }
+        
+        try {
+            const ctx = barCtx.getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tickets',
+                        data: data,
+                        backgroundColor: 'rgba(226, 232, 240, 0.8)',
+                        borderColor: 'rgba(226, 232, 240, 1)',
+                        borderWidth: 0,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                        barThickness: 'flex',
+                        maxBarThickness: 40,
+                        hoverBackgroundColor: 'rgba(226, 232, 240, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800,
+                        easing: 'easeInOutQuart'
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#cbd5e1',
+                            borderColor: 'rgba(226, 232, 240, 0.3)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 12, weight: '500' },
+                                padding: 8
+                            },
+                            grid: { color: '#334155', drawBorder: false },
+                            border: { display: false }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 11, weight: '500' },
+                                padding: 8
+                            },
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Bar chart error:', error);
+        }
+    }
 </script>
 
 <?php 
 // Include layout footer
 include __DIR__ . '/../layouts/footer.php'; 
 ?>
+

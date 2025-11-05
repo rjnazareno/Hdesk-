@@ -107,12 +107,25 @@ class Ticket {
                     WHEN t.submitter_type = 'employee' THEN CONCAT(e.fname, ' ', e.lname)
                     ELSE u1.full_name
                 END as submitter_name,
-                u2.full_name as assigned_name
+                u2.full_name as assigned_name,
+                st.response_due_at, st.resolution_due_at,
+                st.response_sla_status, st.resolution_sla_status,
+                st.is_paused,
+                CASE 
+                    WHEN st.is_paused = 1 THEN 'paused'
+                    WHEN t.status IN ('resolved', 'closed') THEN 
+                        CASE WHEN st.resolution_sla_status = 'met' THEN 'met' ELSE 'breached' END
+                    WHEN NOW() > st.resolution_due_at THEN 'breached'
+                    WHEN TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= 60 THEN 'at_risk'
+                    ELSE 'safe'
+                END as sla_display_status,
+                TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) as minutes_remaining
                 FROM tickets t
                 LEFT JOIN categories c ON t.category_id = c.id
                 LEFT JOIN employees e ON t.submitter_id = e.id AND t.submitter_type = 'employee'
                 LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'
                 LEFT JOIN users u2 ON t.assigned_to = u2.id
+                LEFT JOIN sla_tracking st ON t.id = st.ticket_id
                 WHERE 1=1";
         
         $params = [];

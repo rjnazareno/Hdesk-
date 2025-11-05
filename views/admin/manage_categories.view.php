@@ -6,26 +6,23 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gray-50">
+<div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Top Bar -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-sm">
         <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-gray-900 flex items-center justify-center text-white">
+                <div class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white">
                     <i class="fas fa-edit text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">Manage Categories</h1>
-                    <p class="text-sm text-gray-500 mt-0.5">Edit or delete existing categories</p>
+                    <h1 class="text-xl lg:text-2xl font-semibold text-white">Manage Categories</h1>
+                    <p class="text-sm text-slate-400 mt-0.5">Edit or delete existing categories</p>
                 </div>
             </div>
             <div class="hidden lg:flex items-center space-x-2">
-                <a href="add_category.php" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition">
+                <a href="add_category.php" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium hover:from-cyan-600 hover:to-blue-700 transition">
                     <i class="fas fa-plus mr-2"></i>Add New
                 </a>
-                <button id="darkModeToggle" class="p-2 text-gray-500 hover:text-gray-900 transition" title="Toggle dark mode">
-                    <i id="dark-mode-icon" class="fas fa-moon text-sm"></i>
-                </button>
                 <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
                      alt="User" 
                      class="w-8 h-8 rounded-full"
@@ -40,7 +37,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -49,18 +46,18 @@ include __DIR__ . '/../layouts/header.php';
                 </li>
                 <li>
                     <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <a href="categories.php" class="ml-1 text-sm font-medium text-gray-600 hover:text-gray-900">Categories</a>
+                        <a href="categories.php" class="ml-1 text-sm font-medium text-slate-400 hover:text-white">Categories</a>
                     </div>
                 </li>
                 <li>
                     <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-700">Manage</span>
+                        <span class="ml-1 text-sm font-medium text-slate-300">Manage</span>
                     </div>
                 </li>
             </ol>
@@ -68,97 +65,97 @@ include __DIR__ . '/../layouts/header.php';
 
         <!-- Success/Error Messages -->
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-6">
+        <div class="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 mb-6 rounded">
             <i class="fas fa-exclamation-circle mr-2"></i>
             <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 mb-6">
+        <div class="bg-green-900/30 border border-green-700/50 text-green-400 px-4 py-3 mb-6 rounded">
             <i class="fas fa-check-circle mr-2"></i>
             <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
         </div>
         <?php endif; ?>
 
         <!-- Categories Table -->
-        <div class="bg-white border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
+        <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md rounded-lg shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-700/50">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900">All Categories</h2>
-                        <p class="text-sm text-gray-500 mt-0.5"><?php echo count($categories); ?> categories total</p>
+                        <h2 class="text-lg font-semibold text-white">All Categories</h2>
+                        <p class="text-sm text-slate-400 mt-0.5"><?php echo count($categories); ?> categories total</p>
                     </div>
                     <div class="relative">
                         <input 
                             type="text" 
                             id="searchCategories"
                             placeholder="Search categories..." 
-                            class="pl-8 pr-4 py-2 border border-gray-300 focus:outline-none focus:border-gray-400 text-sm"
+                            class="pl-8 pr-4 py-2 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 text-sm rounded"
                         >
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-xs"></i>
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-lg">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-slate-900/50 border-b border-slate-700/50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Icon</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Icon</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Color</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Tickets</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-slate-800/50 divide-y divide-slate-700/50">
                         <?php if (empty($categories)): ?>
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                                <i class="fas fa-folder-open text-4xl mb-3"></i>
+                            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
+                                <i class="fas fa-folder-open text-4xl mb-3 text-slate-500 block"></i>
                                 <p class="text-lg">No categories found</p>
-                                <a href="add_category.php" class="inline-block mt-4 px-4 py-2 bg-gray-900 text-white text-sm hover:bg-gray-800 transition">
+                                <a href="add_category.php" class="inline-block mt-4 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm hover:from-cyan-600 hover:to-blue-700 transition rounded">
                                     <i class="fas fa-plus mr-2"></i>Add Your First Category
                                 </a>
                             </td>
                         </tr>
                         <?php else: ?>
                             <?php foreach ($categories as $category): ?>
-                            <tr class="hover:bg-gray-50 transition-colors category-row" data-category-name="<?php echo strtolower(htmlspecialchars($category['name'])); ?>">
+                            <tr class="hover:bg-slate-900/50 transition-colors category-row" data-category-name="<?php echo strtolower(htmlspecialchars($category['name'])); ?>">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-3">
                                         <div class="w-10 h-10 flex items-center justify-center" style="background-color: <?php echo htmlspecialchars($category['color']); ?>20; border: 1px solid <?php echo htmlspecialchars($category['color']); ?>40;">
-                                            <i class="fas fa-folder text-gray-700"></i>
+                                            <i class="fas fa-folder text-slate-300"></i>
                                         </div>
                                         <div>
-                                            <div class="font-medium text-gray-900"><?php echo htmlspecialchars($category['name']); ?></div>
-                                            <div class="text-xs text-gray-500">ID: <?php echo $category['id']; ?></div>
+                                            <div class="font-medium text-white"><?php echo htmlspecialchars($category['name']); ?></div>
+                                            <div class="text-xs text-slate-400">ID: <?php echo $category['id']; ?></div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-600 max-w-xs truncate">
+                                    <div class="text-sm text-slate-400 max-w-xs truncate">
                                         <?php echo htmlspecialchars($category['description'] ?? 'No description'); ?>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-2">
-                                        <i class="fas fa-folder text-gray-600"></i>
-                                        <span class="text-xs text-gray-500">fa-folder</span>
+                                        <i class="fas fa-folder text-slate-400"></i>
+                                        <span class="text-xs text-slate-400">fa-folder</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-2">
-                                        <div class="w-6 h-6 border border-gray-300" style="background-color: <?php echo htmlspecialchars($category['color']); ?>"></div>
-                                        <span class="text-xs text-gray-500"><?php echo htmlspecialchars($category['color']); ?></span>
+                                        <div class="w-6 h-6 border border-slate-600" style="background-color: <?php echo htmlspecialchars($category['color']); ?>"></div>
+                                        <span class="text-xs text-slate-400"><?php echo htmlspecialchars($category['color']); ?></span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm">
-                                        <span class="font-semibold text-gray-900"><?php echo $category['ticket_count']; ?></span>
-                                        <span class="text-gray-500">total</span>
+                                        <span class="font-semibold text-white"><?php echo $category['ticket_count']; ?></span>
+                                        <span class="text-slate-400">total</span>
                                     </div>
                                     <?php if ($category['open_tickets'] > 0): ?>
                                     <div class="text-xs text-orange-600 mt-1">
@@ -169,16 +166,16 @@ include __DIR__ . '/../layouts/header.php';
                                 <td class="px-6 py-4 text-right space-x-2">
                                     <button 
                                         onclick="openEditModal(<?php echo $category['id']; ?>, '<?php echo htmlspecialchars(addslashes($category['name'])); ?>', '<?php echo htmlspecialchars(addslashes($category['description'] ?? '')); ?>', 'fa-folder', '<?php echo htmlspecialchars($category['color']); ?>')"
-                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm text-gray-700 hover:bg-gray-50 transition"
+                                        class="inline-flex items-center px-3 py-1.5 border border-cyan-500/30 text-sm text-cyan-400 hover:bg-cyan-500/10 rounded transition"
                                         title="Edit category"
                                     >
                                         <i class="fas fa-edit mr-1"></i>Edit
                                     </button>
                                     <button 
                                         onclick="confirmDelete(<?php echo $category['id']; ?>, '<?php echo htmlspecialchars(addslashes($category['name'])); ?>', <?php echo $category['ticket_count']; ?>)"
-                                        class="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm text-red-700 hover:bg-red-50 transition"
+                                        class="inline-flex items-center px-3 py-1.5 border border-red-500/30 text-sm text-red-400 hover:bg-red-500/10 rounded transition"
                                         title="Delete category"
-                                        <?php echo $category['ticket_count'] > 0 ? 'disabled' : ''; ?>
+                                        <?php echo $category['ticket_count'] > 0 ? 'disabled opacity-50 cursor-not-allowed' : ''; ?>
                                     >
                                         <i class="fas fa-trash mr-1"></i>Delete
                                     </button>
@@ -195,12 +192,12 @@ include __DIR__ . '/../layouts/header.php';
 
 <!-- Edit Category Modal -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white border border-gray-200 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">
+    <div class="bg-slate-800/50 border border-slate-700/50 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white">
                 <i class="fas fa-edit mr-2"></i>Edit Category
             </h3>
-            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+            <button onclick="closeEditModal()" class="text-slate-400 hover:text-white transition">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -211,7 +208,7 @@ include __DIR__ . '/../layouts/header.php';
             
             <!-- Name -->
             <div>
-                <label for="edit_name" class="block text-sm font-medium text-gray-900 mb-2">
+                <label for="edit_name" class="block text-sm font-medium text-white mb-2">
                     Category Name <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -219,32 +216,32 @@ include __DIR__ . '/../layouts/header.php';
                     id="edit_name" 
                     name="name" 
                     required
-                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 rounded"
                 >
             </div>
 
             <!-- Description -->
             <div>
-                <label for="edit_description" class="block text-sm font-medium text-gray-900 mb-2">
+                <label for="edit_description" class="block text-sm font-medium text-white mb-2">
                     Description
                 </label>
                 <textarea 
                     id="edit_description" 
                     name="description" 
                     rows="3"
-                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 rounded"
                 ></textarea>
             </div>
 
             <!-- Icon -->
             <div>
-                <label for="edit_icon" class="block text-sm font-medium text-gray-900 mb-2">
+                <label for="edit_icon" class="block text-sm font-medium text-white mb-2">
                     Icon
                 </label>
                 <select 
                     id="edit_icon" 
                     name="icon"
-                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 rounded"
                 >
                     <option value="fa-folder">Default Folder</option>
                     <option value="fa-desktop">Desktop/Hardware</option>
@@ -267,30 +264,30 @@ include __DIR__ . '/../layouts/header.php';
 
             <!-- Color -->
             <div>
-                <label for="edit_color" class="block text-sm font-medium text-gray-900 mb-2">
+                <label for="edit_color" class="block text-sm font-medium text-white mb-2">
                     Color
                 </label>
                 <input 
                     type="text" 
                     id="edit_color" 
                     name="color"
-                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-400"
+                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 rounded"
                     placeholder="#6b7280"
                 >
             </div>
 
             <!-- Buttons -->
-            <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-700/50">
                 <button 
                     type="button"
                     onclick="closeEditModal()"
-                    class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+                    class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-900/50 rounded transition"
                 >
                     Cancel
                 </button>
                 <button 
                     type="submit"
-                    class="px-6 py-3 bg-gray-900 text-white font-semibold hover:bg-gray-800 transition"
+                    class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 rounded transition"
                 >
                     <i class="fas fa-save mr-2"></i>Save Changes
                 </button>
@@ -301,9 +298,9 @@ include __DIR__ . '/../layouts/header.php';
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white border border-gray-200 max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">
+    <div class="bg-slate-800/50 border border-slate-700/50 max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-700/50">
+            <h3 class="text-lg font-semibold text-white">
                 <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>Confirm Delete
             </h3>
         </div>
@@ -312,10 +309,10 @@ include __DIR__ . '/../layouts/header.php';
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="category_id" id="delete_category_id">
             
-            <p class="text-gray-700 mb-4">
+            <p class="text-slate-300 mb-4">
                 Are you sure you want to delete the category "<strong id="delete_category_name"></strong>"?
             </p>
-            <p class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 p-3">
+            <p class="text-sm text-slate-400 bg-yellow-900/30 border border-yellow-700/50 p-3 rounded">
                 <i class="fas fa-info-circle mr-1"></i>
                 This action cannot be undone. The category will be permanently removed.
             </p>
@@ -324,13 +321,13 @@ include __DIR__ . '/../layouts/header.php';
                 <button 
                     type="button"
                     onclick="closeDeleteModal()"
-                    class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+                    class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-900/50 rounded transition"
                 >
                     Cancel
                 </button>
                 <button 
                     type="submit"
-                    class="px-6 py-3 bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+                    class="px-6 py-3 bg-red-600 text-white font-semibold hover:bg-red-700 rounded transition"
                 >
                     <i class="fas fa-trash mr-2"></i>Delete
                 </button>
@@ -423,3 +420,4 @@ document.getElementById('deleteModal').addEventListener('click', function(e) {
 // Include layout footer
 include __DIR__ . '/../layouts/footer.php'; 
 ?>
+

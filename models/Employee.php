@@ -74,6 +74,16 @@ class Employee {
     }
     
     /**
+     * Find employee by employee_id (external ID from other system)
+     */
+    public function findByEmployeeId($employeeId) {
+        $sql = "SELECT * FROM employees WHERE employee_id = :employee_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':employee_id' => $employeeId]);
+        return $stmt->fetch();
+    }
+    
+    /**
      * Verify employee login
      */
     public function verifyLogin($username, $password) {
