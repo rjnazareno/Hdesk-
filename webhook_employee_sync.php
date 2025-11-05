@@ -103,12 +103,22 @@ $results = [
 
 foreach ($data['employees'] as $emp) {
     try {
-        // Validate required fields
-        $requiredFields = ['employee_id', 'fname', 'lname', 'email'];
+        // Validate required fields (only ID and name are truly required)
+        $requiredFields = ['employee_id', 'fname', 'lname'];
         foreach ($requiredFields as $field) {
             if (empty($emp[$field])) {
                 throw new Exception("Missing required field: $field");
             }
+        }
+
+        // Generate email if missing (use employee_id@noemail.local as placeholder)
+        $email = !empty($emp['email']) ? trim($emp['email']) : $emp['employee_id'] . '@noemail.local';
+        
+        // Validate email format
+        $validatedEmail = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if (!$validatedEmail) {
+            // If invalid, create a safe placeholder
+            $validatedEmail = 'emp' . $emp['employee_id'] . '@noemail.local';
         }
 
         // Sanitize data
@@ -116,17 +126,13 @@ foreach ($data['employees'] as $emp) {
             'employee_id' => sanitize($emp['employee_id']),
             'fname' => sanitize($emp['fname']),
             'lname' => sanitize($emp['lname']),
-            'email' => filter_var($emp['email'], FILTER_VALIDATE_EMAIL),
+            'email' => $validatedEmail,
             'phone' => isset($emp['phone']) ? sanitize($emp['phone']) : null,
             'contact' => isset($emp['phone']) ? sanitize($emp['phone']) : null,
             'company' => isset($emp['department']) ? sanitize($emp['department']) : (isset($emp['company']) ? sanitize($emp['company']) : null),
             'position' => isset($emp['position']) ? sanitize($emp['position']) : null,
             'username' => isset($emp['username']) ? sanitize($emp['username']) : strtolower($emp['fname'] . '.' . $emp['lname']),
         ];
-
-        if (!$employeeData['email']) {
-            throw new Exception("Invalid email format: {$emp['email']}");
-        }
 
         // Check if employee already exists by employee_id or email
         $existingEmployee = $employeeModel->findByEmployeeId($employeeData['employee_id']);
