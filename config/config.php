@@ -30,7 +30,7 @@ define('ASSETS_URL', BASE_URL . 'assets/');
 // Application Settings
 define('APP_NAME', 'ResolveIT');
 define('APP_VERSION', '1.0.0');
-define('APP_TIMEZONE', 'UTC');
+define('APP_TIMEZONE', 'Asia/Manila');
 
 // File Upload Settings
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
