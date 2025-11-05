@@ -45,6 +45,31 @@ class CreateTicketController {
         
         $currentUser = $this->auth->getCurrentUser();
         
+        // Validate required fields
+        if (empty($_POST['submitter_id']) || $_POST['submitter_id'] === '0') {
+            error_log("Ticket creation failed: No employee selected");
+            $_SESSION['error'] = "Please select an employee";
+            redirect('admin/create_ticket.php');
+        }
+        
+        if (empty($_POST['category_id']) || $_POST['category_id'] === '0') {
+            error_log("Ticket creation failed: No category selected");
+            $_SESSION['error'] = "Please select a category";
+            redirect('admin/create_ticket.php');
+        }
+        
+        if (empty($_POST['title'])) {
+            error_log("Ticket creation failed: No title provided");
+            $_SESSION['error'] = "Please enter a ticket title";
+            redirect('admin/create_ticket.php');
+        }
+        
+        if (empty($_POST['description'])) {
+            error_log("Ticket creation failed: No description provided");
+            $_SESSION['error'] = "Please enter a ticket description";
+            redirect('admin/create_ticket.php');
+        }
+        
         // Generate unique ticket number
         do {
             $ticketNumber = generateTicketNumber();
