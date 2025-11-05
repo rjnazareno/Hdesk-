@@ -4,19 +4,12 @@
  * Contains database connection settings
  */
 
-// Production database credentials
+// Database credentials - PRODUCTION ONLY
 define('DB_HOST', 'localhost');
 define('DB_USER', 'u816220874_AyrgoResolveIT');
-define('DB_PASS', 'Y/;@3y&RgpC0');  // UPDATE THIS WITH CORRECT PASSWORD
+define('DB_PASS', 'Y/;@3y&RgpC0');
 define('DB_NAME', 'u816220874_resolveIT');
 define('DB_CHARSET', 'utf8mb4');
-
-// Local development database credentials (commented out)
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', '');
-// define('DB_NAME', 'ithelp');
-// define('DB_CHARSET', 'utf8mb4');
 
 /**
  * Database Connection Class
