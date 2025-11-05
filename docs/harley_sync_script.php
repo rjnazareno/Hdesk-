@@ -228,6 +228,16 @@ try {
 // Step 3: Send to IThelp webhook
 echo "<div class='status info'><strong>Step 3:</strong> Sending employees to IThelp webhook...</div>";
 
+// Debug: Show API key being used
+echo "<details style='margin:10px 0;'>";
+echo "<summary style='cursor:pointer; color:#666;'>🔍 Debug: API Key Info</summary>";
+echo "<pre>";
+echo "Sync Script API Key: " . $API_KEY . "\n";
+echo "API Key Length: " . strlen($API_KEY) . " characters\n";
+echo "Webhook URL: " . $WEBHOOK_URL . "\n";
+echo "</pre>";
+echo "</details>";
+
 $payload = [
     'sync_mode' => 'full', // Use full sync to detect missing employees
     'employees' => $employees
@@ -243,6 +253,7 @@ curl_setopt_array($ch, [
         'X-API-Key: ' . $API_KEY
     ],
     CURLOPT_TIMEOUT => 30,
+    CURLOPT_VERBOSE => false,
 ]);
 
 $response = curl_exec($ch);
