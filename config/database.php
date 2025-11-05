@@ -4,11 +4,24 @@
  * Contains database connection settings
  */
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'ithelp');
-define('DB_CHARSET', 'utf8mb4');
+// Auto-detect environment based on server
+$isProduction = (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'resourcestaffonline.com') !== false);
+
+if ($isProduction) {
+    // Production database credentials
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'u816220874_AyrgoResolveIT');
+    define('DB_PASS', 'W;a1Wq!fVH');
+    define('DB_NAME', 'u816220874_resolveIT');
+    define('DB_CHARSET', 'utf8mb4');
+} else {
+    // Local development database credentials
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'ithelp');
+    define('DB_CHARSET', 'utf8mb4');
+}
 
 /**
  * Database Connection Class
