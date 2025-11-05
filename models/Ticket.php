@@ -35,13 +35,35 @@ class Ticket {
             
             if (!$result) {
                 error_log("Ticket creation failed - execute returned false");
+                error_log("PDO Error Info: " . print_r($stmt->errorInfo(), true));
                 return false;
             }
             
-            return $this->db->lastInsertId();
+            $insertId = $this->db->lastInsertId();
+            error_log("Ticket insert successful - lastInsertId: " . $insertId);
+            error_log("Row count affected: " . $stmt->rowCount());
+            
+            if (!$insertId || $insertId == 0) {
+                error_log("WARNING: lastInsertId returned 0 or false!");
+                error_log("Checking if ticket was actually inserted...");
+                
+                // Try to find the ticket by ticket_number as fallback
+                $checkSql = "SELECT id FROM tickets WHERE ticket_number = :ticket_number ORDER BY id DESC LIMIT 1";
+                $checkStmt = $this->db->prepare($checkSql);
+                $checkStmt->execute([':ticket_number' => $data['ticket_number']]);
+                $found = $checkStmt->fetch();
+                
+                if ($found) {
+                    error_log("Found ticket by ticket_number! ID: " . $found['id']);
+                    return $found['id'];
+                }
+            }
+            
+            return $insertId;
         } catch (PDOException $e) {
             error_log("Ticket creation error: " . $e->getMessage());
             error_log("Data: " . print_r($data, true));
+            error_log("SQL State: " . $e->getCode());
             return false;
         }
     }
