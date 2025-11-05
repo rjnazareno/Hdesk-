@@ -150,20 +150,44 @@ try {
 echo "<div class='status info'><strong>Step 2:</strong> Fetching employees from Harley database...</div>";
 
 try {
-    // Adjust this query based on your actual Harley database structure
-    // Common table names: employees, users, staff, team_members
+    // First, check what columns exist in the employees table
+    $columnCheck = $pdo->query("DESCRIBE employees");
+    $availableColumns = array_column($columnCheck->fetchAll(PDO::FETCH_ASSOC), 'Field');
+    
+    // Build query with only available columns
+    $selectFields = ['id as employee_id', 'fname', 'lname', 'email'];
+    $optionalFields = [
+        'phone' => 'phone',
+        'mobile' => 'phone',
+        'cell' => 'phone',
+        'department' => 'department',
+        'dept' => 'department',
+        'position' => 'position',
+        'title' => 'position',
+        'username' => 'username',
+        'login' => 'username'
+    ];
+    
+    // Add optional fields if they exist
+    foreach ($optionalFields as $dbColumn => $alias) {
+        if (in_array($dbColumn, $availableColumns)) {
+            // Avoid duplicates (e.g., if both 'mobile' and 'phone' exist, use first found)
+            if (!in_array($alias, array_values($selectFields))) {
+                $selectFields[] = ($dbColumn !== $alias) ? "$dbColumn as $alias" : $dbColumn;
+            }
+        }
+    }
+    
     $sql = "SELECT 
-                id as employee_id,
-                fname,
-                lname,
-                email,
-                phone,
-                department,
-                position,
-                username
+                " . implode(",\n                ", $selectFields) . "
             FROM employees 
             WHERE 1=1
             ORDER BY id";
+    
+    echo "<details style='margin:10px 0;'>";
+    echo "<summary style='cursor:pointer; color:#1565c0;'>📋 View SQL Query</summary>";
+    echo "<pre>" . htmlspecialchars($sql) . "</pre>";
+    echo "</details>";
     
     $stmt = $pdo->query($sql);
     $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
