@@ -171,3 +171,5 @@ function getTailwindCSS() {
     return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/tailwind.css">';
 }
 
+// Explicitly load Auth class to ensure it's always available
+require_once __DIR__ . '/../includes/Auth.php';
