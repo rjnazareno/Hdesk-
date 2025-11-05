@@ -162,12 +162,67 @@ include __DIR__ . '/../layouts/header.php';
                 <table class="w-full">
                     <thead class="bg-slate-900/50 border-b border-slate-700/50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Company</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
+                                <a href="<?php echo $sortUrl('fname'); ?>&page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" class="hover:text-cyan-400 flex items-center group">
+                                    Name
+                                    <span class="ml-1 opacity-0 group-hover:opacity-100 transition">
+                                        <?php if ($sortBy === 'fname'): ?>
+                                            <?php echo $sortOrder === 'ASC' ? '▲' : '▼'; ?>
+                                        <?php else: ?>
+                                            ⇅
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
+                                <a href="<?php echo $sortUrl('email'); ?>&page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" class="hover:text-cyan-400 flex items-center group">
+                                    Email
+                                    <span class="ml-1 opacity-0 group-hover:opacity-100 transition">
+                                        <?php if ($sortBy === 'email'): ?>
+                                            <?php echo $sortOrder === 'ASC' ? '▲' : '▼'; ?>
+                                        <?php else: ?>
+                                            ⇅
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
+                                <a href="<?php echo $sortUrl('company'); ?>&page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" class="hover:text-cyan-400 flex items-center group">
+                                    Company
+                                    <span class="ml-1 opacity-0 group-hover:opacity-100 transition">
+                                        <?php if ($sortBy === 'company'): ?>
+                                            <?php echo $sortOrder === 'ASC' ? '▲' : '▼'; ?>
+                                        <?php else: ?>
+                                            ⇅
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Contact</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">Joined</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
+                                <a href="<?php echo $sortUrl('status'); ?>&page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" class="hover:text-cyan-400 flex items-center group">
+                                    Status
+                                    <span class="ml-1 opacity-0 group-hover:opacity-100 transition">
+                                        <?php if ($sortBy === 'status'): ?>
+                                            <?php echo $sortOrder === 'ASC' ? '▲' : '▼'; ?>
+                                        <?php else: ?>
+                                            ⇅
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
+                                <a href="<?php echo $sortUrl('created_at'); ?>&page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" class="hover:text-cyan-400 flex items-center group">
+                                    Joined
+                                    <span class="ml-1 opacity-0 group-hover:opacity-100 transition">
+                                        <?php if ($sortBy === 'created_at'): ?>
+                                            <?php echo $sortOrder === 'ASC' ? '▲' : '▼'; ?>
+                                        <?php else: ?>
+                                            ⇅
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/50">
@@ -224,7 +279,7 @@ include __DIR__ . '/../layouts/header.php';
                     <div class="flex items-center space-x-1">
                         <!-- Previous Button -->
                         <?php if ($pagination['hasPrevious']): ?>
-                        <a href="?page=<?php echo $pagination['previousPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                        <a href="?page=<?php echo $pagination['previousPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <i class="fas fa-chevron-left"></i>
                         </a>
@@ -239,7 +294,7 @@ include __DIR__ . '/../layouts/header.php';
                         $pages = $pagination['pages'];
                         if ($pages[0] > 1): 
                         ?>
-                        <a href="?page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                        <a href="?page=1&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">1</a>
                         <?php if ($pages[0] > 2): ?>
                         <span class="px-2 text-slate-400">...</span>
@@ -252,7 +307,7 @@ include __DIR__ . '/../layouts/header.php';
                             <?php echo $page; ?>
                         </button>
                         <?php else: ?>
-                        <a href="?page=<?php echo $page; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                        <a href="?page=<?php echo $page; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <?php echo $page; ?>
                         </a>
@@ -265,7 +320,7 @@ include __DIR__ . '/../layouts/header.php';
                         <?php if ($pages[count($pages)-1] < $pagination['totalPages'] - 1): ?>
                         <span class="px-2 text-slate-400">...</span>
                         <?php endif; ?>
-                        <a href="?page=<?php echo $pagination['totalPages']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                        <a href="?page=<?php echo $pagination['totalPages']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <?php echo $pagination['totalPages']; ?>
                         </a>
@@ -273,7 +328,7 @@ include __DIR__ . '/../layouts/header.php';
                         
                         <!-- Next Button -->
                         <?php if ($pagination['hasNext']): ?>
-                        <a href="?page=<?php echo $pagination['nextPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>" 
+                        <a href="?page=<?php echo $pagination['nextPage']; ?>&per_page=<?php echo $pagination['itemsPerPage']; ?>&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>" 
                            class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 border border-slate-600 rounded-lg transition">
                             <i class="fas fa-chevron-right"></i>
                         </a>
@@ -287,7 +342,7 @@ include __DIR__ . '/../layouts/header.php';
                     <!-- Items Per Page -->
                     <div class="flex items-center space-x-2">
                         <label class="text-sm text-slate-400">Per page:</label>
-                        <select onchange="window.location.href = '?page=1&per_page=' + this.value" 
+                        <select onchange="window.location.href = '?page=1&per_page=' + this.value + '&sort_by=<?php echo $sortBy; ?>&sort_order=<?php echo $sortOrder; ?>'" 
                                 class="px-3 py-2 text-sm font-medium bg-slate-700/50 text-slate-300 border border-slate-600 rounded-lg hover:border-cyan-500 transition">
                             <option value="10" <?php echo $pagination['itemsPerPage'] == 10 ? 'selected' : ''; ?>>10</option>
                             <option value="25" <?php echo $pagination['itemsPerPage'] == 25 ? 'selected' : ''; ?>>25</option>
