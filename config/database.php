@@ -7,7 +7,7 @@
 // Database credentials - PRODUCTION ONLY
 define('DB_HOST', 'localhost');
 define('DB_USER', 'u816220874_AyrgoResolveIT');
-define('DB_PASS', 'Y/;@3y&RgpC0');
+define('DB_PASS', '#2js&v3+P');
 define('DB_NAME', 'u816220874_resolveIT');
 define('DB_CHARSET', 'utf8mb4');
 
