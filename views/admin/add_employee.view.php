@@ -388,7 +388,7 @@ include __DIR__ . '/../layouts/header.php';
                     <h3 class="text-sm font-semibold text-amber-300 mb-3 flex items-center">
                         <i class="fas fa-exclamation-triangle mr-2"></i>Important
                     </h3>
-                    <ul class="space-y-2 text-xs text-amber-100">
+                    <ul class="space-y-2 text-xs text-white">
                         <li class="flex items-start">
                             <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Login credentials will be emailed to the employee</span>
@@ -409,7 +409,7 @@ include __DIR__ . '/../layouts/header.php';
                     <h3 class="text-sm font-semibold text-cyan-300 mb-3 flex items-center">
                         <i class="fas fa-lightbulb mr-2"></i>Quick Tips
                     </h3>
-                    <ul class="space-y-2 text-xs text-cyan-100">
+                    <ul class="space-y-2 text-xs text-white">
                         <li>• Auto-generates username from first & last names</li>
                         <li>• Tab or click fields to see helpful hints</li>
                         <li>• Required fields show a red asterisk</li>
