@@ -112,7 +112,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="fname" 
                                 name="fname" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="John"
                             >
                         </div>
@@ -127,7 +127,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="lname" 
                                 name="lname" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="Doe"
                             >
                         </div>
@@ -142,7 +142,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="position" 
                                 name="position" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="e.g., Software Developer, Accountant"
                             >
                         </div>
@@ -156,7 +156,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="text" 
                                 id="company" 
                                 name="company"
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="e.g., IT Department"
                             >
                         </div>
@@ -170,7 +170,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="tel" 
                                 id="contact" 
                                 name="contact"
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="+1 234 567 8900"
                             >
                         </div>
@@ -184,7 +184,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="text" 
                                 id="official_sched" 
                                 name="official_sched"
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="e.g., Mon-Fri 9:00 AM - 5:00 PM"
                             >
                         </div>
@@ -208,7 +208,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="username" 
                                 name="username" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="john.doe"
                             >
                             <p class="text-sm text-slate-400 mt-1">
@@ -228,7 +228,7 @@ include __DIR__ . '/../layouts/header.php';
                                     name="password" 
                                     required
                                     minlength="6"
-                                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                    class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                     placeholder="Min. 6 characters"
                                 >
                                 <button 
@@ -254,7 +254,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="email" 
                                 name="email" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="john.doe@company.com"
                             >
                             <p class="text-sm text-slate-400 mt-1">
@@ -271,7 +271,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="email" 
                                 id="personal_email" 
                                 name="personal_email"
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="john.doe@gmail.com"
                             >
                         </div>
@@ -285,7 +285,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="role" 
                                 name="role" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                             >
                                 <option value="employee" selected>Employee</option>
                                 <option value="it_staff">IT Staff</option>
@@ -306,7 +306,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="profile_picture" 
                                 name="profile_picture"
                                 accept="image/*"
-                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                             >
                             <p class="text-sm text-slate-400 mt-1">
                                 <i class="fas fa-image mr-1"></i>JPG, PNG, GIF (Max 2MB)
