@@ -28,8 +28,18 @@ include __DIR__ . '/../layouts/header.php';
         </div>
     </div>
 
+    <!-- Quick Instructions Banner -->
+    <div class="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-cyan-600/30 backdrop-blur-sm">
+        <div class="px-4 lg:px-8 py-3 flex items-start space-x-3">
+            <i class="fas fa-lightbulb text-cyan-400 mt-1 flex-shrink-0"></i>
+            <div class="text-sm text-slate-200">
+                <strong>Quick Tip:</strong> Fields marked with <span class="text-red-400">*</span> are required. Username and email must be unique. The employee will receive login credentials via email.
+            </div>
+        </div>
+    </div>
+
     <!-- Form Content -->
-    <div class="p-8">
+    <div class="p-4 lg:p-8">
         <!-- Breadcrumb -->
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -62,21 +72,28 @@ include __DIR__ . '/../layouts/header.php';
 
         <!-- Success/Error Messages -->
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="bg-red-900/20 border border-red-600/50 text-red-400 px-4 py-3 mb-6">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <div class="bg-red-900/20 border border-red-600/50 text-red-400 px-4 py-3 mb-6 rounded-lg flex items-start space-x-3">
+            <i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0"></i>
+            <div>
+                <strong>Error:</strong> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
         </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="bg-emerald-900/20 border border-emerald-600/50 text-emerald-400 px-4 py-3 mb-6">
-            <i class="fas fa-check-circle mr-2"></i>
-            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        <div class="bg-emerald-900/20 border border-emerald-600/50 text-emerald-400 px-4 py-3 mb-6 rounded-lg flex items-start space-x-3">
+            <i class="fas fa-check-circle mt-0.5 flex-shrink-0"></i>
+            <div>
+                <strong>Success!</strong> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
         </div>
         <?php endif; ?>
 
-        <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-6 max-w-5xl">
-            <form action="add_employee.php" method="POST" enctype="multipart/form-data" class="space-y-6" id="addEmployeeForm">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Main Form (3 columns) -->
+            <div class="lg:col-span-3">
+                <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-6 space-y-6">
+                    <form action="add_employee.php" method="POST" enctype="multipart/form-data" class="space-y-6" id="addEmployeeForm">
                 
                 <!-- Personal Information Section -->
                 <div>
@@ -110,7 +127,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="lname" 
                                 name="lname" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="Doe"
                             >
                         </div>
@@ -125,7 +142,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="position" 
                                 name="position" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="e.g., Software Developer, Accountant"
                             >
                         </div>
@@ -139,7 +156,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="text" 
                                 id="company" 
                                 name="company"
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="e.g., IT Department"
                             >
                         </div>
@@ -153,7 +170,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="tel" 
                                 id="contact" 
                                 name="contact"
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="+1 234 567 8900"
                             >
                         </div>
@@ -167,7 +184,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="text" 
                                 id="official_sched" 
                                 name="official_sched"
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="e.g., Mon-Fri 9:00 AM - 5:00 PM"
                             >
                         </div>
@@ -191,11 +208,11 @@ include __DIR__ . '/../layouts/header.php';
                                 id="username" 
                                 name="username" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="john.doe"
                             >
                             <p class="text-sm text-slate-400 mt-1">
-                                <i class="fas fa-info-circle mr-1"></i>Used for logging into the system
+                                <i class="fas fa-info-circle mr-1"></i><strong>Must be unique</strong> - Used for logging into the system
                             </p>
                         </div>
 
@@ -211,17 +228,20 @@ include __DIR__ . '/../layouts/header.php';
                                     name="password" 
                                     required
                                     minlength="6"
-                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                    class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                     placeholder="Min. 6 characters"
                                 >
                                 <button 
                                     type="button" 
                                     onclick="togglePassword('password')"
-                                    class="absolute right-3 top-3 text-slate-400 hover:text-slate-400"
+                                    class="absolute right-3 top-3 text-slate-400 hover:text-cyan-400"
                                 >
                                     <i class="fas fa-eye" id="password-eye"></i>
                                 </button>
                             </div>
+                            <p class="text-sm text-slate-400 mt-1">
+                                <i class="fas fa-lock mr-1"></i>Strong password recommended
+                            </p>
                         </div>
 
                         <!-- Official Email -->
@@ -234,9 +254,12 @@ include __DIR__ . '/../layouts/header.php';
                                 id="email" 
                                 name="email" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="john.doe@company.com"
                             >
+                            <p class="text-sm text-slate-400 mt-1">
+                                <i class="fas fa-envelope mr-1"></i>Used for notifications and password resets
+                            </p>
                         </div>
 
                         <!-- Personal Email -->
@@ -248,7 +271,7 @@ include __DIR__ . '/../layouts/header.php';
                                 type="email" 
                                 id="personal_email" 
                                 name="personal_email"
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 placeholder="john.doe@gmail.com"
                             >
                         </div>
@@ -262,14 +285,14 @@ include __DIR__ . '/../layouts/header.php';
                                 id="role" 
                                 name="role" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             >
                                 <option value="employee" selected>Employee</option>
                                 <option value="it_staff">IT Staff</option>
-                                <option value="admin">Admin</option>
+                                <option value="admin">Administrator</option>
                             </select>
                             <p class="text-sm text-slate-400 mt-1">
-                                <i class="fas fa-info-circle mr-1"></i>Determines access level
+                                <i class="fas fa-info-circle mr-1"></i>Choose based on system access needs
                             </p>
                         </div>
 
@@ -283,7 +306,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="profile_picture" 
                                 name="profile_picture"
                                 accept="image/*"
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             >
                             <p class="text-sm text-slate-400 mt-1">
                                 <i class="fas fa-image mr-1"></i>JPG, PNG, GIF (Max 2MB)
@@ -294,7 +317,7 @@ include __DIR__ . '/../layouts/header.php';
 
                 <!-- Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700/50">
-                    <a href="customers.php" class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-900/50 transition">
+                    <a href="customers.php" class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-900/50 transition rounded-lg">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                     <button 
@@ -304,36 +327,96 @@ include __DIR__ . '/../layouts/header.php';
                         <i class="fas fa-user-plus mr-2"></i>Add Employee
                     </button>
                 </div>
-            </form>
-        </div>
+                    </form>
+                </div>
+            </div>
 
-        <!-- Help Section -->
-        <div class="mt-6 bg-slate-900/50 border border-slate-700/50 p-6 max-w-5xl">
-            <h3 class="text-lg font-semibold text-white mb-3">
-                <i class="fas fa-info-circle mr-2"></i>Important Notes
-            </h3>
-            <ul class="space-y-2 text-sm text-slate-400">
-                <li class="flex items-start">
-                    <i class="fas fa-check-circle text-white mr-2 mt-0.5"></i>
-                    <span><strong>Username</strong> must be unique and will be used for login</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-check-circle text-white mr-2 mt-0.5"></i>
-                    <span><strong>Password</strong> should be at least 6 characters long and secure</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-check-circle text-white mr-2 mt-0.5"></i>
-                    <span><strong>Role</strong> determines what the employee can access (Employee = submit tickets only)</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-check-circle text-white mr-2 mt-0.5"></i>
-                    <span><strong>Official Email</strong> is used for system notifications and password resets</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-check-circle text-white mr-2 mt-0.5"></i>
-                    <span>The employee will be notified via email with their login credentials</span>
-                </li>
-            </ul>
+            <!-- Sidebar Instructions (1 column) -->
+            <div class="lg:col-span-1 space-y-4">
+                <!-- Role Guide -->
+                <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
+                        <i class="fas fa-shield-alt text-cyan-400 mr-2"></i>Role Guide
+                    </h3>
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <div class="border-l-2 border-cyan-500 pl-2">
+                            <strong class="text-white">Employee</strong>
+                            <p>Can submit tickets only, cannot access admin</p>
+                        </div>
+                        <div class="border-l-2 border-blue-500 pl-2">
+                            <strong class="text-white">IT Staff</strong>
+                            <p>Manage tickets, view reports, assist employees</p>
+                        </div>
+                        <div class="border-l-2 border-purple-500 pl-2">
+                            <strong class="text-white">Administrator</strong>
+                            <p>Full system access, manage all users & settings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
+                        <i class="fas fa-check-circle text-green-400 mr-2"></i>Best Practices
+                    </h3>
+                    <ul class="space-y-2 text-xs text-slate-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-cyan-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Use first.last format for usernames</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-cyan-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Use official company email</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-cyan-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Strong password recommended</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-cyan-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Complete all required fields</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-cyan-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Upload professional profile picture</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="bg-amber-500/10 border border-amber-600/30 backdrop-blur-sm p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-amber-300 mb-3 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Important
+                    </h3>
+                    <ul class="space-y-2 text-xs text-amber-100">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Login credentials will be emailed to the employee</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Email addresses must be unique</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-amber-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Changes can be edited later in the system</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-600/30 backdrop-blur-sm p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-cyan-300 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i>Quick Tips
+                    </h3>
+                    <ul class="space-y-2 text-xs text-cyan-100">
+                        <li>• Auto-generates username from first & last names</li>
+                        <li>• Tab or click fields to see helpful hints</li>
+                        <li>• Required fields show a red asterisk</li>
+                        <li>• Click eye icon to see password</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -355,34 +438,59 @@ function togglePassword(fieldId) {
     }
 }
 
-// Form validation
+// Auto-generate username from name
+function generateUsername() {
+    const fname = document.getElementById('fname').value.trim().toLowerCase();
+    const lname = document.getElementById('lname').value.trim().toLowerCase();
+    const usernameField = document.getElementById('username');
+    
+    if (fname && lname && !usernameField.value) {
+        usernameField.value = fname + '.' + lname;
+    }
+}
+
+// Add blur event listeners for username generation
+document.getElementById('fname').addEventListener('blur', generateUsername);
+document.getElementById('lname').addEventListener('blur', generateUsername);
+
+// Form validation with better error messages
 document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
+    const errors = [];
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const fname = document.getElementById('fname').value;
-    const lname = document.getElementById('lname').value;
-    const position = document.getElementById('position').value;
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const position = document.getElementById('position').value.trim();
     
-    // Check required fields
-    if (!username || !email || !password || !fname || !lname || !position) {
-        e.preventDefault();
-        alert('Please fill in all required fields marked with *');
-        return false;
+    // Validate required fields
+    if (!fname) errors.push('First name is required');
+    if (!lname) errors.push('Last name is required');
+    if (!username) errors.push('Username is required');
+    if (!email) errors.push('Official email is required');
+    if (!password) errors.push('Password is required');
+    if (!position) errors.push('Position is required');
+    
+    // Validate password length
+    if (password && password.length < 6) {
+        errors.push('Password must be at least 6 characters long');
     }
     
-    // Password length validation
-    if (password.length < 6) {
-        e.preventDefault();
-        alert('Password must be at least 6 characters long');
-        return false;
-    }
-    
-    // Email validation
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (email && !emailRegex.test(email)) {
+        errors.push('Please enter a valid email address');
+    }
+    
+    // Validate username format
+    if (username && !/^[a-zA-Z0-9._-]+$/.test(username)) {
+        errors.push('Username can only contain letters, numbers, dots, hyphens, and underscores');
+    }
+    
+    if (errors.length > 0) {
         e.preventDefault();
-        alert('Please enter a valid email address');
+        alert('Please fix the following errors:\n\n• ' + errors.join('\n• '));
         return false;
     }
     
@@ -397,8 +505,9 @@ document.getElementById('profile_picture').addEventListener('change', function(e
     const file = e.target.files[0];
     if (file) {
         // Check file size (2MB max)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('File size must be less than 2MB');
+        const maxSize = 2 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size must be less than 2MB. Your file is ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
             this.value = '';
             return;
         }
@@ -413,19 +522,16 @@ document.getElementById('profile_picture').addEventListener('change', function(e
     }
 });
 
-// Auto-generate username from name
-document.getElementById('fname').addEventListener('blur', generateUsername);
-document.getElementById('lname').addEventListener('blur', generateUsername);
-
-function generateUsername() {
-    const fname = document.getElementById('fname').value.trim().toLowerCase();
-    const lname = document.getElementById('lname').value.trim().toLowerCase();
-    const usernameField = document.getElementById('username');
-    
-    if (fname && lname && !usernameField.value) {
-        usernameField.value = fname + '.' + lname;
-    }
-}
+// Show helpful tooltip on field focus
+document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], select').forEach(field => {
+    field.addEventListener('focus', function() {
+        const parent = this.closest('div');
+        const hint = parent.querySelector('.text-slate-400');
+        if (hint) {
+            hint.style.opacity = '1';
+        }
+    });
+});
 </script>
 
 <?php 
