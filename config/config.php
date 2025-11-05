@@ -24,7 +24,7 @@ if (file_exists($env_file)) {
 define('ENVIRONMENT', getenv('APP_ENV') ?? 'development');
 
 // Base URL Configuration
-define('BASE_URL', 'http://localhost/IThelp/');
+define('BASE_URL', 'http://localhost/ResolveIT/');
 define('ASSETS_URL', BASE_URL . 'assets/');
 
 // Application Settings
@@ -167,19 +167,7 @@ function generateTicketNumber() {
  * @return string HTML string with Tailwind CSS
  */
 function getTailwindCSS() {
-    if (ENVIRONMENT === 'production') {
-        // Production: Use local compiled CSS (includes glass morphism)
-        $css_file = __DIR__ . '/../assets/css/tailwind.min.css';
-        if (file_exists($css_file)) {
-            return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/tailwind.min.css">';
-        } else {
-            // Fallback if CSS not found
-            error_log('WARNING: tailwind.min.css not found. Falling back to CDN.');
-            return '<script src="https://cdn.tailwindcss.com"></script>';
-        }
-    } else {
-        // Development: Use CDN for faster iteration
-        return '<script src="https://cdn.tailwindcss.com"></script>';
-    }
+    // Use locally built Tailwind CSS v3
+    return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/tailwind.css">';
 }
 

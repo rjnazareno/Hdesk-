@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --minify",
+    "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --watch"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
