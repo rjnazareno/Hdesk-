@@ -237,7 +237,7 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="border border-slate-600/50 bg-slate-700/30 p-4 rounded-lg">
                     <div class="flex justify-between items-center mb-3">
                         <div class="text-sm font-medium text-white">Average Daily Tickets</div>
-                        <div class="text-xl font-semibold text-white"><?php echo round(array_sum(array_column($last7Days, 'count')) / count($last7Days), 1); ?></div>
+                        <div class="text-xl font-semibold text-white"><?php echo !empty($last7Days) ? round(array_sum(array_column($last7Days, 'count')) / count($last7Days), 1) : 0; ?></div>
                     </div>
                     <div class="flex items-center justify-between text-xs">
                         <div class="flex items-center text-slate-400">
