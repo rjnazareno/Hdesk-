@@ -89,9 +89,9 @@ include __DIR__ . '/../layouts/header.php';
         </div>
         <?php endif; ?>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Main Form (3 columns) -->
-            <div class="lg:col-span-3">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Form (2 columns) -->
+            <div class="lg:col-span-2">
                 <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-6 space-y-6">
                     <form action="add_employee.php" method="POST" enctype="multipart/form-data" class="space-y-6" id="addEmployeeForm">
                 
