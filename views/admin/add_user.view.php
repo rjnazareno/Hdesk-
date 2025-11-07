@@ -6,10 +6,10 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-slate-900/50">
+<div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Top Bar -->
     <div class="bg-slate-800/50 backdrop-blur-md border-b border-slate-700/50">
-        <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
+        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white rounded-lg">
                     <i class="fas fa-user-shield text-sm"></i>
@@ -30,13 +30,23 @@ include __DIR__ . '/../layouts/header.php';
         </div>
     </div>
 
+    <!-- Quick Instructions Banner -->
+    <div class="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-cyan-600/30 backdrop-blur-sm">
+        <div class="px-4 lg:px-8 py-3 flex items-start space-x-3">
+            <i class="fas fa-lightbulb text-cyan-400 mt-1 flex-shrink-0"></i>
+            <div class="text-sm text-slate-200">
+                <strong>Quick Tip:</strong> Fields marked with <span class="text-red-400">*</span> are required. Username and email must be unique. Choose the appropriate role based on system access needs.
+            </div>
+        </div>
+    </div>
+
     <!-- Form Content -->
-    <div class="p-8">
+    <div class="p-4 lg:p-8">
         <!-- Breadcrumb -->
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-cyan-400">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -45,7 +55,7 @@ include __DIR__ . '/../layouts/header.php';
                 </li>
                 <li>
                     <div class="flex items-center">
-                        <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
                         <span class="ml-1 text-sm font-medium text-slate-300">
@@ -58,16 +68,20 @@ include __DIR__ . '/../layouts/header.php';
 
         <!-- Success/Error Messages -->
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-6">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <div class="bg-red-900/20 border border-red-600/50 text-red-400 px-4 py-3 mb-6 rounded-lg flex items-start space-x-3">
+            <i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0"></i>
+            <div>
+                <strong>Error:</strong> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
         </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 mb-6">
-            <i class="fas fa-check-circle mr-2"></i>
-            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        <div class="bg-emerald-900/20 border border-emerald-600/50 text-emerald-400 px-4 py-3 mb-6 rounded-lg flex items-start space-x-3">
+            <i class="fas fa-check-circle mt-0.5 flex-shrink-0"></i>
+            <div>
+                <strong>Success!</strong> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
         </div>
         <?php endif; ?>
 
@@ -153,7 +167,7 @@ include __DIR__ . '/../layouts/header.php';
                                 id="full_name" 
                                 name="full_name" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="e.g., John Doe Smith"
                             >
                         </div>
@@ -168,7 +182,7 @@ include __DIR__ . '/../layouts/header.php';
                                     type="text" 
                                     id="department" 
                                     name="department"
-                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                    class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                     placeholder="e.g., IT Department"
                                 >
                             </div>
@@ -181,7 +195,7 @@ include __DIR__ . '/../layouts/header.php';
                                     type="tel" 
                                     id="phone" 
                                     name="phone"
-                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                    class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                     placeholder="+1 234 567 8900"
                                 >
                             </div>
@@ -204,11 +218,11 @@ include __DIR__ . '/../layouts/header.php';
                                 id="username" 
                                 name="username" 
                                 required
-                                class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                 placeholder="john.smith"
                             >
                             <p class="text-sm text-slate-400 mt-1">
-                                <i class="fas fa-info-circle mr-1"></i>Used for logging into the system
+                                <i class="fas fa-info-circle mr-1"></i><strong>Must be unique</strong> - Used for logging into the system
                             </p>
                         </div>
 
@@ -223,7 +237,7 @@ include __DIR__ . '/../layouts/header.php';
                                     id="email" 
                                     name="email" 
                                     required
-                                    class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                    class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                     placeholder="john.smith@company.com"
                                 >
                             </div>
@@ -239,7 +253,7 @@ include __DIR__ . '/../layouts/header.php';
                                         name="password" 
                                         required
                                         minlength="8"
-                                        class="w-full px-4 py-3 border border-slate-600 focus:outline-none focus:border-slate-600"
+                                        class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
                                         placeholder="Min. 8 characters"
                                     >
                                     <button 
