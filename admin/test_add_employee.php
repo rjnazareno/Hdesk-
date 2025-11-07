@@ -7,8 +7,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 
-// Check if we're logged in as admin
-session_start();
+// Check if we're logged in as admin (session already started in config)
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
     die("⚠️ Must be logged in as admin/IT staff to run tests");
 }
