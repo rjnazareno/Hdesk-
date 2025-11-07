@@ -64,7 +64,7 @@ class AdminController {
                 break;
             
             default:
-                redirect('admin.php?error=invalid_action');
+                redirect('admin/admin.php?error=invalid_action');
         }
     }
 
@@ -78,10 +78,10 @@ class AdminController {
         if ($user) {
             $newStatus = $user['is_active'] ? 0 : 1;
             $this->userModel->update($userId, ['is_active' => $newStatus]);
-            redirect('admin.php?success=status_updated');
+            redirect('admin/admin.php?success=status_updated');
         }
         
-        redirect('admin.php?error=user_not_found');
+        redirect('admin/admin.php?error=user_not_found');
     }
 
     /**
@@ -99,9 +99,9 @@ class AdminController {
         ];
         
         if ($this->userModel->update($userId, $updateData)) {
-            redirect('admin.php?success=user_updated');
+            redirect('admin/admin.php?success=user_updated');
         } else {
-            redirect('admin.php?error=update_failed');
+            redirect('admin/admin.php?error=update_failed');
         }
     }
 
@@ -115,21 +115,21 @@ class AdminController {
         
         // Validate passwords
         if ($newPassword !== $confirmPassword) {
-            redirect('admin.php?error=password_mismatch');
+            redirect('admin/admin.php?error=password_mismatch');
             return;
         }
         
         if (strlen($newPassword) < 6) {
-            redirect('admin.php?error=password_short');
+            redirect('admin/admin.php?error=password_short');
             return;
         }
         
         // Update password
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         if ($this->userModel->update($userId, ['password' => $hashedPassword])) {
-            redirect('admin.php?success=password_changed');
+            redirect('admin/admin.php?success=password_changed');
         } else {
-            redirect('admin.php?error=password_change_failed');
+            redirect('admin/admin.php?error=password_change_failed');
         }
     }
 
