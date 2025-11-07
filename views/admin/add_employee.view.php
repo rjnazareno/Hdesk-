@@ -239,8 +239,18 @@ include __DIR__ . '/../layouts/header.php';
                                     <i class="fas fa-eye" id="password-eye"></i>
                                 </button>
                             </div>
+                            <!-- Password Strength Meter -->
+                            <div id="password-strength" class="mt-2 hidden">
+                                <div class="flex items-center justify-between text-xs mb-1">
+                                    <span class="text-slate-400">Strength:</span>
+                                    <span id="strength-text" class="font-medium"></span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                    <div id="strength-bar" class="h-full transition-all duration-300 rounded-full"></div>
+                                </div>
+                            </div>
                             <p class="text-sm text-slate-400 mt-1">
-                                <i class="fas fa-lock mr-1"></i>Strong password recommended
+                                <i class="fas fa-lock mr-1"></i>Strong password recommended (min. 6 characters)
                             </p>
                         </div>
 
@@ -305,11 +315,14 @@ include __DIR__ . '/../layouts/header.php';
                                 type="file" 
                                 id="profile_picture" 
                                 name="profile_picture"
-                                accept="image/*"
-                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500"
+                                accept="image/jpeg,image/png,image/gif"
+                                class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 text-white placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 hover:border-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 file:cursor-pointer"
                             >
                             <p class="text-sm text-slate-400 mt-1">
                                 <i class="fas fa-image mr-1"></i>JPG, PNG, GIF (Max 2MB)
+                            </p>
+                            <p id="file-error" class="text-sm text-red-400 mt-1 hidden">
+                                <i class="fas fa-exclamation-triangle mr-1"></i><span id="file-error-text"></span>
                             </p>
                         </div>
                     </div>
@@ -425,18 +438,107 @@ include __DIR__ . '/../layouts/header.php';
 // Toggle password visibility
 function togglePassword(fieldId) {
     const field = document.getElementById(fieldId);
-    const eye = document.getElementById(fieldId + '-eye');
+    const icon = document.getElementById(fieldId + '-eye');
     
     if (field.type === 'password') {
         field.type = 'text';
-        eye.classList.remove('fa-eye');
-        eye.classList.add('fa-eye-slash');
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
     } else {
         field.type = 'password';
-        eye.classList.remove('fa-eye-slash');
-        eye.classList.add('fa-eye');
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
     }
 }
+
+// Password strength meter
+function checkPasswordStrength(password) {
+    const strengthMeter = document.getElementById('password-strength');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+    
+    if (!password || password.length === 0) {
+        strengthMeter.classList.add('hidden');
+        return;
+    }
+    
+    strengthMeter.classList.remove('hidden');
+    
+    let strength = 0;
+    let feedback = '';
+    
+    // Length check
+    if (password.length >= 6) strength += 20;
+    if (password.length >= 8) strength += 10;
+    if (password.length >= 12) strength += 10;
+    
+    // Character variety checks
+    if (/[a-z]/.test(password)) strength += 15; // Lowercase
+    if (/[A-Z]/.test(password)) strength += 15; // Uppercase
+    if (/[0-9]/.test(password)) strength += 15; // Numbers
+    if (/[^a-zA-Z0-9]/.test(password)) strength += 15; // Special chars
+    
+    // Set strength level
+    if (strength <= 30) {
+        strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-red-500';
+        strengthBar.style.width = strength + '%';
+        strengthText.textContent = 'Weak';
+        strengthText.className = 'font-medium text-red-400';
+    } else if (strength <= 60) {
+        strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-yellow-500';
+        strengthBar.style.width = strength + '%';
+        strengthText.textContent = 'Fair';
+        strengthText.className = 'font-medium text-yellow-400';
+    } else if (strength <= 80) {
+        strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-blue-500';
+        strengthBar.style.width = strength + '%';
+        strengthText.textContent = 'Good';
+        strengthText.className = 'font-medium text-blue-400';
+    } else {
+        strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-green-500';
+        strengthBar.style.width = '100%';
+        strengthText.textContent = 'Strong';
+        strengthText.className = 'font-medium text-green-400';
+    }
+}
+
+// Add password strength check on input
+document.getElementById('password').addEventListener('input', function(e) {
+    checkPasswordStrength(e.target.value);
+});
+
+// File upload validation
+document.getElementById('profile_picture').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const fileError = document.getElementById('file-error');
+    const fileErrorText = document.getElementById('file-error-text');
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    
+    if (!file) {
+        fileError.classList.add('hidden');
+        return;
+    }
+    
+    // Check file size
+    if (file.size > maxSize) {
+        fileErrorText.textContent = `File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 2MB.`;
+        fileError.classList.remove('hidden');
+        e.target.value = ''; // Clear the input
+        return;
+    }
+    
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+        fileErrorText.textContent = 'Invalid file type. Only JPG, PNG, and GIF images are allowed.';
+        fileError.classList.remove('hidden');
+        e.target.value = ''; // Clear the input
+        return;
+    }
+    
+    // File is valid
+    fileError.classList.add('hidden');
+});
 
 // Auto-generate username from name
 function generateUsername() {

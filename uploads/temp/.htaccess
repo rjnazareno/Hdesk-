@@ -1,0 +1,5 @@
+# Temporary upload directory
+Options -Indexes
+
+# Deny all direct access to temporary files
+Require all denied

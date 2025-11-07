@@ -1,0 +1,12 @@
+# Protect ticket attachments directory
+Options -Indexes
+
+# Allow common file types for ticket attachments
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|txt|zip)$">
+    Require all granted
+</FilesMatch>
+
+# Deny executable files and scripts
+<FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|jsp|asp|aspx|sh|cgi|exe|bat)$">
+    Require all denied
+</FilesMatch>

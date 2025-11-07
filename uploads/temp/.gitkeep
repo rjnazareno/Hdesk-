@@ -1,0 +1,2 @@
+# This file ensures the uploads/temp directory is tracked in Git
+# Temporary files are ignored via .gitignore

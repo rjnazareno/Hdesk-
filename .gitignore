@@ -17,9 +17,18 @@ composer.lock
 Thumbs.db
 desktop.ini
 
-# Upload files
-/uploads/*
-!/uploads/.gitkeep
+# Upload files (keep directory structure, ignore uploaded files)
+/uploads/profiles/*
+!/uploads/profiles/.gitkeep
+!/uploads/profiles/.htaccess
+
+/uploads/tickets/*
+!/uploads/tickets/.gitkeep
+!/uploads/tickets/.htaccess
+
+/uploads/temp/*
+!/uploads/temp/.gitkeep
+!/uploads/temp/.htaccess
 
 # Log files
 *.log

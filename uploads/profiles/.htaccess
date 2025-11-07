@@ -1,0 +1,12 @@
+# Protect upload directory
+Options -Indexes
+
+# Allow only image files to be accessed directly
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Require all granted
+</FilesMatch>
+
+# Deny access to other file types
+<FilesMatch "\.(?!(jpg|jpeg|png|gif)$)([^.]+)$">
+    Require all denied
+</FilesMatch>
