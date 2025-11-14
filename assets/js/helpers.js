@@ -235,14 +235,9 @@ function initTooltips() {
             font-weight: 500;
             z-index: 10000;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.15s ease-in-out;
             white-space: nowrap;
             max-width: 300px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .custom-tooltip.show {
-            opacity: 1;
         }
         .custom-tooltip::before {
             content: '';
@@ -299,16 +294,13 @@ function initTooltips() {
             
             tooltip.style.left = left + 'px';
             tooltip.style.top = top + 'px';
-            
-            // Show tooltip instantly
-            requestAnimationFrame(() => tooltip.classList.add('show'));
+            // Tooltip shows instantly (no fade-in needed)
         });
         
         element.addEventListener('mouseleave', function() {
             const tooltip = document.getElementById('active-tooltip');
             if (tooltip) {
-                tooltip.classList.remove('show');
-                setTimeout(() => tooltip.remove(), 150);
+                tooltip.remove(); // Remove instantly, no fade
             }
         });
     });
