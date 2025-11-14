@@ -236,7 +236,7 @@ function initTooltips() {
             z-index: 10000;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s ease-in-out;
+            transition: opacity 0.15s ease-in-out;
             white-space: nowrap;
             max-width: 300px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -300,15 +300,15 @@ function initTooltips() {
             tooltip.style.left = left + 'px';
             tooltip.style.top = top + 'px';
             
-            // Show tooltip
-            setTimeout(() => tooltip.classList.add('show'), 10);
+            // Show tooltip instantly
+            requestAnimationFrame(() => tooltip.classList.add('show'));
         });
         
         element.addEventListener('mouseleave', function() {
             const tooltip = document.getElementById('active-tooltip');
             if (tooltip) {
                 tooltip.classList.remove('show');
-                setTimeout(() => tooltip.remove(), 200);
+                setTimeout(() => tooltip.remove(), 150);
             }
         });
     });
