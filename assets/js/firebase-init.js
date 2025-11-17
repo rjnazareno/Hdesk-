@@ -147,34 +147,27 @@ if (messaging) {
             badge: '/img/ResolveIT Logo Only without Background.png',
             tag: payload.data?.ticket_id || 'default',
             data: payload.data,
-            requireInteraction: true,
-            actions: [
-                {
-                    action: 'view',
-                    title: 'View Ticket'
-                },
-                {
-                    action: 'close',
-                    title: 'Dismiss'
-                }
-            ]
+            requireInteraction: true
         };
         
-        // Show notification
-        if (Notification.permission === 'granted') {
-            const notification = new Notification(notificationTitle, notificationOptions);
-            
-            notification.onclick = function(event) {
-                event.preventDefault();
-                
-                // Open ticket if ticket_id exists
-                if (payload.data?.ticket_id) {
-                    const ticketUrl = `/customer/view_ticket.php?id=${payload.data.ticket_id}`;
-                    window.open(ticketUrl, '_blank');
-                }
-                
-                notification.close();
-            };
+        // Show notification using Service Worker (supports actions)
+        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(notificationTitle, {
+                    ...notificationOptions,
+                    actions: [
+                        {
+                            action: 'view',
+                            title: 'View Ticket',
+                            icon: '/img/ResolveIT Logo Only without Background.png'
+                        },
+                        {
+                            action: 'dismiss',
+                            title: 'Dismiss'
+                        }
+                    ]
+                });
+            });
         }
         
         // Update notification badge/count in UI
