@@ -14,6 +14,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <?php endif; ?>
     
+    <!-- Firebase SDK for Cloud Messaging -->
+    <?php if (isset($includeFirebase) && $includeFirebase): ?>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+    <?php endif; ?>
+    
     <!-- Quick Wins CSS -->
     <link rel="stylesheet" href="<?php echo $baseUrl ?? '../'; ?>assets/css/print.css">
     <link rel="stylesheet" href="<?php echo $baseUrl ?? '../'; ?>assets/css/dark-mode.css">

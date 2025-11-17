@@ -2,6 +2,15 @@
     <script src="<?php echo $baseUrl ?? '../'; ?>assets/js/helpers.js"></script>
     <script src="<?php echo $baseUrl ?? '../'; ?>assets/js/notifications.js"></script>
     
+    <?php if (isset($includeFirebase) && $includeFirebase): ?>
+    <!-- Firebase Initialization -->
+    <script src="<?php echo $baseUrl ?? '../'; ?>assets/js/firebase-init.js"></script>
+    <script>
+        // Set logged in status for Firebase
+        document.body.dataset.userLoggedIn = '<?php echo isLoggedIn() ? 'true' : 'false'; ?>';
+    </script>
+    <?php endif; ?>
+    
     <?php if (isset($customScripts)): ?>
     <?php echo $customScripts; ?>
     <?php endif; ?>
