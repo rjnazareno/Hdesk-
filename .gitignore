@@ -1,6 +1,6 @@
 # Dependencies
 # /vendor/  # Temporarily allowing vendor for production deployment
-composer.lock
+# composer.lock  # Need this for production deployment
 
 # Environment files
 .env
