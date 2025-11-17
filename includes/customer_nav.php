@@ -70,6 +70,12 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/customer/') !== false ? '' : 'custome
                 <span class="font-medium">Knowledge Base</span>
             </a>
             
+            <a href="<?= $basePath ?>profile.php" 
+               class="flex items-center px-6 py-3 <?= $currentPage === 'profile.php' ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' : 'text-gray-700 hover:bg-gray-50' ?> transition">
+                <i class="fas fa-user-circle w-6"></i>
+                <span class="font-medium">My Profile</span>
+            </a>
+            
             <div class="mt-6 px-6">
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</p>
                 <a href="<?= $basePath ?>create_ticket.php" 
