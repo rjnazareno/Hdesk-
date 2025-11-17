@@ -205,19 +205,36 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check if user is logged in
     const isLoggedIn = document.body.dataset.userLoggedIn === 'true';
     
-    if (isLoggedIn && messaging) {
-        // Auto-request permission after 3 seconds
-        setTimeout(async () => {
-            const permission = Notification.permission;
+    console.log('🔍 DOMContentLoaded - isLoggedIn:', isLoggedIn, 'messaging:', !!messaging);
+    
+    if (isLoggedIn) {
+        // Wait for messaging to be initialized (max 5 seconds)
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds (50 * 100ms)
+        
+        const waitForMessaging = setInterval(async () => {
+            attempts++;
             
-            if (permission === 'default') {
-                // Show custom permission request UI
-                showNotificationPrompt();
-            } else if (permission === 'granted') {
-                // Already granted, get token
-                await requestNotificationPermission();
+            if (messaging) {
+                clearInterval(waitForMessaging);
+                console.log('✅ Messaging ready, checking permission...');
+                
+                const permission = Notification.permission;
+                console.log('🔔 Current permission:', permission);
+                
+                if (permission === 'default') {
+                    // Show custom permission request UI
+                    showNotificationPrompt();
+                } else if (permission === 'granted') {
+                    // Already granted, get token
+                    console.log('✅ Permission already granted, getting token...');
+                    await requestNotificationPermission();
+                }
+            } else if (attempts >= maxAttempts) {
+                clearInterval(waitForMessaging);
+                console.warn('⚠️ Messaging not initialized after 5 seconds');
             }
-        }, 3000);
+        }, 100);
     }
 });
 
