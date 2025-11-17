@@ -150,6 +150,23 @@ class CustomerCreateTicketController {
                 error_log("Failed to send email: " . $e->getMessage());
             }
             
+            // Send FCM push notification to IT staff
+            try {
+                require_once __DIR__ . '/../../includes/FCMNotification.php';
+                $fcm = new FCMNotification();
+                $ticket = $this->ticketModel->findById($ticketId);
+                $category = $this->categoryModel->findById($ticketData['category_id']);
+                
+                $fcm->notifyTicketCreated(
+                    $ticketId,
+                    $ticketNumber,
+                    $this->currentUser['fname'] . ' ' . $this->currentUser['lname'],
+                    $category['name'] ?? 'General'
+                );
+            } catch (Exception $e) {
+                error_log("Failed to send FCM notification: " . $e->getMessage());
+            }
+            
             $_SESSION['success'] = "Ticket created successfully!";
             redirect('customer/tickets.php');
         } else {

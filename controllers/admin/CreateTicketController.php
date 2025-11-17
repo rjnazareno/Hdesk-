@@ -202,6 +202,36 @@ class CreateTicketController {
                 error_log("Failed to send email: " . $e->getMessage());
             }
             
+            // Send FCM push notification to IT staff (if ticket created by admin)
+            try {
+                require_once __DIR__ . '/../../includes/FCMNotification.php';
+                $fcm = new FCMNotification();
+                $ticket = $this->ticketModel->findById($ticketId);
+                $employee = $this->employeeModel->findById($ticketData['submitter_id']);
+                $category = $this->categoryModel->findById($ticketData['category_id']);
+                
+                $submitterName = trim($employee['fname'] . ' ' . $employee['lname']);
+                
+                $fcm->notifyTicketCreated(
+                    $ticketId,
+                    $ticketNumber,
+                    $submitterName,
+                    $category['name'] ?? 'General'
+                );
+                
+                // If ticket is assigned, send assignment notification
+                if (!empty($ticketData['assigned_to'])) {
+                    $fcm->notifyTicketAssigned(
+                        $ticketId,
+                        $ticketNumber,
+                        $ticketData['assigned_to'],
+                        $currentUser['full_name']
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("Failed to send FCM notification: " . $e->getMessage());
+            }
+            
             redirect('admin/tickets.php?success=created');
         } else {
             error_log("Ticket creation returned FALSE/NULL - ticketId: " . var_export($ticketId, true));

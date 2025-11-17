@@ -124,6 +124,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff) {
         } catch (Exception $e) {
             error_log("Failed to send email: " . $e->getMessage());
         }
+        
+        // Send FCM push notification to submitter
+        try {
+            require_once __DIR__ . '/../includes/FCMNotification.php';
+            $fcm = new FCMNotification();
+            
+            $fcm->notifyTicketStatusChanged(
+                $ticketId,
+                $ticket['ticket_number'],
+                $updateData['status'],
+                $ticket['submitter_id'],
+                $ticket['submitter_type']
+            );
+        } catch (Exception $e) {
+            error_log("Failed to send FCM notification: " . $e->getMessage());
+        }
     }
     
     if (isset($_POST['assigned_to']) && $_POST['assigned_to'] !== $ticket['assigned_to']) {
@@ -166,6 +182,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff) {
                 $mailer->sendTicketAssigned($updatedTicket, $assignee);
             } catch (Exception $e) {
                 error_log("Failed to send email: " . $e->getMessage());
+            }
+            
+            // Send FCM push notification to assigned user
+            try {
+                require_once __DIR__ . '/../includes/FCMNotification.php';
+                $fcm = new FCMNotification();
+                
+                $fcm->notifyTicketAssigned(
+                    $ticketId,
+                    $ticket['ticket_number'],
+                    $assignee['id'],
+                    $currentUser['full_name']
+                );
+            } catch (Exception $e) {
+                error_log("Failed to send FCM notification: " . $e->getMessage());
             }
         }
     }
