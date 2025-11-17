@@ -1,5 +1,5 @@
 # Dependencies
-/vendor/
+# /vendor/  # Temporarily allowing vendor for production deployment
 composer.lock
 
 # Environment files
