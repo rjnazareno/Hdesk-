@@ -38,6 +38,7 @@ messaging.onBackgroundMessage((payload) => {
     const notificationIcon = payload.notification?.icon || '/img/ResolveIT Logo Only without Background.png';
     const ticketId = payload.data?.ticket_id;
     const notificationType = payload.data?.type || 'default';
+    const targetUrl = payload.data?.url || '/';
     
     // Notification options
     const notificationOptions = {
@@ -47,8 +48,9 @@ messaging.onBackgroundMessage((payload) => {
         tag: ticketId ? `ticket-${ticketId}` : 'notification',
         data: {
             ticketId: ticketId,
+            ticket_id: ticketId,
             type: notificationType,
-            url: payload.data?.url || '/',
+            url: targetUrl,
             timestamp: Date.now()
         },
         requireInteraction: true,
@@ -96,12 +98,13 @@ self.addEventListener('notificationclick', (event) => {
     // Default action or 'view' action
     let targetUrl = '/';
     
-    if (data.ticketId) {
-        // Determine user type and redirect accordingly
-        // Default to customer view (employee)
-        targetUrl = `/customer/view_ticket.php?id=${data.ticketId}`;
-    } else if (data.url) {
+    // Use the URL from backend if available
+    if (data.url) {
         targetUrl = data.url;
+    } else if (data.ticketId || data.ticket_id) {
+        // Fallback: construct URL from ticket ID
+        const ticketId = data.ticketId || data.ticket_id;
+        targetUrl = `/customer/view_ticket.php?id=${ticketId}`;
     }
     
     // Open or focus the app window
