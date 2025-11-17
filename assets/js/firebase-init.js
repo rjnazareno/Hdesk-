@@ -35,10 +35,16 @@ if (typeof firebase !== 'undefined') {
         if (firebase.messaging) {
             // Check if browser supports notifications
             if ('Notification' in window && 'serviceWorker' in navigator) {
-                // Register service worker first
+                // Register service worker first and wait for it to be ready
                 navigator.serviceWorker.register('/firebase-messaging-sw.js')
                     .then((registration) => {
                         console.log('✅ Service Worker registered:', registration);
+                        
+                        // Wait for service worker to be active
+                        return navigator.serviceWorker.ready;
+                    })
+                    .then(() => {
+                        console.log('✅ Service Worker is ready');
                         messaging = firebase.messaging(app);
                         console.log('✅ Firebase Cloud Messaging initialized');
                     })
@@ -63,6 +69,11 @@ if (typeof firebase !== 'undefined') {
  */
 async function requestNotificationPermission() {
     try {
+        // Wait for service worker to be ready
+        if ('serviceWorker' in navigator) {
+            await navigator.serviceWorker.ready;
+        }
+        
         // Check if messaging is available
         if (!messaging) {
             console.warn('⚠️ FCM not available');
