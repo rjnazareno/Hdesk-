@@ -86,9 +86,15 @@ async function requestNotificationPermission() {
         if (permission === 'granted') {
             console.log('✅ Notification permission granted');
             
-            // Get FCM token
+            // Ensure service worker is ready before getting token
+            await navigator.serviceWorker.ready;
+            console.log('✅ Service worker confirmed ready before getToken');
+            
+            // Get FCM token with service worker registration
+            const registration = await navigator.serviceWorker.ready;
             const token = await messaging.getToken({
-                vapidKey: 'BO3LtJTs6d9JzKVhNWIaz6wKbptPkvGfALQa5MLGLEnhB92leeLMO6sNIRbv4RyGpUAB5Zg4pPYyRe8eIoP_UXY'
+                vapidKey: 'BO3LtJTs6d9JzKVhNWIaz6wKbptPkvGfALQa5MLGLEnhB92leeLMO6sNIRbv4RyGpUAB5Zg4pPYyRe8eIoP_UXY',
+                serviceWorkerRegistration: registration
             });
             
             if (token) {
