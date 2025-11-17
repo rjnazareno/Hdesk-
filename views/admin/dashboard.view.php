@@ -2,6 +2,7 @@
 // Include layout header
 $pageTitle = 'Dashboard - IT Help Desk';
 $includeChartJs = true;
+$includeFirebase = true; // Enable Firebase notifications
 $baseUrl = '../';
 include __DIR__ . '/../layouts/header.php'; 
 ?>

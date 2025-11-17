@@ -257,6 +257,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK for Cloud Messaging -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+    
     <!-- Quick Wins CSS -->
     <link rel="stylesheet" href="../assets/css/print.css">
     <link rel="stylesheet" href="../assets/css/dark-mode.css">
@@ -668,6 +673,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
     
     <!-- Quick Wins JavaScript -->
     <script src="../assets/js/helpers.js"></script>
+    
+    <!-- Firebase Initialization -->
+    <script src="../assets/js/firebase-init.js"></script>
+    <script>
+        // Set logged in status for Firebase
+        document.body.dataset.userLoggedIn = 'true';
+    </script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             initTooltips();

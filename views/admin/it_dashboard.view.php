@@ -1,6 +1,7 @@
 <?php 
 // Set page-specific variables
 $pageTitle = 'My Dashboard - IT Help Desk';
+$includeFirebase = true; // Enable Firebase notifications
 $baseUrl = '../';
 
 // Include header layout

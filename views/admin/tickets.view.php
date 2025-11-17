@@ -1,6 +1,7 @@
 <?php 
 // Set page-specific variables
 $pageTitle = 'Tickets - IT Help Desk';
+$includeFirebase = true; // Enable Firebase notifications
 $baseUrl = '../';
 
 // Include header layout
