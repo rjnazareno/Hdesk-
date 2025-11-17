@@ -35,8 +35,16 @@ if (typeof firebase !== 'undefined') {
         if (firebase.messaging) {
             // Check if browser supports notifications
             if ('Notification' in window && 'serviceWorker' in navigator) {
-                messaging = firebase.messaging(app);
-                console.log('✅ Firebase Cloud Messaging initialized');
+                // Register service worker first
+                navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration);
+                        messaging = firebase.messaging(app);
+                        console.log('✅ Firebase Cloud Messaging initialized');
+                    })
+                    .catch((error) => {
+                        console.error('❌ Service Worker registration failed:', error);
+                    });
             } else {
                 console.warn('⚠️ Browser does not support notifications or service workers');
             }
