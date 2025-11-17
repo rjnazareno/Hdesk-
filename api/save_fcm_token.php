@@ -66,14 +66,13 @@ try {
     
     if ($checkColumn->rowCount() === 0) {
         // Column doesn't exist, create it
-        $alterSql = "ALTER TABLE `{$table}` ADD COLUMN `fcm_token` VARCHAR(255) NULL AFTER `profile_picture`";
+        $alterSql = "ALTER TABLE `{$table}` ADD COLUMN `fcm_token` VARCHAR(255) NULL";
         $db->exec($alterSql);
     }
     
-    // Update FCM token
+    // Update FCM token (without updated_at if column doesn't exist)
     $sql = "UPDATE `{$table}` 
-            SET `fcm_token` = :token,
-                `updated_at` = CURRENT_TIMESTAMP
+            SET `fcm_token` = :token
             WHERE `id` = :user_id";
     
     $stmt = $db->prepare($sql);
@@ -94,10 +93,13 @@ try {
     
 } catch (PDOException $e) {
     error_log("FCM Token Save Error: " . $e->getMessage());
+    error_log("User Type: {$userType}, User ID: {$userId}, Table: {$table}");
+    error_log("Full Error: " . print_r($e, true));
     
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Database error occurred'
+        'error' => 'Database error occurred',
+        'debug' => $e->getMessage() // Temporary for debugging
     ]);
 }
