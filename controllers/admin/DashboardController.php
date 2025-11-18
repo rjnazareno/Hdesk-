@@ -45,6 +45,14 @@ class DashboardController {
      * Main index action - displays the dashboard
      */
     public function index() {
+        // Pagination for recent tickets
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 5;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Get paginated recent tickets
+        $recentTicketsData = $this->getRecentTickets($itemsPerPage, $offset);
+        
         // Get all required data
         $data = [
             'currentUser' => $this->currentUser,
@@ -53,7 +61,8 @@ class DashboardController {
             'userStats' => $this->userModel->getStats(),
             'employeeStats' => $this->employeeModel->getStats(),
             'categoryStats' => $this->categoryModel->getStats(),
-            'recentTickets' => $this->getRecentTickets(),
+            'recentTickets' => $recentTicketsData['tickets'],
+            'recentTicketsPagination' => $recentTicketsData['pagination'],
             'recentActivity' => $this->getRecentActivity(),
             'dailyStats' => $this->getDailyStatistics(),
             'chartData' => $this->prepareChartData(),
@@ -72,13 +81,34 @@ class DashboardController {
     }
 
     /**
-     * Get recent tickets
+     * Get recent tickets with pagination
      */
-    private function getRecentTickets() {
-        return $this->ticketModel->getAll([
-            'limit' => 5,
+    private function getRecentTickets($limit = 5, $offset = 0) {
+        // Get tickets for pagination
+        $tickets = $this->ticketModel->getAll([
+            'submitter_id' => !$this->isITStaff ? $this->currentUser['id'] : null
+        ], 'created_at', 'DESC', $limit, $offset);
+        
+        // Get total count for pagination
+        $totalTickets = $this->ticketModel->getTotalCount([
             'submitter_id' => !$this->isITStaff ? $this->currentUser['id'] : null
         ]);
+        
+        // Calculate pagination
+        $totalPages = ceil($totalTickets / $limit);
+        $currentPage = floor($offset / $limit) + 1;
+        
+        return [
+            'tickets' => $tickets,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalTickets,
+                'itemsPerPage' => $limit,
+                'hasNextPage' => $currentPage < $totalPages,
+                'hasPrevPage' => $currentPage > 1
+            ]
+        ];
     }
 
     /**

@@ -381,7 +381,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-xs text-slate-400 px-2 py-1 border border-slate-600/50 rounded bg-slate-700/30">
-                                <?php echo count($recentTickets); ?> tickets
+                                <?php echo $recentTicketsPagination['totalItems']; ?> tickets
                             </span>
                         </div>
                     </div>
@@ -497,6 +497,42 @@ include __DIR__ . '/../layouts/header.php';
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination Controls -->
+                    <?php if ($recentTicketsPagination['totalPages'] > 1): ?>
+                    <div class="mt-6 pt-4 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-slate-400">
+                                Page <?php echo $recentTicketsPagination['currentPage']; ?> of <?php echo $recentTicketsPagination['totalPages']; ?>
+                                <span class="mx-2">•</span>
+                                Showing <?php echo count($recentTickets); ?> of <?php echo $recentTicketsPagination['totalItems']; ?> tickets
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <?php if ($recentTicketsPagination['hasPrevPage']): ?>
+                                <a href="?page=<?php echo $recentTicketsPagination['currentPage'] - 1; ?>" 
+                                   class="px-3 py-1.5 text-sm border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-cyan-400 rounded-lg transition">
+                                    <i class="fas fa-chevron-left mr-1"></i> Prev
+                                </a>
+                                <?php else: ?>
+                                <span class="px-3 py-1.5 text-sm border border-slate-700 bg-slate-800/50 text-slate-600 rounded-lg cursor-not-allowed">
+                                    <i class="fas fa-chevron-left mr-1"></i> Prev
+                                </span>
+                                <?php endif; ?>
+                                
+                                <?php if ($recentTicketsPagination['hasNextPage']): ?>
+                                <a href="?page=<?php echo $recentTicketsPagination['currentPage'] + 1; ?>" 
+                                   class="px-3 py-1.5 text-sm border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-cyan-400 rounded-lg transition">
+                                    Next <i class="fas fa-chevron-right ml-1"></i>
+                                </a>
+                                <?php else: ?>
+                                <span class="px-3 py-1.5 text-sm border border-slate-700 bg-slate-800/50 text-slate-600 rounded-lg cursor-not-allowed">
+                                    Next <i class="fas fa-chevron-right ml-1"></i>
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     
                     <!-- View All Button -->
                     <div class="mt-6 pt-4 border-t border-slate-700/50 text-center">
