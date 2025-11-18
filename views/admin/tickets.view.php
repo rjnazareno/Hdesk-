@@ -57,13 +57,13 @@ include __DIR__ . '/../layouts/header.php';
                 
                 <?php if ($isITStaff): ?>
                 <!-- Quick Actions Dropdown -->
-                <div class="relative" id="quickActionsDropdown">
+                <div class="relative z-50" id="quickActionsDropdown">
                     <button class="flex items-center space-x-2 px-4 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:text-white hover:border-cyan-500/50 rounded-lg transition" id="quickActionsBtn">
                         <i class="fas fa-bolt text-cyan-500"></i>
                         <span class="hidden lg:inline text-sm font-medium">Quick Actions</span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
-                    <div class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-700/50 hidden z-50" id="quickActionsMenu">
+                    <div class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-700/50 hidden z-[100]" id="quickActionsMenu">
                         <div class="py-2">
                             <a href="create_ticket.php" class="flex items-center px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-cyan-400 transition">
                                 <i class="fas fa-plus-circle w-5"></i>
@@ -94,8 +94,8 @@ include __DIR__ . '/../layouts/header.php';
                 </button>
 
                 <!-- User Avatar with Dropdown -->
-                <div class="relative" id="userMenuDropdown">
-                    <button class="flex items-center space-x-2 p-1 hover:bg-slate-700/50 transition" id="userMenuBtn">
+                <div class="relative z-50" id="userMenuDropdown">
+                    <button class="flex items-center space-x-2 p-1 hover:bg-slate-700/50 transition rounded-lg" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=06b6d4" 
                              alt="User" 
                              class="w-10 h-10 rounded-full"
@@ -106,7 +106,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
                         <i class="fas fa-chevron-down text-xs text-slate-400 hidden lg:block"></i>
                     </button>
-                    <div class="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700/50 hidden z-50" id="userMenu">
+                    <div class="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700/50 rounded-lg shadow-xl hidden z-[100]" id="userMenu">
                         <div class="p-4 border-b border-slate-700/50">
                             <div class="font-medium text-white"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
                             <div class="text-sm text-slate-400"><?php echo htmlspecialchars($currentUser['email']); ?></div>
