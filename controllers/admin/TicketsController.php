@@ -40,13 +40,33 @@ class TicketsController {
             $filters['submitter_id'] = $this->currentUser['id'];
         }
 
+        // Get pagination parameters
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = isset($_GET['per_page']) ? max(5, min(100, (int)$_GET['per_page'])) : 10;
+        $filters['limit'] = $perPage;
+        $filters['offset'] = ($page - 1) * $perPage;
+
+        // Get sort parameters
+        $filters['sort_by'] = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'created_at';
+        $filters['sort_order'] = isset($_GET['sort_order']) && $_GET['sort_order'] === 'asc' ? 'asc' : 'desc';
+
+        // Get total count for pagination
+        $totalTickets = $this->ticketModel->getCount($filters);
+        $totalPages = ceil($totalTickets / $perPage);
+
         // Get tickets and categories
         $data = [
             'currentUser' => $this->currentUser,
             'isITStaff' => $this->isITStaff,
             'tickets' => $this->ticketModel->getAll($filters),
             'categories' => $this->categoryModel->getAll(),
-            'filters' => $filters
+            'filters' => $filters,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total_tickets' => $totalTickets,
+                'total_pages' => $totalPages
+            ]
         ];
 
         // Load the view

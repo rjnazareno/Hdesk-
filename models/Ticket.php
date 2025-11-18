@@ -133,7 +133,7 @@ class Ticket {
     /**
      * Get all tickets with filters
      */
-    public function getAll($filters = []) {
+    public function getAll($filters = [], $sortBy = 'created_at', $sortDir = 'DESC', $limit = null, $offset = null) {
         $sql = "SELECT t.*, 
                 c.name as category_name, c.color as category_color,
                 CASE 
@@ -193,31 +193,87 @@ class Ticket {
             $params[':search'] = '%' . $filters['search'] . '%';
         }
         
-        $sql .= " ORDER BY t.created_at DESC";
+        // Add sorting
+        $allowedSortFields = ['created_at', 'priority', 'status', 'ticket_number', 'updated_at'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'created_at';
+        }
+        if (!in_array($sortDir, ['ASC', 'DESC'])) {
+            $sortDir = 'DESC';
+        }
+        $sql .= " ORDER BY t.$sortBy $sortDir";
         
-        if (isset($filters['limit'])) {
+        // Add pagination
+        if ($limit !== null) {
             $sql .= " LIMIT :limit";
-            if (isset($filters['offset'])) {
+            if ($offset !== null) {
                 $sql .= " OFFSET :offset";
             }
         }
         
         $stmt = $this->db->prepare($sql);
         
-        // Bind limit and offset separately as integers
+        // Bind filter parameters
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
         
-        if (isset($filters['limit'])) {
-            $stmt->bindValue(':limit', (int)$filters['limit'], PDO::PARAM_INT);
-            if (isset($filters['offset'])) {
-                $stmt->bindValue(':offset', (int)$filters['offset'], PDO::PARAM_INT);
+        // Bind pagination parameters
+        if ($limit !== null) {
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            if ($offset !== null) {
+                $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
             }
         }
         
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+    
+    /**
+     * Get total count of tickets matching filters
+     */
+    public function getTotalCount($filters = []) {
+        $sql = "SELECT COUNT(*) as total
+                FROM tickets t
+                WHERE 1=1";
+        
+        $params = [];
+        
+        if (isset($filters['status']) && !empty($filters['status'])) {
+            $sql .= " AND t.status = :status";
+            $params[':status'] = $filters['status'];
+        }
+        
+        if (isset($filters['priority']) && !empty($filters['priority'])) {
+            $sql .= " AND t.priority = :priority";
+            $params[':priority'] = $filters['priority'];
+        }
+        
+        if (isset($filters['category_id']) && !empty($filters['category_id'])) {
+            $sql .= " AND t.category_id = :category_id";
+            $params[':category_id'] = $filters['category_id'];
+        }
+        
+        if (isset($filters['submitter_id']) && !empty($filters['submitter_id'])) {
+            $sql .= " AND t.submitter_id = :submitter_id";
+            $params[':submitter_id'] = $filters['submitter_id'];
+        }
+        
+        if (isset($filters['assigned_to']) && !empty($filters['assigned_to'])) {
+            $sql .= " AND t.assigned_to = :assigned_to";
+            $params[':assigned_to'] = $filters['assigned_to'];
+        }
+        
+        if (isset($filters['search']) && !empty($filters['search'])) {
+            $sql .= " AND (t.ticket_number LIKE :search OR t.title LIKE :search OR t.description LIKE :search)";
+            $params[':search'] = '%' . $filters['search'] . '%';
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        return (int)$result['total'];
     }
     
     /**

@@ -279,17 +279,53 @@ include __DIR__ . '/../layouts/header.php';
                 <table class="w-full">
                     <thead class="bg-slate-700/30 border-b border-slate-700/50">
                         <tr>
+                            <?php
+                            // Helper function to generate sort URL
+                            function getSortUrl($field, $currentSort, $currentDir) {
+                                $newDir = ($currentSort === $field && $currentDir === 'ASC') ? 'DESC' : 'ASC';
+                                $url = '?sort_by=' . $field . '&sort_dir=' . $newDir;
+                                if (isset($_GET['page'])) $url .= '&page=' . $_GET['page'];
+                                if (isset($_GET['status'])) $url .= '&status=' . urlencode($_GET['status']);
+                                if (isset($_GET['priority'])) $url .= '&priority=' . urlencode($_GET['priority']);
+                                if (isset($_GET['category_id'])) $url .= '&category_id=' . urlencode($_GET['category_id']);
+                                if (isset($_GET['search'])) $url .= '&search=' . urlencode($_GET['search']);
+                                return $url;
+                            }
+                            
+                            // Helper function to generate sort icon
+                            function getSortIcon($field, $currentSort, $currentDir) {
+                                if ($currentSort !== $field) {
+                                    return '<i class="fas fa-sort text-slate-500 ml-1"></i>';
+                                }
+                                return $currentDir === 'ASC' 
+                                    ? '<i class="fas fa-sort-up text-cyan-400 ml-1"></i>' 
+                                    : '<i class="fas fa-sort-down text-cyan-400 ml-1"></i>';
+                            }
+                            ?>
+                            
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
-                                Ticket
+                                <a href="<?php echo getSortUrl('ticket_number', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
+                                   class="flex items-center hover:text-cyan-400 transition">
+                                    Ticket
+                                    <?php echo getSortIcon('ticket_number', $sorting['sort_by'], $sorting['sort_dir']); ?>
+                                </a>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
                                 Category
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
-                                Priority
+                                <a href="<?php echo getSortUrl('priority', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
+                                   class="flex items-center hover:text-cyan-400 transition">
+                                    Priority
+                                    <?php echo getSortIcon('priority', $sorting['sort_by'], $sorting['sort_dir']); ?>
+                                </a>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
-                                Status
+                                <a href="<?php echo getSortUrl('status', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
+                                   class="flex items-center hover:text-cyan-400 transition">
+                                    Status
+                                    <?php echo getSortIcon('status', $sorting['sort_by'], $sorting['sort_dir']); ?>
+                                </a>
                             </th>
                             <?php if ($isITStaff): ?>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
@@ -303,7 +339,11 @@ include __DIR__ . '/../layouts/header.php';
                             </th>
                             <?php endif; ?>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
-                                Created
+                                <a href="<?php echo getSortUrl('created_at', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
+                                   class="flex items-center hover:text-cyan-400 transition">
+                                    Created
+                                    <?php echo getSortIcon('created_at', $sorting['sort_by'], $sorting['sort_dir']); ?>
+                                </a>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wide">
                                 Actions
@@ -479,19 +519,104 @@ include __DIR__ . '/../layouts/header.php';
             <!-- Table Footer with Stats -->
             <?php if (!empty($tickets)): ?>
             <div class="bg-slate-700/30 border-t border-slate-700/50 px-6 py-4">
-                <div class="flex items-center justify-between text-sm">
-                    <div class="flex items-center space-x-6">
-                        <div class="flex items-center space-x-2 px-3 py-1.5 border border-slate-600">
-                            <i class="fas fa-ticket-alt text-slate-300"></i>
-                            <span class="text-slate-300 font-medium">
-                                <strong class="text-white"><?php echo count($tickets); ?></strong> ticket<?php echo count($tickets) !== 1 ? 's' : ''; ?>
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                    <!-- Results Info -->
+                    <div class="flex items-center space-x-2 text-sm text-slate-300">
+                        <i class="fas fa-ticket-alt text-slate-400"></i>
+                        <span>
+                            Showing <strong class="text-white"><?php 
+                                $startItem = (($pagination['current_page'] - 1) * $pagination['items_per_page']) + 1;
+                                $endItem = min($pagination['current_page'] * $pagination['items_per_page'], $pagination['total_items']);
+                                echo $startItem . '-' . $endItem;
+                            ?></strong> of <strong class="text-white"><?php echo $pagination['total_items']; ?></strong> tickets
+                        </span>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <?php if ($pagination['total_pages'] > 1): ?>
+                    <div class="flex items-center space-x-2">
+                        <!-- Previous Button -->
+                        <?php if ($pagination['current_page'] > 1): ?>
+                        <a href="?page=<?php echo $pagination['current_page'] - 1; ?>&sort_by=<?php echo $sorting['sort_by']; ?>&sort_dir=<?php echo $sorting['sort_dir']; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['priority']) ? '&priority=' . urlencode($_GET['priority']) : ''; ?>" 
+                           class="px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <?php else: ?>
+                        <span class="px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-lg cursor-not-allowed">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                        <?php endif; ?>
+
+                        <!-- Page Numbers -->
+                        <div class="hidden sm:flex items-center space-x-1">
+                            <?php
+                            $maxPagesToShow = 5;
+                            $halfPages = floor($maxPagesToShow / 2);
+                            $startPage = max(1, $pagination['current_page'] - $halfPages);
+                            $endPage = min($pagination['total_pages'], $pagination['current_page'] + $halfPages);
+                            
+                            // Adjust if at start or end
+                            if ($pagination['current_page'] <= $halfPages) {
+                                $endPage = min($maxPagesToShow, $pagination['total_pages']);
+                            }
+                            if ($pagination['current_page'] > $pagination['total_pages'] - $halfPages) {
+                                $startPage = max(1, $pagination['total_pages'] - $maxPagesToShow + 1);
+                            }
+
+                            // First page
+                            if ($startPage > 1) {
+                                echo '<a href="?page=1&sort_by=' . $sorting['sort_by'] . '&sort_dir=' . $sorting['sort_dir'];
+                                if (isset($_GET['status'])) echo '&status=' . urlencode($_GET['status']);
+                                if (isset($_GET['priority'])) echo '&priority=' . urlencode($_GET['priority']);
+                                echo '" class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">1</a>';
+                                if ($startPage > 2) echo '<span class="px-2 text-slate-500">...</span>';
+                            }
+
+                            // Page numbers
+                            for ($i = $startPage; $i <= $endPage; $i++):
+                                if ($i == $pagination['current_page']):
+                            ?>
+                            <span class="px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg">
+                                <?php echo $i; ?>
                             </span>
+                            <?php else: ?>
+                            <a href="?page=<?php echo $i; ?>&sort_by=<?php echo $sorting['sort_by']; ?>&sort_dir=<?php echo $sorting['sort_dir']; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['priority']) ? '&priority=' . urlencode($_GET['priority']) : ''; ?>" 
+                               class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">
+                                <?php echo $i; ?>
+                            </a>
+                            <?php 
+                                endif;
+                            endfor;
+
+                            // Last page
+                            if ($endPage < $pagination['total_pages']) {
+                                if ($endPage < $pagination['total_pages'] - 1) echo '<span class="px-2 text-slate-500">...</span>';
+                                echo '<a href="?page=' . $pagination['total_pages'] . '&sort_by=' . $sorting['sort_by'] . '&sort_dir=' . $sorting['sort_dir'];
+                                if (isset($_GET['status'])) echo '&status=' . urlencode($_GET['status']);
+                                if (isset($_GET['priority'])) echo '&priority=' . urlencode($_GET['priority']);
+                                echo '" class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">' . $pagination['total_pages'] . '</a>';
+                            }
+                            ?>
                         </div>
+
+                        <!-- Mobile: Current Page Display -->
+                        <div class="sm:hidden px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 rounded-lg">
+                            <span class="text-white font-semibold"><?php echo $pagination['current_page']; ?></span> / <?php echo $pagination['total_pages']; ?>
+                        </div>
+
+                        <!-- Next Button -->
+                        <?php if ($pagination['current_page'] < $pagination['total_pages']): ?>
+                        <a href="?page=<?php echo $pagination['current_page'] + 1; ?>&sort_by=<?php echo $sorting['sort_by']; ?>&sort_dir=<?php echo $sorting['sort_dir']; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['priority']) ? '&priority=' . urlencode($_GET['priority']) : ''; ?>" 
+                           class="px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <?php else: ?>
+                        <span class="px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-lg cursor-not-allowed">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                        <?php endif; ?>
                     </div>
-                    <div class="flex items-center space-x-2 text-slate-400">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="text-xs">Click on any row to view details</span>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>
