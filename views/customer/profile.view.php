@@ -20,7 +20,7 @@ $basePath = '../';
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 
     <!-- Customer Navigation -->
-    <?php include __DIR__ . '/../includes/customer_nav.php'; ?>
+    <?php include __DIR__ . '/../../includes/customer_nav.php'; ?>
 
     <!-- Main Content -->
     <div class="lg:ml-64 min-h-screen">
