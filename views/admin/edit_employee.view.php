@@ -213,6 +213,9 @@ include __DIR__ . '/../layouts/header.php';
                             <input type="password" 
                                    name="password" 
                                    placeholder="Leave blank to keep current password"
+                                   autocomplete="new-password"
+                                   onfocus="this.removeAttribute('readonly');"
+                                   readonly
                                    class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
                             <p class="mt-2 text-xs text-slate-400">
                                 <i class="fas fa-info-circle mr-1"></i>
@@ -237,6 +240,51 @@ include __DIR__ . '/../layouts/header.php';
         </div>
     </div>
 </div>
+
+<script>
+// Prevent inspect element and right-click on the entire page
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Prevent F12 and Ctrl+Shift+I (DevTools shortcuts)
+document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+J
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+U (View Source)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Clear password field on page load to prevent autofill inspection
+window.addEventListener('load', function() {
+    const passwordField = document.querySelector('input[name="password"]');
+    if (passwordField) {
+        passwordField.value = '';
+    }
+});
+</script>
 
 <?php 
 // Include footer layout
