@@ -162,14 +162,17 @@
                         </div>
                         
                         <!-- Pagination -->
-                        <?php if ($pagination['totalPages'] > 1): ?>
+                        <?php if (isset($pagination)): ?>
                         <div class="px-6 py-4 border-t border-slate-700/50">
                             <div class="flex items-center justify-between">
                                 <div class="text-sm text-slate-400">
+                                    <?php if ($pagination['totalPages'] > 1): ?>
                                     Page <?php echo $pagination['currentPage']; ?> of <?php echo $pagination['totalPages']; ?>
                                     <span class="mx-2">•</span>
+                                    <?php endif; ?>
                                     Showing <?php echo count($notifications); ?> of <?php echo $pagination['totalItems']; ?> notifications
                                 </div>
+                                <?php if ($pagination['totalPages'] > 1): ?>
                                 <div class="flex items-center space-x-2">
                                     <?php if ($pagination['hasPrevPage']): ?>
                                     <a href="?page=<?php echo $pagination['currentPage'] - 1; ?>" 
@@ -193,6 +196,7 @@
                                     </span>
                                     <?php endif; ?>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <?php endif; ?>

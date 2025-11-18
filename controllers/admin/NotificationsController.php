@@ -27,7 +27,7 @@ class NotificationsController {
         
         // Pagination
         $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-        $itemsPerPage = 10;
+        $itemsPerPage = 5; // Show 5 per page so pagination is visible
         $offset = ($page - 1) * $itemsPerPage;
         
         // Get paginated notifications for this user
