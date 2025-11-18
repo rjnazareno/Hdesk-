@@ -18,7 +18,8 @@ class CustomerViewTicketController {
         
         // Ensure only employees can access
         if ($_SESSION['user_type'] !== 'employee') {
-            redirect('admin/dashboard.php');
+            header("Location: " . BASE_URL . "admin/dashboard.php");
+            exit();
         }
         
         $this->ticketModel = new Ticket();
@@ -37,13 +38,15 @@ class CustomerViewTicketController {
         
         if (!$ticket) {
             $_SESSION['error'] = "Ticket not found.";
-            redirect('customer/tickets.php');
+            header("Location: tickets.php");
+            exit();
         }
         
         // Check permission - employees can only view their own tickets
         if (!$this->isITStaff && $ticket['submitter_id'] != $this->currentUser['id']) {
             $_SESSION['error'] = "You don't have permission to view this ticket.";
-            redirect('customer/tickets.php');
+            header("Location: tickets.php");
+            exit();
         }
         
         // Get activity log
@@ -69,7 +72,8 @@ class CustomerViewTicketController {
     public function update() {
         if (!$this->isITStaff) {
             $_SESSION['error'] = "You don't have permission to update tickets.";
-            redirect('customer/tickets.php');
+            header("Location: tickets.php");
+            exit();
         }
         
         $ticketId = $_POST['ticket_id'] ?? 0;
@@ -77,7 +81,8 @@ class CustomerViewTicketController {
         
         if (!$ticket) {
             $_SESSION['error'] = "Ticket not found.";
-            redirect('customer/tickets.php');
+            header("Location: tickets.php");
+            exit();
         }
         
         $updateData = [];
@@ -155,7 +160,8 @@ class CustomerViewTicketController {
             $_SESSION['success'] = "Ticket updated successfully!";
         }
         
-        redirect('customer/view_ticket.php?id=' . $ticketId);
+        header("Location: view_ticket.php?id=" . $ticketId);
+        exit();
     }
     
     /**

@@ -216,7 +216,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff) {
     
     if (!empty($updateData)) {
         $ticketModel->update($ticketId, $updateData);
-        redirect('view_ticket.php?id=' . $ticketId . '&success=updated');
+        header("Location: view_ticket.php?id=" . $ticketId . "&success=updated");
+        exit();
     }
 }
 
@@ -272,7 +273,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
             }
         }
         
-        redirect('view_ticket.php?id=' . $ticketId . '&success=commented');
+        header("Location: view_ticket.php?id=" . $ticketId . "&success=commented");
+        exit();
     }
 }
 ?>
