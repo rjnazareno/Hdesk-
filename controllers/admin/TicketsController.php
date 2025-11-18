@@ -32,40 +32,55 @@ class TicketsController {
      * Display all tickets with filters
      */
     public function index() {
-        // Get filter parameters
+        // Pagination
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 20;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Sorting
+        $sortBy = $_GET['sort_by'] ?? 'created_at';
+        $sortDir = $_GET['sort_dir'] ?? 'DESC';
+        
+        // Validate sort fields
+        $allowedSort = ['created_at', 'priority', 'status', 'ticket_number'];
+        if (!in_array($sortBy, $allowedSort)) {
+            $sortBy = 'created_at';
+        }
+        if (!in_array($sortDir, ['ASC', 'DESC'])) {
+            $sortDir = 'DESC';
+        }
+        
+        // Get filters
         $filters = $this->getFilters();
-
+        
         // If employee, only show their tickets
         if (!$this->isITStaff) {
             $filters['submitter_id'] = $this->currentUser['id'];
         }
-
-        // Get pagination parameters
-        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-        $perPage = isset($_GET['per_page']) ? max(5, min(100, (int)$_GET['per_page'])) : 10;
-        $filters['limit'] = $perPage;
-        $filters['offset'] = ($page - 1) * $perPage;
-
-        // Get sort parameters
-        $filters['sort_by'] = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'created_at';
-        $filters['sort_order'] = isset($_GET['sort_order']) && $_GET['sort_order'] === 'asc' ? 'asc' : 'desc';
-
+        
+        // Get tickets with pagination and sorting
+        $tickets = $this->ticketModel->getAll($filters, $sortBy, $sortDir, $itemsPerPage, $offset);
+        
         // Get total count for pagination
-        $totalTickets = $this->ticketModel->getCount($filters);
-        $totalPages = ceil($totalTickets / $perPage);
-
-        // Get tickets and categories
+        $totalTickets = $this->ticketModel->getTotalCount($filters);
+        $totalPages = ceil($totalTickets / $itemsPerPage);
+        
+        // Prepare data for view
         $data = [
             'currentUser' => $this->currentUser,
             'isITStaff' => $this->isITStaff,
-            'tickets' => $this->ticketModel->getAll($filters),
+            'tickets' => $tickets,
             'categories' => $this->categoryModel->getAll(),
             'filters' => $filters,
             'pagination' => [
                 'current_page' => $page,
-                'per_page' => $perPage,
-                'total_tickets' => $totalTickets,
-                'total_pages' => $totalPages
+                'total_pages' => $totalPages,
+                'items_per_page' => $itemsPerPage,
+                'total_items' => $totalTickets
+            ],
+            'sorting' => [
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir
             ]
         ];
 
