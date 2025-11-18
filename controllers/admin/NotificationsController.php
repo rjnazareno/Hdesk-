@@ -25,22 +25,29 @@ class NotificationsController {
         $userType = $_SESSION['user_type'] ?? 'employee';
         $userId = $this->currentUser['id'];
         
-        // Get all notifications for this user
-        $notifications = $this->getNotifications($userId, $userType);
+        // Pagination
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 10;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Get paginated notifications for this user
+        $notificationsData = $this->getNotifications($userId, $userType, $itemsPerPage, $offset);
         
         // Get notification stats
         $stats = $this->getNotificationStats($userId, $userType);
         
         // Pass data to view
         $currentUser = $this->currentUser;
+        $notifications = $notificationsData['notifications'];
+        $pagination = $notificationsData['pagination'];
         
         // Load appropriate view based on user type
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
             // IT Staff or Admin
-            $this->loadView('admin/notifications', compact('currentUser', 'notifications', 'stats', 'userType'));
+            $this->loadView('admin/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination'));
         } else {
             // Regular Employee
-            $this->loadView('customer/notifications', compact('currentUser', 'notifications', 'stats', 'userType'));
+            $this->loadView('customer/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination'));
         }
     }
     
@@ -77,9 +84,11 @@ class NotificationsController {
         
         $userType = $_SESSION['user_type'] ?? 'employee';
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
-            redirect('admin/notifications.php');
+            header("Location: notifications.php");
+            exit();
         } else {
-            redirect('customer/notifications.php');
+            header("Location: " . BASE_URL . "customer/notifications.php");
+            exit();
         }
     }
     
@@ -102,27 +111,58 @@ class NotificationsController {
         
         $userType = $_SESSION['user_type'] ?? 'employee';
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
-            redirect('admin/notifications.php');
+            header("Location: notifications.php");
+            exit();
         } else {
-            redirect('customer/notifications.php');
+            header("Location: " . BASE_URL . "customer/notifications.php");
+            exit();
         }
     }
     
     /**
-     * Get notifications for user
+     * Get notifications for user with pagination
      */
-    private function getNotifications($userId, $userType) {
+    private function getNotifications($userId, $userType, $limit = 10, $offset = 0) {
+        // Get total count
+        $countSql = "SELECT COUNT(*) as total
+                     FROM notifications n
+                     WHERE n.user_id = :user_id";
+        
+        $stmt = $this->db->prepare($countSql);
+        $stmt->execute([':user_id' => $userId]);
+        $totalNotifications = $stmt->fetch()['total'];
+        
+        // Get paginated notifications
         $sql = "SELECT n.*, 
                 t.ticket_number, t.title as ticket_title
                 FROM notifications n
                 LEFT JOIN tickets t ON n.ticket_id = t.id
                 WHERE n.user_id = :user_id
                 ORDER BY n.created_at DESC
-                LIMIT 50";
+                LIMIT :limit OFFSET :offset";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetchAll();
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $notifications = $stmt->fetchAll();
+        
+        // Calculate pagination
+        $totalPages = ceil($totalNotifications / $limit);
+        $currentPage = floor($offset / $limit) + 1;
+        
+        return [
+            'notifications' => $notifications,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalNotifications,
+                'itemsPerPage' => $limit,
+                'hasNextPage' => $currentPage < $totalPages,
+                'hasPrevPage' => $currentPage > 1
+            ]
+        ];
     }
     
     /**
