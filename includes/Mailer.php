@@ -266,4 +266,70 @@ class Mailer {
         </html>
         ";
     }
+    
+    /**
+     * Send password reset email
+     * 
+     * @param string $email Recipient email
+     * @param string $name Recipient name
+     * @param string $resetLink Password reset link
+     * @return bool
+     */
+    public function sendPasswordResetEmail($email, $name, $resetLink) {
+        $subject = "Password Reset Request - ResolveIT Help Desk";
+        $body = $this->getPasswordResetTemplate($name, $resetLink);
+        
+        return $this->send($email, $name, $subject, $body);
+    }
+    
+    /**
+     * Template for password reset email
+     */
+    private function getPasswordResetTemplate($name, $resetLink) {
+        return "
+        <html>
+        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+            <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;'>
+                <div style='background-color: #fff; padding: 30px; border-radius: 5px;'>
+                    <div style='text-align: center; margin-bottom: 30px;'>
+                        <h1 style='color: #0ea5e9; margin: 0;'>
+                            <span style='color: #334155;'>Resolve</span><span style='color: #06b6d4;'>IT</span>
+                        </h1>
+                    </div>
+                    
+                    <h2 style='color: #1e293b; margin-bottom: 20px;'>Password Reset Request</h2>
+                    <p>Hello {$name},</p>
+                    <p>We received a request to reset your password for your ResolveIT Help Desk account.</p>
+                    
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='{$resetLink}' 
+                           style='display: inline-block; padding: 12px 30px; background: linear-gradient(to right, #06b6d4, #0ea5e9); color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'>
+                            Reset Password
+                        </a>
+                    </div>
+                    
+                    <div style='background-color: #fff7ed; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;'>
+                        <p style='margin: 0; font-size: 14px;'><strong>⚠️ Important:</strong></p>
+                        <ul style='margin: 10px 0; padding-left: 20px; font-size: 14px;'>
+                            <li>This link will expire in <strong>24 hours</strong></li>
+                            <li>If you didn't request this, please ignore this email</li>
+                            <li>Your password will not change unless you click the link above</li>
+                        </ul>
+                    </div>
+                    
+                    <p style='font-size: 14px; color: #64748b;'>If the button doesn't work, copy and paste this link into your browser:</p>
+                    <p style='font-size: 12px; color: #0ea5e9; word-break: break-all;'>{$resetLink}</p>
+                    
+                    <p style='margin-top: 30px; font-size: 14px;'>Best regards,<br><strong>IT Help Desk Team</strong></p>
+                    
+                    <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'>
+                    <p style='font-size: 12px; color: #94a3b8; text-align: center;'>
+                        This is an automated message, please do not reply to this email.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+    }
 }

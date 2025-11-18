@@ -3,7 +3,7 @@
         'name' => 'company/ithelp-ticketing',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '5a5a0865841cf9c2ea0ce8864f6887ca2fba963e',
+        'reference' => 'b5715b913efda79c16cb421be3794611ea676072',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -49,7 +49,7 @@
         'company/ithelp-ticketing' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '5a5a0865841cf9c2ea0ce8864f6887ca2fba963e',
+            'reference' => 'b5715b913efda79c16cb421be3794611ea676072',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

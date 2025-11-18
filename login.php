@@ -84,7 +84,7 @@
                         <input type="checkbox" class="w-4 h-4 text-cyan-500 border-slate-600 bg-slate-700/50 rounded focus:ring-cyan-500 focus:ring-offset-slate-800">
                         <span class="ml-2 text-sm text-slate-300">Remember me</span>
                     </label>
-                    <a href="#" class="text-sm text-cyan-500 hover:text-cyan-400 transition">Forgot password?</a>
+                    <a href="forgot_password.php" class="text-sm text-cyan-500 hover:text-cyan-400 transition">Forgot password?</a>
                 </div>
 
                 <button 
