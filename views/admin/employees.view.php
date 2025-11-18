@@ -258,6 +258,7 @@ include __DIR__ . '/../layouts/header.php';
                                     </span>
                                 </a>
                             </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-slate-300 uppercase tracking-wide">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/50">
@@ -292,6 +293,14 @@ include __DIR__ . '/../layouts/header.php';
                                 <span class="time-ago" data-timestamp="<?php echo $employee['created_at']; ?>">
                                     <?php echo formatDate($employee['created_at'], 'M d, Y'); ?>
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="edit_employee.php?id=<?php echo $employee['id']; ?>" 
+                                   class="inline-flex items-center px-3 py-1.5 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-cyan-400 hover:border-cyan-500/50 transition rounded-lg text-sm"
+                                   title="Edit employee">
+                                    <i class="fas fa-edit mr-1.5"></i>
+                                    Edit
+                                </a>
                             </td>
                         </tr>
                         <?php endforeach; ?>

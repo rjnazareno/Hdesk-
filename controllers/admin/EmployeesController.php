@@ -131,6 +131,90 @@ class EmployeesController {
     }
 
     /**
+     * Edit employee
+     */
+    public function edit() {
+        // Get employee ID from URL
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        
+        if (!$id) {
+            $_SESSION['error'] = 'Invalid employee ID';
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Get employee data
+        $employee = $this->employeeModel->findById($id);
+        
+        if (!$employee) {
+            $_SESSION['error'] = 'Employee not found';
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'fname' => sanitize($_POST['fname'] ?? ''),
+                'lname' => sanitize($_POST['lname'] ?? ''),
+                'username' => sanitize($_POST['username'] ?? ''),
+                'email' => sanitize($_POST['email'] ?? ''),
+                'personal_email' => sanitize($_POST['personal_email'] ?? ''),
+                'company' => sanitize($_POST['company'] ?? ''),
+                'position' => sanitize($_POST['position'] ?? ''),
+                'contact' => sanitize($_POST['contact'] ?? ''),
+                'status' => sanitize($_POST['status'] ?? 'active')
+            ];
+            
+            // Only update password if provided
+            if (!empty($_POST['password'])) {
+                $data['password'] = $_POST['password'];
+            }
+            
+            // Validate required fields
+            $errors = [];
+            if (empty($data['fname'])) $errors[] = 'First name is required';
+            if (empty($data['lname'])) $errors[] = 'Last name is required';
+            if (empty($data['username'])) $errors[] = 'Username is required';
+            if (empty($data['email'])) $errors[] = 'Email is required';
+            
+            // Check if username is taken by another employee
+            $existingUser = $this->employeeModel->findByUsername($data['username']);
+            if ($existingUser && $existingUser['id'] != $id) {
+                $errors[] = 'Username is already taken';
+            }
+            
+            // Check if email is taken by another employee
+            $existingEmail = $this->employeeModel->findByEmail($data['email']);
+            if ($existingEmail && $existingEmail['id'] != $id) {
+                $errors[] = 'Email is already in use';
+            }
+            
+            if (empty($errors)) {
+                // Update employee
+                if ($this->employeeModel->update($id, $data)) {
+                    $_SESSION['success'] = 'Employee updated successfully';
+                    header('Location: customers.php');
+                    exit;
+                } else {
+                    $_SESSION['error'] = 'Failed to update employee';
+                }
+            } else {
+                $_SESSION['error'] = implode('<br>', $errors);
+            }
+        }
+        
+        // Prepare data for view
+        $data = [
+            'currentUser' => $this->currentUser,
+            'employee' => $employee
+        ];
+        
+        // Load the view
+        $this->loadView('admin/edit_employee', $data);
+    }
+
+    /**
      * Load view file with data
      */
     private function loadView($viewName, $data = []) {
