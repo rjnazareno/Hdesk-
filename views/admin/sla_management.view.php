@@ -148,40 +148,130 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Breached Tickets -->
-            <div class="bg-slate-800/50 border border-slate-700/50 p-6 overflow-hidden relative">
+            <div class="bg-slate-800/50 border border-slate-700/50 overflow-hidden relative">
                 <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent pointer-events-none"></div>
-                <div class="flex items-center space-x-3 mb-4 relative z-10">
-                    <div class="w-8 h-8 bg-red-500/20 flex items-center justify-center text-red-400">
-                        <i class="fas fa-times-circle text-sm"></i>
+                <div class="flex items-center justify-between p-6 pb-4 relative z-10">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-red-500/20 flex items-center justify-center text-red-400">
+                            <i class="fas fa-times-circle text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Breached Tickets</h3>
+                            <p class="text-sm text-slate-400">Missed SLA deadline (<?php echo $totalBreached; ?> total)</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-white">Breached Tickets</h3>
-                        <p class="text-sm text-slate-400">Missed SLA deadline</p>
+                    <?php if ($totalPages > 1): ?>
+                    <div class="text-xs text-slate-400">
+                        Page <?php echo $page; ?> of <?php echo $totalPages; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
                 
-                <?php if (empty($breachedTickets)): ?>
-                <div class="text-center py-8 text-slate-400">
-                    <i class="fas fa-check-circle text-4xl mb-2 text-emerald-500"></i>
-                    <p>No breached tickets</p>
-                </div>
-                <?php else: ?>
-                <div class="space-y-3">
-                    <?php foreach ($breachedTickets as $ticket): ?>
-                    <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" class="block p-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="font-medium text-white"><?php echo htmlspecialchars($ticket['ticket_number']); ?></span>
-                                <p class="text-sm text-slate-400 truncate"><?php echo htmlspecialchars($ticket['title']); ?></p>
+                <div class="px-6 pb-6">
+                    <?php if (empty($breachedTickets) && $totalBreached == 0): ?>
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fas fa-check-circle text-4xl mb-2 text-emerald-500"></i>
+                        <p>No breached tickets</p>
+                    </div>
+                    <?php else: ?>
+                    <div class="space-y-3">
+                        <?php foreach ($breachedTickets as $ticket): ?>
+                        <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" class="block p-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-medium text-white"><?php echo htmlspecialchars($ticket['ticket_number']); ?></span>
+                                    <p class="text-sm text-slate-400 truncate"><?php echo htmlspecialchars($ticket['title']); ?></p>
+                                </div>
+                                <span class="text-xs font-semibold text-red-400">
+                                    <?php echo floor($ticket['minutes_overdue'] / 60); ?>h <?php echo $ticket['minutes_overdue'] % 60; ?>m overdue
+                                </span>
                             </div>
-                            <span class="text-xs font-semibold text-red-400">
-                                <?php echo floor($ticket['minutes_overdue'] / 60); ?>h <?php echo $ticket['minutes_overdue'] % 60; ?>m overdue
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <?php if ($totalPages > 1): ?>
+                    <div class="mt-6 pt-4 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between">
+                            <!-- Previous Button -->
+                            <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?>" 
+                               class="px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg text-sm">
+                                <i class="fas fa-chevron-left mr-1"></i>
+                                Previous
+                            </a>
+                            <?php else: ?>
+                            <span class="px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-lg cursor-not-allowed text-sm">
+                                <i class="fas fa-chevron-left mr-1"></i>
+                                Previous
                             </span>
+                            <?php endif; ?>
+
+                            <!-- Page Numbers -->
+                            <div class="flex items-center space-x-1">
+                                <?php
+                                $maxPagesToShow = 5;
+                                $halfPages = floor($maxPagesToShow / 2);
+                                $startPage = max(1, $page - $halfPages);
+                                $endPage = min($totalPages, $page + $halfPages);
+                                
+                                // Adjust if at start or end
+                                if ($page <= $halfPages) {
+                                    $endPage = min($maxPagesToShow, $totalPages);
+                                }
+                                if ($page > $totalPages - $halfPages) {
+                                    $startPage = max(1, $totalPages - $maxPagesToShow + 1);
+                                }
+
+                                // First page
+                                if ($startPage > 1) {
+                                    echo '<a href="?page=1" class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg text-sm">1</a>';
+                                    if ($startPage > 2) echo '<span class="px-2 text-slate-500">...</span>';
+                                }
+
+                                // Page numbers
+                                for ($i = $startPage; $i <= $endPage; $i++):
+                                    if ($i == $page):
+                                ?>
+                                <span class="px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg text-sm">
+                                    <?php echo $i; ?>
+                                </span>
+                                <?php else: ?>
+                                <a href="?page=<?php echo $i; ?>" 
+                                   class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg text-sm">
+                                    <?php echo $i; ?>
+                                </a>
+                                <?php 
+                                    endif;
+                                endfor;
+
+                                // Last page
+                                if ($endPage < $totalPages) {
+                                    if ($endPage < $totalPages - 1) echo '<span class="px-2 text-slate-500">...</span>';
+                                    echo '<a href="?page=' . $totalPages . '" class="px-3 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg text-sm">' . $totalPages . '</a>';
+                                }
+                                ?>
+                            </div>
+
+                            <!-- Next Button -->
+                            <?php if ($page < $totalPages): ?>
+                            <a href="?page=<?php echo $page + 1; ?>" 
+                               class="px-3 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg text-sm">
+                                Next
+                                <i class="fas fa-chevron-right ml-1"></i>
+                            </a>
+                            <?php else: ?>
+                            <span class="px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-lg cursor-not-allowed text-sm">
+                                Next
+                                <i class="fas fa-chevron-right ml-1"></i>
+                            </span>
+                            <?php endif; ?>
                         </div>
-                    </a>
-                    <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
 

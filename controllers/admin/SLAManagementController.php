@@ -33,16 +33,32 @@ class SLAManagementController {
         // Get SLA statistics
         $stats = $this->slaModel->getStatistics();
         
-        // Get at-risk and breached tickets
+        // Get at-risk tickets
         $atRiskTickets = $this->slaModel->getAtRiskTickets(60); // 60 minutes threshold
-        $breachedTickets = $this->slaModel->getBreachedTickets();
+        
+        // Pagination for breached tickets
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 10;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Get all breached tickets for count
+        $allBreachedTickets = $this->slaModel->getBreachedTickets();
+        $totalBreached = count($allBreachedTickets);
+        $totalPages = ceil($totalBreached / $itemsPerPage);
+        
+        // Get paginated breached tickets
+        $breachedTickets = array_slice($allBreachedTickets, $offset, $itemsPerPage);
         
         $this->loadView('admin/sla_management', compact(
             'currentUser',
             'policies',
             'stats',
             'atRiskTickets',
-            'breachedTickets'
+            'breachedTickets',
+            'page',
+            'totalPages',
+            'totalBreached',
+            'itemsPerPage'
         ));
     }
     
