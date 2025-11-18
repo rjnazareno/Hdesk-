@@ -31,8 +31,30 @@ class CreateTicketController {
         $categories = $this->categoryModel->getAll();
         $employees = $this->employeeModel->getAll('active');
         
+        // Pagination for recent tickets
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 5;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Get all recent tickets for count
+        $allRecentTickets = $this->ticketModel->getAll([]);
+        $totalRecent = count($allRecentTickets);
+        $totalPages = ceil($totalRecent / $itemsPerPage);
+        
+        // Get paginated recent tickets
+        $recentTickets = $this->ticketModel->getAll([], 'created_at', 'DESC', $itemsPerPage, $offset);
+        
         // Load view
-        $this->loadView('admin/create_ticket', compact('currentUser', 'categories', 'employees'));
+        $this->loadView('admin/create_ticket', compact(
+            'currentUser', 
+            'categories', 
+            'employees',
+            'recentTickets',
+            'page',
+            'totalPages',
+            'totalRecent',
+            'itemsPerPage'
+        ));
     }
     
     /**

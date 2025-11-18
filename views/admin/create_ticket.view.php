@@ -311,55 +311,101 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Recent Tickets -->
-                <div class="bg-slate-800/50 border border-slate-700/50 p-6 rounded-lg">
-                    <h3 class="text-sm font-semibold text-white mb-4">
-                        <i class="fas fa-clock mr-2"></i>Recent Tickets
-                    </h3>
-                    <?php
-                    $recentTickets = $ticketModel->getAll(['limit' => 3, 'order' => 'created_at DESC']);
-                    if (empty($recentTickets)):
-                    ?>
-                    <p class="text-sm text-slate-400 text-center py-4">No recent tickets</p>
-                    <?php else: ?>
-                    <div class="space-y-3">
-                        <?php foreach ($recentTickets as $ticket): 
-                            $priorityColors = [
-                                'low' => 'bg-emerald-600',
-                                'medium' => 'bg-yellow-600',
-                                'high' => 'bg-orange-600',
-                                'urgent' => 'bg-red-600'
-                            ];
-                            $statusColors = [
-                                'open' => 'bg-blue-600',
-                                'in_progress' => 'bg-purple-600',
-                                'pending' => 'bg-yellow-600',
-                                'closed' => 'bg-emerald-600'
-                            ];
-                        ?>
-                        <div class="border-b border-slate-700/50 pb-3 last:border-0">
-                            <div class="flex items-start justify-between mb-1">
-                                <div class="text-sm font-medium text-white line-clamp-1">
-                                    #<?php echo $ticket['id']; ?>
+                <div class="bg-slate-800/50 border border-slate-700/50 rounded-lg overflow-hidden">
+                    <div class="p-6 pb-4 border-b border-slate-700/50">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-white">
+                                <i class="fas fa-clock mr-2"></i>Recent Tickets
+                            </h3>
+                            <?php if ($totalRecent > 0): ?>
+                            <span class="text-xs text-slate-400">
+                                <?php echo $totalRecent; ?> total
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 pt-4">
+                        <?php if (empty($recentTickets)): ?>
+                        <p class="text-sm text-slate-400 text-center py-4">No recent tickets</p>
+                        <?php else: ?>
+                        <div class="space-y-3 mb-4">
+                            <?php foreach ($recentTickets as $ticket): 
+                                $priorityColors = [
+                                    'low' => 'bg-emerald-600',
+                                    'medium' => 'bg-yellow-600',
+                                    'high' => 'bg-orange-600',
+                                    'urgent' => 'bg-red-600'
+                                ];
+                                $statusColors = [
+                                    'open' => 'bg-blue-600',
+                                    'in_progress' => 'bg-purple-600',
+                                    'pending' => 'bg-yellow-600',
+                                    'resolved' => 'bg-green-600',
+                                    'closed' => 'bg-slate-600'
+                                ];
+                            ?>
+                            <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" class="block border-b border-slate-700/50 pb-3 last:border-0 hover:bg-slate-700/20 transition -mx-2 px-2 py-2 rounded">
+                                <div class="flex items-start justify-between mb-1">
+                                    <div class="text-sm font-medium text-white line-clamp-1">
+                                        <?php echo htmlspecialchars($ticket['ticket_number']); ?>
+                                    </div>
+                                    <span class="px-2 py-0.5 <?php echo $priorityColors[$ticket['priority']]; ?> text-white text-xs uppercase flex-shrink-0 ml-2">
+                                        <?php echo $ticket['priority']; ?>
+                                    </span>
                                 </div>
-                                <span class="px-2 py-0.5 <?php echo $priorityColors[$ticket['priority']]; ?> text-white text-xs uppercase flex-shrink-0">
-                                    <?php echo $ticket['priority']; ?>
-                                </span>
-                            </div>
-                            <div class="text-xs text-slate-400 line-clamp-2 mb-2">
-                                <?php echo htmlspecialchars($ticket['title']); ?>
-                            </div>
+                                <div class="text-xs text-slate-400 line-clamp-2 mb-2">
+                                    <?php echo htmlspecialchars($ticket['title']); ?>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2 py-0.5 <?php echo $statusColors[$ticket['status']]; ?> text-white text-xs">
+                                        <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
+                                    </span>
+                                    <span class="text-xs text-slate-500">
+                                        <?php echo date('M j, g:i A', strtotime($ticket['created_at'])); ?>
+                                    </span>
+                                </div>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <!-- Pagination Controls -->
+                        <?php if ($totalPages > 1): ?>
+                        <div class="pt-4 border-t border-slate-700/50">
                             <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 <?php echo $statusColors[$ticket['status']]; ?> text-white text-xs">
-                                    <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
+                                <!-- Previous -->
+                                <?php if ($page > 1): ?>
+                                <a href="?page=<?php echo $page - 1; ?>" 
+                                   class="px-2 py-1 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded text-xs">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                                <?php else: ?>
+                                <span class="px-2 py-1 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded cursor-not-allowed text-xs">
+                                    <i class="fas fa-chevron-left"></i>
                                 </span>
-                                <span class="text-xs text-slate-500">
-                                    <?php echo date('M j, g:i A', strtotime($ticket['created_at'])); ?>
+                                <?php endif; ?>
+
+                                <!-- Page Info -->
+                                <span class="text-xs text-slate-400">
+                                    Page <?php echo $page; ?> of <?php echo $totalPages; ?>
                                 </span>
+
+                                <!-- Next -->
+                                <?php if ($page < $totalPages): ?>
+                                <a href="?page=<?php echo $page + 1; ?>" 
+                                   class="px-2 py-1 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded text-xs">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <?php else: ?>
+                                <span class="px-2 py-1 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded cursor-not-allowed text-xs">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
+                        <?php endif; ?>
                     </div>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Best Practices -->
