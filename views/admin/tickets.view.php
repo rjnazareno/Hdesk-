@@ -11,8 +11,8 @@ include __DIR__ . '/../layouts/header.php';
 <!-- Main Content -->
 <div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Top Bar -->
-    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md">
-        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
+    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md relative z-40">
+        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4 overflow-visible">
             <!-- Left Section: Title & Stats -->
             <div class="flex items-center space-x-4">
                 <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-lg">
@@ -35,7 +35,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Right Section: Actions & User -->
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3 overflow-visible">
                 <!-- Search (Hidden on Mobile) -->
                 <div class="hidden md:block relative">
                     <input 
