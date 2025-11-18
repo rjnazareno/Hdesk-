@@ -10,8 +10,8 @@ include __DIR__ . '/../layouts/header.php';
 <!-- Main Content -->
 <div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Top Bar -->
-    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md">
-        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
+    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md relative z-40">
+        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4 overflow-visible">
             <!-- Left Section: Title & Stats -->
             <div class="flex items-center space-x-4">
                 <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-lg">
@@ -32,7 +32,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Right Section: Actions & User -->
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3 overflow-visible">
                 <!-- Smart Search with Page Finder -->
                 <div class="hidden md:block relative" id="searchContainer">
                     <form method="GET" action="" class="flex">
@@ -60,13 +60,13 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Quick Actions Dropdown -->
-                <div class="relative" id="quickActionsDropdown">
+                <div class="relative z-50" id="quickActionsDropdown">
                     <button class="flex items-center space-x-2 px-4 py-2 border border-slate-600 bg-slate-700/50 text-slate-300 hover:text-white hover:border-cyan-500/50 rounded-lg transition" id="quickActionsBtn">
                         <i class="fas fa-bolt text-cyan-500"></i>
                         <span class="hidden lg:inline text-sm font-medium">Quick Actions</span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
-                    <div class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-700/50 hidden z-50" id="quickActionsMenu">
+                    <div class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-700/50 hidden z-[100]" id="quickActionsMenu">
                         <div class="py-2">
                             <a href="add_employee.php" class="flex items-center px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-cyan-400 transition">
                                 <i class="fas fa-user-plus w-5"></i>
@@ -96,7 +96,7 @@ include __DIR__ . '/../layouts/header.php';
                 </button>
 
                 <!-- User Avatar with Dropdown -->
-                <div class="relative" id="userMenuDropdown">
+                <div class="relative z-50" id="userMenuDropdown">
                     <button class="flex items-center space-x-2 p-1 hover:bg-slate-700/50 transition" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=06b6d4" 
                              alt="User" 
@@ -108,7 +108,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
                         <i class="fas fa-chevron-down text-xs text-slate-400 hidden lg:block"></i>
                     </button>
-                    <div class="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700/50 hidden z-50" id="userMenu">
+                    <div class="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700/50 rounded-lg shadow-xl hidden z-[100]" id="userMenu">
                         <div class="p-4 border-b border-slate-700/50">
                             <div class="font-medium text-white"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
                             <div class="text-sm text-slate-400"><?php echo htmlspecialchars($currentUser['email']); ?></div>
