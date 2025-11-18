@@ -79,6 +79,8 @@ class FCMNotification {
             // Send message
             $result = $this->messaging->send($message);
             
+            error_log("FCM sent successfully to token: " . substr($fcmToken, 0, 20) . "... | Message ID: " . $result);
+            
             return [
                 'success' => true,
                 'message_id' => $result
@@ -244,7 +246,10 @@ class FCMNotification {
         // Get submitter's FCM token
         $token = $this->getUserToken($submitterId, $submitterType);
         
+        error_log("Status change notification: Submitter ID={$submitterId}, Type={$submitterType}, Token=" . ($token ? 'EXISTS' : 'NULL'));
+        
         if (!$token) {
+            error_log("No FCM token for submitter ID {$submitterId} (type: {$submitterType})");
             return [
                 'success' => false,
                 'error' => 'Submitter has no FCM token'
