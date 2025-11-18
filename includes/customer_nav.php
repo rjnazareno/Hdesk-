@@ -34,11 +34,27 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/customer/') !== false ? '' : 'custome
         <!-- User Info -->
         <div class="p-6 border-b border-gray-200">
             <div class="flex items-center space-x-3">
+                <?php 
+                // Handle both employee (fname/lname) and user (full_name) formats
+                $displayName = '';
+                $initials = '';
+                
+                if (isset($currentUser['full_name'])) {
+                    $displayName = $currentUser['full_name'];
+                    $initials = strtoupper(substr($displayName, 0, 2));
+                } elseif (isset($currentUser['fname']) && isset($currentUser['lname'])) {
+                    $displayName = $currentUser['fname'] . ' ' . $currentUser['lname'];
+                    $initials = strtoupper(substr($currentUser['fname'], 0, 1) . substr($currentUser['lname'], 0, 1));
+                } else {
+                    $displayName = 'User';
+                    $initials = 'U';
+                }
+                ?>
                 <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span class="text-lg font-bold text-white"><?= strtoupper(substr($currentUser['full_name'], 0, 2)) ?></span>
+                    <span class="text-lg font-bold text-white"><?= $initials ?></span>
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($currentUser['full_name']) ?></p>
+                    <p class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($displayName) ?></p>
                     <p class="text-xs text-gray-500">Employee Portal</p>
                 </div>
             </div>
