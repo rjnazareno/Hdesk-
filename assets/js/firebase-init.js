@@ -87,11 +87,13 @@ async function requestNotificationPermission() {
             console.log('✅ Notification permission granted');
             
             // Ensure service worker is ready before getting token
-            await navigator.serviceWorker.ready;
+            const registration = await navigator.serviceWorker.ready;
             console.log('✅ Service worker confirmed ready before getToken');
             
+            // Small delay to ensure pushManager is available
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             // Get FCM token with service worker registration
-            const registration = await navigator.serviceWorker.ready;
             const token = await messaging.getToken({
                 vapidKey: 'BO3LtJTs6d9JzKVhNWIaz6wKbptPkvGfALQa5MLGLEnhB92leeLMO6sNIRbv4RyGpUAB5Zg4pPYyRe8eIoP_UXY',
                 serviceWorkerRegistration: registration
