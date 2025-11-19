@@ -1,10 +1,13 @@
 /**
- * Print Styles for ResolveIT
- * Optimized for printing tickets and reports
+ * Print Styles for ResolveIT Help Desk
+ * Optimized for printing tickets with clean, professional formatting
+ * Updated: November 2025
  */
 
 @media print {
-    /* Hide non-essential elements */
+    /* ========================================
+       HIDE NON-ESSENTIAL ELEMENTS
+       ======================================== */
     aside,
     nav,
     .no-print,
@@ -12,240 +15,436 @@
     #mobile-menu-button,
     #mobile-overlay,
     #sidebar,
-    .bg-gray-900,
     header,
     footer,
     .toast-notification,
     #toast-container,
     #loading-overlay,
-    .tooltip-popup {
+    .tooltip-popup,
+    .breadcrumb,
+    nav[aria-label="Breadcrumb"],
+    .bg-slate-800\/50.backdrop-blur-md:first-child,
+    /* Hide sidebar navigation */
+    [class*="lg:ml-64"] > div:first-child,
+    /* Hide action buttons */
+    form button[type="submit"]:not(.print-keep),
+    input[type="submit"]:not(.print-keep),
+    /* Hide interactive elements */
+    .hover\:,
+    [onclick]:not(.print-keep) {
         display: none !important;
     }
     
-    /* Reset layout for print */
-    body {
-        margin: 0;
-        padding: 20px;
-        background: white !important;
-        color: black !important;
-        font-size: 12pt;
+    /* ========================================
+       PAGE SETUP
+       ======================================== */
+    @page {
+        size: A4;
+        margin: 1.5cm 2cm;
     }
     
-    /* Remove margins from main content */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* ========================================
+       BODY & LAYOUT
+       ======================================== */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: #000 !important;
+        font-family: 'Arial', 'Helvetica', sans-serif !important;
+        font-size: 11pt;
+        line-height: 1.5;
+    }
+    
+    /* Remove all margins from main content */
     .lg\:ml-64,
-    .ml-64 {
+    .ml-64,
+    main,
+    .container {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    /* ========================================
+       HEADER - COMPANY BRANDING
+       ======================================== */
+    body::before {
+        content: "ResolveIT Help Desk";
+        display: block;
+        font-size: 20pt;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 5px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #000;
+    }
+    
+    body::after {
+        content: "Printed on: " attr(data-print-date);
+        display: block;
+        font-size: 9pt;
+        color: #666;
+        margin-top: -25px;
+        text-align: right;
+    }
+    
+    /* ========================================
+       TICKET HEADER
+       ======================================== */
+    h1, h2.text-2xl {
+        font-size: 18pt !important;
+        font-weight: bold !important;
+        color: #000 !important;
+        margin: 20px 0 10px 0 !important;
+        padding: 0 !important;
+        page-break-after: avoid;
+    }
+    
+    /* Ticket number */
+    p.text-slate-400,
+    .text-slate-400 {
+        color: #666 !important;
+        font-size: 10pt !important;
+    }
+    
+    /* ========================================
+       TICKET DETAILS CARD
+       ======================================== */
+    .bg-slate-800\/50,
+    .bg-slate-700\/50,
+    [class*="bg-slate"] {
+        background: white !important;
+        border: 1px solid #ddd !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        padding: 15px !important;
+        margin-bottom: 15px !important;
+        page-break-inside: avoid;
+    }
+    
+    /* ========================================
+       STATUS BADGES
+       ======================================== */
+    .bg-yellow-500\/20,
+    .bg-blue-500\/20,
+    .bg-purple-500\/20,
+    .bg-green-500\/20,
+    .bg-red-500\/20,
+    [class*="bg-yellow"],
+    [class*="bg-blue"],
+    [class*="bg-purple"],
+    [class*="bg-green"],
+    [class*="bg-red"] {
+        background: transparent !important;
+        border: 2px solid #000 !important;
+        color: #000 !important;
+        padding: 3px 10px !important;
+        display: inline-block !important;
+        font-weight: bold !important;
+        font-size: 10pt !important;
+    }
+    
+    /* Status-specific styling */
+    .text-yellow-400,
+    .text-yellow-500 {
+        color: #000 !important;
+    }
+    
+    .text-yellow-400::before {
+        content: "⚠ ";
+    }
+    
+    .text-blue-400::before,
+    .text-blue-500::before {
+        content: "● ";
+    }
+    
+    .text-green-400::before,
+    .text-green-500::before {
+        content: "✓ ";
+    }
+    
+    .text-purple-400::before,
+    .text-purple-500::before {
+        content: "⟳ ";
+    }
+    
+    /* ========================================
+       PRIORITY INDICATORS
+       ======================================== */
+    .text-red-400,
+    .text-orange-400,
+    .text-cyan-400 {
+        color: #000 !important;
+        font-weight: bold !important;
+    }
+    
+    .text-red-400::before {
+        content: "🔴 HIGH PRIORITY: ";
+        font-weight: bold;
+    }
+    
+    .text-orange-400::before {
+        content: "🟠 MEDIUM PRIORITY: ";
+    }
+    
+    /* ========================================
+       TEXT COLORS
+       ======================================== */
+    .text-white,
+    .text-slate-100,
+    .text-slate-200,
+    .text-slate-300,
+    .text-slate-400,
+    .text-gray-300,
+    .text-gray-400 {
+        color: #000 !important;
+    }
+    
+    /* ========================================
+       DESCRIPTION & CONTENT
+       ======================================== */
+    .prose,
+    .description,
+    [class*="text-sm"] {
+        color: #000 !important;
+        font-size: 11pt !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* ========================================
+       ACTIVITY TIMELINE
+       ======================================== */
+    .space-y-4 > div,
+    .activity-item,
+    [class*="border-l"] {
+        border-left: 2px solid #000 !important;
+        padding-left: 15px !important;
+        margin-bottom: 12px !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Activity icons */
+    .fas,
+    .far,
+    .fa {
+        color: #000 !important;
+    }
+    
+    /* ========================================
+       COMMENTS SECTION
+       ======================================== */
+    .divide-y > div,
+    .comment-item {
+        border-top: 1px solid #ccc !important;
+        padding: 12px 0 !important;
+        page-break-inside: avoid;
+    }
+    
+    .divide-y > div:first-child {
+        border-top: none !important;
+    }
+    
+    /* Comment author */
+    .font-semibold,
+    .font-bold {
+        font-weight: bold !important;
+        color: #000 !important;
+    }
+    
+    /* ========================================
+       SIDEBAR INFO
+       ======================================== */
+    .lg\:col-span-1 {
+        width: 100% !important;
+        margin-top: 20px !important;
+        page-break-before: avoid;
+    }
+    
+    /* Info labels */
+    dt, .label {
+        font-weight: bold !important;
+        color: #000 !important;
+        margin-bottom: 3px !important;
+    }
+    
+    dd, .value {
+        color: #333 !important;
+        margin-bottom: 10px !important;
         margin-left: 0 !important;
     }
     
-    /* Full width for print */
-    .container,
-    .max-w-7xl {
-        max-width: 100% !important;
-        padding: 0 !important;
+    /* ========================================
+       FORMS & INPUTS (hide)
+       ======================================== */
+    input,
+    textarea,
+    select,
+    form:not(.print-keep) {
+        display: none !important;
     }
     
-    /* Page breaks */
+    /* ========================================
+       ICONS
+       ======================================== */
+    i.fas,
+    i.far,
+    i.fa {
+        font-size: 9pt !important;
+        margin-right: 5px !important;
+    }
+    
+    /* ========================================
+       LINKS
+       ======================================== */
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
+    }
+    
+    /* Don't print URLs */
+    a[href]:after {
+        content: "" !important;
+    }
+    
+    /* ========================================
+       TABLES
+       ======================================== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        page-break-inside: avoid;
+    }
+    
+    th, td {
+        border: 1px solid #333 !important;
+        padding: 8px !important;
+        text-align: left !important;
+        color: #000 !important;
+    }
+    
+    th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold !important;
+    }
+    
+    /* ========================================
+       PAGE BREAKS
+       ======================================== */
+    h1, h2, h3, h4, h5 {
+        page-break-after: avoid;
+    }
+    
     .page-break {
         page-break-after: always;
     }
     
-    .avoid-break {
+    .avoid-break,
+    .bg-slate-800\/50 {
         page-break-inside: avoid;
     }
     
-    /* Ticket header */
-    .print-header {
-        border-bottom: 2px solid #000;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
+    /* ========================================
+       GRID LAYOUTS
+       ======================================== */
+    .grid,
+    .grid-cols-1,
+    .lg\:grid-cols-2,
+    .lg\:grid-cols-3 {
+        display: block !important;
     }
     
-    /* Ticket details */
-    .print-ticket-details {
-        margin-bottom: 20px;
+    .lg\:col-span-2,
+    .lg\:col-span-1 {
+        width: 100% !important;
+        float: none !important;
     }
     
-    .print-ticket-details dt {
-        font-weight: bold;
-        float: left;
-        clear: left;
-        width: 150px;
+    /* ========================================
+       SPACING
+       ======================================== */
+    .space-y-4 > * + *,
+    .space-y-6 > * + * {
+        margin-top: 12px !important;
     }
     
-    .print-ticket-details dd {
-        margin-left: 160px;
-        margin-bottom: 10px;
+    .gap-6,
+    .gap-4 {
+        gap: 0 !important;
     }
     
-    /* Make sure colors show properly */
-    .bg-red-100,
-    .bg-yellow-100,
-    .bg-blue-100,
-    .bg-green-100,
-    .bg-gray-100 {
-        background-color: #f3f4f6 !important;
-    }
-    
-    /* Status badges */
-    .badge-print {
-        border: 1px solid #000;
-        padding: 2px 8px;
-        display: inline-block;
-        font-weight: bold;
-    }
-    
-    /* Comments section */
-    .print-comments {
-        margin-top: 30px;
-        border-top: 1px solid #ddd;
-        padding-top: 20px;
-    }
-    
-    .print-comment {
-        margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        page-break-inside: avoid;
-    }
-    
-    .print-comment-author {
-        font-weight: bold;
-        font-size: 11pt;
-    }
-    
-    .print-comment-date {
-        color: #666;
-        font-size: 9pt;
-    }
-    
-    /* Tables */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-    
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    
-    th {
-        background-color: #f3f4f6 !important;
-        font-weight: bold;
-    }
-    
-    /* Links - show URL */
-    a[href]:after {
-        content: " (" attr(href) ")";
-        font-size: 9pt;
-        color: #666;
-    }
-    
-    /* But not for buttons and internal links */
-    a[href^="#"]:after,
-    a[href^="javascript"]:after,
-    .no-print-link:after {
-        content: "";
-    }
-    
-    /* Logo/Branding */
-    .print-logo {
-        font-size: 24pt;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    
-    /* Print date */
-    .print-date:after {
-        content: "Printed: " attr(data-date);
-        font-size: 9pt;
-        color: #666;
-        float: right;
-    }
-    
-    /* Charts - hide interactive elements */
-    canvas {
-        max-width: 100%;
-        height: auto !important;
-    }
-    
-    /* Shadows and borders */
+    /* ========================================
+       BORDERS & SHADOWS
+       ======================================== */
     .shadow,
     .shadow-sm,
     .shadow-md,
-    .shadow-lg {
+    .shadow-lg,
+    .shadow-xl {
         box-shadow: none !important;
-        border: 1px solid #ddd;
     }
     
-    /* Remove hover effects */
-    *:hover {
-        background-color: inherit !important;
-        color: inherit !important;
+    .rounded,
+    .rounded-lg,
+    .rounded-xl,
+    [class*="rounded"] {
+        border-radius: 0 !important;
     }
     
-    /* Priority indicators */
-    .priority-high {
-        font-weight: bold;
-        text-decoration: underline;
+    .border-slate-700,
+    .border-slate-600,
+    [class*="border-slate"] {
+        border-color: #ccc !important;
     }
     
-    /* Attachments list */
-    .print-attachments {
-        margin-top: 20px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        background-color: #f9f9f9 !important;
+    /* ========================================
+       GRADIENTS (remove)
+       ======================================== */
+    .bg-gradient-to-r,
+    .bg-gradient-to-br,
+    [class*="bg-gradient"] {
+        background: white !important;
     }
     
-    .print-attachments ul {
-        list-style-type: disc;
-        margin-left: 20px;
-    }
-    
-    /* Footer */
+    /* ========================================
+       FOOTER INFO
+       ======================================== */
     @page {
-        margin: 2cm;
-        
         @bottom-right {
-            content: "Page " counter(page) " of " counter(pages);
+            content: "Page " counter(page);
+            font-size: 9pt;
+            color: #666;
         }
         
-        @bottom-left {
-            content: "ResolveIT Help Desk";
+        @bottom-center {
+            content: "ResolveIT Help Desk System";
+            font-size: 9pt;
+            color: #666;
         }
     }
     
-    /* Ensure good contrast */
+    /* ========================================
+       FINAL ADJUSTMENTS
+       ======================================== */
     * {
-        color: #000 !important;
-        background: #fff !important;
+        background: white !important;
+        text-shadow: none !important;
     }
     
-    .text-gray-600,
-    .text-gray-700,
-    .text-gray-800 {
-        color: #333 !important;
+    /* Ensure readability */
+    body,
+    div,
+    span,
+    p {
+        orphans: 3;
+        widows: 3;
     }
-    
-    /* Ticket status colors for print */
-    .status-pending { border-left: 4px solid #666; }
-    .status-open { border-left: 4px solid #000; }
-    .status-in-progress { border-left: 4px solid #333; }
-    .status-closed { border-left: 4px solid #999; }
-    
-    /* Make sure important info stands out */
-    h1, h2, h3, h4 {
-        color: #000 !important;
-        font-weight: bold !important;
-        margin-top: 15px;
-        margin-bottom: 10px;
-    }
-    
-    h1 { font-size: 18pt; }
-    h2 { font-size: 16pt; }
-    h3 { font-size: 14pt; }
-    h4 { font-size: 12pt; }
 }

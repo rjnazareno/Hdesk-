@@ -720,6 +720,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
             initDarkMode();
             updateTimeAgo();
             setInterval(updateTimeAgo, 60000);
+            
+            // Add print date to body for print styling
+            const now = new Date();
+            const printDate = now.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.body.setAttribute('data-print-date', printDate);
+        });
+        
+        // Optimize for printing
+        window.addEventListener('beforeprint', function() {
+            document.body.classList.add('printing');
+        });
+        
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('printing');
         });
     </script>
 </body>
