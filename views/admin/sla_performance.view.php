@@ -245,12 +245,12 @@ $baseUrl = '../';
                                     <span class="text-white text-sm"><?php echo $breach['assigned_to_name'] ?: 'Unassigned'; ?></span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <?php if ($breach['first_response_sla_met'] == 0): ?>
+                                    <?php if ($breach['response_sla_status'] == 'breached'): ?>
                                     <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg mr-1">
                                         <i class="fas fa-bolt mr-1"></i> Response
                                     </span>
                                     <?php endif; ?>
-                                    <?php if ($breach['resolution_sla_met'] == 0 && $breach['resolved_at']): ?>
+                                    <?php if ($breach['resolution_sla_status'] == 'breached'): ?>
                                     <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg">
                                         <i class="fas fa-clock mr-1"></i> Resolution
                                     </span>

@@ -52,10 +52,10 @@ class SLAPerformanceController {
                     u.email,
                     COUNT(DISTINCT t.id) as total_tickets,
                     COUNT(DISTINCT CASE WHEN t.status IN ('resolved', 'closed') THEN t.id END) as resolved_tickets,
-                    COUNT(DISTINCT CASE WHEN sla.first_response_sla_met = 1 THEN t.id END) as response_sla_met,
-                    COUNT(DISTINCT CASE WHEN sla.first_response_sla_met = 0 AND sla.first_response_at IS NOT NULL THEN t.id END) as response_sla_breached,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_met = 1 THEN t.id END) as resolution_sla_met,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_met = 0 AND sla.resolved_at IS NOT NULL THEN t.id END) as resolution_sla_breached,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_sla_met,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_sla_breached,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_sla_met,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'breached' THEN t.id END) as resolution_sla_breached,
                     AVG(CASE 
                         WHEN sla.first_response_at IS NOT NULL AND t.created_at IS NOT NULL 
                         THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.first_response_at) 
@@ -73,8 +73,8 @@ class SLAPerformanceController {
                 ORDER BY 
                     CASE 
                         WHEN COUNT(DISTINCT t.id) > 0 
-                        THEN (COUNT(DISTINCT CASE WHEN sla.first_response_sla_met = 1 THEN t.id END) + 
-                              COUNT(DISTINCT CASE WHEN sla.resolution_sla_met = 1 THEN t.id END)) / 
+                        THEN (COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) + 
+                              COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END)) / 
                              (COUNT(DISTINCT t.id) * 2)
                         ELSE 0 
                     END DESC";
@@ -128,10 +128,10 @@ class SLAPerformanceController {
     private function getOverallStats() {
         $sql = "SELECT 
                     COUNT(DISTINCT t.id) as total_tickets,
-                    COUNT(DISTINCT CASE WHEN sla.first_response_sla_met = 1 THEN t.id END) as response_met,
-                    COUNT(DISTINCT CASE WHEN sla.first_response_sla_met = 0 AND sla.first_response_at IS NOT NULL THEN t.id END) as response_breached,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_met = 1 THEN t.id END) as resolution_met,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_met = 0 AND sla.resolved_at IS NOT NULL THEN t.id END) as resolution_breached,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_met,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_breached,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_met,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'breached' THEN t.id END) as resolution_breached,
                     AVG(CASE 
                         WHEN sla.first_response_at IS NOT NULL 
                         THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.first_response_at) 
@@ -174,14 +174,14 @@ class SLAPerformanceController {
                     t.status,
                     t.created_at,
                     u.full_name as assigned_to_name,
-                    sla.first_response_sla_met,
-                    sla.resolution_sla_met,
+                    sla.response_sla_status,
+                    sla.resolution_sla_status,
                     sla.first_response_at,
                     sla.resolved_at
                 FROM tickets t
                 JOIN sla_tracking sla ON t.id = sla.ticket_id
                 LEFT JOIN users u ON t.assigned_to = u.id
-                WHERE (sla.first_response_sla_met = 0 OR sla.resolution_sla_met = 0)
+                WHERE (sla.response_sla_status = 'breached' OR sla.resolution_sla_status = 'breached')
                 AND t.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                 ORDER BY t.created_at DESC
                 LIMIT 10";
