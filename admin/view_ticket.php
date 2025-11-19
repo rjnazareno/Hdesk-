@@ -386,6 +386,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
             </div>
             <?php endif; ?>
 
+            <!-- Print-Only Header Information -->
+            <div class="print-only-header" style="display: none;">
+                <div style="margin-bottom: 20px; padding: 15px; border: 2px solid #000;">
+                    <table style="width: 100%; border: none;">
+                        <tr>
+                            <td style="width: 50%; border: none; vertical-align: top;">
+                                <h3 style="margin: 0 0 10px 0; font-size: 14pt;">Ticket Information</h3>
+                                <p style="margin: 5px 0;"><strong>Ticket #:</strong> <?php echo htmlspecialchars($ticket['ticket_number']); ?></p>
+                                <p style="margin: 5px 0;"><strong>Status:</strong> <?php echo str_replace('_', ' ', strtoupper($ticket['status'])); ?></p>
+                                <p style="margin: 5px 0;"><strong>Priority:</strong> <?php echo strtoupper($ticket['priority']); ?></p>
+                                <p style="margin: 5px 0;"><strong>Category:</strong> <?php echo htmlspecialchars($ticket['category_name']); ?></p>
+                                <p style="margin: 5px 0;"><strong>Created:</strong> <?php echo formatDate($ticket['created_at'], 'M d, Y g:i A'); ?></p>
+                            </td>
+                            <td style="width: 50%; border: none; vertical-align: top;">
+                                <h3 style="margin: 0 0 10px 0; font-size: 14pt;">People Involved</h3>
+                                <p style="margin: 5px 0;"><strong>Submitted By:</strong><br><?php echo htmlspecialchars($ticket['submitter_name']); ?>
+                                <?php if ($ticket['submitter_type'] === 'employee'): ?>
+                                    <br><span style="font-size: 9pt; color: #666;">(Employee)</span>
+                                <?php else: ?>
+                                    <br><span style="font-size: 9pt; color: #666;">(IT Staff)</span>
+                                <?php endif; ?>
+                                </p>
+                                <?php if ($ticket['assigned_to']): ?>
+                                <p style="margin: 5px 0;"><strong>Assigned To:</strong><br><?php echo htmlspecialchars($ticket['assigned_name']); ?></p>
+                                <?php endif; ?>
+                                <?php if ($ticket['status'] === 'resolved' || $ticket['status'] === 'closed'): 
+                                    // Find who resolved it from activities
+                                    $resolver = null;
+                                    foreach ($activities as $activity) {
+                                        if ($activity['action_type'] === 'resolution_added' || 
+                                            ($activity['action_type'] === 'status_change' && 
+                                             ($activity['new_value'] === 'resolved' || $activity['new_value'] === 'closed'))) {
+                                            $resolver = $activity['user_name'];
+                                            break;
+                                        }
+                                    }
+                                    if ($resolver):
+                                ?>
+                                <p style="margin: 5px 0;"><strong>Resolved By:</strong><br><?php echo htmlspecialchars($resolver); ?></p>
+                                <?php endif; endif; ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-6">

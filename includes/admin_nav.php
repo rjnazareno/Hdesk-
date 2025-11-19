@@ -70,6 +70,12 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
                 <span>SLA Management</span>
             </a>
             
+            <a href="<?= $basePath ?>sla_performance.php" 
+               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'sla_performance.php' ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' ?> transition">
+                <i class="fas fa-chart-line w-6"></i>
+                <span>SLA Performance</span>
+            </a>
+            
             <a href="<?= $basePath ?>reset_employee_passwords.php" 
                class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'reset_employee_passwords.php' ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' ?> transition">
                 <i class="fas fa-key w-6"></i>

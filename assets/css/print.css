@@ -75,14 +75,58 @@
        HEADER - COMPANY BRANDING
        ======================================== */
     body::before {
-        content: "ResolveIT Help Desk";
+        content: "";
         display: block;
-        font-size: 20pt;
-        font-weight: bold;
-        color: #000;
-        margin-bottom: 5px;
+        height: 60px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60"><rect width="50" height="50" rx="8" fill="%2306b6d4"/><text x="60" y="35" font-family="Arial" font-size="24" font-weight="bold" fill="%23000">ResolveIT</text><text x="60" y="52" font-family="Arial" font-size="10" fill="%23666">Help Desk System</text></svg>');
+        background-repeat: no-repeat;
+        background-position: left center;
+        margin-bottom: 10px;
         padding-bottom: 10px;
         border-bottom: 3px solid #000;
+    }
+    
+    body::after {
+        content: attr(data-print-date);
+        display: block;
+        font-size: 9pt;
+        color: #666;
+        margin-top: -20px;
+        text-align: right;
+        margin-bottom: 20px;
+    }
+    
+    /* Show print-only header */
+    .print-only-header {
+        display: block !important;
+        page-break-after: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .print-only-header table {
+        border: 2px solid #000 !important;
+    }
+    
+    .print-only-header td {
+        border: none !important;
+        padding: 10px !important;
+    }
+    
+    .print-only-header h3 {
+        font-size: 13pt !important;
+        margin-top: 0 !important;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+    }
+    
+    .print-only-header p {
+        margin: 8px 0 !important;
+        line-height: 1.4 !important;
+    }
+    
+    .print-only-header strong {
+        font-weight: bold !important;
+        color: #000 !important;
     }
     
     body::after {
