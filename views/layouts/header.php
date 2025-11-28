@@ -30,4 +30,15 @@
     <?php endif; ?>
 </head>
 <body class="bg-gray-50">
-    <?php include __DIR__ . '/../../includes/admin_nav.php'; ?>
+    <?php 
+    // Load appropriate navigation based on user type
+    $userType = $_SESSION['user_type'] ?? 'employee';
+    $userRole = $_SESSION['role'] ?? '';
+    
+    // IT Staff and Admin use admin navigation, regular employees use customer navigation
+    if ($userType === 'user' || in_array($userRole, ['it_staff', 'admin'])) {
+        include __DIR__ . '/../../includes/admin_nav.php';
+    } else {
+        include __DIR__ . '/../../includes/customer_nav.php';
+    }
+    ?>
