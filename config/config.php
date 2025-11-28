@@ -40,10 +40,10 @@ define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'xlsx'
 // Email Configuration (PHPMailer)
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
-define('MAIL_USERNAME', 'your-email@gmail.com');
-define('MAIL_PASSWORD', 'your-app-password');
-define('MAIL_FROM_EMAIL', 'noreply@company.com');
-define('MAIL_FROM_NAME', 'IT Help Desk');
+define('MAIL_USERNAME', 'it.resourcestaff@gmail.com');
+define('MAIL_PASSWORD', 'fqbr ocgu jcfh jwdy');
+define('MAIL_FROM_EMAIL', 'it.resourcestaff@gmail.com');
+define('MAIL_FROM_NAME', 'ResolveIT Help Desk');
 define('MAIL_ENCRYPTION', 'tls');
 
 // Pagination
