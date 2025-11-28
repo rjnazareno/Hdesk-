@@ -121,6 +121,68 @@ include __DIR__ . '/../layouts/header.php';
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+
+                    <!-- Pagination -->
+                    <?php if (isset($pagination) && $pagination['totalPages'] > 1): ?>
+                    <div class="bg-gray-50 border-t border-gray-200 px-6 py-4">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <!-- Info Text -->
+                            <div class="text-sm text-gray-600">
+                                Showing <span class="font-medium text-gray-900"><?php echo (($pagination['currentPage'] - 1) * $pagination['itemsPerPage']) + 1; ?></span> 
+                                to <span class="font-medium text-gray-900"><?php echo min($pagination['currentPage'] * $pagination['itemsPerPage'], $pagination['totalItems']); ?></span> 
+                                of <span class="font-medium text-gray-900"><?php echo $pagination['totalItems']; ?></span> notifications
+                            </div>
+                            
+                            <!-- Pagination Controls -->
+                            <div class="flex items-center space-x-2">
+                                <!-- Previous Button -->
+                                <?php if ($pagination['hasPrevPage']): ?>
+                                <a href="?page=<?php echo $pagination['currentPage'] - 1; ?>" 
+                                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                                <?php else: ?>
+                                <button disabled class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 opacity-50 cursor-not-allowed">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                <?php endif; ?>
+                                
+                                <!-- Page Numbers -->
+                                <div class="flex items-center space-x-1">
+                                    <?php 
+                                    $startPage = max(1, $pagination['currentPage'] - 2);
+                                    $endPage = min($pagination['totalPages'], $pagination['currentPage'] + 2);
+                                    
+                                    for ($i = $startPage; $i <= $endPage; $i++): 
+                                    ?>
+                                        <?php if ($i == $pagination['currentPage']): ?>
+                                        <button class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600">
+                                            <?php echo $i; ?>
+                                        </button>
+                                        <?php else: ?>
+                                        <a href="?page=<?php echo $i; ?>" 
+                                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition">
+                                            <?php echo $i; ?>
+                                        </a>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+                                </div>
+                                
+                                <!-- Next Button -->
+                                <?php if ($pagination['hasNextPage']): ?>
+                                <a href="?page=<?php echo $pagination['currentPage'] + 1; ?>" 
+                                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <?php else: ?>
+                                <button disabled class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 opacity-50 cursor-not-allowed">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 

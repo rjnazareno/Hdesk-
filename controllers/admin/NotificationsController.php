@@ -56,9 +56,12 @@ class NotificationsController {
      */
     public function markAsRead() {
         $notificationId = $_POST['notification_id'] ?? 0;
+        $userType = $_SESSION['user_type'] ?? 'employee';
+        $isEmployee = ($userType === 'employee' && !in_array($this->currentUser['role'] ?? '', ['it_staff', 'admin']));
+        $whereColumn = $isEmployee ? 'employee_id' : 'user_id';
         
         if ($notificationId) {
-            $sql = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE id = :id AND user_id = :user_id";
+            $sql = "UPDATE notifications SET is_read = 1 WHERE id = :id AND {$whereColumn} = :user_id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id' => $notificationId,
@@ -76,13 +79,16 @@ class NotificationsController {
      * Mark all notifications as read
      */
     public function markAllAsRead() {
-        $sql = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = :user_id AND is_read = 0";
+        $userType = $_SESSION['user_type'] ?? 'employee';
+        $isEmployee = ($userType === 'employee' && !in_array($this->currentUser['role'] ?? '', ['it_staff', 'admin']));
+        $whereColumn = $isEmployee ? 'employee_id' : 'user_id';
+        
+        $sql = "UPDATE notifications SET is_read = 1 WHERE {$whereColumn} = :user_id AND is_read = 0";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':user_id' => $this->currentUser['id']]);
         
         $_SESSION['success'] = "All notifications marked as read!";
         
-        $userType = $_SESSION['user_type'] ?? 'employee';
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
             header("Location: notifications.php");
             exit();
@@ -97,9 +103,12 @@ class NotificationsController {
      */
     public function delete() {
         $notificationId = $_POST['notification_id'] ?? 0;
+        $userType = $_SESSION['user_type'] ?? 'employee';
+        $isEmployee = ($userType === 'employee' && !in_array($this->currentUser['role'] ?? '', ['it_staff', 'admin']));
+        $whereColumn = $isEmployee ? 'employee_id' : 'user_id';
         
         if ($notificationId) {
-            $sql = "DELETE FROM notifications WHERE id = :id AND user_id = :user_id";
+            $sql = "DELETE FROM notifications WHERE id = :id AND {$whereColumn} = :user_id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id' => $notificationId,
@@ -109,7 +118,6 @@ class NotificationsController {
             $_SESSION['success'] = "Notification deleted!";
         }
         
-        $userType = $_SESSION['user_type'] ?? 'employee';
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
             header("Location: notifications.php");
             exit();
@@ -123,10 +131,14 @@ class NotificationsController {
      * Get notifications for user with pagination
      */
     private function getNotifications($userId, $userType, $limit = 10, $offset = 0) {
+        // Determine which column to query based on user type
+        $isEmployee = ($userType === 'employee' && !in_array($this->currentUser['role'] ?? '', ['it_staff', 'admin']));
+        $whereColumn = $isEmployee ? 'employee_id' : 'user_id';
+        
         // Get total count
         $countSql = "SELECT COUNT(*) as total
                      FROM notifications n
-                     WHERE n.user_id = :user_id";
+                     WHERE n.{$whereColumn} = :user_id";
         
         $stmt = $this->db->prepare($countSql);
         $stmt->execute([':user_id' => $userId]);
@@ -137,7 +149,7 @@ class NotificationsController {
                 t.ticket_number, t.title as ticket_title
                 FROM notifications n
                 LEFT JOIN tickets t ON n.ticket_id = t.id
-                WHERE n.user_id = :user_id
+                WHERE n.{$whereColumn} = :user_id
                 ORDER BY n.created_at DESC
                 LIMIT :limit OFFSET :offset";
         
@@ -169,13 +181,17 @@ class NotificationsController {
      * Get notification statistics
      */
     private function getNotificationStats($userId, $userType) {
+        // Determine which column to query based on user type
+        $isEmployee = ($userType === 'employee' && !in_array($this->currentUser['role'] ?? '', ['it_staff', 'admin']));
+        $whereColumn = $isEmployee ? 'employee_id' : 'user_id';
+        
         $sql = "SELECT 
                 COUNT(*) as total,
                 SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END) as unread,
                 SUM(CASE WHEN is_read = 1 THEN 1 ELSE 0 END) as `read`,
                 SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as today
                 FROM notifications
-                WHERE user_id = :user_id";
+                WHERE {$whereColumn} = :user_id";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
