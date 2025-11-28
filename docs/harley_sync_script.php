@@ -29,104 +29,301 @@ $DB_PASS = 'Z&e#mtcW3';
 // ============================================
 
 header('Content-Type: text/html; charset=utf-8');
+ob_start(); // Start output buffering for loading effect
 
 echo "<!DOCTYPE html>
 <html>
 <head>
     <title>Harley → IThelp Employee Sync</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 40px auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
             padding: 20px;
-            background: #f5f5f5;
+            color: #e2e8f0;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-content {
+            text-align: center;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(16px);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(6, 182, 212, 0.2);
+            border-top-color: #06b6d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .loading-subtext {
+            color: #94a3b8;
+            font-size: 14px;
         }
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         h1 {
-            color: #333;
-            border-bottom: 3px solid #4CAF50;
-            padding-bottom: 10px;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .sync-time {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 30px;
         }
         .status {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-            border-left: 4px solid;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid;
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(8px);
         }
-        .success { background: #e8f5e9; border-color: #4CAF50; color: #2e7d32; }
-        .error { background: #ffebee; border-color: #f44336; color: #c62828; }
-        .info { background: #e3f2fd; border-color: #2196F3; color: #1565c0; }
-        .warning { background: #fff3e0; border-color: #ff9800; color: #e65100; }
+        .success { 
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(34, 197, 94, 0.1);
+            color: #86efac;
+        }
+        .error { 
+            border-color: rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+        }
+        .info { 
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.1);
+            color: #93c5fd;
+        }
+        .warning { 
+            border-color: rgba(251, 146, 60, 0.5);
+            background: rgba(251, 146, 60, 0.1);
+            color: #fdba74;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
         th, td {
-            padding: 12px;
+            padding: 16px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
         th {
-            background: #4CAF50;
-            color: white;
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
-        tr:hover {
-            background: #f5f5f5;
+        td {
+            color: #cbd5e1;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        tr:hover td {
+            background: rgba(148, 163, 184, 0.05);
         }
         .summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            gap: 20px;
+            margin: 30px 0;
         }
         .summary-card {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(16px);
+            padding: 24px;
+            border-radius: 12px;
             text-align: center;
-            border: 2px solid #ddd;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
         }
         .summary-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 36px;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .summary-card p {
-            margin: 0;
-            color: #666;
+            color: #94a3b8;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .summary-card.created h3 { 
+            background: linear-gradient(to right, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .summary-card.updated h3 { 
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .summary-card.failed h3 { 
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .summary-card.warning h3 { 
+            background: linear-gradient(to right, #fb923c, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         pre {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            border-radius: 12px;
             overflow-x: auto;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+            font-size: 13px;
+            line-height: 1.6;
         }
         .btn {
             display: inline-block;
-            padding: 12px 24px;
-            background: #4CAF50;
+            padding: 14px 28px;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             margin: 10px 5px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
         }
         .btn:hover {
-            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4);
+        }
+        details {
+            margin: 20px 0;
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 16px;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #06b6d4;
+            padding: 8px;
+            user-select: none;
+        }
+        summary:hover {
+            color: #3b82f6;
+        }
+        h3 {
+            color: #e2e8f0;
+            font-size: 20px;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(148, 163, 184, 0.3), transparent);
+            margin: 40px 0;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            padding: 10px 0;
+            color: #cbd5e1;
+        }
+        ul li:before {
+            content: '▹ ';
+            color: #06b6d4;
+            font-weight: bold;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
+    <div class='loading-overlay' id='loadingOverlay'>
+        <div class='loading-content'>
+            <div class='spinner'></div>
+            <div class='loading-text'>Importing Employees</div>
+            <div class='loading-subtext'>Syncing data from Harley to ResolveIT...</div>
+        </div>
+    </div>
     <div class='container'>
-        <h1>🔄 Harley → IThelp Employee Sync</h1>
-        <p><strong>Sync Time:</strong> " . date('Y-m-d H:i:s') . "</p>
+        <h1>🔄 Harley → ResolveIT Employee Sync</h1>
+        <p class='sync-time'><strong>Sync Time:</strong> " . date('F d, Y - H:i:s') . "</p>
 ";
+
+// Hide loading overlay after content loads
+echo "<script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, 500);
+    });
+</script>";
 
 // Step 1: Connect to Harley database
 echo "<div class='status info'><strong>Step 1:</strong> Connecting to Harley database...</div>";
@@ -283,11 +480,11 @@ if ($curlError) {
         // Display summary
         echo "<div class='summary'>";
         echo "<div class='summary-card'><h3>" . $result['summary']['total'] . "</h3><p>Total Sent</p></div>";
-        echo "<div class='summary-card' style='border-color:#4CAF50;'><h3>" . $result['summary']['created'] . "</h3><p>Created</p></div>";
-        echo "<div class='summary-card' style='border-color:#2196F3;'><h3>" . $result['summary']['updated'] . "</h3><p>Updated</p></div>";
-        echo "<div class='summary-card' style='border-color:#f44336;'><h3>" . $result['summary']['failed'] . "</h3><p>Failed</p></div>";
+        echo "<div class='summary-card created'><h3>" . $result['summary']['created'] . "</h3><p>Created</p></div>";
+        echo "<div class='summary-card updated'><h3>" . $result['summary']['updated'] . "</h3><p>Updated</p></div>";
+        echo "<div class='summary-card failed'><h3>" . $result['summary']['failed'] . "</h3><p>Failed</p></div>";
         if ($result['summary']['not_in_source'] > 0) {
-            echo "<div class='summary-card' style='border-color:#ff9800;'><h3>" . $result['summary']['not_in_source'] . "</h3><p>Not in Harley</p></div>";
+            echo "<div class='summary-card warning'><h3>" . $result['summary']['not_in_source'] . "</h3><p>Not in Harley</p></div>";
         }
         echo "</div>";
         
@@ -366,19 +563,19 @@ if ($curlError) {
 }
 
 echo "
-        <hr style='margin:30px 0;'>
-        <p><strong>Next Steps:</strong></p>
+        <hr>
+        <h3>Next Steps</h3>
         <ul>
-            <li>✅ Review the sync results above</li>
-            <li>🔄 <a href='" . $_SERVER['PHP_SELF'] . "' class='btn'>Run Sync Again</a></li>
-            <li>📅 Setup cron job in cPanel to run this automatically (daily/hourly)</li>
-            <li>🔗 <a href='https://your-ithelp-domain.com/admin/customers.php' class='btn' style='background:#2196F3;'>View Employees in IThelp</a></li>
+            <li>Review the sync results above</li>
+            <li><a href='" . $_SERVER['PHP_SELF'] . "' class='btn'>Run Sync Again</a></li>
+            <li>Setup cron job in cPanel to run this automatically (daily/hourly)</li>
+            <li><a href='https://resolveit.resourcestaffonline.com/admin/customers.php' class='btn'>View Employees in ResolveIT</a></li>
         </ul>
         
         <h3>🤖 Setup Automatic Sync (Optional)</h3>
-        <p>To automatically sync employees every day, add this cron job in cPanel:</p>
-        <pre>0 2 * * * /usr/bin/php /home/your-username/public_html/Public/module/harley_sync_script.php > /dev/null 2>&1</pre>
-        <p>This will run the sync every day at 2:00 AM.</p>
+        <p style='color:#94a3b8; line-height:1.8;'>To automatically sync employees every day, add this cron job in cPanel:</p>
+        <pre>0 2 * * * /usr/bin/php /home/u816220874/public_html/harley.resourcestaffonline.com/Public/module/harley_sync_script.php > /dev/null 2>&1</pre>
+        <p style='color:#94a3b8; line-height:1.8;'>This will run the sync every day at 2:00 AM.</p>
     </div>
 </body>
 </html>

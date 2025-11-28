@@ -143,8 +143,11 @@ foreach ($data['employees'] as $emp) {
         }
 
         if ($existingEmployee) {
-            // Update existing employee
+            // Update existing employee (DO NOT update password)
             $employeeData['id'] = $existingEmployee['id'];
+            
+            // Remove password from update data to preserve existing password
+            unset($employeeData['password']);
             
             if ($employeeModel->update($employeeData['id'], $employeeData)) {
                 $results['updated'][] = [
