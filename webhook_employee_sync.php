@@ -161,17 +161,33 @@ foreach ($data['employees'] as $emp) {
             }
         } else {
             // Generate a default password (they should reset it)
-            $employeeData['password'] = password_hash('Welcome123!', PASSWORD_DEFAULT);
+            $defaultPassword = 'Welcome123!';
+            $employeeData['password'] = password_hash($defaultPassword, PASSWORD_DEFAULT);
             
             // Create new employee
             $newId = $employeeModel->create($employeeData);
             
             if ($newId) {
+                // Send welcome email to new employee
+                try {
+                    $mailer = new Mailer();
+                    $emailSent = $mailer->sendWelcomeEmail(
+                        $employeeData['email'],
+                        $employeeData['fname'] . ' ' . $employeeData['lname'],
+                        $employeeData['username'],
+                        $defaultPassword
+                    );
+                } catch (Exception $mailError) {
+                    // Log email error but don't fail the sync
+                    error_log("Failed to send welcome email to {$employeeData['email']}: " . $mailError->getMessage());
+                }
+                
                 $results['success'][] = [
                     'employee_id' => $employeeData['employee_id'],
                     'email' => $employeeData['email'],
                     'name' => $employeeData['fname'] . ' ' . $employeeData['lname'],
                     'id' => $newId,
+                    'email_sent' => $emailSent ?? false,
                 ];
                 $trackSyncedIds[] = $employeeData['employee_id'];
             } else {
