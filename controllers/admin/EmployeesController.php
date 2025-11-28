@@ -215,6 +215,58 @@ class EmployeesController {
     }
 
     /**
+     * Delete employee
+     */
+    public function delete() {
+        // Only allow POST requests
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = 'Invalid request method';
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Get employee ID
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+        
+        if (!$id) {
+            $_SESSION['error'] = 'Invalid employee ID';
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Get employee data
+        $employee = $this->employeeModel->findById($id);
+        
+        if (!$employee) {
+            $_SESSION['error'] = 'Employee not found';
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Check if employee has any tickets
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT COUNT(*) as ticket_count FROM tickets WHERE submitter_id = ? AND submitter_type = 'employee'");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result['ticket_count'] > 0) {
+            $_SESSION['error'] = "Cannot delete employee: {$employee['fname']} {$employee['lname']} has {$result['ticket_count']} ticket(s). Please reassign or close tickets first.";
+            header('Location: customers.php');
+            exit;
+        }
+        
+        // Delete employee
+        if ($this->employeeModel->delete($id)) {
+            $_SESSION['success'] = "Employee {$employee['fname']} {$employee['lname']} deleted successfully";
+        } else {
+            $_SESSION['error'] = 'Failed to delete employee';
+        }
+        
+        header('Location: customers.php');
+        exit;
+    }
+
+    /**
      * Load view file with data
      */
     private function loadView($viewName, $data = []) {

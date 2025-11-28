@@ -149,6 +149,31 @@ include __DIR__ . '/../layouts/header.php';
 
     <!-- Content -->
     <div class="p-8">
+        <!-- Success/Error Messages -->
+        <?php if (isset($_SESSION['success'])): ?>
+        <div class="mb-6 bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-emerald-400 text-lg"></i>
+                <p class="text-emerald-300 font-medium"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-300">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <?php unset($_SESSION['success']); endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="mb-6 bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-exclamation-circle text-red-400 text-lg"></i>
+                <p class="text-red-300 font-medium"><?php echo htmlspecialchars($_SESSION['error']); ?></p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <?php unset($_SESSION['error']); endif; ?>
+        
         <!-- Search Results Feedback Banner -->
         <?php if ($searchResults && !empty($searchQuery)): ?>
         <div class="mb-6 bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 flex items-center justify-between">
@@ -295,12 +320,20 @@ include __DIR__ . '/../layouts/header.php';
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="edit_employee.php?id=<?php echo $employee['id']; ?>" 
-                                   class="inline-flex items-center px-3 py-1.5 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-cyan-400 hover:border-cyan-500/50 transition rounded-lg text-sm"
-                                   title="Edit employee">
-                                    <i class="fas fa-edit mr-1.5"></i>
-                                    Edit
-                                </a>
+                                <div class="flex items-center justify-end space-x-2">
+                                    <a href="edit_employee.php?id=<?php echo $employee['id']; ?>" 
+                                       class="inline-flex items-center px-3 py-1.5 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-cyan-400 hover:border-cyan-500/50 transition rounded-lg text-sm"
+                                       title="Edit employee">
+                                        <i class="fas fa-edit mr-1.5"></i>
+                                        Edit
+                                    </a>
+                                    <button onclick="confirmDelete(<?php echo $employee['id']; ?>, '<?php echo htmlspecialchars($fullName, ENT_QUOTES); ?>')"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/30 hover:border-red-500 transition rounded-lg text-sm"
+                                            title="Delete employee">
+                                        <i class="fas fa-trash mr-1.5"></i>
+                                        Delete
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -492,6 +525,25 @@ include __DIR__ . '/../layouts/header.php';
         // Print function
         window.printEmployees = function() {
             window.print();
+        };
+
+        // Delete confirmation function
+        window.confirmDelete = function(id, name) {
+            if (confirm(`Are you sure you want to delete ${name}?\n\nThis action cannot be undone. The employee will only be deleted if they have no associated tickets.`)) {
+                // Create and submit form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'customers.php?action=delete';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
         };
     });
 </script>
