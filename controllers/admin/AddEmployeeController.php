@@ -96,18 +96,24 @@ class AddEmployeeController {
         $employeeId = $this->employeeModel->create($employeeData);
         
         if ($employeeId) {
-            // Send welcome email (optional)
+            // Send welcome email
             try {
                 $mailer = new Mailer();
-                $employee = $this->employeeModel->findById($employeeId);
+                $fullName = $employeeData['fname'] . ' ' . $employeeData['lname'];
+                $plainPassword = $_POST['password']; // Get plain password before it was hashed
                 
-                // You can create a sendWelcomeEmail method in Mailer class
-                // $mailer->sendWelcomeEmail($employee);
+                $mailer->sendWelcomeEmail(
+                    $employeeData['email'],
+                    $fullName,
+                    $employeeData['username'],
+                    $plainPassword
+                );
             } catch (Exception $e) {
                 error_log("Failed to send welcome email: " . $e->getMessage());
+                // Don't fail the employee creation if email fails
             }
             
-            $_SESSION['success'] = "Employee added successfully!";
+            $_SESSION['success'] = "Employee added successfully! Welcome email sent to " . $employeeData['email'];
             redirect('admin/customers.php');
         } else {
             $_SESSION['error'] = "Failed to add employee. Please try again.";
