@@ -22,8 +22,8 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
         <!-- Logo/Header -->
         <div class="flex items-center justify-between h-16 bg-gradient-to-r from-teal-600 to-emerald-600 px-6 border-b border-teal-700">
             <div class="flex items-center">
-                <img src="<?= strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '../' : '' ?>img/ResolveIT Logo Only without Background.png" alt="ResolveIT" class="h-8 w-auto mr-2 brightness-0 invert">
-                <span class="text-xl font-bold text-white">Resolve<span class="text-green-200">IT</span></span>
+                <img src="<?= strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '../' : '' ?>img/ResolveIT Logo Only without Background.png" alt="ResolveIT" class="h-8 w-auto mr-2">
+                <span class="text-xl font-bold text-white">Resolve<span class="text-white">IT</span></span>
             </div>
             <!-- Close button for mobile -->
             <button id="close-sidebar" class="lg:hidden text-white hover:text-green-100 transition">
@@ -74,12 +74,6 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
                class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'sla_performance.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-chart-line w-6"></i>
                 <span>SLA Performance</span>
-            </a>
-            
-            <a href="<?= $basePath ?>reset_employee_passwords.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'reset_employee_passwords.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
-                <i class="fas fa-key w-6"></i>
-                <span>Reset Passwords</span>
             </a>
             
             <a href="<?= $basePath ?>admin.php" 
