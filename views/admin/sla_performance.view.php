@@ -20,9 +20,6 @@ $baseUrl = '../';
         <div class="bg-white  border-b border-gray-200">
             <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white">
-                        <i class="fas fa-chart-line text-sm"></i>
-                    </div>
                     <div>
                         <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">SLA Performance</h1>
                         <p class="text-sm text-gray-600 mt-0.5">IT staff performance metrics (Last 30 days)</p>
@@ -42,8 +39,8 @@ $baseUrl = '../';
                             <p class="text-gray-600 text-sm mb-1">Total Tickets</p>
                             <p class="text-3xl font-bold text-gray-900"><?php echo $overallStats['total_tickets']; ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-teal-500/20 flex items-center justify-center">
-                            <i class="fas fa-ticket-alt text-teal-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-ticket-alt text-gray-700 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -58,8 +55,8 @@ $baseUrl = '../';
                             </p>
                             <p class="text-xs text-gray-500 mt-1"><?php echo $overallStats['response_met']; ?> met / <?php echo $overallStats['response_breached']; ?> breached</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-500/20 flex items-center justify-center">
-                            <i class="fas fa-bolt text-green-400 text-xl"></i>
+                        <div class="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-bolt text-gray-700 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -74,8 +71,8 @@ $baseUrl = '../';
                             </p>
                             <p class="text-xs text-gray-500 mt-1"><?php echo $overallStats['resolution_met']; ?> met / <?php echo $overallStats['resolution_breached']; ?> breached</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-500/20 flex items-center justify-center">
-                            <i class="fas fa-check-circle text-blue-400 text-xl"></i>
+                        <div class="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-check-circle text-gray-700 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -99,8 +96,8 @@ $baseUrl = '../';
                                 ?>
                             </p>
                         </div>
-                        <div class="w-12 h-12 bg-purple-500/20 flex items-center justify-center">
-                            <i class="fas fa-clock text-purple-400 text-xl"></i>
+                        <div class="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-clock text-gray-700 text-xl"></i>
                         </div>
                     </div>
                 </div>
