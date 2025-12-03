@@ -807,10 +807,10 @@ include __DIR__ . '/../layouts/header.php';
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#cbd5e1',
-                            borderColor: 'rgba(6, 182, 212, 0.5)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: 'rgba(20, 184, 166, 0.5)',
                             borderWidth: 1,
                             padding: 12,
                             displayColors: false
@@ -820,16 +820,16 @@ include __DIR__ . '/../layouts/header.php';
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: '#94a3b8',
+                                color: '#6b7280',
                                 font: { size: 12, weight: '500' },
                                 padding: 8
                             },
-                            grid: { color: '#334155', drawBorder: false },
+                            grid: { color: '#e5e7eb', drawBorder: false },
                             border: { display: false }
                         },
                         x: {
                             ticks: {
-                                color: '#94a3b8',
+                                color: '#6b7280',
                                 font: { size: 11, weight: '500' },
                                 padding: 8
                             },
@@ -862,14 +862,14 @@ include __DIR__ . '/../layouts/header.php';
                     datasets: [{
                         label: 'Tickets',
                         data: data,
-                        backgroundColor: 'rgba(226, 232, 240, 0.8)',
-                        borderColor: 'rgba(226, 232, 240, 1)',
+                        backgroundColor: 'rgba(20, 184, 166, 0.8)',
+                        borderColor: 'rgba(20, 184, 166, 1)',
                         borderWidth: 0,
                         borderRadius: 4,
                         borderSkipped: false,
                         barThickness: 'flex',
                         maxBarThickness: 40,
-                        hoverBackgroundColor: 'rgba(226, 232, 240, 1)'
+                        hoverBackgroundColor: 'rgba(20, 184, 166, 1)'
                     }]
                 },
                 options: {
@@ -887,10 +887,10 @@ include __DIR__ . '/../layouts/header.php';
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#cbd5e1',
-                            borderColor: 'rgba(226, 232, 240, 0.3)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: 'rgba(20, 184, 166, 0.5)',
                             borderWidth: 1,
                             padding: 12,
                             displayColors: false
@@ -900,16 +900,16 @@ include __DIR__ . '/../layouts/header.php';
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: '#94a3b8',
+                                color: '#6b7280',
                                 font: { size: 12, weight: '500' },
                                 padding: 8
                             },
-                            grid: { color: '#334155', drawBorder: false },
+                            grid: { color: '#e5e7eb', drawBorder: false },
                             border: { display: false }
                         },
                         x: {
                             ticks: {
-                                color: '#94a3b8',
+                                color: '#6b7280',
                                 font: { size: 11, weight: '500' },
                                 padding: 8
                             },
