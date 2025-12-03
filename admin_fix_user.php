@@ -8,15 +8,8 @@
 
 require_once 'config/database.php';
 
-// Simple password protection
-$admin_pass = 'admin123'; // Change this!
-$access_granted = false;
-
-if (isset($_POST['admin_password'])) {
-    if ($_POST['admin_password'] === $admin_pass) {
-        $access_granted = true;
-    }
-}
+// No password protection - direct access
+$access_granted = true;
 
 ?>
 <!DOCTYPE html>
@@ -33,28 +26,11 @@ if (isset($_POST['admin_password'])) {
             <strong>⚠️ Security Warning:</strong> Delete this file after use!
         </div>
 
-        <?php if (!$access_granted && !isset($_POST['check_user'])): ?>
-            <!-- Password protection -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h1 class="text-2xl font-bold mb-4">Admin Access Required</h1>
-                <form method="POST">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-2">Admin Password:</label>
-                        <input type="password" name="admin_password" class="w-full px-3 py-2 border rounded" required>
-                    </div>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                        Access Tool
-                    </button>
-                </form>
-            </div>
-        <?php elseif ($access_granted || isset($_POST['check_user'])): ?>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h1 class="text-2xl font-bold mb-6">User Account Diagnostic Tool</h1>
             
-            <div class="bg-white rounded-lg shadow p-6">
-                <h1 class="text-2xl font-bold mb-6">User Account Diagnostic Tool</h1>
-                
-                <!-- Check User Form -->
-                <form method="POST" class="mb-6">
-                    <input type="hidden" name="admin_password" value="<?php echo htmlspecialchars($admin_pass); ?>">
+            <!-- Check User Form -->
+            <form method="POST" class="mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-gray-700 mb-2">Username:</label>
@@ -216,7 +192,6 @@ if (isset($_POST['admin_password'])) {
                 }
                 ?>
             </div>
-        <?php endif; ?>
     </div>
 </body>
 </html>
