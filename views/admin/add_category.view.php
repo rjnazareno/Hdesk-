@@ -6,17 +6,17 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+<div class="lg:ml-64 min-h-screen bg-gray-50">
     <!-- Top Bar -->
-    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md">
+    <div class="bg-white border-b border-gray-200 ">
         <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white rounded-lg">
+                <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-gray-900 rounded-lg">
                     <i class="fas fa-folder-plus text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-white">Add New Category</h1>
-                    <p class="text-sm text-slate-400 mt-0.5">Create a new ticket category</p>
+                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">Add New Category</h1>
+                    <p class="text-sm text-gray-600 mt-0.5">Create a new ticket category</p>
                 </div>
             </div>
             <div class="hidden lg:flex items-center space-x-2">
@@ -34,7 +34,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-cyan-400">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-teal-600">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -46,7 +46,7 @@ include __DIR__ . '/../layouts/header.php';
                         <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <a href="categories.php" class="ml-1 text-sm font-medium text-slate-400 hover:text-cyan-400">Categories</a>
+                        <a href="categories.php" class="ml-1 text-sm font-medium text-gray-600 hover:text-teal-600">Categories</a>
                     </div>
                 </li>
                 <li>
@@ -54,7 +54,7 @@ include __DIR__ . '/../layouts/header.php';
                         <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-slate-300">Add Category</span>
+                        <span class="ml-1 text-sm font-medium text-gray-700">Add Category</span>
                     </div>
                 </li>
             </ol>
@@ -77,8 +77,8 @@ include __DIR__ . '/../layouts/header.php';
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Form Section -->
-            <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-6">
-                <h2 class="text-lg font-semibold text-white mb-6 pb-3 border-b border-slate-700/50">
+            <div class="bg-white border border-gray-200  p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">
                     <i class="fas fa-folder mr-2"></i>Category Details
                 </h2>
                 
@@ -86,7 +86,7 @@ include __DIR__ . '/../layouts/header.php';
                     
                     <!-- Category Name -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-white mb-2">
+                        <label for="name" class="block text-sm font-medium text-gray-900 mb-2">
                             Category Name <span class="text-red-400">*</span>
                         </label>
                         <input 
@@ -94,10 +94,10 @@ include __DIR__ . '/../layouts/header.php';
                             id="name" 
                             name="name" 
                             required
-                            class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                            class="w-full px-4 py-3 border border-gray-300 bg-gray-50 text-gray-900 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             placeholder="e.g., Hardware Issues, Software Support"
                         >
-                        <p class="text-sm text-slate-400 mt-2">
+                        <p class="text-sm text-gray-600 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
                             Choose a clear, descriptive name for the category
                         </p>
@@ -105,17 +105,17 @@ include __DIR__ . '/../layouts/header.php';
 
                     <!-- Description -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-white mb-2">
+                        <label for="description" class="block text-sm font-medium text-gray-900 mb-2">
                             Description
                         </label>
                         <textarea 
                             id="description" 
                             name="description" 
                             rows="4"
-                            class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                            class="w-full px-4 py-3 border border-gray-300 bg-gray-50 text-gray-900 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             placeholder="Describe what types of tickets belong to this category..."
                         ></textarea>
-                        <p class="text-sm text-slate-400 mt-2">
+                        <p class="text-sm text-gray-600 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
                             Help users understand when to use this category
                         </p>
@@ -123,14 +123,14 @@ include __DIR__ . '/../layouts/header.php';
 
                     <!-- Icon Selection -->
                     <div>
-                        <label for="icon" class="block text-sm font-medium text-white mb-2">
+                        <label for="icon" class="block text-sm font-medium text-gray-900 mb-2">
                             Icon
                         </label>
                         <div class="flex items-center space-x-3">
                             <select 
                                 id="icon" 
                                 name="icon"
-                                class="flex-1 px-4 py-3 border border-slate-600 bg-slate-700/50 text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                class="flex-1 px-4 py-3 border border-gray-300 bg-gray-50 text-gray-900 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                 onchange="updateIconPreview()"
                             >
                                 <option value="fa-folder">Default Folder</option>
@@ -152,11 +152,11 @@ include __DIR__ . '/../layouts/header.php';
                                 <option value="fa-phone">Phone/VoIP</option>
                                 <option value="fa-headset">Support</option>
                             </select>
-                            <div class="w-12 h-12 border border-slate-600 flex items-center justify-center bg-slate-700/50 rounded-lg" id="iconPreview">
-                                <i class="fas fa-folder text-slate-300 text-lg"></i>
+                            <div class="w-12 h-12 border border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg" id="iconPreview">
+                                <i class="fas fa-folder text-gray-700 text-lg"></i>
                             </div>
                         </div>
-                        <p class="text-sm text-slate-400 mt-2">
+                        <p class="text-sm text-gray-600 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
                             Choose an icon that represents this category
                         </p>
@@ -164,7 +164,7 @@ include __DIR__ . '/../layouts/header.php';
 
                     <!-- Color Selection -->
                     <div>
-                        <label for="color" class="block text-sm font-medium text-white mb-2">
+                        <label for="color" class="block text-sm font-medium text-gray-900 mb-2">
                             Color
                         </label>
                         <div class="grid grid-cols-8 gap-2 mb-3">
@@ -192,7 +192,7 @@ include __DIR__ . '/../layouts/header.php';
                             ?>
                             <button 
                                 type="button" 
-                                class="w-10 h-10 border-2 border-slate-600 hover:border-cyan-500 transition color-btn rounded-lg"
+                                class="w-10 h-10 border-2 border-gray-300 hover:border-teal-500 transition color-btn rounded-lg"
                                 style="background-color: <?php echo $color['value']; ?>"
                                 onclick="selectColor('<?php echo $color['value']; ?>')"
                                 title="<?php echo $color['name']; ?>"
@@ -204,23 +204,23 @@ include __DIR__ . '/../layouts/header.php';
                             id="color" 
                             name="color"
                             value="#6b7280"
-                            class="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                            class="w-full px-4 py-3 border border-gray-300 bg-gray-50 text-gray-900 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             placeholder="#6b7280"
                         >
-                        <p class="text-sm text-slate-400 mt-2">
+                        <p class="text-sm text-gray-600 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
                             Click a color above or enter a custom hex code
                         </p>
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700/50">
-                        <a href="categories.php" class="px-6 py-3 border border-slate-600 text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
+                    <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <a href="categories.php" class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </a>
                         <button 
                             type="submit"
-                            class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition rounded-lg"
+                            class="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-gray-900 font-semibold hover:from-teal-700 hover:to-emerald-700 transition rounded-lg"
                         >
                             <i class="fas fa-folder-plus mr-2"></i>Add Category
                         </button>
@@ -229,36 +229,36 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Preview Section -->
-            <div class="bg-slate-800/50 border border-slate-700/50 backdrop-blur-md p-6">
-                <h2 class="text-lg font-semibold text-white mb-6 pb-3 border-b border-slate-700/50">
+            <div class="bg-white border border-gray-200  p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">
                     <i class="fas fa-eye mr-2"></i>Live Preview
                 </h2>
                 
                 <!-- Preview Card -->
-                <div class="border border-slate-700/50 bg-slate-700/20 p-4 hover:border-cyan-500/50 transition-colors rounded-lg">
+                <div class="border border-gray-200 bg-gray-100/20 p-4 hover:border-teal-500/50 transition-colors rounded-lg">
                     <div class="flex items-center space-x-3 mb-3">
                         <div class="w-10 h-10 flex items-center justify-center rounded-lg" id="previewIconContainer">
-                            <i class="fas fa-folder text-slate-400 text-xl" id="previewIcon"></i>
+                            <i class="fas fa-folder text-gray-600 text-xl" id="previewIcon"></i>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-semibold text-white" id="previewName">Category Name</h3>
-                            <p class="text-xs text-slate-400 mt-0.5" id="previewDescription">No description yet</p>
+                            <h3 class="font-semibold text-gray-900" id="previewName">Category Name</h3>
+                            <p class="text-xs text-gray-600 mt-0.5" id="previewDescription">No description yet</p>
                         </div>
                     </div>
-                    <div class="border-t border-slate-700/50 pt-3 mt-3">
+                    <div class="border-t border-gray-200 pt-3 mt-3">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-slate-400">Sample Tickets:</span>
-                            <span class="font-semibold text-white">0</span>
+                            <span class="text-gray-600">Sample Tickets:</span>
+                            <span class="font-semibold text-gray-900">0</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Common Categories Reference -->
-                <div class="mt-6 bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-white mb-3">
+                <div class="mt-6 bg-white border border-gray-200 p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3">
                         <i class="fas fa-lightbulb mr-1"></i>Common Categories
                     </h3>
-                    <ul class="space-y-2 text-sm text-slate-400">
+                    <ul class="space-y-2 text-sm text-gray-600">
                         <li class="flex items-center">
                             <i class="fas fa-desktop text-cyan-500 w-5 mr-2"></i>
                             <span><strong>Hardware Issues</strong> - Physical device problems</span>
@@ -287,11 +287,11 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Help Section -->
-                <div class="mt-6 bg-cyan-900/20 border border-cyan-600/50 p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-cyan-400 mb-3">
+                <div class="mt-6 bg-teal-50 border border-teal-600/50 p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-teal-600 mb-3">
                         <i class="fas fa-info-circle mr-1"></i>Best Practices
                     </h3>
-                    <ul class="space-y-2 text-sm text-cyan-300">
+                    <ul class="space-y-2 text-sm text-teal-500">
                         <li class="flex items-start">
                             <i class="fas fa-check-circle mr-2 mt-0.5"></i>
                             <span>Use clear, concise names</span>
@@ -325,7 +325,7 @@ function updateIconPreview() {
     
     // Update both previews
     previewIcon.className = 'fas ' + iconClass + ' text-xl';
-    iconPreview.className = 'fas ' + iconClass + ' text-slate-300 text-lg';
+    iconPreview.className = 'fas ' + iconClass + ' text-gray-700 text-lg';
 }
 
 // Select color
