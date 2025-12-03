@@ -328,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
                     <p class="text-gray-600"><?php echo htmlspecialchars($ticket['ticket_number']); ?></p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button onclick="window.print()" class="px-4 py-2 bg-gray-900 text-gray-900 hover:bg-teal-600 transition no-print" title="Print this ticket">
+                    <button onclick="window.print()" class="px-4 py-2 bg-gray-900 text-white hover:bg-teal-600 transition no-print" title="Print this ticket">
                         <i class="fas fa-print mr-2"></i>Print
                     </button>
                     <a href="tickets.php" class="px-4 py-2 border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition" title="Back to tickets list">
