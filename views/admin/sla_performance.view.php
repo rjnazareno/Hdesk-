@@ -10,7 +10,6 @@ $baseUrl = '../';
     <title><?php echo $pageTitle; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 <body class="bg-gray-50">
     <?php include __DIR__ . '/../../includes/admin_nav.php'; ?>
@@ -21,7 +20,7 @@ $baseUrl = '../';
         <div class="bg-white  border-b border-gray-200">
             <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-gray-900 rounded-lg">
+                    <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white">
                         <i class="fas fa-chart-line text-sm"></i>
                     </div>
                     <div>
@@ -43,7 +42,7 @@ $baseUrl = '../';
                             <p class="text-gray-600 text-sm mb-1">Total Tickets</p>
                             <p class="text-3xl font-bold text-gray-900"><?php echo $overallStats['total_tickets']; ?></p>
                         </div>
-                        <div class="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-teal-500/20 flex items-center justify-center">
                             <i class="fas fa-ticket-alt text-teal-600 text-xl"></i>
                         </div>
                     </div>
@@ -59,7 +58,7 @@ $baseUrl = '../';
                             </p>
                             <p class="text-xs text-gray-500 mt-1"><?php echo $overallStats['response_met']; ?> met / <?php echo $overallStats['response_breached']; ?> breached</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-500/20 flex items-center justify-center">
                             <i class="fas fa-bolt text-green-400 text-xl"></i>
                         </div>
                     </div>
@@ -75,7 +74,7 @@ $baseUrl = '../';
                             </p>
                             <p class="text-xs text-gray-500 mt-1"><?php echo $overallStats['resolution_met']; ?> met / <?php echo $overallStats['resolution_breached']; ?> breached</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-500/20 flex items-center justify-center">
                             <i class="fas fa-check-circle text-blue-400 text-xl"></i>
                         </div>
                     </div>
@@ -100,7 +99,7 @@ $baseUrl = '../';
                                 ?>
                             </p>
                         </div>
-                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-purple-500/20 flex items-center justify-center">
                             <i class="fas fa-clock text-purple-400 text-xl"></i>
                         </div>
                     </div>
@@ -230,14 +229,14 @@ $baseUrl = '../';
                                     <p class="text-sm text-gray-600 mt-1"><?php echo htmlspecialchars(substr($breach['title'], 0, 50)); ?></p>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-lg
+                                    <span class="px-2 py-1 text-xs font-semibold
                                         <?php 
                                         echo match($breach['priority']) {
                                             'urgent' => 'bg-red-500/20 text-red-400 border border-red-500/30',
                                             'high' => 'bg-orange-500/20 text-orange-400 border border-orange-500/30',
                                             'medium' => 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
                                             'low' => 'bg-green-500/20 text-green-400 border border-green-500/30',
-                                            default => 'bg-slate-500/20 text-gray-600'
+                                            default => 'bg-gray-100 text-gray-600 border border-gray-300'
                                         };
                                         ?>">
                                         <?php echo ucfirst($breach['priority']); ?>
@@ -248,13 +247,13 @@ $baseUrl = '../';
                                 </td>
                                 <td class="px-6 py-4">
                                     <?php if ($breach['response_sla_status'] == 'breached'): ?>
-                                    <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg mr-1">
+                                    <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 mr-1">
                                         <i class="fas fa-bolt mr-1"></i> Response
                                     </span>
                                     <?php endif; ?>
-                                    <?php if ($breach['resolution_sla_status'] == 'breached'): ?>
-                                    <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg">
-                                        <i class="fas fa-clock mr-1"></i> Resolution
+                                    <?php if ($breach['resolution_sla_status'] === 'breached'): ?>
+                                    <span class="inline-flex items-center px-2 py-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Resolution
                                     </span>
                                     <?php endif; ?>
                                 </td>
