@@ -136,18 +136,13 @@ class User {
         $fields = [];
         $params = [':id' => $id];
         
-        $allowedFields = ['username', 'email', 'full_name', 'role', 'department', 'phone', 'is_active'];
+        $allowedFields = ['username', 'email', 'full_name', 'role', 'department', 'phone', 'is_active', 'password'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
                 $fields[] = "$field = :$field";
                 $params[":$field"] = $data[$field];
             }
-        }
-        
-        if (isset($data['password']) && !empty($data['password'])) {
-            $fields[] = "password = :password";
-            $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         
         if (empty($fields)) {
