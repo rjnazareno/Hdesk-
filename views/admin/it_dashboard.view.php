@@ -82,7 +82,7 @@ include __DIR__ . '/../layouts/header.php';
         <!-- Performance Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <!-- Total Assigned -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
+            <div class="bg-white border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-xs text-gray-600 uppercase tracking-wide mb-2">Assigned to Me</p>
@@ -95,7 +95,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Open Tickets -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
+            <div class="bg-white border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-xs text-gray-600 uppercase tracking-wide mb-2">Open Tickets</p>
@@ -108,7 +108,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- In Progress -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
+            <div class="bg-white border border-gray-200 p-5 hover:border-teal-500/50 transition-colors rounded-lg">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-xs text-gray-600 uppercase tracking-wide mb-2">In Progress</p>
@@ -137,7 +137,7 @@ include __DIR__ . '/../layouts/header.php';
         <!-- Performance Metrics -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <!-- Response Time -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 rounded-lg">
                 <div class="flex items-center space-x-3 mb-6">
                     <div class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded">
                         <i class="fas fa-clock text-teal-600"></i>
@@ -156,7 +156,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Resolution Time -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 rounded-lg">
                 <div class="flex items-center space-x-3 mb-6">
                     <div class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded">
                         <i class="fas fa-check-circle text-teal-600"></i>
@@ -175,7 +175,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Resolved Tickets -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 rounded-lg">
                 <div class="flex items-center space-x-3 mb-6">
                     <div class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded">
                         <i class="fas fa-trophy text-teal-600"></i>
@@ -205,7 +205,7 @@ include __DIR__ . '/../layouts/header.php';
         <!-- SLA Widgets Row -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- SLA Compliance Card -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 rounded-lg">
                 <div class="flex items-center space-x-3 mb-4">
                     <div class="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-teal-500 to-emerald-600 text-gray-900 rounded">
                         <i class="fas fa-chart-line text-sm"></i>
@@ -348,7 +348,7 @@ include __DIR__ . '/../layouts/header.php';
         </div>
 
         <!-- My Assigned Tickets -->
-        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 mb-8 rounded-lg">
+        <div class="bg-white border border-gray-200 mb-8 rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900">My Assigned Tickets</h3>
@@ -386,7 +386,7 @@ include __DIR__ . '/../layouts/header.php';
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-gradient-to-br from-slate-800 to-slate-800/50 divide-y divide-slate-700/50">
+                    <tbody class="bg-white divide-y divide-slate-700/50">
                         <?php if (empty($myTickets)): ?>
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center">
