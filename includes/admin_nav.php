@@ -20,13 +20,13 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
 <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white text-gray-900 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 border-r border-gray-200 shadow-xl">
     <div class="flex flex-col h-full">
         <!-- Logo/Header -->
-        <div class="flex items-center justify-between h-16 bg-gradient-to-r from-teal-600 to-emerald-600 px-6 border-b border-teal-700">
+        <div class="flex items-center justify-between h-16 bg-white px-6 border-b border-gray-200">
             <div class="flex items-center">
                 <img src="<?= strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '../' : '' ?>img/ResolveIT Logo Only without Background.png" alt="ResolveIT" class="h-8 w-auto mr-2">
-                <span class="text-xl font-bold"><span class="text-green-300">Resolve</span><span class="text-teal-200">IT</span></span>
+                <span class="text-xl font-bold text-gray-900">ResolveIT</span>
             </div>
             <!-- Close button for mobile -->
-            <button id="close-sidebar" class="lg:hidden text-white hover:text-green-100 transition">
+            <button id="close-sidebar" class="lg:hidden text-gray-700 hover:text-gray-900 transition">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
