@@ -37,7 +37,7 @@ $baseUrl = '../';
             <!-- Overall Stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Total Tickets -->
-                <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
+                <div class="bg-white  border border-gray-200 shadow-sm p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-600 text-sm mb-1">Total Tickets</p>
@@ -50,7 +50,7 @@ $baseUrl = '../';
                 </div>
 
                 <!-- Response SLA -->
-                <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
+                <div class="bg-white  border border-gray-200 shadow-sm p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-600 text-sm mb-1">Response SLA</p>
@@ -66,7 +66,7 @@ $baseUrl = '../';
                 </div>
 
                 <!-- Resolution SLA -->
-                <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
+                <div class="bg-white  border border-gray-200 shadow-sm p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-600 text-sm mb-1">Resolution SLA</p>
@@ -82,18 +82,20 @@ $baseUrl = '../';
                 </div>
 
                 <!-- Avg Response Time -->
-                <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
+                <div class="bg-white  border border-gray-200 shadow-sm p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-600 text-sm mb-1">Avg Response</p>
                             <p class="text-2xl font-bold text-gray-900">
                                 <?php 
-                                if ($overallStats['avg_response_minutes'] < 60) {
+                                if ($overallStats['avg_response_minutes'] !== null && $overallStats['avg_response_minutes'] < 60) {
                                     echo round($overallStats['avg_response_minutes']) . ' min';
-                                } else {
+                                } elseif ($overallStats['avg_response_minutes'] !== null) {
                                     $hours = floor($overallStats['avg_response_minutes'] / 60);
                                     $mins = round($overallStats['avg_response_minutes'] % 60);
                                     echo $hours . 'h ' . $mins . 'm';
+                                } else {
+                                    echo '0 min';
                                 }
                                 ?>
                             </p>
@@ -106,7 +108,7 @@ $baseUrl = '../';
             </div>
 
             <!-- IT Staff Performance Table -->
-            <div class="bg-white  border border-gray-200 rounded-lg shadow-xl mb-8">
+            <div class="bg-white  border border-gray-200 mb-8">
                 <div class="p-6 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900 flex items-center">
                         <i class="fas fa-users mr-2 text-teal-600"></i>
@@ -199,7 +201,7 @@ $baseUrl = '../';
 
             <!-- Recent SLA Breaches -->
             <?php if (count($recentBreaches) > 0): ?>
-            <div class="bg-white  border border-gray-200 rounded-lg shadow-xl">
+            <div class="bg-white  border border-gray-200 shadow-sm">
                 <div class="p-6 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900 flex items-center">
                         <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>
@@ -268,7 +270,7 @@ $baseUrl = '../';
             <?php endif; ?>
 
             <!-- Score Legend -->
-            <div class="mt-8 bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
+            <div class="mt-8 bg-white  border border-gray-200 p-6">
                 <h3 class="text-sm font-semibold text-gray-900 mb-4">
                     <i class="fas fa-info-circle mr-2 text-teal-600"></i>
                     SLA Score Calculation
