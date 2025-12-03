@@ -80,7 +80,7 @@ include __DIR__ . '/../layouts/header.php';
         </nav>
         
         <!-- Analytics Overview -->
-        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 mb-6 rounded-xl backdrop-blur">
+        <div class="bg-white border border-gray-200 p-6 mb-6 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900">Ticket Analytics</h2>
@@ -90,7 +90,7 @@ include __DIR__ . '/../layouts/header.php';
             
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <!-- Total Tickets -->
-                <div class="bg-gradient-to-br from-slate-700/50 to-slate-700/20 border border-gray-300/50 p-4 hover:border-teal-500/50 transition-colors cursor-pointer rounded-lg"
+                <div class="bg-gray-50 border border-gray-200 p-4 hover:border-teal-500 transition-colors cursor-pointer"
                      data-stat-filter="all" 
                      onclick="filterByStatus('all')"
                      title="Click to show all tickets">
@@ -158,7 +158,7 @@ include __DIR__ . '/../layouts/header.php';
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
             <!-- Recent Activity Timeline -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
@@ -184,7 +184,7 @@ include __DIR__ . '/../layouts/header.php';
                 ?>
                 
                 <!-- Today's Stats -->
-                <div class="border border-gray-300/50 bg-gray-100/30 p-5 mb-4 rounded-lg">
+                <div class="border border-gray-200 bg-gray-50 p-5 mb-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
                             <div class="text-sm text-gray-600 mb-2">Today's Tickets</div>
@@ -203,7 +203,7 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 
                 <!-- Yesterday's Comparison -->
-                <div class="border border-gray-300/50 bg-gray-100/30 p-4 mb-6 rounded-lg">
+                <div class="border border-gray-200 bg-gray-50 p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-xs text-gray-600 mb-1">Yesterday</div>
@@ -235,7 +235,7 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 
                 <!-- Weekly Summary -->
-                <div class="border border-gray-300/50 bg-gray-100/30 p-4 rounded-lg">
+                <div class="border border-gray-200 bg-gray-50 p-4">
                     <div class="flex justify-between items-center mb-3">
                         <div class="text-sm font-medium text-gray-900">Average Daily Tickets</div>
                         <div class="text-xl font-semibold text-gray-900"><?php echo !empty($last7Days) ? round(array_sum(array_column($last7Days, 'count')) / count($last7Days), 1) : 0; ?></div>
@@ -257,7 +257,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Daily Chart - Line Chart -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-1">Ticket Trends (Line)</h3>
                 <p class="text-sm text-gray-600 mb-3">Last 10 days ticket trends</p>
                 <div class="h-96 mb-2">
@@ -266,7 +266,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Daily Chart - Bar Chart -->
-            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="bg-white border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-1">Daily Ticket Volume</h3>
                 <p class="text-sm text-gray-600 mb-3">Last 10 days ticket trends</p>
                 <div class="h-96 mb-2">
@@ -302,13 +302,13 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 
                 <!-- Volume Summary -->
-                <div class="border border-gray-300/50 bg-gray-100/30 p-4 rounded-lg">
+                <div class="border border-gray-200 bg-gray-50 p-4">
                     <div class="grid grid-cols-3 gap-4">
                         <div class="text-center">
                             <div class="text-gray-600 text-xs mb-1">Peak Day</div>
                             <div class="text-lg font-semibold text-gray-900"><?php echo !empty($dailyStats) ? max(array_column($dailyStats, 'count')) : 0; ?></div>
                         </div>
-                        <div class="text-center border-l border-r border-gray-300/50">
+                        <div class="text-center border-l border-r border-gray-200">
                             <div class="text-gray-600 text-xs mb-1">Average</div>
                             <div class="text-lg font-semibold text-gray-900"><?php echo !empty($dailyStats) ? round(array_sum(array_column($dailyStats, 'count')) / count($dailyStats), 1) : 0; ?></div>
                         </div>
@@ -321,7 +321,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Status Distribution -->
-            <div class="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 p-6 rounded-lg">
+            <div class="lg:col-span-1 bg-white border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-1">Status Distribution</h3>
                 <p class="text-sm text-gray-600 mb-8">Tickets breakdown by status</p>
                 <div class="space-y-4">
@@ -336,7 +336,7 @@ include __DIR__ . '/../layouts/header.php';
                     foreach ($statusData as $data):
                         $percentage = $stats['total'] > 0 ? round(($data['count'] / $stats['total']) * 100) : 0;
                     ?>
-                    <div class="border border-gray-300/50 bg-gray-100/30 p-4 hover:border-teal-500/50 transition-colors rounded-lg">
+                    <div class="border border-gray-200 bg-gray-50 p-4 hover:border-teal-500 transition-colors">
                         <div class="flex justify-between items-center mb-3">
                             <span class="flex items-center">
                                 <div>
@@ -352,7 +352,7 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div class="mt-8 border border-gray-300/50 bg-gray-100/30 p-4 rounded-lg">
+                <div class="mt-8 border border-gray-200 bg-gray-50 p-4">
                     <div class="flex justify-between items-center mb-3">
                         <div class="text-sm font-medium text-gray-900">Total Active Tickets</div>
                         <div class="text-2xl font-semibold text-gray-900"><?php echo $stats['open'] + $stats['in_progress']; ?></div>
@@ -372,7 +372,7 @@ include __DIR__ . '/../layouts/header.php';
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Recent Tickets -->
-            <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 rounded-lg">
+            <div class="lg:col-span-2 bg-white border border-gray-200 shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <div>
@@ -380,7 +380,7 @@ include __DIR__ . '/../layouts/header.php';
                             <p class="text-sm text-gray-600 mt-0.5">Latest ticket submissions</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs text-gray-600 px-2 py-1 border border-gray-300/50 rounded bg-gray-100/30">
+                            <span class="text-xs text-gray-600 px-2 py-1 border border-gray-200 bg-gray-50">
                                 <?php echo $recentTicketsPagination['totalItems']; ?> tickets
                             </span>
                         </div>
@@ -446,7 +446,7 @@ include __DIR__ . '/../layouts/header.php';
                                         'low' => 'fa-arrow-down'
                                     ];
                                 ?>
-                                <tr class="border-b border-gray-300/30 hover:bg-gray-100/30 transition-all duration-200 cursor-pointer group searchable-row" 
+                                <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer group searchable-row" 
                                     data-ticket-row 
                                     data-ticket-id="<?php echo $ticket['id']; ?>"
                                     data-ticket-title="<?php echo htmlspecialchars($ticket['title']); ?>"
@@ -472,13 +472,13 @@ include __DIR__ . '/../layouts/header.php';
                                         </div>
                                     </td>
                                     <td class="py-4 pr-4">
-                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border <?php echo $statusColors[$ticket['status']] ?? 'bg-gray-50 text-gray-700 border-gray-300/50'; ?>">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border <?php echo $statusColors[$ticket['status']] ?? 'bg-gray-50 text-gray-700 border-gray-200'; ?>">
                                             <i class="fas <?php echo $statusIcons[$ticket['status']] ?? 'fa-circle'; ?> mr-1.5"></i>
                                             <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
                                         </span>
                                     </td>
                                     <td class="py-4 pr-4">
-                                        <span class="inline-flex items-center <?php echo $priorityColors[$ticket['priority']] ?? 'text-gray-600 bg-gray-100/30 px-2 py-1 rounded-lg'; ?>">
+                                        <span class="inline-flex items-center <?php echo $priorityColors[$ticket['priority']] ?? 'text-gray-600 bg-gray-50 px-2 py-1'; ?>">
                                             <i class="fas <?php echo $priorityIcons[$ticket['priority']] ?? 'fa-circle'; ?> mr-1.5 text-xs"></i>
                                             <?php echo ucfirst($ticket['priority']); ?>
                                         </span>
@@ -510,22 +510,22 @@ include __DIR__ . '/../layouts/header.php';
                             <div class="flex items-center space-x-2">
                                 <?php if ($recentTicketsPagination['hasPrevPage']): ?>
                                 <a href="?page=<?php echo $recentTicketsPagination['currentPage'] - 1; ?>" 
-                                   class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 rounded-lg transition">
+                                   class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition">
                                     <i class="fas fa-chevron-left mr-1"></i> Prev
                                 </a>
                                 <?php else: ?>
-                                <span class="px-3 py-1.5 text-sm border border-gray-300 bg-white text-slate-600 rounded-lg cursor-not-allowed">
+                                <span class="px-3 py-1.5 text-sm border border-gray-300 bg-white text-gray-400 cursor-not-allowed">
                                     <i class="fas fa-chevron-left mr-1"></i> Prev
                                 </span>
                                 <?php endif; ?>
                                 
                                 <?php if ($recentTicketsPagination['hasNextPage']): ?>
                                 <a href="?page=<?php echo $recentTicketsPagination['currentPage'] + 1; ?>" 
-                                   class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 rounded-lg transition">
+                                   class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition">
                                     Next <i class="fas fa-chevron-right ml-1"></i>
                                 </a>
                                 <?php else: ?>
-                                <span class="px-3 py-1.5 text-sm border border-gray-300 bg-white text-slate-600 rounded-lg cursor-not-allowed">
+                                <span class="px-3 py-1.5 text-sm border border-gray-300 bg-white text-gray-400 cursor-not-allowed">
                                     Next <i class="fas fa-chevron-right ml-1"></i>
                                 </span>
                                 <?php endif; ?>
@@ -546,7 +546,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Last Updates -->
-            <div class="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-800/50 border border-gray-200 rounded-lg">
+            <div class="lg:col-span-1 bg-white border border-gray-200 shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <div class="flex justify-between items-center">
                         <div>
@@ -563,7 +563,7 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="p-6">
                     <div class="space-y-2">
                         <!-- New Employee -->
-                        <div class="p-3 hover:bg-gray-100/30 transition-colors border border-gray-300/50 cursor-pointer rounded-lg">
+                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 flex items-center justify-center rounded">
@@ -581,7 +581,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
 
                         <!-- New Messages -->
-                        <div class="p-3 hover:bg-gray-100/30 transition-colors border border-gray-300/50 cursor-pointer rounded-lg">
+                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 flex items-center justify-center rounded">
@@ -599,7 +599,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
 
                         <!-- Resources -->
-                        <div class="p-3 hover:bg-gray-100/30 transition-colors border border-gray-300/50 cursor-pointer rounded-lg">
+                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 flex items-center justify-center rounded">
@@ -617,7 +617,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
 
                         <!-- Active Tickets -->
-                        <div class="p-3 hover:bg-gray-100/30 transition-colors border border-gray-300/50 cursor-pointer rounded-lg">
+                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 flex items-center justify-center rounded">
@@ -635,7 +635,7 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
 
                         <!-- New Articles -->
-                        <div class="p-3 hover:bg-gray-100/30 transition-colors border border-gray-300/50 cursor-pointer rounded-lg">
+                        <div class="p-3 hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 flex items-center justify-center rounded">
@@ -655,7 +655,7 @@ include __DIR__ . '/../layouts/header.php';
 
                     <!-- Quick Actions -->
                     <div class="mt-6 pt-4 border-t border-gray-200">
-                        <a href="#" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300/50 hover:border-teal-500/50 hover:text-teal-600 transition rounded">
+                        <a href="#" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 hover:border-teal-500 hover:text-teal-600 transition">
                             View Full Report
                         </a>
                     </div>
