@@ -23,7 +23,7 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
         <div class="flex items-center justify-between h-16 bg-gradient-to-r from-teal-600 to-emerald-600 px-6 border-b border-teal-700">
             <div class="flex items-center">
                 <img src="<?= strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '../' : '' ?>img/ResolveIT Logo Only without Background.png" alt="ResolveIT" class="h-8 w-auto mr-2">
-                <span class="text-xl font-bold text-white">Resolve<span class="text-white">IT</span></span>
+                <span class="text-xl font-bold bg-gradient-to-r from-green-300 to-teal-200 bg-clip-text text-transparent">ResolveIT</span>
             </div>
             <!-- Close button for mobile -->
             <button id="close-sidebar" class="lg:hidden text-white hover:text-green-100 transition">
