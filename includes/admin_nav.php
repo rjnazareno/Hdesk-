@@ -9,7 +9,7 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
 ?>
 
 <!-- Mobile Menu Button -->
-<button id="mobile-menu-button" class="lg:hidden fixed top-4 left-4 z-50 bg-teal-600 text-white p-3 rounded-lg shadow-lg hover:bg-teal-700 transition">
+<button id="mobile-menu-button" class="lg:hidden fixed top-4 left-4 z-50 bg-teal-600 text-white p-3 rounded-none shadow-lg hover:bg-teal-700 transition">
     <i class="fas fa-bars text-xl"></i>
 </button>
 
@@ -34,57 +34,57 @@ $basePath = strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '' : 'admin/';
         <!-- Navigation Links -->
         <nav class="flex-1 overflow-y-auto py-6">
             <a href="<?= $basePath ?>dashboard.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'dashboard.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'dashboard.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-th-large w-6"></i>
                 <span>Dashboard</span>
             </a>
             
             <a href="<?= $basePath ?>tickets.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'tickets.php' || $currentPage === 'view_ticket.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'tickets.php' || $currentPage === 'view_ticket.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-ticket-alt w-6"></i>
                 <span>Tickets</span>
             </a>
             
             <a href="<?= $basePath ?>create_ticket.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'create_ticket.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'create_ticket.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-plus-circle w-6"></i>
                 <span>Create Ticket</span>
             </a>
             
             <a href="<?= $basePath ?>customers.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'customers.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'customers.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-users w-6"></i>
                 <span>Employees</span>
             </a>
             
             <a href="<?= $basePath ?>categories.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'categories.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'categories.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-folder w-6"></i>
                 <span>Categories</span>
             </a>
             
             <?php if ($currentUser['role'] === 'admin'): ?>
             <a href="<?= $basePath ?>sla_management.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'sla_management.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'sla_management.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-clock w-6"></i>
                 <span>SLA Management</span>
             </a>
             
             <a href="<?= $basePath ?>sla_performance.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'sla_performance.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'sla_performance.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-chart-line w-6"></i>
                 <span>SLA Performance</span>
             </a>
             
             <a href="<?= $basePath ?>admin.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'admin.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'admin.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-cog w-6"></i>
                 <span>Admin Settings</span>
             </a>
             <?php endif; ?>
             
             <a href="<?= strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? '../' : '' ?>article.php" 
-               class="flex items-center px-6 py-3 mx-3 rounded-lg <?= $currentPage === 'article.php' ? 'bg-teal-50 text-teal-700 border border-teal-200 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
+               class="flex items-center px-6 py-3 mx-3 rounded-none <?= $currentPage === 'article.php' ? 'bg-gray-100 text-gray-900 border-l-4 border-teal-600 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600' ?> transition">
                 <i class="fas fa-newspaper w-6"></i>
                 <span>Articles</span>
             </a>
