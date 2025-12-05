@@ -15,7 +15,7 @@
     }
     
     @page {
-        size: A4 portrait;
+        size: A4 landscape;
         margin: 0.3cm;
     }
     
@@ -170,21 +170,21 @@
     }
     
     /* ========================================
-       GRID - SIDE BY SIDE FOR COMPACT
+       GRID - SIDE BY SIDE FOR LANDSCAPE
        ======================================== */
     .grid.lg\:grid-cols-3 {
         display: flex !important;
-        flex-wrap: wrap !important;
+        flex-wrap: nowrap !important;
     }
     
     .lg\:col-span-2 {
-        width: 65% !important;
+        width: 70% !important;
         display: block !important;
-        padding-right: 10px !important;
+        padding-right: 15px !important;
     }
     
     .lg\:col-span-1 {
-        width: 35% !important;
+        width: 30% !important;
         display: block !important;
     }
     
