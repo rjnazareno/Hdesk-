@@ -64,23 +64,7 @@
         background: #fff !important;
     }
     
-    /* ========================================
-       PASSPORT HEADER - MAROON BANNER
-       ======================================== */
-    .lg\:ml-64::before {
-        content: "══════════════════════════════════════════════════════════════════════════════\A              REPUBLIKA NG PILIPINAS  •  REPUBLIC OF THE PHILIPPINES\A                     RESOURCE STAFF ONLINE  •  IT SUPPORT TICKET\A══════════════════════════════════════════════════════════════════════════════" !important;
-        display: block !important;
-        white-space: pre !important;
-        background: linear-gradient(135deg, #800000 0%, #5c0000 100%) !important;
-        color: #ffd700 !important;
-        padding: 8px 15px !important;
-        font-size: 8pt !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        font-family: 'Times New Roman', serif !important;
-        letter-spacing: 1px !important;
-        border-bottom: 3px solid #000080 !important;
-    }
+    /* Header banner removed */
     
     /* ========================================
        TOP BAR - NAVY BLUE ACCENT
