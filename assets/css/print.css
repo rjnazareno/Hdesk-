@@ -6,12 +6,19 @@
 
 @media print {
     /* ========================================
-       HIDE NON-ESSENTIAL ELEMENTS
+       RESET & HIDE EVERYTHING FIRST
        ======================================== */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Hide all non-essential elements */
     aside,
     nav,
     .no-print,
-    button:not(.print-keep),
+    button,
     #mobile-menu-button,
     #mobile-overlay,
     #sidebar,
@@ -21,19 +28,20 @@
     #toast-container,
     #loading-overlay,
     .tooltip-popup,
-    .breadcrumb,
     nav[aria-label="Breadcrumb"],
-    .bg-slate-800\/50.backdrop-blur-md:first-child,
-    [class*="lg:ml-64"] > div:first-child,
-    form button[type="submit"]:not(.print-keep),
-    input[type="submit"]:not(.print-keep),
-    .hover\:,
-    [onclick]:not(.print-keep),
+    form,
     input,
     textarea,
     select,
-    form:not(.print-keep) {
+    [onclick],
+    .hover\:,
+    a[href="tickets.php"],
+    .bg-gradient-to-r,
+    .space-x-4 > a,
+    .space-x-4 > button,
+    img.rounded-full {
         display: none !important;
+        visibility: hidden !important;
     }
     
     /* ========================================
@@ -41,402 +49,155 @@
        ======================================== */
     @page {
         size: A4;
-        margin: 1cm;
+        margin: 0.5cm;
     }
     
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        box-sizing: border-box;
-    }
-    
-    /* ========================================
-       BODY - PASSPORT BACKGROUND
-       ======================================== */
-    body {
-        margin: 0 !important;
-        padding: 20px !important;
-        background: white !important;
-        color: #1a1a2e !important;
-        font-family: 'Courier New', 'Consolas', monospace !important;
-        font-size: 10pt;
-        line-height: 1.4;
-    }
-    
-    /* Remove layout margins */
-    .lg\:ml-64,
-    .ml-64,
-    main,
-    .container {
+    html, body {
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        max-width: 100% !important;
-    }
-    
-    /* ========================================
-       PASSPORT HEADER - OFFICIAL LOOK
-       ======================================== */
-    body::before {
-        content: "";
-        display: block;
-        width: 100%;
-        height: 80px;
-        background: #1a1a2e;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="80"><rect width="800" height="80" fill="%231a1a2e"/><text x="20" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="%2388a0b8" letter-spacing="3">RESOURCE STAFF ONLINE</text><text x="20" y="52" font-family="Arial" font-size="16" font-weight="bold" fill="%23ffffff">IT SUPPORT TICKET</text><text x="20" y="68" font-family="Arial" font-size="8" fill="%2388a0b8">OFFICIAL SERVICE DOCUMENT</text><circle cx="750" cy="40" r="25" fill="%230f3460" stroke="%2388a0b8" stroke-width="1"/><text x="738" y="48" font-family="Arial" font-size="20" fill="%2388a0b8">🎫</text></svg>');
-        background-size: cover;
-        margin-bottom: 0;
-        border: 3px solid #1a1a2e;
-    }
-    
-    /* ========================================
-       MAIN PASSPORT CONTAINER
-       ======================================== */
-    .bg-slate-800\/50,
-    .bg-slate-700\/50,
-    .bg-white,
-    .bg-gray-50,
-    [class*="bg-slate"],
-    .lg\:col-span-2 {
-        background: #fafafa !important;
-        border: 3px solid #1a1a2e !important;
-        border-top: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        padding: 20px !important;
-        margin-bottom: 0 !important;
-        page-break-inside: avoid;
-        position: relative;
-    }
-    
-    /* Security pattern overlay */
-    .lg\:col-span-2::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 10px,
-            rgba(26, 26, 46, 0.02) 10px,
-            rgba(26, 26, 46, 0.02) 20px
-        );
-        pointer-events: none;
-        z-index: 0;
-    }
-    
-    /* ========================================
-       TICKET TITLE
-       ======================================== */
-    h1, h2.text-2xl {
-        font-size: 14pt !important;
-        font-weight: bold !important;
-        color: #1a1a2e !important;
-        margin: 0 0 5px 0 !important;
-        padding: 10px 0 !important;
-        border-bottom: 2px solid #1a1a2e;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        page-break-after: avoid;
-    }
-    
-    /* Ticket ID - Machine readable style */
-    p.text-slate-400,
-    .text-slate-400,
-    p.text-gray-600,
-    .text-gray-600 {
-        color: #0f3460 !important;
-        font-size: 11pt !important;
-        font-family: 'Courier New', monospace !important;
-        letter-spacing: 3px;
-        background: #e8e8e8;
-        padding: 5px 10px;
-        display: inline-block;
-        border: 1px solid #ccc;
-        margin: 10px 0;
-    }
-    
-    /* ========================================
-       SIDEBAR - ID PHOTO AREA
-       ======================================== */
-    .lg\:col-span-1 {
-        width: 100% !important;
-        margin-top: 0 !important;
-        padding: 15px !important;
-        background: #f0f0f0 !important;
-        border: 3px solid #1a1a2e !important;
-        border-top: none !important;
-        page-break-before: avoid;
-        position: relative;
-    }
-    
-    /* Avatar placeholder with user icon */
-    .lg\:col-span-1::before {
-        content: "👤";
-        display: block;
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
-        border: 3px solid #1a1a2e;
-        margin: 0 auto 15px auto;
-        font-size: 50pt;
-        text-align: center;
-        line-height: 100px;
-    }
-    
-    /* ========================================
-       DATA FIELDS - PASSPORT STYLE
-       ======================================== */
-    dt, .label {
-        font-weight: bold !important;
-        color: #0f3460 !important;
-        font-size: 8pt !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 2px !important;
-        border-bottom: 1px dotted #999;
-        padding-bottom: 2px;
-    }
-    
-    dd, .value {
-        color: #1a1a2e !important;
-        font-size: 11pt !important;
-        font-family: 'Courier New', monospace !important;
-        margin-bottom: 12px !important;
-        margin-left: 0 !important;
-        padding-left: 0;
-        font-weight: bold;
-    }
-    
-    /* ========================================
-       STATUS BADGES - RUBBER STAMP STYLE
-       ======================================== */
-    .bg-yellow-500\/20,
-    .bg-blue-500\/20,
-    .bg-purple-500\/20,
-    .bg-green-500\/20,
-    .bg-red-500\/20,
-    [class*="bg-yellow"],
-    [class*="bg-blue"],
-    [class*="bg-purple"],
-    [class*="bg-green"],
-    [class*="bg-red"] {
-        background: transparent !important;
-        border: 3px solid #1a1a2e !important;
-        color: #1a1a2e !important;
-        padding: 8px 15px !important;
-        display: inline-block !important;
-        font-weight: bold !important;
-        font-size: 10pt !important;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        transform: rotate(-2deg);
-        position: relative;
-    }
-    
-    /* Status text prefixes */
-    .text-yellow-400,
-    .text-yellow-500 {
-        color: #1a1a2e !important;
-    }
-    
-    .text-yellow-400::before,
-    .text-yellow-500::before {
-        content: "⏳ ";
-    }
-    
-    .text-blue-400::before,
-    .text-blue-500::before {
-        content: "📂 ";
-    }
-    
-    .text-green-400::before,
-    .text-green-500::before {
-        content: "✅ ";
-    }
-    
-    .text-purple-400::before,
-    .text-purple-500::before {
-        content: "🔄 ";
-    }
-    
-    /* ========================================
-       PRIORITY - CLASSIFICATION LEVEL
-       ======================================== */
-    .text-red-400,
-    .text-orange-400,
-    .text-cyan-400 {
-        color: #1a1a2e !important;
-        font-weight: bold !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .text-red-400::before {
-        content: "🔴 PRIORITY: CRITICAL — ";
-        font-weight: bold;
-    }
-    
-    .text-orange-400::before {
-        content: "🟠 PRIORITY: HIGH — ";
-    }
-    
-    /* ========================================
-       TEXT COLORS
-       ======================================== */
-    .text-white,
-    .text-slate-100,
-    .text-slate-200,
-    .text-slate-300,
-    .text-slate-400,
-    .text-gray-300,
-    .text-gray-400,
-    .text-gray-600,
-    .text-gray-700,
-    .text-gray-900 {
-        color: #1a1a2e !important;
-    }
-    
-    /* ========================================
-       DESCRIPTION CONTENT
-       ======================================== */
-    .prose,
-    .description,
-    [class*="text-sm"] {
-        color: #1a1a2e !important;
-        font-size: 10pt !important;
-        line-height: 1.5 !important;
-        font-family: 'Georgia', serif !important;
-        text-align: justify;
-    }
-    
-    /* ========================================
-       ACTIVITY LOG - VISA STAMPS STYLE
-       ======================================== */
-    .space-y-4 > div,
-    .activity-item,
-    [class*="border-l"] {
-        border-left: 3px solid #1a1a2e !important;
-        padding-left: 15px !important;
-        margin-bottom: 10px !important;
-        margin-left: 10px !important;
-        page-break-inside: avoid;
-        position: relative;
-    }
-    
-    /* Entry marker */
-    .space-y-4 > div::before,
-    .activity-item::before {
-        content: "●";
-        position: absolute;
-        left: -8px;
-        color: #1a1a2e;
-        font-size: 12pt;
-    }
-    
-    /* ========================================
-       COMMENTS SECTION
-       ======================================== */
-    .divide-y > div,
-    .comment-item {
-        border-top: 1px dashed #1a1a2e !important;
-        padding: 10px 0 !important;
-        page-break-inside: avoid;
-    }
-    
-    .divide-y > div:first-child {
-        border-top: none !important;
-    }
-    
-    .font-semibold,
-    .font-bold {
-        font-weight: bold !important;
-        color: #0f3460 !important;
-        text-transform: uppercase;
-        font-size: 9pt;
-        letter-spacing: 1px;
-    }
-    
-    /* ========================================
-       ICONS
-       ======================================== */
-    .fas,
-    .far,
-    .fa {
-        color: #1a1a2e !important;
-    }
-    
-    i.fas,
-    i.far,
-    i.fa {
+        background: #fff !important;
+        font-family: 'Courier New', Courier, monospace !important;
         font-size: 9pt !important;
-        margin-right: 5px !important;
-    }
-    
-    /* ========================================
-       LINKS
-       ======================================== */
-    a {
-        color: #0f3460 !important;
-        text-decoration: none !important;
-    }
-    
-    a[href]:after {
-        content: "" !important;
-    }
-    
-    /* ========================================
-       TABLES
-       ======================================== */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 15px 0;
-        page-break-inside: avoid;
-        font-family: 'Courier New', monospace;
-    }
-    
-    th, td {
-        border: 1px solid #1a1a2e !important;
-        padding: 8px !important;
-        text-align: left !important;
+        line-height: 1.3 !important;
         color: #1a1a2e !important;
     }
     
-    th {
-        background-color: #e8e8e8 !important;
+    /* Remove sidebar margin */
+    .lg\:ml-64 {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* ========================================
+       PASSPORT DOCUMENT WRAPPER
+       ======================================== */
+    .lg\:ml-64 {
+        position: relative !important;
+        border: 4px solid #1a1a2e !important;
+        margin: 10px !important;
+        background: #fefefe !important;
+    }
+    
+    /* Passport Header Banner */
+    .lg\:ml-64::before {
+        content: "RESOURCE STAFF ONLINE  ━━━━━━━  IT SUPPORT TICKET  ━━━━━━━  OFFICIAL DOCUMENT" !important;
+        display: block !important;
+        width: 100% !important;
+        background: #1a1a2e !important;
+        color: #88a0b8 !important;
+        padding: 12px 20px !important;
+        font-size: 10pt !important;
         font-weight: bold !important;
-        text-transform: uppercase;
-        font-size: 8pt;
-        letter-spacing: 1px;
+        letter-spacing: 2px !important;
+        text-align: center !important;
+        border-bottom: 3px solid #0f3460 !important;
     }
     
     /* ========================================
-       SIGNATURE AREA
+       TOP BAR - TICKET HEADER
        ======================================== */
-    .lg\:col-span-1::after {
-        content: "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  AUTHORIZED BY: _______________________     DATE: _______________  SIGNATURE: _______________________";
-        display: block;
-        margin-top: 30px;
-        padding-top: 15px;
-        border-top: 2px solid #1a1a2e;
-        font-size: 8pt;
-        color: #666;
-        letter-spacing: 1px;
-        white-space: pre-line;
-        line-height: 2;
+    .bg-white.border-b {
+        background: #f5f5f5 !important;
+        border: none !important;
+        border-bottom: 2px solid #1a1a2e !important;
+        padding: 15px 20px !important;
+    }
+    
+    .bg-white.border-b h1 {
+        font-size: 16pt !important;
+        font-weight: bold !important;
+        color: #1a1a2e !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        margin: 0 !important;
+    }
+    
+    .bg-white.border-b p {
+        font-size: 12pt !important;
+        font-family: 'Courier New', monospace !important;
+        letter-spacing: 3px !important;
+        background: #e8e8e8 !important;
+        padding: 5px 15px !important;
+        border: 1px solid #999 !important;
+        display: inline-block !important;
+        margin-top: 8px !important;
+        color: #0f3460 !important;
+        font-weight: bold !important;
     }
     
     /* ========================================
-       GRID & LAYOUT
+       PRINT-ONLY HEADER - MRZ STYLE
        ======================================== */
-    .grid,
-    .grid-cols-1,
-    .lg\:grid-cols-2,
+    .print-only-header {
+        display: block !important;
+        visibility: visible !important;
+        background: #1a1a2e !important;
+        color: #fff !important;
+        padding: 15px 20px !important;
+        margin: 0 !important;
+        border-bottom: 3px solid #0f3460 !important;
+    }
+    
+    .print-only-header table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        border: none !important;
+        background: transparent !important;
+    }
+    
+    .print-only-header td {
+        border: none !important;
+        padding: 5px 10px !important;
+        color: #e0e0e0 !important;
+        vertical-align: top !important;
+    }
+    
+    .print-only-header h3 {
+        font-size: 11pt !important;
+        margin: 0 0 10px 0 !important;
+        padding-bottom: 8px !important;
+        border-bottom: 1px solid #88a0b8 !important;
+        color: #fff !important;
+        letter-spacing: 2px !important;
+        text-transform: uppercase !important;
+    }
+    
+    .print-only-header p {
+        margin: 4px 0 !important;
+        font-size: 9pt !important;
+        color: #ccc !important;
+    }
+    
+    .print-only-header strong {
+        color: #88a0b8 !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        font-size: 8pt !important;
+        letter-spacing: 1px !important;
+    }
+    
+    /* ========================================
+       CONTENT AREA
+       ======================================== */
+    .p-8 {
+        padding: 15px 20px !important;
+    }
+    
+    /* Hide breadcrumb */
+    nav[aria-label="Breadcrumb"],
+    .flex.mb-4,
+    ol.inline-flex {
+        display: none !important;
+    }
+    
+    /* ========================================
+       GRID LAYOUT - MAKE LINEAR
+       ======================================== */
+    .grid {
+        display: block !important;
+    }
+    
     .lg\:grid-cols-3 {
         display: block !important;
     }
@@ -445,43 +206,226 @@
     .lg\:col-span-1 {
         width: 100% !important;
         float: none !important;
+        display: block !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .space-y-6 > * {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
     }
     
     /* ========================================
-       SPACING
+       TICKET INFO CARDS - PASSPORT SECTIONS
        ======================================== */
-    .space-y-4 > * + *,
-    .space-y-6 > * + * {
-        margin-top: 10px !important;
+    .bg-white.border.border-gray-200 {
+        background: #fafafa !important;
+        border: 2px solid #1a1a2e !important;
+        border-top: none !important;
+        padding: 15px 20px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
     }
     
-    .gap-6,
-    .gap-4 {
-        gap: 0 !important;
+    .bg-white.border.border-gray-200.shadow-sm {
+        background: #fafafa !important;
+        border: 2px solid #1a1a2e !important;
+        border-top: none !important;
+    }
+    
+    /* Section Headers */
+    .bg-white h2,
+    .bg-white h3 {
+        font-size: 11pt !important;
+        font-weight: bold !important;
+        color: #0f3460 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        border-bottom: 2px solid #1a1a2e !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Main Title (Ticket Subject) */
+    h2.text-2xl {
+        font-size: 14pt !important;
+        color: #1a1a2e !important;
+        text-transform: none !important;
+        border-bottom: 2px solid #1a1a2e !important;
     }
     
     /* ========================================
-       REMOVE DECORATIONS
+       AVATAR/PHOTO PLACEHOLDER
        ======================================== */
-    .shadow,
-    .shadow-sm,
-    .shadow-md,
-    .shadow-lg,
-    .shadow-xl {
+    .lg\:col-span-1 .bg-white.border::before {
+        content: "👤" !important;
+        display: block !important;
+        width: 80px !important;
+        height: 80px !important;
+        background: linear-gradient(135deg, #e0e0e0, #c0c0c0) !important;
+        border: 3px solid #1a1a2e !important;
+        margin: 0 auto 15px auto !important;
+        font-size: 40pt !important;
+        text-align: center !important;
+        line-height: 75px !important;
+    }
+    
+    /* ========================================
+       DATA LABELS & VALUES
+       ======================================== */
+    label,
+    .text-sm.text-gray-600.font-medium {
+        display: block !important;
+        font-size: 7pt !important;
+        font-weight: bold !important;
+        color: #0f3460 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        margin-bottom: 2px !important;
+        border-bottom: 1px dotted #999 !important;
+        padding-bottom: 2px !important;
+    }
+    
+    .font-medium.text-gray-900,
+    p.font-medium {
+        font-size: 10pt !important;
+        font-family: 'Courier New', monospace !important;
+        color: #1a1a2e !important;
+        font-weight: bold !important;
+        margin-bottom: 10px !important;
+    }
+    
+    /* ========================================
+       STATUS BADGES - RUBBER STAMP
+       ======================================== */
+    .px-4.py-2.rounded-full,
+    .px-3.py-1.rounded-full,
+    span[class*="bg-yellow"],
+    span[class*="bg-blue"],
+    span[class*="bg-green"],
+    span[class*="bg-purple"],
+    span[class*="bg-red"],
+    span[class*="bg-orange"],
+    span[class*="bg-gray"] {
+        background: transparent !important;
+        border: 3px solid #1a1a2e !important;
+        border-radius: 0 !important;
+        color: #1a1a2e !important;
+        padding: 6px 12px !important;
+        font-weight: bold !important;
+        font-size: 10pt !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        transform: rotate(-2deg) !important;
+        display: inline-block !important;
+    }
+    
+    /* ========================================
+       DESCRIPTION TEXT
+       ======================================== */
+    .prose,
+    .prose p,
+    .text-gray-700.leading-relaxed {
+        font-family: 'Georgia', serif !important;
+        font-size: 10pt !important;
+        line-height: 1.5 !important;
+        color: #1a1a2e !important;
+        text-align: justify !important;
+    }
+    
+    /* ========================================
+       ACTIVITY TIMELINE - VISA STAMPS
+       ======================================== */
+    .space-y-6 > .flex.space-x-4 {
+        display: block !important;
+        border-left: 3px solid #1a1a2e !important;
+        padding-left: 15px !important;
+        margin-left: 10px !important;
+        margin-bottom: 10px !important;
+        position: relative !important;
+        page-break-inside: avoid !important;
+    }
+    
+    /* Entry dot */
+    .space-y-6 > .flex.space-x-4::before {
+        content: "●" !important;
+        position: absolute !important;
+        left: -9px !important;
+        color: #1a1a2e !important;
+        font-size: 14pt !important;
+        line-height: 1 !important;
+    }
+    
+    /* Hide activity icons */
+    .flex-shrink-0,
+    .w-10.h-10.rounded-full {
+        display: none !important;
+    }
+    
+    .flex-1 {
+        display: block !important;
+    }
+    
+    .flex-1 .font-medium {
+        font-size: 9pt !important;
+        font-weight: bold !important;
+        color: #0f3460 !important;
+        text-transform: uppercase !important;
+    }
+    
+    .flex-1 .text-sm.text-gray-600 {
+        font-size: 8pt !important;
+        color: #1a1a2e !important;
+    }
+    
+    /* ========================================
+       FOOTER - SIGNATURE LINE
+       ======================================== */
+    .lg\:ml-64::after {
+        content: "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  AUTHORIZED BY: ________________________     DATE: ____________     SIGNATURE: ________________________  ResolveIT Help Desk System • CONFIDENTIAL • Page 1" !important;
+        display: block !important;
+        background: #f0f0f0 !important;
+        border-top: 3px solid #1a1a2e !important;
+        padding: 15px 20px !important;
+        font-size: 8pt !important;
+        color: #666 !important;
+        letter-spacing: 1px !important;
+        white-space: pre-line !important;
+        line-height: 2 !important;
+        text-align: center !important;
+    }
+    
+    /* ========================================
+       HIDE FORMS & INTERACTIVE
+       ======================================== */
+    form,
+    .bg-white.border.border-gray-200.p-6.shadow-sm:has(form),
+    div:has(> textarea),
+    div:has(> form) {
+        display: none !important;
+    }
+    
+    /* ========================================
+       COLOR OVERRIDES
+       ======================================== */
+    .text-gray-900 { color: #1a1a2e !important; }
+    .text-gray-700 { color: #1a1a2e !important; }
+    .text-gray-600 { color: #333 !important; }
+    .text-teal-600 { color: #0f3460 !important; }
+    .text-green-600 { color: #1a1a2e !important; }
+    
+    /* ========================================
+       REMOVE ALL SHADOWS & EFFECTS
+       ======================================== */
+    .shadow, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl {
         box-shadow: none !important;
     }
     
-    .rounded,
-    .rounded-lg,
-    .rounded-xl,
+    .rounded, .rounded-lg, .rounded-xl, .rounded-full,
     [class*="rounded"] {
         border-radius: 0 !important;
-    }
-    
-    [class*="border-slate"],
-    .border-slate-700,
-    .border-slate-600 {
-        border-color: #1a1a2e !important;
     }
     
     .bg-gradient-to-r,
@@ -491,87 +435,34 @@
     }
     
     /* ========================================
-       PAGE CONTROL
+       PAGE BREAKS
        ======================================== */
     h1, h2, h3, h4, h5 {
-        page-break-after: avoid;
+        page-break-after: avoid !important;
     }
     
-    .page-break {
-        page-break-after: always;
-    }
-    
-    .avoid-break,
-    .bg-slate-800\/50 {
-        page-break-inside: avoid;
+    .avoid-break {
+        page-break-inside: avoid !important;
     }
     
     /* ========================================
-       MRZ STYLE HEADER
+       WATERMARK PATTERN
        ======================================== */
-    .print-only-header {
-        display: block !important;
-        background: #1a1a2e !important;
-        color: #fff !important;
-        padding: 10px 15px !important;
-        font-family: 'Courier New', monospace !important;
-        font-size: 9pt;
-        letter-spacing: 2px;
-        margin-bottom: 0;
-        border: 3px solid #1a1a2e !important;
-        border-top: none !important;
-    }
-    
-    .print-only-header table {
-        border: none !important;
-        background: transparent !important;
-    }
-    
-    .print-only-header td {
-        border: none !important;
-        padding: 5px !important;
-        color: #fff !important;
-    }
-    
-    .print-only-header h3 {
-        font-size: 11pt !important;
-        margin-top: 0 !important;
-        border-bottom: 1px solid #88a0b8;
-        padding-bottom: 5px;
-        color: #fff !important;
-    }
-    
-    .print-only-header p {
-        margin: 5px 0 !important;
-        line-height: 1.3 !important;
-        color: #ccc !important;
-    }
-    
-    .print-only-header strong {
-        font-weight: bold !important;
-        color: #fff !important;
-    }
-    
-    /* ========================================
-       FOOTER WATERMARK
-       ======================================== */
-    @page {
-        @bottom-center {
-            content: "ResolveIT • OFFICIAL IT SUPPORT DOCUMENT • CONFIDENTIAL";
-            font-size: 7pt;
-            color: #999;
-            letter-spacing: 2px;
-        }
-    }
-    
-    /* ========================================
-       FINAL
-       ======================================== */
-    body,
-    div,
-    span,
-    p {
-        orphans: 3;
-        widows: 3;
+    .p-8::before {
+        content: "" !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background-image: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 15px,
+            rgba(26, 26, 46, 0.015) 15px,
+            rgba(26, 26, 46, 0.015) 30px
+        ) !important;
+        pointer-events: none !important;
+        z-index: -1 !important;
     }
 }
