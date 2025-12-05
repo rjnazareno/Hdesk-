@@ -1,28 +1,26 @@
 /**
  * Print Styles for ResolveIT Help Desk
- * PASSPORT/ID CARD STYLE - Professional ticket printing
+ * PHILIPPINE PASSPORT STYLE - Professional ticket printing
+ * Colors: Deep Maroon (#800000) and Navy Blue (#000080)
  * Updated: December 2025
  */
 
 @media print {
     /* ========================================
-       FORCE COLOR PRINTING
+       FORCE COLOR PRINTING & ONE PAGE
        ======================================== */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
     
-    /* ========================================
-       PAGE SETUP
-       ======================================== */
     @page {
         size: A4 portrait;
-        margin: 0.5cm;
+        margin: 0.3cm;
     }
     
     /* ========================================
-       HIDE ONLY SPECIFIC ELEMENTS
+       HIDE NON-ESSENTIAL ELEMENTS
        ======================================== */
     #sidebar,
     #mobile-menu-button,
@@ -35,90 +33,95 @@
     form,
     textarea,
     input,
-    select {
-        display: none !important;
-    }
-    
-    /* ========================================
-       BODY RESET
-       ======================================== */
-    html, body {
-        background: #fff !important;
-        color: #1a1a2e !important;
-        font-family: 'Courier New', Courier, monospace !important;
-        font-size: 10pt !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    /* ========================================
-       REMOVE SIDEBAR MARGIN
-       ======================================== */
-    .lg\:ml-64 {
-        margin-left: 0 !important;
-        border: 4px solid #1a1a2e !important;
-        position: relative !important;
-    }
-    
-    /* ========================================
-       PASSPORT HEADER BANNER
-       ======================================== */
-    .lg\:ml-64::before {
-        content: "═══════════════════════════════════════════════════════════════════════\A        RESOURCE STAFF ONLINE  •  IT SUPPORT TICKET  •  OFFICIAL DOCUMENT\A═══════════════════════════════════════════════════════════════════════" !important;
-        display: block !important;
-        white-space: pre !important;
-        background: #1a1a2e !important;
-        color: #88a0b8 !important;
-        padding: 12px 20px !important;
-        font-size: 9pt !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        font-family: 'Courier New', monospace !important;
-        border-bottom: 3px solid #0f3460 !important;
-    }
-    
-    /* ========================================
-       TOP BAR STYLING
-       ======================================== */
-    .bg-white.border-b.border-gray-200 {
-        background: #f0f0f0 !important;
-        border-bottom: 2px solid #1a1a2e !important;
-        padding: 15px 20px !important;
-    }
-    
-    .bg-white.border-b h1 {
-        font-size: 16pt !important;
-        color: #1a1a2e !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-    }
-    
-    .bg-white.border-b p {
-        font-size: 12pt !important;
-        font-family: 'Courier New', monospace !important;
-        letter-spacing: 3px !important;
-        background: #ddd !important;
-        padding: 5px 15px !important;
-        border: 2px solid #1a1a2e !important;
-        display: inline-block !important;
-        color: #0f3460 !important;
-        font-weight: bold !important;
-    }
-    
-    /* Hide print button and back link in header */
+    select,
+    .flex.mb-4,
+    ol.inline-flex,
+    img.rounded-full,
     .bg-white.border-b .flex.items-center.space-x-4 {
         display: none !important;
     }
     
     /* ========================================
-       PRINT-ONLY HEADER (MRZ Style)
+       BODY - COMPACT FOR ONE PAGE
+       ======================================== */
+    html, body {
+        background: #fff !important;
+        color: #1a1a1a !important;
+        font-family: 'Times New Roman', Georgia, serif !important;
+        font-size: 9pt !important;
+        line-height: 1.2 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* ========================================
+       MAIN CONTAINER - PASSPORT BORDER
+       ======================================== */
+    .lg\:ml-64 {
+        margin-left: 0 !important;
+        border: 5px solid #800000 !important;
+        position: relative !important;
+        background: #fff !important;
+    }
+    
+    /* ========================================
+       PASSPORT HEADER - MAROON BANNER
+       ======================================== */
+    .lg\:ml-64::before {
+        content: "══════════════════════════════════════════════════════════════════════════════\A              REPUBLIKA NG PILIPINAS  •  REPUBLIC OF THE PHILIPPINES\A                     RESOURCE STAFF ONLINE  •  IT SUPPORT TICKET\A══════════════════════════════════════════════════════════════════════════════" !important;
+        display: block !important;
+        white-space: pre !important;
+        background: linear-gradient(135deg, #800000 0%, #5c0000 100%) !important;
+        color: #ffd700 !important;
+        padding: 8px 15px !important;
+        font-size: 8pt !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        font-family: 'Times New Roman', serif !important;
+        letter-spacing: 1px !important;
+        border-bottom: 3px solid #000080 !important;
+    }
+    
+    /* ========================================
+       TOP BAR - NAVY BLUE ACCENT
+       ======================================== */
+    .bg-white.border-b.border-gray-200 {
+        background: #f5f5dc !important;
+        border-bottom: 2px solid #000080 !important;
+        padding: 8px 15px !important;
+    }
+    
+    .bg-white.border-b h1 {
+        font-size: 12pt !important;
+        color: #800000 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        margin: 0 !important;
+        font-family: 'Times New Roman', serif !important;
+    }
+    
+    .bg-white.border-b p {
+        font-size: 10pt !important;
+        font-family: 'Courier New', monospace !important;
+        letter-spacing: 2px !important;
+        background: #fffacd !important;
+        padding: 3px 12px !important;
+        border: 2px solid #800000 !important;
+        display: inline-block !important;
+        color: #000080 !important;
+        font-weight: bold !important;
+        margin: 3px 0 0 0 !important;
+    }
+    
+    /* ========================================
+       PRINT-ONLY HEADER - MRZ STYLE
        ======================================== */
     .print-only-header {
         display: block !important;
-        background: #1a1a2e !important;
+        background: #000080 !important;
         color: #fff !important;
-        padding: 15px 20px !important;
-        border-bottom: 3px solid #0f3460 !important;
+        padding: 10px 15px !important;
+        border-bottom: 2px solid #ffd700 !important;
     }
     
     .print-only-header table {
@@ -129,58 +132,59 @@
     
     .print-only-header td {
         border: none !important;
-        padding: 5px 10px !important;
+        padding: 3px 8px !important;
         color: #e0e0e0 !important;
         vertical-align: top !important;
+        font-size: 8pt !important;
     }
     
     .print-only-header h3 {
-        font-size: 11pt !important;
-        color: #fff !important;
-        border-bottom: 1px solid #88a0b8 !important;
-        padding-bottom: 8px !important;
-        margin-bottom: 10px !important;
+        font-size: 9pt !important;
+        color: #ffd700 !important;
+        border-bottom: 1px solid #ffd700 !important;
+        padding-bottom: 5px !important;
+        margin-bottom: 6px !important;
         text-transform: uppercase !important;
-        letter-spacing: 2px !important;
+        letter-spacing: 1px !important;
+        font-family: 'Times New Roman', serif !important;
     }
     
     .print-only-header p {
-        margin: 4px 0 !important;
-        font-size: 9pt !important;
+        margin: 2px 0 !important;
+        font-size: 8pt !important;
         color: #ccc !important;
     }
     
     .print-only-header strong {
-        color: #88a0b8 !important;
+        color: #ffd700 !important;
         text-transform: uppercase !important;
-        font-size: 8pt !important;
+        font-size: 7pt !important;
         letter-spacing: 1px !important;
     }
     
     /* ========================================
-       CONTENT AREA
+       CONTENT - COMPACT SPACING
        ======================================== */
     .p-8 {
-        padding: 15px !important;
-    }
-    
-    /* Hide breadcrumbs */
-    .flex.mb-4,
-    ol.inline-flex {
-        display: none !important;
+        padding: 8px 12px !important;
     }
     
     /* ========================================
-       GRID LAYOUT - STACK VERTICALLY
+       GRID - SIDE BY SIDE FOR COMPACT
        ======================================== */
-    .grid,
-    .lg\:grid-cols-3 {
-        display: block !important;
+    .grid.lg\:grid-cols-3 {
+        display: flex !important;
+        flex-wrap: wrap !important;
     }
     
-    .lg\:col-span-2,
+    .lg\:col-span-2 {
+        width: 65% !important;
+        display: block !important;
+        padding-right: 10px !important;
+    }
+    
     .lg\:col-span-1 {
-        width: 100% !important;
+        width: 35% !important;
         display: block !important;
     }
     
@@ -192,10 +196,10 @@
        TICKET CARDS - PASSPORT SECTIONS
        ======================================== */
     .bg-white.border.border-gray-200 {
-        background: #fafafa !important;
-        border: 2px solid #1a1a2e !important;
+        background: #fffef5 !important;
+        border: 2px solid #800000 !important;
         border-top: none !important;
-        padding: 15px !important;
+        padding: 8px 12px !important;
         margin: 0 !important;
         box-shadow: none !important;
         border-radius: 0 !important;
@@ -205,61 +209,65 @@
     /* Section headers */
     .bg-white h2,
     .bg-white h3 {
-        font-size: 11pt !important;
-        color: #0f3460 !important;
+        font-size: 9pt !important;
+        color: #000080 !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
-        border-bottom: 2px solid #1a1a2e !important;
-        padding-bottom: 8px !important;
-        margin-bottom: 12px !important;
+        border-bottom: 1px solid #800000 !important;
+        padding-bottom: 4px !important;
+        margin-bottom: 6px !important;
+        font-family: 'Times New Roman', serif !important;
     }
     
     h2.text-2xl {
-        font-size: 13pt !important;
+        font-size: 10pt !important;
         text-transform: none !important;
+        color: #800000 !important;
     }
     
     /* ========================================
-       AVATAR PLACEHOLDER
+       AVATAR PLACEHOLDER - PH SUN
        ======================================== */
     .lg\:col-span-1 > .bg-white:first-child::before {
-        content: "👤" !important;
+        content: "☀" !important;
         display: block !important;
-        width: 80px !important;
-        height: 80px !important;
-        background: linear-gradient(135deg, #e0e0e0, #c0c0c0) !important;
-        border: 3px solid #1a1a2e !important;
-        margin: 0 auto 15px auto !important;
-        font-size: 45pt !important;
+        width: 60px !important;
+        height: 60px !important;
+        background: linear-gradient(135deg, #ffd700, #ffcc00) !important;
+        border: 3px solid #800000 !important;
+        margin: 0 auto 10px auto !important;
+        font-size: 35pt !important;
         text-align: center !important;
-        line-height: 75px !important;
+        line-height: 55px !important;
+        color: #800000 !important;
     }
     
     /* ========================================
-       DATA LABELS
+       DATA LABELS - COMPACT
        ======================================== */
     .text-sm.text-gray-600.font-medium,
     label {
-        font-size: 7pt !important;
-        color: #0f3460 !important;
+        font-size: 6pt !important;
+        color: #000080 !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
-        border-bottom: 1px dotted #888 !important;
+        border-bottom: 1px dotted #800000 !important;
         display: block !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
+        font-family: 'Times New Roman', serif !important;
     }
     
     .font-medium.text-gray-900,
     p.font-medium {
-        font-size: 10pt !important;
+        font-size: 8pt !important;
         font-family: 'Courier New', monospace !important;
-        color: #1a1a2e !important;
+        color: #1a1a1a !important;
         font-weight: bold !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 6px !important;
     }
     
     /* ========================================
-       STATUS BADGES - STAMP STYLE
+       STATUS BADGES - OFFICIAL SEAL STYLE
        ======================================== */
     .rounded-full,
     span[class*="bg-yellow"],
@@ -269,85 +277,86 @@
     span[class*="bg-red"],
     span[class*="bg-orange"],
     span[class*="bg-gray"] {
-        background: transparent !important;
-        border: 3px solid #1a1a2e !important;
+        background: #fffacd !important;
+        border: 2px solid #800000 !important;
         border-radius: 0 !important;
-        color: #1a1a2e !important;
-        padding: 5px 12px !important;
+        color: #800000 !important;
+        padding: 3px 8px !important;
         font-weight: bold !important;
-        font-size: 10pt !important;
+        font-size: 8pt !important;
         text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        transform: rotate(-2deg) !important;
+        letter-spacing: 1px !important;
         display: inline-block !important;
+        font-family: 'Times New Roman', serif !important;
     }
     
     /* ========================================
-       DESCRIPTION
+       DESCRIPTION - COMPACT
        ======================================== */
     .prose,
     .text-gray-700.leading-relaxed {
-        font-family: Georgia, serif !important;
-        font-size: 10pt !important;
-        line-height: 1.5 !important;
-        color: #1a1a2e !important;
+        font-family: 'Times New Roman', serif !important;
+        font-size: 9pt !important;
+        line-height: 1.3 !important;
+        color: #1a1a1a !important;
     }
     
     /* ========================================
-       ACTIVITY TIMELINE
+       ACTIVITY TIMELINE - COMPACT
        ======================================== */
     .space-y-6 > .flex {
-        border-left: 3px solid #1a1a2e !important;
-        padding-left: 15px !important;
-        margin-left: 10px !important;
-        margin-bottom: 8px !important;
+        border-left: 2px solid #800000 !important;
+        padding-left: 10px !important;
+        margin-left: 8px !important;
+        margin-bottom: 4px !important;
         position: relative !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
     }
     
     .space-y-6 > .flex::before {
         content: "●" !important;
         position: absolute !important;
-        left: -10px !important;
-        color: #1a1a2e !important;
-        font-size: 14pt !important;
+        left: -6px !important;
+        color: #800000 !important;
+        font-size: 10pt !important;
     }
     
-    /* Hide round activity icons */
     .w-10.h-10.rounded-full.bg-blue-100,
     .flex-shrink-0 {
         display: none !important;
     }
     
     .flex-1 .font-medium {
-        font-size: 9pt !important;
-        color: #0f3460 !important;
+        font-size: 7pt !important;
+        color: #000080 !important;
         text-transform: uppercase !important;
     }
     
     .flex-1 .text-sm {
-        font-size: 8pt !important;
+        font-size: 7pt !important;
         color: #333 !important;
     }
     
     /* ========================================
-       FOOTER SIGNATURE
+       FOOTER - OFFICIAL SIGNATURE
        ======================================== */
     .lg\:ml-64::after {
-        content: "═══════════════════════════════════════════════════════════════════════\A\A  AUTHORIZED BY: _________________________    DATE: ______________\A\A  SIGNATURE: _____________________________    VERIFIED: ☐ YES  ☐ NO\A\A═══════════════════════════════════════════════════════════════════════\A              ResolveIT Help Desk  •  CONFIDENTIAL  •  Page 1" !important;
+        content: "════════════════════════════════════════════════════════════════════════════════\A  AUTHORIZED: ____________________  DATE: ____________  SIGNATURE: ____________________\A════════════════════════════════════════════════════════════════════════════════\A         REPUBLIKA NG PILIPINAS  •  ResolveIT Help Desk  •  OFFICIAL DOCUMENT" !important;
         display: block !important;
         white-space: pre !important;
-        background: #e8e8e8 !important;
-        border-top: 3px solid #1a1a2e !important;
-        padding: 15px !important;
-        font-size: 9pt !important;
-        color: #333 !important;
+        background: linear-gradient(135deg, #800000 0%, #5c0000 100%) !important;
+        color: #ffd700 !important;
+        padding: 8px 15px !important;
+        font-size: 7pt !important;
         text-align: center !important;
         font-family: 'Courier New', monospace !important;
-        line-height: 1.6 !important;
+        line-height: 1.5 !important;
+        border-top: 3px solid #000080 !important;
     }
     
     /* ========================================
-       GENERAL CLEANUP
+       CLEANUP
        ======================================== */
     .shadow, .shadow-sm, .shadow-md, .shadow-lg {
         box-shadow: none !important;
@@ -358,20 +367,27 @@
     }
     
     .bg-gradient-to-r, .bg-gradient-to-br {
-        background: #fafafa !important;
+        background: #fffef5 !important;
     }
     
-    /* Hide user avatar in header */
-    img.rounded-full {
-        display: none !important;
-    }
-    
-    /* Text colors */
     .text-gray-900, .text-gray-700 {
-        color: #1a1a2e !important;
+        color: #1a1a1a !important;
     }
     
     .text-gray-600 {
         color: #333 !important;
+    }
+    
+    /* ========================================
+       FORCE ONE PAGE - SHRINK IF NEEDED
+       ======================================== */
+    .lg\:ml-64 {
+        max-height: 100vh !important;
+        overflow: hidden !important;
+    }
+    
+    /* Hide SLA section if exists to save space */
+    .bg-gradient-to-br.from-slate-900 {
+        display: none !important;
     }
 }
