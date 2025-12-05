@@ -251,24 +251,24 @@ document.addEventListener('DOMContentLoaded', async function() {
  */
 function showNotificationPrompt() {
     const promptHTML = `
-        <div id="notification-prompt" class="fixed top-4 right-4 z-50 bg-slate-800/95 backdrop-blur-md border border-cyan-500/50 rounded-lg p-4 shadow-xl max-w-sm animate-slide-in">
+        <div id="notification-prompt" class="fixed top-4 right-4 z-50 bg-white border border-gray-200 shadow-lg p-4 max-w-sm no-print" style="border-left: 4px solid #0d9488;">
             <div class="flex items-start space-x-3">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-bell text-cyan-400 text-2xl"></i>
+                    <i class="fas fa-bell text-teal-600 text-2xl"></i>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-white font-semibold mb-1">Enable Notifications?</h3>
-                    <p class="text-sm text-slate-300 mb-3">Get instant alerts when your tickets are updated</p>
+                    <h3 class="text-gray-900 font-semibold mb-1">Enable Notifications?</h3>
+                    <p class="text-sm text-gray-600 mb-3">Get instant alerts when your tickets are updated</p>
                     <div class="flex space-x-2">
-                        <button onclick="enableNotifications()" class="flex-1 px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm rounded hover:from-cyan-600 hover:to-blue-700 transition">
+                        <button onclick="enableNotifications()" class="flex-1 px-3 py-2 bg-teal-600 text-white text-sm hover:bg-teal-700 transition">
                             <i class="fas fa-check mr-1"></i> Enable
                         </button>
-                        <button onclick="dismissNotificationPrompt()" class="px-3 py-2 bg-slate-700 text-slate-300 text-sm rounded hover:bg-slate-600 transition">
+                        <button onclick="dismissNotificationPrompt()" class="px-3 py-2 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition">
                             Later
                         </button>
                     </div>
                 </div>
-                <button onclick="dismissNotificationPrompt()" class="flex-shrink-0 text-slate-400 hover:text-white">
+                <button onclick="dismissNotificationPrompt()" class="flex-shrink-0 text-gray-400 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
