@@ -295,9 +295,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment'])) {
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
     
-    <!-- Quick Wins CSS -->
-    <link rel="stylesheet" href="../assets/css/print.css">
+    <!-- Dark mode CSS (load before print) -->
     <link rel="stylesheet" href="../assets/css/dark-mode.css">
+    
+    <!-- Print styles - MUST BE LAST for proper cascade -->
+    <link rel="stylesheet" href="../assets/css/print.css" media="print">
     
     <style>
         /* Dark theme select styling */
