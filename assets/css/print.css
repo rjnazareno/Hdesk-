@@ -2,70 +2,15 @@
  * Print Styles for ResolveIT Help Desk
  * PASSPORT/ID CARD STYLE - Professional ticket printing
  * Updated: December 2025
- * 
- * NOTE: This file uses aggressive !important and high-specificity 
- * selectors to override Tailwind CSS and other styles
  */
 
 @media print {
     /* ========================================
-       MASTER RESET - FORCE WHITE BACKGROUNDS
+       FORCE COLOR PRINTING
        ======================================== */
-    html, html body, body,
-    html.dark, html.dark body,
-    .dark, .dark body {
-        background: #fff !important;
-        background-color: #fff !important;
-        color: #1a1a2e !important;
-        font-family: 'Courier New', Courier, monospace !important;
-        font-size: 9pt !important;
-        line-height: 1.4 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    
-    /* Force color printing */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        box-sizing: border-box !important;
-    }
-    
-    /* ========================================
-       HIDE EVERYTHING NON-ESSENTIAL
-       ======================================== */
-    html body aside,
-    html body nav,
-    html body button,
-    html body .no-print,
-    html body #mobile-menu-button,
-    html body #mobile-overlay,
-    html body #sidebar,
-    html body header,
-    html body footer,
-    html body .toast-notification,
-    html body #toast-container,
-    html body form,
-    html body input,
-    html body textarea,
-    html body select,
-    html body nav[aria-label="Breadcrumb"],
-    html body ol.inline-flex,
-    html body .flex.mb-4,
-    html body img.rounded-full,
-    html body .space-x-4 > a,
-    html body .space-x-4 > button,
-    html body a[href="tickets.php"],
-    html body [onclick] {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        width: 0 !important;
-        overflow: hidden !important;
-        opacity: 0 !important;
     }
     
     /* ========================================
@@ -73,497 +18,359 @@
        ======================================== */
     @page {
         size: A4 portrait;
-        margin: 0.8cm;
+        margin: 0.5cm;
     }
     
     /* ========================================
-       MAIN WRAPPER - PASSPORT BORDER
+       HIDE ONLY SPECIFIC ELEMENTS
        ======================================== */
-    html body div.lg\:ml-64,
-    html body .lg\:ml-64,
-    body div.lg\:ml-64,
-    body .lg\:ml-64 {
-        margin: 0 !important;
-        margin-left: 0 !important;
-        padding: 0 !important;
-        border: 5px solid #1a1a2e !important;
+    #sidebar,
+    #mobile-menu-button,
+    #mobile-overlay,
+    aside,
+    nav[aria-label="Breadcrumb"],
+    .no-print,
+    button,
+    form,
+    textarea,
+    input,
+    select {
+        display: none !important;
+    }
+    
+    /* ========================================
+       BODY RESET
+       ======================================== */
+    html, body {
         background: #fff !important;
+        color: #1a1a2e !important;
+        font-family: 'Courier New', Courier, monospace !important;
+        font-size: 10pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* ========================================
+       REMOVE SIDEBAR MARGIN
+       ======================================== */
+    .lg\:ml-64 {
+        margin-left: 0 !important;
+        border: 4px solid #1a1a2e !important;
         position: relative !important;
     }
     
     /* ========================================
        PASSPORT HEADER BANNER
        ======================================== */
-    html body div.lg\:ml-64::before,
-    body .lg\:ml-64::before {
-        content: "══════════════════════════════════════════════════════════════════════════════════════\A           RESOURCE STAFF ONLINE   •   IT SUPPORT TICKET   •   OFFICIAL DOCUMENT\A══════════════════════════════════════════════════════════════════════════════════════" !important;
+    .lg\:ml-64::before {
+        content: "═══════════════════════════════════════════════════════════════════════\A        RESOURCE STAFF ONLINE  •  IT SUPPORT TICKET  •  OFFICIAL DOCUMENT\A═══════════════════════════════════════════════════════════════════════" !important;
         display: block !important;
         white-space: pre !important;
-        width: 100% !important;
         background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
         color: #88a0b8 !important;
-        padding: 10px 15px !important;
+        padding: 12px 20px !important;
         font-size: 9pt !important;
         font-weight: bold !important;
-        letter-spacing: 1px !important;
         text-align: center !important;
         font-family: 'Courier New', monospace !important;
-        border-bottom: 4px double #0f3460 !important;
+        border-bottom: 3px solid #0f3460 !important;
     }
     
     /* ========================================
-       TOP BAR WITH TICKET TITLE
+       TOP BAR STYLING
        ======================================== */
-    html body .bg-white.border-b,
-    body .bg-white.border-b,
     .bg-white.border-b.border-gray-200 {
         background: #f0f0f0 !important;
-        background-color: #f0f0f0 !important;
-        border: none !important;
-        border-bottom: 3px solid #1a1a2e !important;
-        padding: 20px !important;
+        border-bottom: 2px solid #1a1a2e !important;
+        padding: 15px 20px !important;
     }
     
-    html body .bg-white.border-b h1,
-    body .bg-white.border-b h1 {
-        font-size: 18pt !important;
-        font-weight: bold !important;
+    .bg-white.border-b h1 {
+        font-size: 16pt !important;
         color: #1a1a2e !important;
         text-transform: uppercase !important;
-        letter-spacing: 3px !important;
-        margin: 0 0 10px 0 !important;
-        font-family: 'Courier New', monospace !important;
+        letter-spacing: 2px !important;
     }
     
-    html body .bg-white.border-b p,
-    body .bg-white.border-b p {
-        font-size: 14pt !important;
+    .bg-white.border-b p {
+        font-size: 12pt !important;
         font-family: 'Courier New', monospace !important;
-        letter-spacing: 4px !important;
-        background: #d0d0d0 !important;
-        background-color: #d0d0d0 !important;
-        padding: 8px 20px !important;
+        letter-spacing: 3px !important;
+        background: #ddd !important;
+        padding: 5px 15px !important;
         border: 2px solid #1a1a2e !important;
         display: inline-block !important;
-        margin: 5px 0 0 0 !important;
         color: #0f3460 !important;
         font-weight: bold !important;
     }
     
+    /* Hide print button and back link in header */
+    .bg-white.border-b .flex.items-center.space-x-4 {
+        display: none !important;
+    }
+    
     /* ========================================
-       SHOW PRINT-ONLY HEADER
+       PRINT-ONLY HEADER (MRZ Style)
        ======================================== */
-    html body .print-only-header,
-    body .print-only-header,
     .print-only-header {
         display: block !important;
-        visibility: visible !important;
         background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
         color: #fff !important;
-        padding: 20px !important;
-        margin: 0 !important;
-        border-bottom: 4px solid #0f3460 !important;
+        padding: 15px 20px !important;
+        border-bottom: 3px solid #0f3460 !important;
     }
     
-    html body .print-only-header table,
     .print-only-header table {
         width: 100% !important;
-        border-collapse: collapse !important;
         border: none !important;
         background: transparent !important;
-        background-color: transparent !important;
     }
     
-    html body .print-only-header td,
     .print-only-header td {
         border: none !important;
-        padding: 8px 15px !important;
+        padding: 5px 10px !important;
         color: #e0e0e0 !important;
         vertical-align: top !important;
-        background: transparent !important;
     }
     
-    html body .print-only-header h3,
     .print-only-header h3 {
-        font-size: 12pt !important;
-        margin: 0 0 12px 0 !important;
-        padding-bottom: 10px !important;
-        border-bottom: 2px solid #88a0b8 !important;
+        font-size: 11pt !important;
         color: #fff !important;
-        letter-spacing: 3px !important;
+        border-bottom: 1px solid #88a0b8 !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 10px !important;
         text-transform: uppercase !important;
-        font-family: 'Courier New', monospace !important;
-    }
-    
-    html body .print-only-header p,
-    .print-only-header p {
-        margin: 6px 0 !important;
-        font-size: 10pt !important;
-        color: #ccc !important;
-        font-family: 'Courier New', monospace !important;
-    }
-    
-    html body .print-only-header strong,
-    .print-only-header strong {
-        color: #88a0b8 !important;
-        font-weight: bold !important;
-        text-transform: uppercase !important;
-        font-size: 8pt !important;
         letter-spacing: 2px !important;
     }
     
-    /* ========================================
-       CONTENT PADDING
-       ======================================== */
-    html body .p-8,
-    body .p-8 {
-        padding: 20px !important;
-        background: #fff !important;
+    .print-only-header p {
+        margin: 4px 0 !important;
+        font-size: 9pt !important;
+        color: #ccc !important;
+    }
+    
+    .print-only-header strong {
+        color: #88a0b8 !important;
+        text-transform: uppercase !important;
+        font-size: 8pt !important;
+        letter-spacing: 1px !important;
     }
     
     /* ========================================
-       GRID - MAKE LINEAR/STACKED
+       CONTENT AREA
        ======================================== */
-    html body .grid,
-    html body .lg\:grid-cols-3,
-    body .grid,
-    body .lg\:grid-cols-3 {
+    .p-8 {
+        padding: 15px !important;
+    }
+    
+    /* Hide breadcrumbs */
+    .flex.mb-4,
+    ol.inline-flex {
+        display: none !important;
+    }
+    
+    /* ========================================
+       GRID LAYOUT - STACK VERTICALLY
+       ======================================== */
+    .grid,
+    .lg\:grid-cols-3 {
         display: block !important;
     }
     
-    html body .lg\:col-span-2,
-    html body .lg\:col-span-1,
-    body .lg\:col-span-2,
-    body .lg\:col-span-1 {
+    .lg\:col-span-2,
+    .lg\:col-span-1 {
         width: 100% !important;
-        max-width: 100% !important;
-        float: none !important;
         display: block !important;
-        margin: 0 !important;
     }
     
-    html body .space-y-6 > *,
-    body .space-y-6 > * {
-        margin-top: 0 !important;
+    .space-y-6 > * {
         margin-bottom: 0 !important;
     }
     
     /* ========================================
        TICKET CARDS - PASSPORT SECTIONS
        ======================================== */
-    html body .bg-white.border.border-gray-200,
-    html body .bg-white.border.border-gray-200.shadow-sm,
-    html body .bg-white.border.border-gray-200.p-6,
-    body .bg-white.border.border-gray-200,
-    body .bg-white.border.border-gray-200.shadow-sm {
+    .bg-white.border.border-gray-200 {
         background: #fafafa !important;
-        background-color: #fafafa !important;
-        border: 3px solid #1a1a2e !important;
+        border: 2px solid #1a1a2e !important;
         border-top: none !important;
-        padding: 20px !important;
+        padding: 15px !important;
         margin: 0 !important;
         box-shadow: none !important;
         border-radius: 0 !important;
         page-break-inside: avoid !important;
     }
     
-    /* Section Headers */
-    html body .bg-white h2,
-    html body .bg-white h3,
-    body .bg-white h2,
-    body .bg-white h3 {
-        font-size: 12pt !important;
-        font-weight: bold !important;
+    /* Section headers */
+    .bg-white h2,
+    .bg-white h3 {
+        font-size: 11pt !important;
         color: #0f3460 !important;
         text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        border-bottom: 3px solid #1a1a2e !important;
-        padding-bottom: 10px !important;
-        margin-bottom: 15px !important;
-        font-family: 'Courier New', monospace !important;
+        letter-spacing: 1px !important;
+        border-bottom: 2px solid #1a1a2e !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 12px !important;
     }
     
-    /* Main ticket title */
-    html body h2.text-2xl,
-    body h2.text-2xl {
-        font-size: 14pt !important;
+    h2.text-2xl {
+        font-size: 13pt !important;
         text-transform: none !important;
-        color: #1a1a2e !important;
     }
     
     /* ========================================
-       AVATAR/PHOTO PLACEHOLDER
+       AVATAR PLACEHOLDER
        ======================================== */
-    html body .lg\:col-span-1 .bg-white.border.border-gray-200::before,
-    body .lg\:col-span-1 .bg-white.border.border-gray-200::before {
+    .lg\:col-span-1 > .bg-white:first-child::before {
         content: "👤" !important;
         display: block !important;
-        width: 100px !important;
-        height: 100px !important;
-        background: linear-gradient(135deg, #e0e0e0, #b0b0b0) !important;
-        border: 4px solid #1a1a2e !important;
-        margin: 0 auto 20px auto !important;
-        font-size: 55pt !important;
+        width: 80px !important;
+        height: 80px !important;
+        background: linear-gradient(135deg, #e0e0e0, #c0c0c0) !important;
+        border: 3px solid #1a1a2e !important;
+        margin: 0 auto 15px auto !important;
+        font-size: 45pt !important;
         text-align: center !important;
-        line-height: 95px !important;
+        line-height: 75px !important;
     }
     
     /* ========================================
-       DATA LABELS (Passport Field Style)
+       DATA LABELS
        ======================================== */
-    html body label,
-    html body .text-sm.text-gray-600.font-medium,
-    body label,
-    body .text-sm.text-gray-600.font-medium {
-        display: block !important;
+    .text-sm.text-gray-600.font-medium,
+    label {
         font-size: 7pt !important;
-        font-weight: bold !important;
         color: #0f3460 !important;
         text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 3px !important;
+        letter-spacing: 1px !important;
         border-bottom: 1px dotted #888 !important;
-        padding-bottom: 3px !important;
-        font-family: 'Courier New', monospace !important;
+        display: block !important;
+        margin-bottom: 2px !important;
     }
     
-    /* Data Values */
-    html body .font-medium.text-gray-900,
-    html body p.font-medium,
-    body .font-medium.text-gray-900,
-    body p.font-medium {
-        font-size: 11pt !important;
+    .font-medium.text-gray-900,
+    p.font-medium {
+        font-size: 10pt !important;
         font-family: 'Courier New', monospace !important;
         color: #1a1a2e !important;
         font-weight: bold !important;
-        margin-bottom: 12px !important;
-        letter-spacing: 1px !important;
+        margin-bottom: 10px !important;
     }
     
     /* ========================================
-       STATUS & PRIORITY BADGES - STAMP STYLE
+       STATUS BADGES - STAMP STYLE
        ======================================== */
-    html body .px-4.py-2.rounded-full,
-    html body .px-3.py-1.rounded-full,
-    html body span[class*="bg-yellow"],
-    html body span[class*="bg-blue"],
-    html body span[class*="bg-green"],
-    html body span[class*="bg-purple"],
-    html body span[class*="bg-red"],
-    html body span[class*="bg-orange"],
-    html body span[class*="bg-gray-100"],
-    body .px-4.py-2.rounded-full,
-    body .px-3.py-1.rounded-full,
-    body span[class*="bg-yellow"],
-    body span[class*="bg-blue"],
-    body span[class*="bg-green"],
-    body span[class*="bg-purple"],
-    body span[class*="bg-red"],
-    body span[class*="bg-orange"] {
+    .rounded-full,
+    span[class*="bg-yellow"],
+    span[class*="bg-blue"],
+    span[class*="bg-green"],
+    span[class*="bg-purple"],
+    span[class*="bg-red"],
+    span[class*="bg-orange"],
+    span[class*="bg-gray"] {
         background: transparent !important;
-        background-color: transparent !important;
-        border: 4px solid #1a1a2e !important;
+        border: 3px solid #1a1a2e !important;
         border-radius: 0 !important;
         color: #1a1a2e !important;
-        padding: 8px 15px !important;
+        padding: 5px 12px !important;
         font-weight: bold !important;
-        font-size: 11pt !important;
+        font-size: 10pt !important;
         text-transform: uppercase !important;
-        letter-spacing: 3px !important;
-        transform: rotate(-3deg) !important;
+        letter-spacing: 2px !important;
+        transform: rotate(-2deg) !important;
         display: inline-block !important;
-        font-family: 'Courier New', monospace !important;
     }
     
     /* ========================================
-       DESCRIPTION TEXT
+       DESCRIPTION
        ======================================== */
-    html body .prose,
-    html body .prose p,
-    html body .text-gray-700.leading-relaxed,
-    body .prose,
-    body .prose p,
-    body .text-gray-700.leading-relaxed {
-        font-family: 'Georgia', 'Times New Roman', serif !important;
-        font-size: 11pt !important;
-        line-height: 1.6 !important;
+    .prose,
+    .text-gray-700.leading-relaxed {
+        font-family: Georgia, serif !important;
+        font-size: 10pt !important;
+        line-height: 1.5 !important;
         color: #1a1a2e !important;
-        text-align: justify !important;
     }
     
     /* ========================================
-       ACTIVITY TIMELINE - VISA STAMP STYLE
+       ACTIVITY TIMELINE
        ======================================== */
-    html body .space-y-6 > .flex.space-x-4,
-    body .space-y-6 > .flex.space-x-4 {
-        display: block !important;
-        border-left: 4px solid #1a1a2e !important;
-        padding: 10px 0 10px 20px !important;
-        margin-left: 15px !important;
-        margin-bottom: 0 !important;
+    .space-y-6 > .flex {
+        border-left: 3px solid #1a1a2e !important;
+        padding-left: 15px !important;
+        margin-left: 10px !important;
+        margin-bottom: 8px !important;
         position: relative !important;
-        page-break-inside: avoid !important;
-        background: #f8f8f8 !important;
     }
     
-    /* Entry marker dot */
-    html body .space-y-6 > .flex.space-x-4::before,
-    body .space-y-6 > .flex.space-x-4::before {
+    .space-y-6 > .flex::before {
         content: "●" !important;
         position: absolute !important;
-        left: -12px !important;
-        top: 12px !important;
+        left: -10px !important;
         color: #1a1a2e !important;
-        font-size: 16pt !important;
-        line-height: 1 !important;
-        background: #fff !important;
+        font-size: 14pt !important;
     }
     
-    /* Hide circular icons in timeline */
-    html body .flex-shrink-0,
-    html body .w-10.h-10.rounded-full.bg-blue-100,
-    body .flex-shrink-0,
-    body .w-10.h-10.rounded-full {
+    /* Hide round activity icons */
+    .w-10.h-10.rounded-full.bg-blue-100,
+    .flex-shrink-0 {
         display: none !important;
     }
     
-    html body .flex-1,
-    body .flex-1 {
-        display: block !important;
-    }
-    
-    html body .flex-1 .font-medium,
-    body .flex-1 .font-medium {
-        font-size: 10pt !important;
-        font-weight: bold !important;
+    .flex-1 .font-medium {
+        font-size: 9pt !important;
         color: #0f3460 !important;
         text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-        font-family: 'Courier New', monospace !important;
     }
     
-    html body .flex-1 .text-sm.text-gray-600,
-    body .flex-1 .text-sm.text-gray-600 {
-        font-size: 9pt !important;
+    .flex-1 .text-sm {
+        font-size: 8pt !important;
         color: #333 !important;
-        font-family: 'Courier New', monospace !important;
     }
     
     /* ========================================
-       FOOTER - SIGNATURE AREA
+       FOOTER SIGNATURE
        ======================================== */
-    html body div.lg\:ml-64::after,
-    body .lg\:ml-64::after {
-        content: "══════════════════════════════════════════════════════════════════════════════════════\A\A    AUTHORIZED BY: ________________________________     DATE: ____________________\A\A    SIGNATURE: ____________________________________     VERIFIED: ☐ YES   ☐ NO\A\A══════════════════════════════════════════════════════════════════════════════════════\A                    ResolveIT Help Desk System  •  CONFIDENTIAL  •  Page 1" !important;
+    .lg\:ml-64::after {
+        content: "═══════════════════════════════════════════════════════════════════════\A\A  AUTHORIZED BY: _________________________    DATE: ______________\A\A  SIGNATURE: _____________________________    VERIFIED: ☐ YES  ☐ NO\A\A═══════════════════════════════════════════════════════════════════════\A              ResolveIT Help Desk  •  CONFIDENTIAL  •  Page 1" !important;
         display: block !important;
         white-space: pre !important;
         background: #e8e8e8 !important;
-        background-color: #e8e8e8 !important;
-        border-top: 4px solid #1a1a2e !important;
-        padding: 20px !important;
+        border-top: 3px solid #1a1a2e !important;
+        padding: 15px !important;
         font-size: 9pt !important;
         color: #333 !important;
-        letter-spacing: 1px !important;
         text-align: center !important;
         font-family: 'Courier New', monospace !important;
-        line-height: 1.8 !important;
+        line-height: 1.6 !important;
     }
     
     /* ========================================
-       HIDE COMMENT FORM SECTION
+       GENERAL CLEANUP
        ======================================== */
-    html body .bg-white.border.border-gray-200.p-6.shadow-sm:last-of-type,
-    html body div:has(textarea),
-    html body div:has(form),
-    body .bg-white.border.border-gray-200.p-6.shadow-sm:last-of-type {
-        display: none !important;
-    }
-    
-    /* ========================================
-       COLOR RESETS
-       ======================================== */
-    html body .text-gray-900,
-    body .text-gray-900 { color: #1a1a2e !important; }
-    
-    html body .text-gray-700,
-    body .text-gray-700 { color: #1a1a2e !important; }
-    
-    html body .text-gray-600,
-    body .text-gray-600 { color: #333 !important; }
-    
-    html body .text-teal-600,
-    body .text-teal-600 { color: #0f3460 !important; }
-    
-    html body .text-green-600,
-    body .text-green-600 { color: #1a1a2e !important; }
-    
-    /* ========================================
-       REMOVE ALL SHADOWS & ROUNDED CORNERS
-       ======================================== */
-    html body .shadow,
-    html body .shadow-sm,
-    html body .shadow-md,
-    html body .shadow-lg,
-    body .shadow,
-    body .shadow-sm,
-    body .shadow-md,
-    body .shadow-lg {
+    .shadow, .shadow-sm, .shadow-md, .shadow-lg {
         box-shadow: none !important;
     }
     
-    html body .rounded,
-    html body .rounded-lg,
-    html body .rounded-xl,
-    html body .rounded-full,
-    html body [class*="rounded"],
-    body .rounded,
-    body .rounded-lg,
-    body .rounded-xl,
-    body .rounded-full {
+    .rounded, .rounded-lg, .rounded-xl {
         border-radius: 0 !important;
     }
     
-    html body .bg-gradient-to-r,
-    html body .bg-gradient-to-br,
-    html body [class*="bg-gradient"],
-    body .bg-gradient-to-r,
-    body .bg-gradient-to-br {
+    .bg-gradient-to-r, .bg-gradient-to-br {
         background: #fafafa !important;
-        background-color: #fafafa !important;
     }
     
-    /* ========================================
-       PAGE BREAKS
-       ======================================== */
-    h1, h2, h3, h4, h5 {
-        page-break-after: avoid !important;
+    /* Hide user avatar in header */
+    img.rounded-full {
+        display: none !important;
     }
     
-    .avoid-break {
-        page-break-inside: avoid !important;
+    /* Text colors */
+    .text-gray-900, .text-gray-700 {
+        color: #1a1a2e !important;
     }
     
-    /* ========================================
-       WATERMARK PATTERN (diagonal lines)
-       ======================================== */
-    html body .p-8::before,
-    body .p-8::before {
-        content: "" !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        background-image: repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 20px,
-            rgba(26, 26, 46, 0.02) 20px,
-            rgba(26, 26, 46, 0.02) 40px
-        ) !important;
-        pointer-events: none !important;
-        z-index: -1 !important;
+    .text-gray-600 {
+        color: #333 !important;
     }
 }
