@@ -1,7 +1,7 @@
 /**
  * Print Styles for ResolveIT Help Desk
- * Optimized for printing tickets with clean, professional formatting
- * Updated: November 2025
+ * PASSPORT/ID CARD STYLE - Professional ticket printing
+ * Updated: December 2025
  */
 
 @media print {
@@ -24,14 +24,15 @@
     .breadcrumb,
     nav[aria-label="Breadcrumb"],
     .bg-slate-800\/50.backdrop-blur-md:first-child,
-    /* Hide sidebar navigation */
     [class*="lg:ml-64"] > div:first-child,
-    /* Hide action buttons */
     form button[type="submit"]:not(.print-keep),
     input[type="submit"]:not(.print-keep),
-    /* Hide interactive elements */
     .hover\:,
-    [onclick]:not(.print-keep) {
+    [onclick]:not(.print-keep),
+    input,
+    textarea,
+    select,
+    form:not(.print-keep) {
         display: none !important;
     }
     
@@ -40,28 +41,29 @@
        ======================================== */
     @page {
         size: A4;
-        margin: 1.5cm 2cm;
+        margin: 1cm;
     }
     
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        box-sizing: border-box;
     }
     
     /* ========================================
-       BODY & LAYOUT
+       BODY - PASSPORT BACKGROUND
        ======================================== */
     body {
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 20px !important;
         background: white !important;
-        color: #000 !important;
-        font-family: 'Arial', 'Helvetica', sans-serif !important;
-        font-size: 11pt;
-        line-height: 1.5;
+        color: #1a1a2e !important;
+        font-family: 'Courier New', 'Consolas', monospace !important;
+        font-size: 10pt;
+        line-height: 1.4;
     }
     
-    /* Remove all margins from main content */
+    /* Remove layout margins */
     .lg\:ml-64,
     .ml-64,
     main,
@@ -72,114 +74,146 @@
     }
     
     /* ========================================
-       HEADER - COMPANY BRANDING
+       PASSPORT HEADER - OFFICIAL LOOK
        ======================================== */
     body::before {
         content: "";
         display: block;
-        height: 60px;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60"><rect width="50" height="50" rx="8" fill="%2306b6d4"/><text x="60" y="35" font-family="Arial" font-size="24" font-weight="bold" fill="%23000">ResolveIT</text><text x="60" y="52" font-family="Arial" font-size="10" fill="%23666">Help Desk System</text></svg>');
-        background-repeat: no-repeat;
-        background-position: left center;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 3px solid #000;
-    }
-    
-    body::after {
-        content: attr(data-print-date);
-        display: block;
-        font-size: 9pt;
-        color: #666;
-        margin-top: -20px;
-        text-align: right;
-        margin-bottom: 20px;
-    }
-    
-    /* Show print-only header */
-    .print-only-header {
-        display: block !important;
-        page-break-after: avoid;
-        margin-bottom: 20px;
-    }
-    
-    .print-only-header table {
-        border: 2px solid #000 !important;
-    }
-    
-    .print-only-header td {
-        border: none !important;
-        padding: 10px !important;
-    }
-    
-    .print-only-header h3 {
-        font-size: 13pt !important;
-        margin-top: 0 !important;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
-    }
-    
-    .print-only-header p {
-        margin: 8px 0 !important;
-        line-height: 1.4 !important;
-    }
-    
-    .print-only-header strong {
-        font-weight: bold !important;
-        color: #000 !important;
-    }
-    
-    body::after {
-        content: "Printed on: " attr(data-print-date);
-        display: block;
-        font-size: 9pt;
-        color: #666;
-        margin-top: -25px;
-        text-align: right;
+        width: 100%;
+        height: 80px;
+        background: #1a1a2e;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="80"><rect width="800" height="80" fill="%231a1a2e"/><text x="20" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="%2388a0b8" letter-spacing="3">RESOURCE STAFF ONLINE</text><text x="20" y="52" font-family="Arial" font-size="16" font-weight="bold" fill="%23ffffff">IT SUPPORT TICKET</text><text x="20" y="68" font-family="Arial" font-size="8" fill="%2388a0b8">OFFICIAL SERVICE DOCUMENT</text><circle cx="750" cy="40" r="25" fill="%230f3460" stroke="%2388a0b8" stroke-width="1"/><text x="738" y="48" font-family="Arial" font-size="20" fill="%2388a0b8">🎫</text></svg>');
+        background-size: cover;
+        margin-bottom: 0;
+        border: 3px solid #1a1a2e;
     }
     
     /* ========================================
-       TICKET HEADER
-       ======================================== */
-    h1, h2.text-2xl {
-        font-size: 18pt !important;
-        font-weight: bold !important;
-        color: #000 !important;
-        margin: 20px 0 10px 0 !important;
-        padding: 0 !important;
-        page-break-after: avoid;
-    }
-    
-    /* Ticket number */
-    p.text-slate-400,
-    .text-slate-400,
-    p.text-gray-600,
-    .text-gray-600 {
-        color: #666 !important;
-        font-size: 10pt !important;
-    }
-    
-    /* ========================================
-       TICKET DETAILS CARD
+       MAIN PASSPORT CONTAINER
        ======================================== */
     .bg-slate-800\/50,
     .bg-slate-700\/50,
     .bg-white,
     .bg-gray-50,
     [class*="bg-slate"],
-    [class*="border"] {
-        background: white !important;
-        border: 1px solid #ddd !important;
+    .lg\:col-span-2 {
+        background: #fafafa !important;
+        border: 3px solid #1a1a2e !important;
+        border-top: none !important;
         border-radius: 0 !important;
         box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
-        padding: 15px !important;
-        margin-bottom: 15px !important;
+        padding: 20px !important;
+        margin-bottom: 0 !important;
         page-break-inside: avoid;
+        position: relative;
+    }
+    
+    /* Security pattern overlay */
+    .lg\:col-span-2::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(26, 26, 46, 0.02) 10px,
+            rgba(26, 26, 46, 0.02) 20px
+        );
+        pointer-events: none;
+        z-index: 0;
     }
     
     /* ========================================
-       STATUS BADGES
+       TICKET TITLE
+       ======================================== */
+    h1, h2.text-2xl {
+        font-size: 14pt !important;
+        font-weight: bold !important;
+        color: #1a1a2e !important;
+        margin: 0 0 5px 0 !important;
+        padding: 10px 0 !important;
+        border-bottom: 2px solid #1a1a2e;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        page-break-after: avoid;
+    }
+    
+    /* Ticket ID - Machine readable style */
+    p.text-slate-400,
+    .text-slate-400,
+    p.text-gray-600,
+    .text-gray-600 {
+        color: #0f3460 !important;
+        font-size: 11pt !important;
+        font-family: 'Courier New', monospace !important;
+        letter-spacing: 3px;
+        background: #e8e8e8;
+        padding: 5px 10px;
+        display: inline-block;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+    }
+    
+    /* ========================================
+       SIDEBAR - ID PHOTO AREA
+       ======================================== */
+    .lg\:col-span-1 {
+        width: 100% !important;
+        margin-top: 0 !important;
+        padding: 15px !important;
+        background: #f0f0f0 !important;
+        border: 3px solid #1a1a2e !important;
+        border-top: none !important;
+        page-break-before: avoid;
+        position: relative;
+    }
+    
+    /* Avatar placeholder with user icon */
+    .lg\:col-span-1::before {
+        content: "👤";
+        display: block;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+        border: 3px solid #1a1a2e;
+        margin: 0 auto 15px auto;
+        font-size: 50pt;
+        text-align: center;
+        line-height: 100px;
+    }
+    
+    /* ========================================
+       DATA FIELDS - PASSPORT STYLE
+       ======================================== */
+    dt, .label {
+        font-weight: bold !important;
+        color: #0f3460 !important;
+        font-size: 8pt !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 2px !important;
+        border-bottom: 1px dotted #999;
+        padding-bottom: 2px;
+    }
+    
+    dd, .value {
+        color: #1a1a2e !important;
+        font-size: 11pt !important;
+        font-family: 'Courier New', monospace !important;
+        margin-bottom: 12px !important;
+        margin-left: 0 !important;
+        padding-left: 0;
+        font-weight: bold;
+    }
+    
+    /* ========================================
+       STATUS BADGES - RUBBER STAMP STYLE
        ======================================== */
     .bg-yellow-500\/20,
     .bg-blue-500\/20,
@@ -192,56 +226,63 @@
     [class*="bg-green"],
     [class*="bg-red"] {
         background: transparent !important;
-        border: 2px solid #000 !important;
-        color: #000 !important;
-        padding: 3px 10px !important;
+        border: 3px solid #1a1a2e !important;
+        color: #1a1a2e !important;
+        padding: 8px 15px !important;
         display: inline-block !important;
         font-weight: bold !important;
         font-size: 10pt !important;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transform: rotate(-2deg);
+        position: relative;
     }
     
-    /* Status-specific styling */
+    /* Status text prefixes */
     .text-yellow-400,
     .text-yellow-500 {
-        color: #000 !important;
+        color: #1a1a2e !important;
     }
     
-    .text-yellow-400::before {
-        content: "⚠ ";
+    .text-yellow-400::before,
+    .text-yellow-500::before {
+        content: "⏳ ";
     }
     
     .text-blue-400::before,
     .text-blue-500::before {
-        content: "● ";
+        content: "📂 ";
     }
     
     .text-green-400::before,
     .text-green-500::before {
-        content: "✓ ";
+        content: "✅ ";
     }
     
     .text-purple-400::before,
     .text-purple-500::before {
-        content: "⟳ ";
+        content: "🔄 ";
     }
     
     /* ========================================
-       PRIORITY INDICATORS
+       PRIORITY - CLASSIFICATION LEVEL
        ======================================== */
     .text-red-400,
     .text-orange-400,
     .text-cyan-400 {
-        color: #000 !important;
+        color: #1a1a2e !important;
         font-weight: bold !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     
     .text-red-400::before {
-        content: "🔴 HIGH PRIORITY: ";
+        content: "🔴 PRIORITY: CRITICAL — ";
         font-weight: bold;
     }
     
     .text-orange-400::before {
-        content: "🟠 MEDIUM PRIORITY: ";
+        content: "🟠 PRIORITY: HIGH — ";
     }
     
     /* ========================================
@@ -257,37 +298,44 @@
     .text-gray-600,
     .text-gray-700,
     .text-gray-900 {
-        color: #000 !important;
+        color: #1a1a2e !important;
     }
     
     /* ========================================
-       DESCRIPTION & CONTENT
+       DESCRIPTION CONTENT
        ======================================== */
     .prose,
     .description,
     [class*="text-sm"] {
-        color: #000 !important;
-        font-size: 11pt !important;
-        line-height: 1.6 !important;
+        color: #1a1a2e !important;
+        font-size: 10pt !important;
+        line-height: 1.5 !important;
+        font-family: 'Georgia', serif !important;
+        text-align: justify;
     }
     
     /* ========================================
-       ACTIVITY TIMELINE
+       ACTIVITY LOG - VISA STAMPS STYLE
        ======================================== */
     .space-y-4 > div,
     .activity-item,
     [class*="border-l"] {
-        border-left: 2px solid #000 !important;
+        border-left: 3px solid #1a1a2e !important;
         padding-left: 15px !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 10px !important;
+        margin-left: 10px !important;
         page-break-inside: avoid;
+        position: relative;
     }
     
-    /* Activity icons */
-    .fas,
-    .far,
-    .fa {
-        color: #000 !important;
+    /* Entry marker */
+    .space-y-4 > div::before,
+    .activity-item::before {
+        content: "●";
+        position: absolute;
+        left: -8px;
+        color: #1a1a2e;
+        font-size: 12pt;
     }
     
     /* ========================================
@@ -295,8 +343,8 @@
        ======================================== */
     .divide-y > div,
     .comment-item {
-        border-top: 1px solid #ccc !important;
-        padding: 12px 0 !important;
+        border-top: 1px dashed #1a1a2e !important;
+        padding: 10px 0 !important;
         page-break-inside: avoid;
     }
     
@@ -304,48 +352,24 @@
         border-top: none !important;
     }
     
-    /* Comment author */
     .font-semibold,
     .font-bold {
         font-weight: bold !important;
-        color: #000 !important;
-    }
-    
-    /* ========================================
-       SIDEBAR INFO
-       ======================================== */
-    .lg\:col-span-1 {
-        width: 100% !important;
-        margin-top: 20px !important;
-        page-break-before: avoid;
-    }
-    
-    /* Info labels */
-    dt, .label {
-        font-weight: bold !important;
-        color: #000 !important;
-        margin-bottom: 3px !important;
-    }
-    
-    dd, .value {
-        color: #333 !important;
-        margin-bottom: 10px !important;
-        margin-left: 0 !important;
-    }
-    
-    /* ========================================
-       FORMS & INPUTS (hide)
-       ======================================== */
-    input,
-    textarea,
-    select,
-    form:not(.print-keep) {
-        display: none !important;
+        color: #0f3460 !important;
+        text-transform: uppercase;
+        font-size: 9pt;
+        letter-spacing: 1px;
     }
     
     /* ========================================
        ICONS
        ======================================== */
+    .fas,
+    .far,
+    .fa {
+        color: #1a1a2e !important;
+    }
+    
     i.fas,
     i.far,
     i.fa {
@@ -357,11 +381,10 @@
        LINKS
        ======================================== */
     a {
-        color: #000 !important;
+        color: #0f3460 !important;
         text-decoration: none !important;
     }
     
-    /* Don't print URLs */
     a[href]:after {
         content: "" !important;
     }
@@ -374,38 +397,42 @@
         border-collapse: collapse;
         margin: 15px 0;
         page-break-inside: avoid;
+        font-family: 'Courier New', monospace;
     }
     
     th, td {
-        border: 1px solid #333 !important;
+        border: 1px solid #1a1a2e !important;
         padding: 8px !important;
         text-align: left !important;
-        color: #000 !important;
+        color: #1a1a2e !important;
     }
     
     th {
-        background-color: #f0f0f0 !important;
+        background-color: #e8e8e8 !important;
         font-weight: bold !important;
+        text-transform: uppercase;
+        font-size: 8pt;
+        letter-spacing: 1px;
     }
     
     /* ========================================
-       PAGE BREAKS
+       SIGNATURE AREA
        ======================================== */
-    h1, h2, h3, h4, h5 {
-        page-break-after: avoid;
-    }
-    
-    .page-break {
-        page-break-after: always;
-    }
-    
-    .avoid-break,
-    .bg-slate-800\/50 {
-        page-break-inside: avoid;
+    .lg\:col-span-1::after {
+        content: "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  AUTHORIZED BY: _______________________     DATE: _______________  SIGNATURE: _______________________";
+        display: block;
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 2px solid #1a1a2e;
+        font-size: 8pt;
+        color: #666;
+        letter-spacing: 1px;
+        white-space: pre-line;
+        line-height: 2;
     }
     
     /* ========================================
-       GRID LAYOUTS
+       GRID & LAYOUT
        ======================================== */
     .grid,
     .grid-cols-1,
@@ -425,7 +452,7 @@
        ======================================== */
     .space-y-4 > * + *,
     .space-y-6 > * + * {
-        margin-top: 12px !important;
+        margin-top: 10px !important;
     }
     
     .gap-6,
@@ -434,7 +461,7 @@
     }
     
     /* ========================================
-       BORDERS & SHADOWS
+       REMOVE DECORATIONS
        ======================================== */
     .shadow,
     .shadow-sm,
@@ -451,47 +478,95 @@
         border-radius: 0 !important;
     }
     
+    [class*="border-slate"],
     .border-slate-700,
-    .border-slate-600,
-    [class*="border-slate"] {
-        border-color: #ccc !important;
+    .border-slate-600 {
+        border-color: #1a1a2e !important;
     }
     
-    /* ========================================
-       GRADIENTS (remove)
-       ======================================== */
     .bg-gradient-to-r,
     .bg-gradient-to-br,
     [class*="bg-gradient"] {
-        background: white !important;
+        background: #fafafa !important;
     }
     
     /* ========================================
-       FOOTER INFO
+       PAGE CONTROL
+       ======================================== */
+    h1, h2, h3, h4, h5 {
+        page-break-after: avoid;
+    }
+    
+    .page-break {
+        page-break-after: always;
+    }
+    
+    .avoid-break,
+    .bg-slate-800\/50 {
+        page-break-inside: avoid;
+    }
+    
+    /* ========================================
+       MRZ STYLE HEADER
+       ======================================== */
+    .print-only-header {
+        display: block !important;
+        background: #1a1a2e !important;
+        color: #fff !important;
+        padding: 10px 15px !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 9pt;
+        letter-spacing: 2px;
+        margin-bottom: 0;
+        border: 3px solid #1a1a2e !important;
+        border-top: none !important;
+    }
+    
+    .print-only-header table {
+        border: none !important;
+        background: transparent !important;
+    }
+    
+    .print-only-header td {
+        border: none !important;
+        padding: 5px !important;
+        color: #fff !important;
+    }
+    
+    .print-only-header h3 {
+        font-size: 11pt !important;
+        margin-top: 0 !important;
+        border-bottom: 1px solid #88a0b8;
+        padding-bottom: 5px;
+        color: #fff !important;
+    }
+    
+    .print-only-header p {
+        margin: 5px 0 !important;
+        line-height: 1.3 !important;
+        color: #ccc !important;
+    }
+    
+    .print-only-header strong {
+        font-weight: bold !important;
+        color: #fff !important;
+    }
+    
+    /* ========================================
+       FOOTER WATERMARK
        ======================================== */
     @page {
-        @bottom-right {
-            content: "Page " counter(page);
-            font-size: 9pt;
-            color: #666;
-        }
-        
         @bottom-center {
-            content: "ResolveIT Help Desk System";
-            font-size: 9pt;
-            color: #666;
+            content: "ResolveIT • OFFICIAL IT SUPPORT DOCUMENT • CONFIDENTIAL";
+            font-size: 7pt;
+            color: #999;
+            letter-spacing: 2px;
         }
     }
     
     /* ========================================
-       FINAL ADJUSTMENTS
+       FINAL
        ======================================== */
-    * {
-        background: white !important;
-        text-shadow: none !important;
-    }
-    
-    /* Ensure readability */
     body,
     div,
     span,
