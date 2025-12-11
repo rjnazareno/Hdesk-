@@ -213,6 +213,17 @@
                             </table>
                         </div>
                     <?php endif; ?>
+                    
+                    <!-- View All Tickets Link -->
+                    <?php if (!empty($recentTickets)): ?>
+                    <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center">
+                        <p class="text-sm text-gray-500">Showing <?php echo count($recentTickets); ?> most recent tickets</p>
+                        <a href="tickets.php" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium text-sm">
+                            <i class="fas fa-list mr-2"></i>View All My Tickets
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
