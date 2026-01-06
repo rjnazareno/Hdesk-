@@ -276,10 +276,25 @@ class Mailer {
      * @return bool
      */
     public function sendPasswordResetEmail($email, $name, $resetLink) {
-        $subject = "Password Reset Request - ResolveIT Help Desk";
-        $body = $this->getPasswordResetTemplate($name, $resetLink);
-        
-        return $this->send($email, $name, $subject, $body);
+        try {
+            $subject = "Password Reset Request - ResolveIT Help Desk";
+            $body = $this->getPasswordResetTemplate($name, $resetLink);
+            
+            if ($this->usePHPMailer) {
+                $this->mail->clearAddresses();
+                $this->mail->addAddress($email, $name);
+                $this->mail->Subject = $subject;
+                $this->mail->Body = $body;
+                $this->mail->AltBody = strip_tags($body);
+                return $this->mail->send();
+            } else {
+                error_log("Password reset email would be sent to: {$email} - Subject: $subject");
+                return true;
+            }
+        } catch (Exception $e) {
+            error_log("Email sending error: " . $e->getMessage());
+            return false;
+        }
     }
     
     /**

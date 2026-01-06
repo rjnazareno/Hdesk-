@@ -250,25 +250,31 @@ document.addEventListener('DOMContentLoaded', async function() {
  * Show custom notification permission prompt
  */
 function showNotificationPrompt() {
+    // Remove any existing prompt first
+    const existingPrompt = document.getElementById('notification-prompt');
+    if (existingPrompt) {
+        existingPrompt.remove();
+    }
+    
     const promptHTML = `
-        <div id="notification-prompt" class="fixed top-4 right-4 z-50 bg-white border border-gray-200 shadow-lg p-4 max-w-sm no-print" style="border-left: 4px solid #0d9488;">
+        <div id="notification-prompt" class="fixed top-4 right-4 z-[9999] bg-white border border-gray-200 shadow-xl rounded-lg p-4 max-w-sm no-print animate-slide-in" style="border-left: 4px solid #0d9488; min-width: 320px;">
             <div class="flex items-start space-x-3">
                 <div class="flex-shrink-0">
                     <i class="fas fa-bell text-teal-600 text-2xl"></i>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-gray-900 font-semibold mb-1">Enable Notifications?</h3>
+                    <h3 class="text-gray-900 font-semibold mb-1">🔔 Enable Notifications?</h3>
                     <p class="text-sm text-gray-600 mb-3">Get instant alerts when your tickets are updated</p>
                     <div class="flex space-x-2">
-                        <button onclick="enableNotifications()" class="flex-1 px-3 py-2 bg-teal-600 text-white text-sm hover:bg-teal-700 transition">
-                            <i class="fas fa-check mr-1"></i> Enable
+                        <button onclick="enableNotifications()" class="flex-1 px-3 py-2 bg-teal-600 text-white text-sm font-medium rounded hover:bg-teal-700 transition duration-200">
+                            <i class="fas fa-check mr-1"></i> Allow
                         </button>
-                        <button onclick="dismissNotificationPrompt()" class="px-3 py-2 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition">
+                        <button onclick="dismissNotificationPrompt()" class="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 transition duration-200">
                             Later
                         </button>
                     </div>
                 </div>
-                <button onclick="dismissNotificationPrompt()" class="flex-shrink-0 text-gray-400 hover:text-gray-700">
+                <button onclick="dismissNotificationPrompt()" class="flex-shrink-0 text-gray-400 hover:text-gray-700 p-1 rounded transition duration-200">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -276,14 +282,60 @@ function showNotificationPrompt() {
     `;
     
     document.body.insertAdjacentHTML('beforeend', promptHTML);
+    
+    // Ensure it's visible and on top
+    const prompt = document.getElementById('notification-prompt');
+    if (prompt) {
+        prompt.style.display = 'block';
+        prompt.style.visibility = 'visible';
+        prompt.style.position = 'fixed';
+        console.log('✅ Notification prompt displayed');
+    }
 }
 
 /**
  * Enable notifications (called from prompt button)
  */
 async function enableNotifications() {
+    console.log('🔔 User clicked Enable notifications');
     dismissNotificationPrompt();
-    await requestNotificationPermission();
+    
+    try {
+        await requestNotificationPermission();
+    } catch (error) {
+        console.error('❌ Error enabling notifications:', error);
+        // Show a user-friendly error message
+        showNotificationError();
+    }
+}
+
+/**
+ * Show notification error message
+ */
+function showNotificationError() {
+    const errorHTML = `
+        <div id="notification-error" class="fixed top-4 right-4 z-[9999] bg-red-50 border border-red-200 rounded-lg shadow-xl p-4 max-w-sm animate-slide-in">
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-red-900 font-semibold mb-1">Notification Error</h3>
+                    <p class="text-sm text-red-700 mb-2">Unable to enable notifications. Please check your browser settings.</p>
+                    <button onclick="document.getElementById('notification-error').remove()" class="text-sm bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', errorHTML);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const errorEl = document.getElementById('notification-error');
+        if (errorEl) errorEl.remove();
+    }, 5000);
 }
 
 /**
@@ -300,6 +352,7 @@ function dismissNotificationPrompt() {
 // Add CSS animation
 const style = document.createElement('style');
 style.textContent = `
+    /* Notification Prompt Animations */
     @keyframes slide-in {
         from {
             transform: translateX(400px);
@@ -323,11 +376,30 @@ style.textContent = `
     }
     
     .animate-slide-in {
-        animation: slide-in 0.3s ease-out;
+        animation: slide-in 0.4s ease-out forwards;
     }
     
     .animate-slide-out {
-        animation: slide-out 0.3s ease-in;
+        animation: slide-out 0.3s ease-in forwards;
+    }
+    
+    /* Ensure notification prompt is always visible */
+    #notification-prompt {
+        pointer-events: auto !important;
+        z-index: 9999 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Mobile responsiveness for notification prompt */
+    @media (max-width: 640px) {
+        #notification-prompt {
+            left: 1rem !important;
+            right: 1rem !important;
+            top: 1rem !important;
+            max-width: none !important;
+            min-width: auto !important;
+        }
     }
 `;
 document.head.appendChild(style);
@@ -336,5 +408,13 @@ document.head.appendChild(style);
 window.ResolveITNotifications = {
     requestPermission: requestNotificationPermission,
     messaging: messaging,
-    app: app
+    app: app,
+    showPrompt: showNotificationPrompt, // Manual trigger for testing
+    enableNotifications: enableNotifications // Manual enable function
+};
+
+// Debug function - you can call this in console to test
+window.testNotificationPrompt = function() {
+    console.log('🧪 Testing notification prompt...');
+    showNotificationPrompt();
 };
