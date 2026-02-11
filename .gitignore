@@ -47,3 +47,9 @@ desktop.ini
 # Configuration overrides (keep templates)
 # config/database.php
 # config/config.php
+# Firebase credentials (NEVER commit these!)
+config/firebase-service-account.json
+config/firebase_service_account.php
+
+# Composer
+composer.phar
