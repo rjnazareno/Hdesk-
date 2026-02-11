@@ -1,6 +1,6 @@
 # Dependencies
-/vendor/
-composer.lock
+# /vendor/  # Allowing vendor for deployment
+# composer.lock  # Need this for deployment
 
 # Environment files
 .env
