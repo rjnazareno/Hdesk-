@@ -1,7 +1,7 @@
 <?php
 /**
  * Customer/Employee Notifications Entry Point
- * Routes to NotificationsController
+ * Routes to s
  */
 
 require_once __DIR__ . '/../config/config.php';
