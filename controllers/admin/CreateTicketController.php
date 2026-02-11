@@ -11,6 +11,8 @@ class CreateTicketController {
     private $employeeModel;
     private $activityModel;
     private $slaModel;
+    private $departmentModel;
+    private $priorityMapModel;
     
     public function __construct() {
         $this->auth = new Auth();
@@ -21,6 +23,8 @@ class CreateTicketController {
         $this->employeeModel = new Employee();
         $this->activityModel = new TicketActivity();
         $this->slaModel = new SLA();
+        $this->departmentModel = new Department();
+        $this->priorityMapModel = new CategoryPriorityMap();
     }
     
     /**
@@ -30,6 +34,11 @@ class CreateTicketController {
         $currentUser = $this->auth->getCurrentUser();
         $categories = $this->categoryModel->getAll();
         $employees = $this->employeeModel->getAll('active');
+        $departments = $this->departmentModel->getAll();
+        
+        // Get IT staff for assignment
+        $userModel = new User();
+        $itStaff = $userModel->getITStaff();
         
         // Pagination for recent tickets
         $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -44,16 +53,33 @@ class CreateTicketController {
         // Get paginated recent tickets
         $recentTickets = $this->ticketModel->getAll([], 'created_at', 'DESC', $itemsPerPage, $offset);
         
+        // Get category priority map for auto-priority assignment
+        $priorityMap = [];
+        if ($this->priorityMapModel->tableExists()) {
+            $priorityMap = $this->priorityMapModel->getAllAsLookup();
+        }
+        
+        // SLA targets for display
+        $slaTargets = [
+            'high' => CategoryPriorityMap::getSLATargets('high'),
+            'medium' => CategoryPriorityMap::getSLATargets('medium'),
+            'low' => CategoryPriorityMap::getSLATargets('low')
+        ];
+        
         // Load view
         $this->loadView('admin/create_ticket', compact(
             'currentUser', 
             'categories', 
             'employees',
+            'departments',
+            'itStaff',
             'recentTickets',
             'page',
             'totalPages',
             'totalRecent',
-            'itemsPerPage'
+            'itemsPerPage',
+            'priorityMap',
+            'slaTargets'
         ));
     }
     
@@ -104,13 +130,29 @@ class CreateTicketController {
             $existingTicket = $this->ticketModel->findByTicketNumber($ticketNumber);
         } while ($existingTicket);
         
+        // Determine priority: use category-mapped priority if available, fallback to submitted value
+        $categoryId = (int)$_POST['category_id'];
+        $submittedPriority = sanitize($_POST['priority']);
+        $mappedPriority = null;
+        
+        if ($this->priorityMapModel->tableExists()) {
+            $mappedPriority = $this->priorityMapModel->getDefaultPriority($categoryId);
+        }
+        
+        // Admin can override: if admin_priority_override is set, use submitted priority
+        // Otherwise, use the mapped priority from the SLA guide
+        $finalPriority = $mappedPriority ?? $submittedPriority;
+        if (isset($_POST['admin_priority_override']) && $_POST['admin_priority_override'] === '1') {
+            $finalPriority = $submittedPriority;
+        }
+        
         // Prepare ticket data
         $ticketData = [
             'ticket_number' => $ticketNumber,
             'title' => sanitize($_POST['title']),
             'description' => sanitize($_POST['description']),
-            'category_id' => (int)$_POST['category_id'],
-            'priority' => sanitize($_POST['priority']),
+            'category_id' => $categoryId,
+            'priority' => $finalPriority,
             'status' => 'pending',
             'submitter_id' => (int)$_POST['submitter_id'],
             'submitter_type' => 'employee',

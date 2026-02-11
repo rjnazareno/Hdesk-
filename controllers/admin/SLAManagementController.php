@@ -7,18 +7,20 @@
 class SLAManagementController {
     private $auth;
     private $slaModel;
+    private $priorityMapModel;
     
     public function __construct() {
         $this->auth = new Auth();
         $this->auth->requireLogin();
         
-        // ADMIN ONLY - IT Staff cannot access this
-        if (!$this->auth->isAdmin()) {
+        // ADMIN OR INTERNAL - Only these roles can access SLA management
+        if (!$this->auth->isAdmin() && $_SESSION['role'] !== 'internal') {
             $_SESSION['error'] = "Access denied. Admin privileges required.";
             redirect('admin/dashboard.php');
         }
         
         $this->slaModel = new SLA();
+        $this->priorityMapModel = new CategoryPriorityMap();
     }
     
     /**
@@ -49,6 +51,18 @@ class SLAManagementController {
         // Get paginated breached tickets
         $breachedTickets = array_slice($allBreachedTickets, $offset, $itemsPerPage);
         
+        // Get category-priority mappings for reference
+        $priorityMappings = [];
+        if ($this->priorityMapModel->tableExists()) {
+            $priorityMappings = $this->priorityMapModel->getAll();
+        }
+        
+        $slaTargetReference = [
+            'high' => CategoryPriorityMap::getSLATargets('high'),
+            'medium' => CategoryPriorityMap::getSLATargets('medium'),
+            'low' => CategoryPriorityMap::getSLATargets('low')
+        ];
+        
         $this->loadView('admin/sla_management', compact(
             'currentUser',
             'policies',
@@ -58,7 +72,9 @@ class SLAManagementController {
             'page',
             'totalPages',
             'totalBreached',
-            'itemsPerPage'
+            'itemsPerPage',
+            'priorityMappings',
+            'slaTargetReference'
         ));
     }
     

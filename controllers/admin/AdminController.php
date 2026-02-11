@@ -14,7 +14,7 @@ class AdminController {
         // Initialize authentication
         $this->auth = new Auth();
         $this->auth->requireLogin();
-        $this->auth->requireRole('admin'); // Only admins can access
+        $this->auth->requireAdminOrInternal(); // Only admins and internal employees can access
 
         // Initialize models
         $this->userModel = new User();

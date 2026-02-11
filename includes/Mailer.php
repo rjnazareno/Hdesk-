@@ -10,13 +10,35 @@ class Mailer {
     
     public function __construct() {
         // Check if PHPMailer is available
-        if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-            require_once __DIR__ . '/../vendor/autoload.php';
+        $vendorAutoload = __DIR__ . '/../vendor/autoload.php';
+        
+        // Only try to load if vendor directory appears valid
+        if (file_exists($vendorAutoload) && is_dir(__DIR__ . '/../vendor/phpmailer')) {
+            // Set error handler to catch warnings and errors
+            set_error_handler(function($errno, $errstr, $errfile, $errline) {
+                // Suppress all errors during vendor autoload
+                return true;
+            });
             
-            if (class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
-                $this->usePHPMailer = true;
-                $this->mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-                $this->configure();
+            try {
+                require_once $vendorAutoload;
+                
+                if (class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
+                    $this->usePHPMailer = true;
+                    $this->mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+                    $this->configure();
+                }
+            } catch (Exception $e) {
+                // Vendor autoload failed, fall back to PHP mail()
+                error_log("Failed to load PHPMailer: " . $e->getMessage());
+                $this->usePHPMailer = false;
+            } catch (Error $e) {
+                // Catch fatal errors during autoload
+                error_log("Failed to load PHPMailer: " . $e->getMessage());
+                $this->usePHPMailer = false;
+            } finally {
+                // Restore error handler
+                restore_error_handler();
             }
         }
     }

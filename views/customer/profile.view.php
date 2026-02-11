@@ -4,7 +4,7 @@
  * Employee profile management page
  */
 
-$pageTitle = 'My Profile - ResolveIT';
+$pageTitle = 'My Profile - ' . (defined('APP_NAME') ? APP_NAME : 'ServiceHub');
 $basePath = '../';
 ?>
 
@@ -65,9 +65,9 @@ $basePath = '../';
                                 <?php if (!empty($currentUser['profile_picture'])): ?>
                                     <img src="../uploads/profiles/<?= htmlspecialchars($currentUser['profile_picture']) ?>" 
                                          alt="Profile Picture" 
-                                         class="w-32 h-32 rounded-full mx-auto border-4 border-blue-500 object-cover">
+                                         class="w-32 h-32 rounded-full mx-auto border-4 border-emerald-500 object-cover">
                                 <?php else: ?>
-                                    <div class="w-32 h-32 bg-blue-600 rounded-full mx-auto border-4 border-blue-500 flex items-center justify-center">
+                                    <div class="w-32 h-32 bg-emerald-500 rounded-full mx-auto border-4 border-emerald-500 flex items-center justify-center">
                                         <span class="text-4xl font-bold text-white">
                                             <?= strtoupper(substr($currentUser['fname'], 0, 1) . substr($currentUser['lname'], 0, 1)) ?>
                                         </span>
@@ -86,7 +86,7 @@ $basePath = '../';
                                 <input type="hidden" name="action" value="upload_picture">
                                 <input type="file" id="profile_picture_input" name="profile_picture" accept="image/jpeg,image/png,image/gif" class="hidden">
                                 <button type="button" onclick="document.getElementById('profile_picture_input').click()" 
-                                        class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                        class="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition">
                                     <i class="fas fa-camera mr-2"></i>Change Picture
                                 </button>
                             </form>
@@ -117,7 +117,7 @@ $basePath = '../';
                     <!-- Profile Information -->
                     <div class="bg-white border border-gray-200 rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-user-edit mr-2 text-blue-600"></i>
+                            <i class="fas fa-user-edit mr-2 text-emerald-500"></i>
                             Profile Information
                         </h3>
 
@@ -142,7 +142,7 @@ $basePath = '../';
                                     </label>
                                     <input type="email" id="personal_email" name="personal_email" 
                                            value="<?= htmlspecialchars($currentUser['personal_email'] ?? '') ?>"
-                                           class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
                                 </div>
 
                                 <!-- Contact Number -->
@@ -152,7 +152,7 @@ $basePath = '../';
                                     </label>
                                     <input type="text" id="contact" name="contact" 
                                            value="<?= htmlspecialchars($currentUser['contact'] ?? '') ?>"
-                                           class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                           class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                            placeholder="09123456789">
                                 </div>
 
@@ -168,7 +168,7 @@ $basePath = '../';
 
                             <div class="mt-6 flex justify-end">
                                 <button type="submit" 
-                                        class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                                        class="px-6 py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition">
                                     <i class="fas fa-save mr-2"></i>Update Profile
                                 </button>
                             </div>
@@ -178,7 +178,7 @@ $basePath = '../';
                     <!-- Change Password -->
                     <div class="bg-white border border-gray-200 rounded-lg p-6" id="change-password">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-lock mr-2 text-blue-600"></i>
+                            <i class="fas fa-lock mr-2 text-emerald-500"></i>
                             Change Password
                         </h3>
 
@@ -193,10 +193,10 @@ $basePath = '../';
                                     </label>
                                     <div class="relative">
                                         <input type="password" id="current_password" name="current_password" required
-                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                                placeholder="Enter current password">
                                         <button type="button" onclick="togglePasswordVisibility('current_password')"
-                                                class="absolute right-3 top-3 text-gray-400 hover:text-blue-600">
+                                                class="absolute right-3 top-3 text-gray-400 hover:text-emerald-500">
                                             <i class="fas fa-eye" id="current_password-eye"></i>
                                         </button>
                                     </div>
@@ -209,10 +209,10 @@ $basePath = '../';
                                     </label>
                                     <div class="relative">
                                         <input type="password" id="new_password" name="new_password" required minlength="6"
-                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                                placeholder="Min. 6 characters">
                                         <button type="button" onclick="togglePasswordVisibility('new_password')"
-                                                class="absolute right-3 top-3 text-gray-400 hover:text-blue-600">
+                                                class="absolute right-3 top-3 text-gray-400 hover:text-emerald-500">
                                             <i class="fas fa-eye" id="new_password-eye"></i>
                                         </button>
                                     </div>
@@ -235,10 +235,10 @@ $basePath = '../';
                                     </label>
                                     <div class="relative">
                                         <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
-                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                               class="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                                placeholder="Re-enter new password">
                                         <button type="button" onclick="togglePasswordVisibility('confirm_password')"
-                                                class="absolute right-3 top-3 text-gray-400 hover:text-blue-600">
+                                                class="absolute right-3 top-3 text-gray-400 hover:text-emerald-500">
                                             <i class="fas fa-eye" id="confirm_password-eye"></i>
                                         </button>
                                     </div>
@@ -247,7 +247,7 @@ $basePath = '../';
 
                             <div class="mt-6 flex justify-end">
                                 <button type="submit" 
-                                        class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                                        class="px-6 py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition">
                                     <i class="fas fa-key mr-2"></i>Change Password
                                 </button>
                             </div>
@@ -309,10 +309,10 @@ $basePath = '../';
             strengthText.textContent = 'Fair';
             strengthText.className = 'font-medium text-yellow-400';
         } else if (strength <= 80) {
-            strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-blue-500';
+            strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-emerald-500';
             strengthBar.style.width = strength + '%';
             strengthText.textContent = 'Good';
-            strengthText.className = 'font-medium text-blue-400';
+            strengthText.className = 'font-medium text-emerald-400';
         } else {
             strengthBar.className = 'h-full transition-all duration-300 rounded-full bg-green-500';
             strengthBar.style.width = '100%';

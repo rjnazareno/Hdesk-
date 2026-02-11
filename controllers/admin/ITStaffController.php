@@ -28,12 +28,21 @@ class ITStaffController {
      * Main index action - displays the IT staff dashboard
      */
     public function index() {
+        // Pagination for my tickets
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 5;
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Get paginated tickets
+        $myTicketsData = $this->getMyTickets($itemsPerPage, $offset);
+        
         // Get all required data for IT staff
         $data = [
             'currentUser' => $this->currentUser,
             'isITStaff' => true,
             'myStats' => $this->getMyStatistics(),
-            'myTickets' => $this->getMyTickets(),
+            'myTickets' => $myTicketsData['tickets'],
+            'myTicketsPagination' => $myTicketsData['pagination'],
             'myPerformance' => $this->getMyPerformance(),
             'myWorkload' => $this->getMyWorkload(),
             'myChartData' => $this->prepareMyChartData(),
@@ -60,7 +69,7 @@ class ITStaffController {
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
                 SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_today,
                 SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_tickets,
-                SUM(CASE WHEN priority = 'urgent' AND status IN ('open', 'in_progress') THEN 1 ELSE 0 END) as urgent_pending
+                SUM(CASE WHEN priority = 'high' AND status IN ('open', 'in_progress') THEN 1 ELSE 0 END) as high_pending
                 FROM tickets 
                 WHERE assigned_to = :user_id";
         
@@ -70,14 +79,38 @@ class ITStaffController {
     }
 
     /**
-     * Get tickets assigned to this IT staff
+     * Get tickets assigned to this IT staff with pagination
      */
-    private function getMyTickets() {
-        return $this->ticketModel->getAll([
-            'assigned_to' => $this->currentUser['id'],
-            'limit' => 10,
-            'order_by' => 'priority DESC, created_at DESC'
-        ]);
+    private function getMyTickets($limit = 5, $offset = 0) {
+        $userId = $this->currentUser['id'];
+        
+        // Get tickets for pagination
+        $tickets = $this->ticketModel->getAll([
+            'assigned_to' => $userId
+        ], 'priority', 'DESC', $limit, $offset);
+        
+        // Get total count for pagination
+        $db = Database::getInstance()->getConnection();
+        $countSql = "SELECT COUNT(*) as total FROM tickets WHERE assigned_to = :user_id";
+        $stmt = $db->prepare($countSql);
+        $stmt->execute([':user_id' => $userId]);
+        $totalTickets = $stmt->fetch()['total'];
+        
+        // Calculate pagination
+        $totalPages = ceil($totalTickets / $limit);
+        $currentPage = floor($offset / $limit) + 1;
+        
+        return [
+            'tickets' => $tickets,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalTickets,
+                'itemsPerPage' => $limit,
+                'hasNextPage' => $currentPage < $totalPages,
+                'hasPrevPage' => $currentPage > 1
+            ]
+        ];
     }
 
     /**
@@ -115,7 +148,7 @@ class ITStaffController {
                 FROM tickets 
                 WHERE assigned_to = :user_id
                 GROUP BY priority
-                ORDER BY FIELD(priority, 'urgent', 'high', 'medium', 'low')";
+                ORDER BY FIELD(priority, 'high', 'medium', 'low')";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([':user_id' => $userId]);

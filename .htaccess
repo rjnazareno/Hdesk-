@@ -3,7 +3,10 @@
 # Enable RewriteEngine
 RewriteEngine On
 
-# Set base directory
+# Set base directory:
+# - LOCAL DEVELOPMENT (XAMPP): /IThelp/
+# - PRODUCTION (Hostinger root): /
+# CHANGE THIS when deploying!
 RewriteBase /IThelp/
 
 # Deny access to sensitive files

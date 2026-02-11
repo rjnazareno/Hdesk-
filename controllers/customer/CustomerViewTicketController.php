@@ -30,6 +30,18 @@ class CustomerViewTicketController {
     }
     
     /**
+     * Get unread notification count for current user
+     */
+    private function getUnreadCount() {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT COUNT(*) as count FROM notifications WHERE employee_id = :employee_id AND is_read = 0";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':employee_id' => $this->currentUser['id']]);
+        $result = $stmt->fetch();
+        return $result['count'] ?? 0;
+    }
+    
+    /**
      * Display ticket details
      */
     public function index() {
@@ -58,12 +70,17 @@ class CustomerViewTicketController {
             $itStaff = $this->userModel->getITStaff();
         }
         
+        // Get ticket replies
+        $replyModel = new TicketReply();
+        $replies = $replyModel->getByTicketId($ticketId);
+        
         // Pass data to view
         $currentUser = $this->currentUser;
         $isITStaff = $this->isITStaff;
+        $unreadNotifications = $this->getUnreadCount();
         
         // Load view
-        $this->loadView('customer/view_ticket', compact('currentUser', 'isITStaff', 'ticket', 'activities', 'itStaff'));
+        $this->loadView('customer/view_ticket', compact('currentUser', 'isITStaff', 'ticket', 'activities', 'itStaff', 'unreadNotifications', 'replies'));
     }
     
     /**

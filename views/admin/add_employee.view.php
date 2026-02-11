@@ -1,22 +1,22 @@
 <?php 
 // Include layout header
-$pageTitle = 'Add Employee - IT Help Desk';
+$pageTitle = 'Add Employee - ' . (defined('APP_NAME') ? APP_NAME : 'ServiceHub');
 $baseUrl = '../';
 include __DIR__ . '/../layouts/header.php'; 
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gray-50">
+<div class="lg:ml-64 min-h-screen bg-slate-50">
     <!-- Top Bar -->
-    <div class="bg-white border-b border-gray-200 ">
+    <div class="bg-white border-b border-slate-200 ">
         <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-gray-900 rounded-lg">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-800 rounded-lg">
                     <i class="fas fa-user-plus text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">Add New Employee</h1>
-                    <p class="text-sm text-gray-600 mt-0.5">Register a new employee to the system</p>
+                    <h1 class="text-xl lg:text-2xl font-semibold text-slate-800">Add New Employee</h1>
+                    <p class="text-sm text-slate-500 mt-0.5">Register a new employee to the system</p>
                 </div>
             </div>
             <div class="hidden lg:flex items-center space-x-2">
@@ -29,9 +29,9 @@ include __DIR__ . '/../layouts/header.php';
     </div>
 
     <!-- Quick Instructions Banner -->
-    <div class="bg-gradient-to-r from-cyan-600/20 to-emerald-600/20 border-b border-teal-600/30 ">
+    <div class="bg-gradient-to-r from-cyan-600/20 to-emerald-600/20 border-b border-emerald-600/30 ">
         <div class="px-4 lg:px-8 py-3 flex items-start space-x-3">
-            <i class="fas fa-lightbulb text-teal-600 mt-1 flex-shrink-0"></i>
+            <i class="fas fa-lightbulb text-emerald-600 mt-1 flex-shrink-0"></i>
             <div class="text-sm text-slate-200">
                 <strong>Quick Tip:</strong> Fields marked with <span class="text-red-400">*</span> are required. Username and email must be unique. The employee will receive login credentials via email.
             </div>
@@ -44,7 +44,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-teal-600">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-emerald-600">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -56,7 +56,7 @@ include __DIR__ . '/../layouts/header.php';
                         <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <a href="customers.php" class="ml-1 text-sm font-medium text-gray-600 hover:text-teal-600">Employees</a>
+                        <a href="customers.php" class="ml-1 text-sm font-medium text-slate-500 hover:text-emerald-600">Employees</a>
                     </div>
                 </li>
                 <li>
@@ -92,19 +92,19 @@ include __DIR__ . '/../layouts/header.php';
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Main Form (2 columns) -->
             <div class="lg:col-span-2">
-                <div class="bg-white border border-gray-200  p-6 space-y-6">
+                <div class="bg-white border border-slate-200  p-6 space-y-6">
                     <form action="add_employee.php" method="POST" enctype="multipart/form-data" class="space-y-6" id="addEmployeeForm">
                 
                 <!-- Personal Information Section -->
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4 pb-2 border-b border-slate-200">
                         <i class="fas fa-user mr-2"></i>Personal Information
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- First Name -->
                         <div>
-                            <label for="fname" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="fname" class="block text-sm font-medium text-slate-800 mb-2">
                                 First Name <span class="text-red-400">*</span>
                             </label>
                             <input 
@@ -112,14 +112,14 @@ include __DIR__ . '/../layouts/header.php';
                                 id="fname" 
                                 name="fname" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="John"
                             >
                         </div>
 
                         <!-- Last Name -->
                         <div>
-                            <label for="lname" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="lname" class="block text-sm font-medium text-slate-800 mb-2">
                                 Last Name <span class="text-red-400">*</span>
                             </label>
                             <input 
@@ -127,14 +127,14 @@ include __DIR__ . '/../layouts/header.php';
                                 id="lname" 
                                 name="lname" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="Doe"
                             >
                         </div>
 
                         <!-- Position -->
                         <div>
-                            <label for="position" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="position" class="block text-sm font-medium text-slate-800 mb-2">
                                 Position <span class="text-red-400">*</span>
                             </label>
                             <input 
@@ -142,49 +142,49 @@ include __DIR__ . '/../layouts/header.php';
                                 id="position" 
                                 name="position" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="e.g., Software Developer, Accountant"
                             >
                         </div>
 
                         <!-- Company/Department -->
                         <div>
-                            <label for="company" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="company" class="block text-sm font-medium text-slate-800 mb-2">
                                 Company/Department
                             </label>
                             <input 
                                 type="text" 
                                 id="company" 
                                 name="company"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="e.g., IT Department"
                             >
                         </div>
 
                         <!-- Contact Number -->
                         <div>
-                            <label for="contact" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="contact" class="block text-sm font-medium text-slate-800 mb-2">
                                 Contact Number
                             </label>
                             <input 
                                 type="tel" 
                                 id="contact" 
                                 name="contact"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="+1 234 567 8900"
                             >
                         </div>
 
                         <!-- Official Schedule -->
                         <div>
-                            <label for="official_sched" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="official_sched" class="block text-sm font-medium text-slate-800 mb-2">
                                 Official Schedule
                             </label>
                             <input 
                                 type="text" 
                                 id="official_sched" 
                                 name="official_sched"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="e.g., Mon-Fri 9:00 AM - 5:00 PM"
                             >
                         </div>
@@ -193,14 +193,14 @@ include __DIR__ . '/../layouts/header.php';
 
                 <!-- Account Information Section -->
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4 pb-2 border-b border-slate-200">
                         <i class="fas fa-user-lock mr-2"></i>Account Information
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Username -->
                         <div>
-                            <label for="username" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="username" class="block text-sm font-medium text-slate-800 mb-2">
                                 Username <span class="text-red-400">*</span>
                             </label>
                             <input 
@@ -208,17 +208,17 @@ include __DIR__ . '/../layouts/header.php';
                                 id="username" 
                                 name="username" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="john.doe"
                             >
-                            <p class="text-sm text-gray-600 mt-1">
+                            <p class="text-sm text-slate-500 mt-1">
                                 <i class="fas fa-info-circle mr-1"></i><strong>Must be unique</strong> - Used for logging into the system
                             </p>
                         </div>
 
                         <!-- Password -->
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="password" class="block text-sm font-medium text-slate-800 mb-2">
                                 Password <span class="text-red-400">*</span>
                             </label>
                             <div class="relative">
@@ -228,13 +228,13 @@ include __DIR__ . '/../layouts/header.php';
                                     name="password" 
                                     required
                                     minlength="6"
-                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                     placeholder="Min. 6 characters"
                                 >
                                 <button 
                                     type="button" 
                                     onclick="togglePassword('password')"
-                                    class="absolute right-3 top-3 text-gray-600 hover:text-teal-600"
+                                    class="absolute right-3 top-3 text-slate-500 hover:text-emerald-600"
                                 >
                                     <i class="fas fa-eye" id="password-eye"></i>
                                 </button>
@@ -242,21 +242,21 @@ include __DIR__ . '/../layouts/header.php';
                             <!-- Password Strength Meter -->
                             <div id="password-strength" class="mt-2 hidden">
                                 <div class="flex items-center justify-between text-xs mb-1">
-                                    <span class="text-gray-600">Strength:</span>
+                                    <span class="text-slate-500">Strength:</span>
                                     <span id="strength-text" class="font-medium"></span>
                                 </div>
-                                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                     <div id="strength-bar" class="h-full transition-all duration-300 rounded-full"></div>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-600 mt-1">
+                            <p class="text-sm text-slate-500 mt-1">
                                 <i class="fas fa-lock mr-1"></i>Strong password recommended (min. 6 characters)
                             </p>
                         </div>
 
                         <!-- Official Email -->
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="email" class="block text-sm font-medium text-slate-800 mb-2">
                                 Official Email <span class="text-red-400">*</span>
                             </label>
                             <input 
@@ -264,51 +264,51 @@ include __DIR__ . '/../layouts/header.php';
                                 id="email" 
                                 name="email" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="john.doe@company.com"
                             >
-                            <p class="text-sm text-gray-600 mt-1">
+                            <p class="text-sm text-slate-500 mt-1">
                                 <i class="fas fa-envelope mr-1"></i>Used for notifications and password resets
                             </p>
                         </div>
 
                         <!-- Personal Email -->
                         <div>
-                            <label for="personal_email" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="personal_email" class="block text-sm font-medium text-slate-800 mb-2">
                                 Personal Email
                             </label>
                             <input 
                                 type="email" 
                                 id="personal_email" 
                                 name="personal_email"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                                 placeholder="john.doe@gmail.com"
                             >
                         </div>
 
                         <!-- Role -->
                         <div>
-                            <label for="role" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="role" class="block text-sm font-medium text-slate-800 mb-2">
                                 Role <span class="text-red-400">*</span>
                             </label>
                             <select 
                                 id="role" 
                                 name="role" 
                                 required
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500"
                             >
                                 <option value="employee" selected>Employee</option>
                                 <option value="it_staff">IT Staff</option>
                                 <option value="admin">Administrator</option>
                             </select>
-                            <p class="text-sm text-gray-600 mt-1">
+                            <p class="text-sm text-slate-500 mt-1">
                                 <i class="fas fa-info-circle mr-1"></i>Choose based on system access needs
                             </p>
                         </div>
 
                         <!-- Profile Picture -->
                         <div>
-                            <label for="profile_picture" class="block text-sm font-medium text-gray-900 mb-2">
+                            <label for="profile_picture" class="block text-sm font-medium text-slate-800 mb-2">
                                 Profile Picture
                             </label>
                             <input 
@@ -316,9 +316,9 @@ include __DIR__ . '/../layouts/header.php';
                                 id="profile_picture" 
                                 name="profile_picture"
                                 accept="image/jpeg,image/png,image/gif"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-teal-500 hover:border-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-500 file:text-gray-900 hover:file:bg-teal-600 file:cursor-pointer"
+                                class="w-full px-4 py-3 bg-slate-50 border border-gray-300 text-slate-800 placeholder-slate-500 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-emerald-500 hover:border-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-500 file:text-slate-800 hover:file:bg-emerald-600 file:cursor-pointer"
                             >
-                            <p class="text-sm text-gray-600 mt-1">
+                            <p class="text-sm text-slate-500 mt-1">
                                 <i class="fas fa-image mr-1"></i>JPG, PNG, GIF (Max 2MB)
                             </p>
                             <p id="file-error" class="text-sm text-red-400 mt-1 hidden">
@@ -329,13 +329,13 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Buttons -->
-                <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200">
                     <a href="customers.php" class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-white transition rounded-lg">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                     <button 
                         type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-gray-900 font-semibold hover:from-teal-700 hover:to-emerald-700 transition rounded-lg"
+                        class="px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-600 text-slate-800 font-semibold hover:from-teal-700 hover:to-emerald-700 transition rounded-lg"
                     >
                         <i class="fas fa-user-plus mr-2"></i>Add Employee
                     </button>
@@ -347,50 +347,50 @@ include __DIR__ . '/../layouts/header.php';
             <!-- Sidebar Instructions (1 column) -->
             <div class="lg:col-span-1 space-y-4">
                 <!-- Role Guide -->
-                <div class="bg-white border border-gray-200  p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                        <i class="fas fa-shield-alt text-teal-600 mr-2"></i>Role Guide
+                <div class="bg-white border border-slate-200  p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-3 flex items-center">
+                        <i class="fas fa-shield-alt text-emerald-600 mr-2"></i>Role Guide
                     </h3>
                     <div class="space-y-3 text-xs text-gray-700">
-                        <div class="border-l-2 border-teal-500 pl-2">
-                            <strong class="text-gray-900">Employee</strong>
+                        <div class="border-l-2 border-emerald-500 pl-2">
+                            <strong class="text-slate-800">Employee</strong>
                             <p>Can submit tickets only, cannot access admin</p>
                         </div>
                         <div class="border-l-2 border-blue-500 pl-2">
-                            <strong class="text-gray-900">IT Staff</strong>
+                            <strong class="text-slate-800">IT Staff</strong>
                             <p>Manage tickets, view reports, assist employees</p>
                         </div>
                         <div class="border-l-2 border-purple-500 pl-2">
-                            <strong class="text-gray-900">Administrator</strong>
+                            <strong class="text-slate-800">Administrator</strong>
                             <p>Full system access, manage all users & settings</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Best Practices -->
-                <div class="bg-white border border-gray-200  p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                <div class="bg-white border border-slate-200  p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-3 flex items-center">
                         <i class="fas fa-check-circle text-green-400 mr-2"></i>Best Practices
                     </h3>
                     <ul class="space-y-2 text-xs text-gray-700">
                         <li class="flex items-start">
-                            <i class="fas fa-arrow-right text-teal-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-arrow-right text-emerald-600 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Use first.last format for usernames</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-arrow-right text-teal-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-arrow-right text-emerald-600 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Use official company email</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-arrow-right text-teal-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-arrow-right text-emerald-600 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Strong password recommended</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-arrow-right text-teal-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-arrow-right text-emerald-600 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Complete all required fields</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-arrow-right text-teal-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <i class="fas fa-arrow-right text-emerald-600 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Upload professional profile picture</span>
                         </li>
                     </ul>
@@ -401,7 +401,7 @@ include __DIR__ . '/../layouts/header.php';
                     <h3 class="text-sm font-semibold text-amber-300 mb-3 flex items-center">
                         <i class="fas fa-exclamation-triangle text-amber-400 mr-2"></i>Important
                     </h3>
-                    <ul class="space-y-2 text-xs text-gray-900">
+                    <ul class="space-y-2 text-xs text-slate-800">
                         <li class="flex items-start">
                             <i class="fas fa-check text-amber-400 mr-2 mt-0.5 flex-shrink-0"></i>
                             <span>Login credentials will be emailed to the employee</span>
@@ -418,11 +418,11 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
 
                 <!-- Quick Tips -->
-                <div class="bg-gradient-to-br from-cyan-600/20 to-emerald-600/20 border border-teal-600/30  p-4 rounded-lg">
+                <div class="bg-gradient-to-br from-cyan-600/20 to-emerald-600/20 border border-emerald-600/30  p-4 rounded-lg">
                     <h3 class="text-sm font-semibold text-teal-500 mb-3 flex items-center">
                         <i class="fas fa-lightbulb mr-2"></i>Quick Tips
                     </h3>
-                    <ul class="space-y-2 text-xs text-gray-900">
+                    <ul class="space-y-2 text-xs text-slate-800">
                         <li>• Auto-generates username from first & last names</li>
                         <li>• Tab or click fields to see helpful hints</li>
                         <li>• Required fields show a red asterisk</li>
@@ -628,7 +628,7 @@ document.getElementById('profile_picture').addEventListener('change', function(e
 document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], select').forEach(field => {
     field.addEventListener('focus', function() {
         const parent = this.closest('div');
-        const hint = parent.querySelector('.text-gray-600');
+        const hint = parent.querySelector('.text-slate-500');
         if (hint) {
             hint.style.opacity = '1';
         }
@@ -640,4 +640,5 @@ document.querySelectorAll('input[type="email"], input[type="password"], input[ty
 // Include layout footer
 include __DIR__ . '/../layouts/footer.php'; 
 ?>
+
 

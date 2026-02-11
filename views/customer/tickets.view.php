@@ -3,75 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tickets - IT Help Desk</title>
+    <title>My Tickets - <?php echo defined('APP_NAME') ? APP_NAME : 'ServiceHub'; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Quick Wins CSS -->
-    <link rel="stylesheet" href="../assets/css/print.css">
-    <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 <body class="bg-gray-50">
     <?php include __DIR__ . '/../../includes/customer_nav.php'; ?>
 
     <!-- Main Content -->
     <div class="lg:ml-64 min-h-screen">
-        <!-- Top Bar -->
-        <div class="bg-white shadow-sm">
-            <div class="flex items-center justify-between px-8 py-4 pt-20 lg:pt-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">My Tickets</h1>
-                    <p class="text-gray-600">View and manage your support requests</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button id="darkModeToggle" class="p-2 text-gray-600 hover:text-gray-900" title="Toggle dark mode">
-                        <i id="dark-mode-icon" class="fas fa-moon"></i>
-                    </button>
-                    <a href="create_ticket.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" title="Create a new support ticket">
-                        <i class="fas fa-plus mr-2"></i>New Ticket
-                    </a>
-                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=2563eb&color=fff" 
-                         alt="User" 
-                         class="w-10 h-10 rounded-full"
-                         title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
-                </div>
-            </div>
-        </div>
+        <?php 
+        // Set page variables for header
+        $pageTitle = 'My Tickets';
+        $pageSubtitle = 'View and manage your support requests';
+        $showSearch = true;
+        $basePath = '';
+        include __DIR__ . '/../../includes/customer_header.php'; 
+        ?>
+        
+        <script>
+        // Ticket search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('customerQuickSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase();
+                    document.querySelectorAll('.ticket-row').forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(query) ? '' : 'none';
+                    });
+                });
+            }
+        });
+        </script>
 
         <!-- Content -->
-        <div class="p-8">
-            <!-- Breadcrumb -->
-            <nav class="flex mb-4" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-600">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                            </svg>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-700">My Tickets</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-
+        <div class="p-6">
             <?php if (isset($_SESSION['success'])): ?>
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-                <i class="fas fa-check-circle mr-2"></i>
-                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-400 rounded-2xl mb-6 shadow-lg overflow-hidden">
+                <div class="flex items-start p-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center animate-bounce">
+                            <i class="fas fa-check text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-xl font-bold text-emerald-900 mb-1">Success!</h3>
+                        <p class="text-emerald-700 text-base font-medium"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
+                        <p class="text-emerald-600 text-sm mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            You'll receive email updates on your ticket status.
+                        </p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 text-emerald-600 hover:text-emerald-800 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="h-2 bg-emerald-500 relative overflow-hidden">
+                    <div class="h-full bg-emerald-600 animate-pulse"></div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error'])): ?>
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center">
+                <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-                <i class="fas fa-check-circle mr-2"></i>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl mb-6 flex items-center">
+                <i class="fas fa-check-circle mr-3 text-emerald-500"></i>
                 <?php 
                     if ($_GET['success'] === 'created') {
                         echo 'Ticket created successfully!';
@@ -83,21 +86,21 @@
             <?php endif; ?>
 
             <!-- Filters -->
-            <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <form method="GET" action="tickets.php" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl border border-gray-100 p-5 mb-6">
+                <form method="GET" action="tickets.php" class="grid grid-cols-1 md:grid-cols-6 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Search</label>
                         <input 
                             type="text" 
                             name="search" 
                             value="<?php echo htmlspecialchars($filters['search']); ?>"
                             placeholder="Ticket number, title..."
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                         >
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Status</label>
+                        <select name="status" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white">
                             <option value="">All Status</option>
                             <option value="pending" <?php echo $filters['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
                             <option value="open" <?php echo $filters['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
@@ -107,18 +110,17 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                        <select name="priority" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Priority</label>
+                        <select name="priority" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white">
                             <option value="">All Priority</option>
                             <option value="low" <?php echo $filters['priority'] === 'low' ? 'selected' : ''; ?>>Low</option>
                             <option value="medium" <?php echo $filters['priority'] === 'medium' ? 'selected' : ''; ?>>Medium</option>
                             <option value="high" <?php echo $filters['priority'] === 'high' ? 'selected' : ''; ?>>High</option>
-                            <option value="urgent" <?php echo $filters['priority'] === 'urgent' ? 'selected' : ''; ?>>Urgent</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                        <select name="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Category</label>
+                        <select name="category_id" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white">
                             <option value="">All Categories</option>
                             <?php foreach ($categories as $category): ?>
                             <option value="<?php echo $category['id']; ?>" <?php echo $filters['category_id'] == $category['id'] ? 'selected' : ''; ?>>
@@ -127,130 +129,148 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="md:col-span-4 flex justify-end space-x-2">
-                        <a href="tickets.php" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                            Clear Filters
-                        </a>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            <i class="fas fa-search mr-2"></i>Apply Filters
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Department</label>
+                        <select name="department_id" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white">
+                            <option value="">All Departments</option>
+                            <?php foreach ($departments as $department): ?>
+                            <option value="<?php echo $department['id']; ?>" <?php echo $filters['department_id'] == $department['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($department['name']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" class="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition text-sm font-medium">
+                            <i class="fas fa-search mr-2"></i>Search
                         </button>
+                        <a href="tickets.php" class="px-4 py-2.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm">
+                            <i class="fas fa-times"></i>
+                        </a>
                     </div>
                 </form>
             </div>
 
             <!-- Tickets Table -->
-            <div class="bg-white rounded-xl shadow-sm">
-                <div class="p-6">
-                    <?php if (empty($tickets)): ?>
-                        <div class="text-center py-12">
-                            <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">No Tickets Found</h3>
-                            <p class="text-gray-600 mb-6">
-                                <?php if (!empty(array_filter($filters))): ?>
-                                    Try adjusting your filters or <a href="tickets.php" class="text-blue-600 hover:underline">clear all filters</a>
-                                <?php else: ?>
-                                    Create your first ticket to get started!
-                                <?php endif; ?>
-                            </p>
-                            <?php if (empty(array_filter($filters))): ?>
-                            <a href="create_ticket.php" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-plus mr-2"></i>Create Your First Ticket
-                            </a>
+            <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                <?php if (empty($tickets)): ?>
+                    <div class="p-12 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-inbox text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">No Tickets Found</h3>
+                        <p class="text-gray-500 text-sm mb-4">
+                            <?php if (!empty(array_filter($filters))): ?>
+                                Try adjusting your filters or <a href="tickets.php" class="text-emerald-600 hover:underline">clear all filters</a>
+                            <?php else: ?>
+                                Create your first ticket to get started!
                             <?php endif; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="text-left text-gray-600 text-sm border-b">
-                                        <th class="pb-3">Ticket #</th>
-                                        <th class="pb-3">Title</th>
-                                        <th class="pb-3">Category</th>
-                                        <th class="pb-3">Priority</th>
-                                        <th class="pb-3">Status</th>
-                                        <th class="pb-3">Created</th>
-                                        <th class="pb-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm">
-                                    <?php foreach ($tickets as $ticket): ?>
-                                    <tr class="border-b hover:bg-gray-50">
-                                        <td class="py-4">
-                                            <span class="font-mono text-blue-600 font-medium"><?php echo htmlspecialchars($ticket['ticket_number']); ?></span>
-                                        </td>
-                                        <td class="py-4">
-                                            <div class="font-medium text-gray-900"><?php echo htmlspecialchars($ticket['title']); ?></div>
-                                        </td>
-                                        <td class="py-4">
-                                            <span class="text-gray-600"><?php echo htmlspecialchars($ticket['category_name']); ?></span>
-                                        </td>
-                                        <td class="py-4">
-                                            <?php
-                                            $priorityColors = [
-                                                'low' => 'bg-green-100 text-green-800',
-                                                'medium' => 'bg-yellow-100 text-yellow-800',
-                                                'high' => 'bg-orange-100 text-orange-800',
-                                                'urgent' => 'bg-red-600 text-white'
-                                            ];
-                                            $priorityClass = $priorityColors[$ticket['priority']] ?? 'bg-gray-100 text-gray-800';
-                                            ?>
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium <?php echo $priorityClass; ?>">
-                                                <?php echo ucfirst($ticket['priority']); ?>
-                                            </span>
-                                        </td>
-                                        <td class="py-4">
-                                            <?php
-                                            $statusColors = [
-                                                'pending' => 'bg-yellow-100 text-yellow-800',
-                                                'open' => 'bg-blue-100 text-blue-800',
-                                                'in_progress' => 'bg-purple-100 text-purple-800',
-                                                'resolved' => 'bg-green-100 text-green-800',
-                                                'closed' => 'bg-gray-100 text-gray-800'
-                                            ];
-                                            $statusClass = $statusColors[$ticket['status']] ?? 'bg-gray-100 text-gray-800';
-                                            ?>
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium <?php echo $statusClass; ?>">
-                                                <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
-                                            </span>
-                                        </td>
-                                        <td class="py-4 text-gray-600">
-                                            <span class="time-ago" data-timestamp="<?php echo $ticket['created_at']; ?>">
-                                                <?php echo date('M d, Y', strtotime($ticket['created_at'])); ?>
-                                            </span>
-                                        </td>
-                                        <td class="py-4">
+                        </p>
+                        <?php if (empty(array_filter($filters))): ?>
+                        <a href="create_ticket.php" class="inline-flex items-center px-5 py-2.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition font-medium text-sm">
+                            <i class="fas fa-plus mr-2"></i>Create Your First Ticket
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ticket #</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Priority</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+                                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <?php foreach ($tickets as $ticket): ?>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-5 py-4">
+                                        <span class="font-mono text-emerald-600 font-medium text-sm"><?php echo htmlspecialchars($ticket['ticket_number']); ?></span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="font-medium text-gray-800 text-sm"><?php echo htmlspecialchars($ticket['title']); ?></span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="text-gray-600 text-sm"><?php echo htmlspecialchars($ticket['category_name']); ?></span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <?php
+                                        $priorityConfig = [
+                                            'low' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700'],
+                                            'medium' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700'],
+                                            'high' => ['bg' => 'bg-red-100', 'text' => 'text-red-700']
+                                        ];
+                                        $priority = $priorityConfig[$ticket['priority']] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-700'];
+                                        ?>
+                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium <?php echo $priority['bg']; ?> <?php echo $priority['text']; ?>">
+                                            <?php echo ucfirst($ticket['priority']); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <?php
+                                        $statusConfig = [
+                                            'pending' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'label' => 'Pending'],
+                                            'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'label' => 'Open'],
+                                            'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'label' => 'In Progress'],
+                                            'resolved' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved'],
+                                            'closed' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => 'Closed']
+                                        ];
+                                        $status = $statusConfig[$ticket['status']] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => ucfirst($ticket['status'])];
+                                        ?>
+                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium <?php echo $status['bg']; ?> <?php echo $status['text']; ?>">
+                                            <?php echo $status['label']; ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="text-gray-500 text-sm">
+                                            <?php echo date('M d, Y', strtotime($ticket['created_at'])); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <div class="flex items-center space-x-2">
                                             <a href="view_ticket.php?id=<?php echo $ticket['id']; ?>" 
-                                               class="text-blue-600 hover:text-blue-800" 
-                                               title="View ticket details">
-                                                <i class="fas fa-eye"></i>
+                                               class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition">
+                                                View Details
                                             </a>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="mt-6 flex items-center justify-between text-sm text-gray-600">
-                            <div>
-                                Showing <strong><?php echo count($tickets); ?></strong> ticket<?php echo count($tickets) !== 1 ? 's' : ''; ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
+                                            <?php 
+                                            // Only show Cancel button if ticket is still pending and hasn't been assigned or worked on
+                                            $canCancel = $ticket['status'] === 'pending' && 
+                                                         empty($ticket['assigned_to']) && 
+                                                         empty($ticket['grabbed_by']);
+                                            if ($canCancel): 
+                                            ?>
+                                            <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this ticket request?');">
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="ticket_id" value="<?php echo $ticket['id']; ?>">
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg transition text-sm font-medium">
+                                                    <i class="fas fa-times-circle mr-2"></i>
+                                                    Cancel Request
+                                                </button>
+                                            </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="p-4 border-t border-gray-100 bg-gray-50">
+                        <span class="text-sm text-gray-500">
+                            Showing <strong><?php echo count($tickets); ?></strong> ticket<?php echo count($tickets) !== 1 ? 's' : ''; ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <!-- Quick Wins JavaScript -->
     <script src="../assets/js/helpers.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initTooltips();
-            initDarkMode();
-            updateTimeAgo();
-            setInterval(updateTimeAgo, 60000);
-        });
-    </script>
 </body>
 </html>

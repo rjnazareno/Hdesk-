@@ -4,34 +4,61 @@
  * Sends push notifications via Firebase Cloud Messaging using Firebase Admin SDK
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\Notification;
-
 class FCMNotification {
     
     private $messaging;
+    private $firebaseAvailable = false;
     
     public function __construct() {
+        // Check if Firebase SDK is available
+        $vendorAutoload = __DIR__ . '/../vendor/autoload.php';
+        
+        if (!file_exists($vendorAutoload)) {
+            error_log('Vendor autoload not found - Firebase notifications disabled');
+            $this->messaging = null;
+            return;
+        }
+        
+        // Set error handler to suppress errors
+        set_error_handler(function($errno, $errstr, $errfile, $errline) {
+            return true;
+        });
+        
         try {
+            require_once $vendorAutoload;
+            
+            // Check if Firebase classes exist
+            if (!class_exists('Kreait\Firebase\Factory')) {
+                error_log('Firebase SDK not installed - notifications disabled');
+                $this->messaging = null;
+                restore_error_handler();
+                return;
+            }
+            
+            $this->firebaseAvailable = true;
+            
             // Path to Firebase service account JSON
             $serviceAccountPath = __DIR__ . '/../config/firebase-service-account.json';
             
             if (!file_exists($serviceAccountPath)) {
                 error_log('Firebase service account JSON not found: ' . $serviceAccountPath);
                 $this->messaging = null;
+                restore_error_handler();
                 return;
             }
             
             // Initialize Firebase with service account
-            $factory = (new Factory)->withServiceAccount($serviceAccountPath);
+            $factory = (new \Kreait\Firebase\Factory)->withServiceAccount($serviceAccountPath);
             $this->messaging = $factory->createMessaging();
             
         } catch (Exception $e) {
             error_log('Firebase initialization error: ' . $e->getMessage());
             $this->messaging = null;
+        } catch (Error $e) {
+            error_log('Firebase initialization error: ' . $e->getMessage());
+            $this->messaging = null;
+        } finally {
+            restore_error_handler();
         }
     }
     
@@ -61,7 +88,7 @@ class FCMNotification {
         
         try {
             // Create notification
-            $notification = Notification::create($title, $body)
+            $notification = \Kreait\Firebase\Messaging\Notification::create($title, $body)
                 ->withImageUrl(BASE_URL . 'img/ResolveIT Logo Only without Background.png');
             
             // Add data payload
@@ -72,7 +99,7 @@ class FCMNotification {
             ]);
             
             // Create message
-            $message = CloudMessage::withTarget('token', $fcmToken)
+            $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $fcmToken)
                 ->withNotification($notification)
                 ->withData($dataPayload);
             

@@ -7,14 +7,206 @@
 class SLA {
     private $db;
     
+    // Business hours configuration
+    private const BUSINESS_START_HOUR = 8;  // 8:00 AM
+    private const BUSINESS_END_HOUR = 17;   // 5:00 PM
+    
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
     
     /**
+     * Check if a given date is a weekend (Saturday or Sunday)
+     * 
+     * @param DateTime $date The date to check
+     * @return bool True if weekend
+     */
+    public function isWeekend(DateTime $date) {
+        $dayOfWeek = (int)$date->format('N'); // 1=Monday, 7=Sunday
+        return $dayOfWeek >= 6; // 6=Saturday, 7=Sunday
+    }
+    
+    /**
+     * Check if a given datetime is within business hours (Mon-Fri, 8AM-5PM)
+     * 
+     * @param DateTime $date The date to check
+     * @return bool True if within business hours
+     */
+    public function isWithinBusinessHours(DateTime $date) {
+        // Weekend check
+        if ($this->isWeekend($date)) {
+            return false;
+        }
+        
+        $hour = (int)$date->format('H');
+        return $hour >= self::BUSINESS_START_HOUR && $hour < self::BUSINESS_END_HOUR;
+    }
+    
+    /**
+     * Calculate business minutes between two dates (excludes weekends and after-hours)
+     * 
+     * @param DateTime $start Start date
+     * @param DateTime $end End date
+     * @param bool $businessHoursOnly Whether to only count business hours
+     * @return int Business minutes elapsed
+     */
+    public function getBusinessMinutesBetween(DateTime $start, DateTime $end, $businessHoursOnly = true) {
+        if (!$businessHoursOnly) {
+            // Simple calculation - all minutes count
+            return max(0, (int)round(($end->getTimestamp() - $start->getTimestamp()) / 60));
+        }
+        
+        $businessMinutes = 0;
+        $current = clone $start;
+        
+        // If start is after end, swap them
+        if ($start > $end) {
+            return 0;
+        }
+        
+        while ($current < $end) {
+            // Skip weekends entirely
+            if ($this->isWeekend($current)) {
+                $current->modify('+1 day');
+                $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+                continue;
+            }
+            
+            $currentHour = (int)$current->format('H');
+            $currentMinute = (int)$current->format('i');
+            
+            // If before business hours, jump to start
+            if ($currentHour < self::BUSINESS_START_HOUR) {
+                $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+                continue;
+            }
+            
+            // If after business hours, jump to next day
+            if ($currentHour >= self::BUSINESS_END_HOUR) {
+                $current->modify('+1 day');
+                $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+                continue;
+            }
+            
+            // Calculate end of current business day
+            $endOfBusinessDay = clone $current;
+            $endOfBusinessDay->setTime(self::BUSINESS_END_HOUR, 0, 0);
+            
+            // Determine the actual end point for this iteration
+            $effectiveEnd = ($end < $endOfBusinessDay) ? $end : $endOfBusinessDay;
+            
+            // Add the business minutes
+            if ($effectiveEnd > $current) {
+                $minutesToAdd = (int)round(($effectiveEnd->getTimestamp() - $current->getTimestamp()) / 60);
+                $businessMinutes += max(0, $minutesToAdd);
+            }
+            
+            // Move to next business day
+            $current->modify('+1 day');
+            $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+        }
+        
+        return $businessMinutes;
+    }
+    
+    /**
+     * Get the next business time (skips weekends)
+     * Returns the adjusted current time if it's a weekend or after hours
+     * 
+     * @param DateTime|null $date The date to adjust (defaults to now)
+     * @return DateTime Adjusted business datetime
+     */
+    public function getNextBusinessTime(DateTime $date = null) {
+        $current = $date ? clone $date : new DateTime();
+        
+        // Skip weekends
+        while ($this->isWeekend($current)) {
+            $current->modify('+1 day');
+            $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+        }
+        
+        $hour = (int)$current->format('H');
+        
+        // If before business hours, jump to start
+        if ($hour < self::BUSINESS_START_HOUR) {
+            $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+        }
+        
+        // If after business hours, jump to next day
+        if ($hour >= self::BUSINESS_END_HOUR) {
+            $current->modify('+1 day');
+            $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+            // Make sure next day isn't a weekend
+            while ($this->isWeekend($current)) {
+                $current->modify('+1 day');
+            }
+        }
+        
+        return $current;
+    }
+    
+    /**
+     * Check if SLA should be considered breached, accounting for weekends
+     * 
+     * @param DateTime $dueDate The SLA due date
+     * @param bool $isBusinessHoursOnly Whether business hours apply
+     * @param DateTime|null $checkTime Time to check against (defaults to now)
+     * @return bool True if breached
+     */
+    public function isSLABreached(DateTime $dueDate, $isBusinessHoursOnly, DateTime $checkTime = null) {
+        $now = $checkTime ?? new DateTime();
+        
+        if (!$isBusinessHoursOnly) {
+            // Simple comparison for 24/7 SLAs
+            return $now > $dueDate;
+        }
+        
+        // For business hours SLA, check if it's currently a weekend
+        // If so, the SLA is effectively "paused"
+        if ($this->isWeekend($now)) {
+            // On weekends, never breach (SLA is paused)
+            return false;
+        }
+        
+        // Check if we're outside business hours
+        $hour = (int)$now->format('H');
+        if ($hour < self::BUSINESS_START_HOUR || $hour >= self::BUSINESS_END_HOUR) {
+            return false; // Outside business hours, SLA paused
+        }
+        
+        // During business hours, compare normally
+        return $now > $dueDate;
+    }
+    
+    /**
+     * Get remaining business minutes until due date
+     * 
+     * @param DateTime $dueDate The due date
+     * @param bool $isBusinessHoursOnly Whether business hours apply
+     * @return int Remaining business minutes (negative if overdue)
+     */
+    public function getBusinessMinutesRemaining(DateTime $dueDate, $isBusinessHoursOnly) {
+        $now = new DateTime();
+        
+        if (!$isBusinessHoursOnly) {
+            // Simple calculation
+            return (int)round(($dueDate->getTimestamp() - $now->getTimestamp()) / 60);
+        }
+        
+        // If we're past the due date during business hours, calculate overdue
+        if ($now > $dueDate) {
+            $overdue = $this->getBusinessMinutesBetween($dueDate, $now, true);
+            return -$overdue;
+        }
+        
+        // Calculate remaining business minutes
+        return $this->getBusinessMinutesBetween($now, $dueDate, true);
+    }
+    
+    /**
      * Get SLA policy for a given priority
      * 
-     * @param string $priority The ticket priority (low, medium, high, urgent)
+     * @param string $priority The ticket priority (low, medium, high)
      * @return array|false SLA policy or false if not found
      */
     public function getPolicyByPriority($priority) {
@@ -31,7 +223,7 @@ class SLA {
      */
     public function getAllPolicies() {
         $sql = "SELECT * FROM sla_policies WHERE is_active = 1 
-                ORDER BY FIELD(priority, 'urgent', 'high', 'medium', 'low')";
+                ORDER BY FIELD(priority, 'high', 'medium', 'low')";
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -173,42 +365,59 @@ class SLA {
         $sla = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($sla) {
-            // Calculate remaining time and percentage
+            // Calculate remaining time and percentage (accounting for weekends)
             $now = new DateTime();
-            $sla['response_remaining'] = $this->calculateRemainingTime($now, $sla['response_due_at'], $sla['is_paused']);
-            $sla['resolution_remaining'] = $this->calculateRemainingTime($now, $sla['resolution_due_at'], $sla['is_paused']);
+            $isBusinessHours = (bool)$sla['is_business_hours'];
+            $sla['response_remaining'] = $this->calculateRemainingTime($now, $sla['response_due_at'], $sla['is_paused'], $isBusinessHours);
+            $sla['resolution_remaining'] = $this->calculateRemainingTime($now, $sla['resolution_due_at'], $sla['is_paused'], $isBusinessHours);
             $sla['response_percentage'] = $this->calculateElapsedPercentage($sla['response_time_minutes'], $sla['target_response'], $sla['response_sla_status']);
             $sla['resolution_percentage'] = $this->calculateElapsedPercentage($sla['resolution_time_minutes'], $sla['target_resolution'], $sla['resolution_sla_status']);
+            
+            // Add weekend pause info
+            $sla['is_weekend_paused'] = $isBusinessHours && $this->isWeekend($now);
+            $sla['is_after_hours_paused'] = $isBusinessHours && !$this->isWithinBusinessHours($now);
         }
         
         return $sla;
     }
     
     /**
-     * Calculate remaining time until deadline
+     * Calculate remaining time until deadline (accounting for weekends)
      * 
      * @param DateTime $now Current time
      * @param string $dueDate Due date string
      * @param bool $isPaused Whether SLA is paused
+     * @param bool $isBusinessHoursOnly Whether to only count business hours (excludes weekends)
      * @return array Remaining time data
      */
-    private function calculateRemainingTime($now, $dueDate, $isPaused) {
+    private function calculateRemainingTime($now, $dueDate, $isPaused, $isBusinessHoursOnly = false) {
         $due = new DateTime($dueDate);
-        $diff = $now->diff($due);
         
-        $totalMinutes = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
+        // Check if SLA is auto-paused (weekend or after hours)
+        $isWeekendPaused = $isBusinessHoursOnly && ($this->isWeekend($now) || !$this->isWithinBusinessHours($now));
+        $effectivelyPaused = $isPaused || $isWeekendPaused;
         
-        if ($diff->invert) {
-            // Overdue
-            $totalMinutes = -$totalMinutes;
+        if ($isBusinessHoursOnly) {
+            // Calculate using business minutes only (excludes weekends)
+            $totalMinutes = $this->getBusinessMinutesRemaining($due, true);
+            $isOverdue = $totalMinutes < 0;
+        } else {
+            // Simple calendar time calculation
+            $diff = $now->diff($due);
+            $totalMinutes = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
+            if ($diff->invert) {
+                $totalMinutes = -$totalMinutes;
+            }
+            $isOverdue = $diff->invert;
         }
         
         return [
             'minutes' => $totalMinutes,
             'hours' => floor(abs($totalMinutes) / 60),
             'remaining_minutes' => abs($totalMinutes) % 60,
-            'is_overdue' => $diff->invert && !$isPaused,
-            'formatted' => $this->formatRemainingTime($totalMinutes, $diff->invert, $isPaused)
+            'is_overdue' => $isOverdue && !$effectivelyPaused,
+            'is_weekend_paused' => $isWeekendPaused,
+            'formatted' => $this->formatRemainingTime($totalMinutes, $isOverdue, $effectivelyPaused, $isWeekendPaused)
         ];
     }
     
@@ -218,11 +427,24 @@ class SLA {
      * @param int $totalMinutes Total minutes
      * @param bool $isOverdue Whether time is overdue
      * @param bool $isPaused Whether SLA is paused
+     * @param bool $isWeekendPaused Whether SLA is paused due to weekend
      * @return string Formatted time string
      */
-    private function formatRemainingTime($totalMinutes, $isOverdue, $isPaused) {
-        if ($isPaused) {
+    private function formatRemainingTime($totalMinutes, $isOverdue, $isPaused, $isWeekendPaused = false) {
+        if ($isPaused && !$isWeekendPaused) {
             return 'Paused';
+        }
+        
+        if ($isWeekendPaused) {
+            // Show remaining time with weekend pause indicator
+            $hours = floor(abs($totalMinutes) / 60);
+            $minutes = abs($totalMinutes) % 60;
+            $formatted = '';
+            if ($hours > 0) {
+                $formatted .= $hours . 'h ';
+            }
+            $formatted .= $minutes . 'm';
+            return $formatted . ' (paused - weekend)';
         }
         
         $hours = floor(abs($totalMinutes) / 60);
@@ -265,29 +487,52 @@ class SLA {
     }
     
     /**
-     * Record first response to a ticket
+     * Record first response to a ticket (accounts for weekends/business hours)
      * 
      * @param int $ticketId The ticket ID
      * @return bool Success status
      */
     public function recordFirstResponse($ticketId) {
+        // First, get the SLA tracking info and policy
+        $sla = $this->getTicketSLA($ticketId);
+        if (!$sla || $sla['first_response_at'] !== null) {
+            return false; // Already responded or no SLA tracking
+        }
+        
+        // Get ticket creation time
+        $ticketSql = "SELECT created_at FROM tickets WHERE id = :ticket_id";
+        $ticketStmt = $this->db->prepare($ticketSql);
+        $ticketStmt->execute([':ticket_id' => $ticketId]);
+        $ticket = $ticketStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$ticket) {
+            return false;
+        }
+        
+        $now = new DateTime();
+        $createdAt = new DateTime($ticket['created_at']);
+        $responseDue = new DateTime($sla['response_due_at']);
+        $isBusinessHoursOnly = (bool)$sla['is_business_hours'];
+        
+        // Calculate actual response time in business minutes
+        $responseTimeMinutes = $this->getBusinessMinutesBetween($createdAt, $now, $isBusinessHoursOnly);
+        
+        // Determine if breached using weekend-aware check
+        $isBreached = $this->isSLABreached($responseDue, $isBusinessHoursOnly, $now);
+        $slaStatus = $isBreached ? 'breached' : 'met';
+        
         $sql = "UPDATE sla_tracking 
                 SET first_response_at = NOW(),
-                    response_time_minutes = TIMESTAMPDIFF(MINUTE, 
-                        (SELECT created_at FROM tickets WHERE id = :ticket_id), 
-                        NOW()
-                    ),
-                    response_sla_status = CASE
-                        WHEN NOW() <= response_due_at THEN 'met'
-                        ELSE 'breached'
-                    END
-                WHERE ticket_id = :ticket_id2 
+                    response_time_minutes = :response_minutes,
+                    response_sla_status = :sla_status
+                WHERE ticket_id = :ticket_id 
                 AND first_response_at IS NULL";
         
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute([
             ':ticket_id' => $ticketId,
-            ':ticket_id2' => $ticketId
+            ':response_minutes' => $responseTimeMinutes,
+            ':sla_status' => $slaStatus
         ]);
         
         // Check if breached and log
@@ -300,28 +545,52 @@ class SLA {
     }
     
     /**
-     * Record ticket resolution
+     * Record ticket resolution (accounts for weekends/business hours)
      * 
      * @param int $ticketId The ticket ID
      * @return bool Success status
      */
     public function recordResolution($ticketId) {
+        // First, get the SLA tracking info and policy
+        $sla = $this->getTicketSLA($ticketId);
+        if (!$sla) {
+            return false; // No SLA tracking
+        }
+        
+        // Get ticket creation time
+        $ticketSql = "SELECT created_at FROM tickets WHERE id = :ticket_id";
+        $ticketStmt = $this->db->prepare($ticketSql);
+        $ticketStmt->execute([':ticket_id' => $ticketId]);
+        $ticket = $ticketStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$ticket) {
+            return false;
+        }
+        
+        $now = new DateTime();
+        $createdAt = new DateTime($ticket['created_at']);
+        $resolutionDue = new DateTime($sla['resolution_due_at']);
+        $isBusinessHoursOnly = (bool)$sla['is_business_hours'];
+        
+        // Calculate actual resolution time in business minutes (minus paused time)
+        $totalElapsed = $this->getBusinessMinutesBetween($createdAt, $now, $isBusinessHoursOnly);
+        $resolutionTimeMinutes = $totalElapsed - (int)$sla['total_pause_minutes'];
+        
+        // Determine if breached using weekend-aware check
+        $isBreached = $this->isSLABreached($resolutionDue, $isBusinessHoursOnly, $now);
+        $slaStatus = $isBreached ? 'breached' : 'met';
+        
         $sql = "UPDATE sla_tracking 
                 SET resolved_at = NOW(),
-                    resolution_time_minutes = TIMESTAMPDIFF(MINUTE, 
-                        (SELECT created_at FROM tickets WHERE id = :ticket_id), 
-                        NOW()
-                    ) - total_pause_minutes,
-                    resolution_sla_status = CASE
-                        WHEN NOW() <= resolution_due_at THEN 'met'
-                        ELSE 'breached'
-                    END
-                WHERE ticket_id = :ticket_id2";
+                    resolution_time_minutes = :resolution_minutes,
+                    resolution_sla_status = :sla_status
+                WHERE ticket_id = :ticket_id";
         
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute([
             ':ticket_id' => $ticketId,
-            ':ticket_id2' => $ticketId
+            ':resolution_minutes' => $resolutionTimeMinutes,
+            ':sla_status' => $slaStatus
         ]);
         
         // Check if breached and log
@@ -458,50 +727,103 @@ class SLA {
     }
     
     /**
-     * Get tickets at risk of breaching SLA
+     * Get tickets at risk of breaching SLA (accounts for weekends)
      * 
-     * @param int $minutesThreshold Minutes until breach (default 60)
+     * @param int $minutesThreshold Business minutes until breach (default 60)
      * @return array Tickets at risk
      */
     public function getAtRiskTickets($minutesThreshold = 60) {
+        // Get all open tickets that haven't been resolved yet
         $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
-                st.resolution_due_at,
-                TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) as minutes_remaining
+                st.resolution_due_at, sp.is_business_hours
                 FROM tickets t
                 JOIN sla_tracking st ON t.id = st.ticket_id
+                JOIN sla_policies sp ON st.sla_policy_id = sp.id
                 WHERE t.status NOT IN ('closed', 'resolved')
                 AND st.is_paused = 0
                 AND st.resolved_at IS NULL
-                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= :threshold
-                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) > 0
+                AND st.resolution_sla_status = 'pending'
                 ORDER BY st.resolution_due_at ASC";
         
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':threshold' => $minutesThreshold]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->db->query($sql);
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $atRiskTickets = [];
+        $now = new DateTime();
+        
+        foreach ($tickets as $ticket) {
+            $dueDate = new DateTime($ticket['resolution_due_at']);
+            $isBusinessHours = (bool)$ticket['is_business_hours'];
+            
+            // Skip if currently on weekend (SLA paused)
+            if ($isBusinessHours && $this->isWeekend($now)) {
+                continue;
+            }
+            
+            // Calculate business minutes remaining
+            $minutesRemaining = $this->getBusinessMinutesRemaining($dueDate, $isBusinessHours);
+            
+            // Check if within threshold and not breached
+            if ($minutesRemaining > 0 && $minutesRemaining <= $minutesThreshold) {
+                $ticket['minutes_remaining'] = $minutesRemaining;
+                $ticket['is_weekend_excluded'] = $isBusinessHours;
+                unset($ticket['is_business_hours']);
+                $atRiskTickets[] = $ticket;
+            }
+        }
+        
+        return $atRiskTickets;
     }
     
     /**
-     * Get breached tickets
+     * Get breached tickets (accounts for weekends)
      * 
      * @return array Breached tickets
      */
     public function getBreachedTickets() {
+        // Get all open tickets with potential breach
         $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
-                st.resolution_due_at,
-                TIMESTAMPDIFF(MINUTE, st.resolution_due_at, NOW()) as minutes_overdue,
-                sb.breach_type, sb.delay_minutes
+                st.resolution_due_at, sp.is_business_hours,
+                sb.breach_type, sb.delay_minutes,
+                st.response_sla_status, st.resolution_sla_status
                 FROM tickets t
                 JOIN sla_tracking st ON t.id = st.ticket_id
+                JOIN sla_policies sp ON st.sla_policy_id = sp.id
                 LEFT JOIN sla_breaches sb ON t.id = sb.ticket_id
                 WHERE t.status NOT IN ('closed', 'resolved')
-                AND (st.response_sla_status = 'breached' 
-                     OR st.resolution_sla_status = 'breached'
-                     OR NOW() > st.resolution_due_at)
                 ORDER BY st.resolution_due_at ASC";
         
         $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $breachedTickets = [];
+        $now = new DateTime();
+        
+        foreach ($tickets as $ticket) {
+            // Skip if already marked as breached in database
+            if ($ticket['response_sla_status'] === 'breached' || $ticket['resolution_sla_status'] === 'breached') {
+                $dueDate = new DateTime($ticket['resolution_due_at']);
+                $isBusinessHours = (bool)$ticket['is_business_hours'];
+                $ticket['minutes_overdue'] = abs($this->getBusinessMinutesRemaining($dueDate, $isBusinessHours));
+                $ticket['is_weekend_excluded'] = $isBusinessHours;
+                unset($ticket['is_business_hours'], $ticket['response_sla_status'], $ticket['resolution_sla_status']);
+                $breachedTickets[] = $ticket;
+                continue;
+            }
+            
+            $dueDate = new DateTime($ticket['resolution_due_at']);
+            $isBusinessHours = (bool)$ticket['is_business_hours'];
+            
+            // Check if breached using weekend-aware logic
+            if ($this->isSLABreached($dueDate, $isBusinessHours, $now)) {
+                $ticket['minutes_overdue'] = abs($this->getBusinessMinutesRemaining($dueDate, $isBusinessHours));
+                $ticket['is_weekend_excluded'] = $isBusinessHours;
+                unset($ticket['is_business_hours'], $ticket['response_sla_status'], $ticket['resolution_sla_status']);
+                $breachedTickets[] = $ticket;
+            }
+        }
+        
+        return $breachedTickets;
     }
     
     /**

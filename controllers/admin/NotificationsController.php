@@ -40,14 +40,15 @@ class NotificationsController {
         $currentUser = $this->currentUser;
         $notifications = $notificationsData['notifications'];
         $pagination = $notificationsData['pagination'];
+        $unreadNotifications = $stats['unread'] ?? 0;
         
         // Load appropriate view based on user type
         if ($userType === 'employee' && ($this->currentUser['role'] === 'it_staff' || $this->currentUser['role'] === 'admin')) {
             // IT Staff or Admin
-            $this->loadView('admin/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination'));
+            $this->loadView('admin/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination', 'unreadNotifications'));
         } else {
             // Regular Employee
-            $this->loadView('customer/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination'));
+            $this->loadView('customer/notifications', compact('currentUser', 'notifications', 'stats', 'userType', 'pagination', 'unreadNotifications'));
         }
     }
     

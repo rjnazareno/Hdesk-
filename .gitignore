@@ -32,12 +32,17 @@ desktop.ini
 
 # Log files
 *.log
-logs/
+/logs/*
+!/logs/.gitkeep
+!/logs/.htaccess
 
 # Temporary files
 *.tmp
 *.temp
 *.cache
+
+# Backup folder (old docs, debug archives)
+/_backup/
 
 # Configuration overrides (keep templates)
 # config/database.php

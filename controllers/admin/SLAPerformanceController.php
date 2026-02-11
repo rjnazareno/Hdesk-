@@ -1,7 +1,8 @@
 <?php
 /**
  * SLA Performance Controller
- * Displays SLA scores and performance metrics for IT staff
+ * Tab 1: My SLA Performance - personal metrics for logged-in user
+ * Tab 2: Generate SLA Report - date-filtered report for all admin staff
  */
 
 class SLAPerformanceController {
@@ -19,57 +20,173 @@ class SLAPerformanceController {
     }
     
     /**
-     * Display SLA performance dashboard
+     * Display SLA performance with tabs
      */
     public function index() {
-        // Get IT staff performance metrics
-        $staffPerformance = $this->getStaffPerformance();
-        
-        // Get overall statistics
-        $overallStats = $this->getOverallStats();
-        
-        // Get recent SLA breaches
-        $recentBreaches = $this->getRecentBreaches();
-        
-        // Pass data to view
+        $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'my_performance';
         $currentUser = $this->currentUser;
+        
+        // Data for Tab 1: My SLA Performance (always loaded)
+        $myPerformance = $this->getMyPerformance();
+        $myRecentTickets = $this->getMyRecentTickets();
+        
+        // Data for Tab 2: Generate Report
+        $dateFrom = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-01');
+        $dateTo = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-d');
+        $staffReport = [];
+        $reportOverallStats = [];
+        $reportGenerated = false;
+        
+        if ($activeTab === 'report') {
+            $staffReport = $this->getStaffPerformanceByDateRange($dateFrom, $dateTo);
+            $reportOverallStats = $this->getOverallStatsByDateRange($dateFrom, $dateTo);
+            $reportGenerated = true;
+        }
         
         $this->loadView('admin/sla_performance', compact(
             'currentUser',
-            'staffPerformance',
-            'overallStats',
-            'recentBreaches'
+            'activeTab',
+            'myPerformance',
+            'myRecentTickets',
+            'dateFrom',
+            'dateTo',
+            'staffReport',
+            'reportOverallStats',
+            'reportGenerated'
         ));
     }
     
     /**
-     * Get performance metrics for each IT staff member
+     * Get the logged-in user's own SLA performance
      */
-    private function getStaffPerformance() {
+    private function getMyPerformance() {
+        $userId = $_SESSION['user_id'];
+        
         $sql = "SELECT 
-                    u.id,
-                    u.full_name,
-                    u.email,
                     COUNT(DISTINCT t.id) as total_tickets,
                     COUNT(DISTINCT CASE WHEN t.status IN ('resolved', 'closed') THEN t.id END) as resolved_tickets,
-                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_sla_met,
-                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_sla_breached,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_sla_met,
-                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'breached' THEN t.id END) as resolution_sla_breached,
+                    COUNT(DISTINCT CASE WHEN t.status NOT IN ('resolved', 'closed') THEN t.id END) as open_tickets,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_met,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_breached,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_met,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'breached' THEN t.id END) as resolution_breached,
                     AVG(CASE 
                         WHEN sla.first_response_at IS NOT NULL AND t.created_at IS NOT NULL 
                         THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.first_response_at) 
-                    END) as avg_response_time_minutes,
+                    END) as avg_response_minutes,
                     AVG(CASE 
                         WHEN sla.resolved_at IS NOT NULL AND t.created_at IS NOT NULL 
-                        THEN TIMESTAMPDIFF(HOUR, t.created_at, sla.resolved_at) 
-                    END) as avg_resolution_time_hours
-                FROM users u
-                LEFT JOIN tickets t ON u.id = t.assigned_to
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.resolved_at) 
+                    END) as avg_resolution_minutes,
+                    COUNT(DISTINCT CASE WHEN t.priority = 'high' THEN t.id END) as high_tickets,
+                    COUNT(DISTINCT CASE WHEN t.priority = 'medium' THEN t.id END) as medium_tickets,
+                    COUNT(DISTINCT CASE WHEN t.priority = 'low' THEN t.id END) as low_tickets
+                FROM tickets t
                 LEFT JOIN sla_tracking sla ON t.id = sla.ticket_id
-                WHERE u.role IN ('it_staff', 'admin')
-                AND (t.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) OR t.id IS NULL)
-                GROUP BY u.id, u.full_name, u.email
+                WHERE t.assigned_to = :user_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Calculate percentages and score
+        $responseTotal = $stats['response_met'] + $stats['response_breached'];
+        $resolutionTotal = $stats['resolution_met'] + $stats['resolution_breached'];
+        
+        $stats['response_percentage'] = $responseTotal > 0 
+            ? round(($stats['response_met'] / $responseTotal) * 100, 1) : 0;
+        $stats['resolution_percentage'] = $resolutionTotal > 0 
+            ? round(($stats['resolution_met'] / $resolutionTotal) * 100, 1) : 0;
+        
+        // SLA Score: 50 pts response + 50 pts resolution
+        $responseScore = $responseTotal > 0 ? ($stats['response_met'] / $responseTotal) * 50 : 0;
+        $resolutionScore = $resolutionTotal > 0 ? ($stats['resolution_met'] / $resolutionTotal) * 50 : 0;
+        $stats['sla_score'] = round($responseScore + $resolutionScore, 1);
+        
+        // Format average times
+        $stats['avg_response_formatted'] = $stats['avg_response_minutes'] !== null 
+            ? $this->formatMinutes($stats['avg_response_minutes']) : 'N/A';
+        $stats['avg_resolution_formatted'] = $stats['avg_resolution_minutes'] !== null 
+            ? $this->formatMinutes($stats['avg_resolution_minutes']) : 'N/A';
+        
+        return $stats;
+    }
+    
+    /**
+     * Get recent tickets assigned to the current user with SLA info
+     */
+    private function getMyRecentTickets() {
+        $userId = $_SESSION['user_id'];
+        
+        $sql = "SELECT 
+                    t.id, t.ticket_number, t.title, t.priority, t.status, t.created_at,
+                    sla.response_sla_status, sla.resolution_sla_status,
+                    sla.response_due_at, sla.resolution_due_at,
+                    CASE 
+                        WHEN sla.first_response_at IS NOT NULL 
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.first_response_at)
+                        ELSE NULL 
+                    END as response_time_mins,
+                    CASE 
+                        WHEN sla.resolved_at IS NOT NULL 
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.resolved_at)
+                        ELSE NULL 
+                    END as resolution_time_mins
+                FROM tickets t
+                LEFT JOIN sla_tracking sla ON t.id = sla.ticket_id
+                WHERE t.assigned_to = :user_id
+                ORDER BY t.created_at DESC
+                LIMIT 20";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($tickets as &$ticket) {
+            $ticket['response_time_formatted'] = $ticket['response_time_mins'] !== null 
+                ? $this->formatMinutes($ticket['response_time_mins']) : '-';
+            $ticket['resolution_time_formatted'] = $ticket['resolution_time_mins'] !== null 
+                ? $this->formatMinutes($ticket['resolution_time_mins']) : '-';
+        }
+        
+        return $tickets;
+    }
+    
+    /**
+     * Get all staff SLA performance filtered by date range
+     */
+    private function getStaffPerformanceByDateRange($dateFrom, $dateTo) {
+        $dateToEnd = $dateTo . ' 23:59:59';
+        
+        $sql = "SELECT 
+                    e.id,
+                    CONCAT(e.fname, ' ', e.lname) as full_name,
+                    e.email,
+                    e.admin_rights_hdesk,
+                    COUNT(DISTINCT t.id) as total_tickets,
+                    COUNT(DISTINCT CASE WHEN t.status IN ('resolved', 'closed') THEN t.id END) as resolved_tickets,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_met,
+                    COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_breached,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_met,
+                    COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'breached' THEN t.id END) as resolution_breached,
+                    AVG(CASE 
+                        WHEN sla.first_response_at IS NOT NULL AND t.created_at IS NOT NULL 
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.first_response_at) 
+                    END) as avg_response_minutes,
+                    AVG(CASE 
+                        WHEN sla.resolved_at IS NOT NULL AND t.created_at IS NOT NULL 
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.resolved_at) 
+                    END) as avg_resolution_minutes
+                FROM employees e
+                LEFT JOIN tickets t ON e.id = t.assigned_to 
+                    AND t.created_at >= :date_from 
+                    AND t.created_at <= :date_to_end
+                LEFT JOIN sla_tracking sla ON t.id = sla.ticket_id
+                WHERE e.role = 'internal' 
+                AND e.admin_rights_hdesk IS NOT NULL
+                AND e.status = 'active'
+                GROUP BY e.id, e.fname, e.lname, e.email, e.admin_rights_hdesk
+                HAVING total_tickets > 0
                 ORDER BY 
                     CASE 
                         WHEN COUNT(DISTINCT t.id) > 0 
@@ -80,54 +197,42 @@ class SLAPerformanceController {
                     END DESC";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([
+            ':date_from' => $dateFrom,
+            ':date_to_end' => $dateToEnd
+        ]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Calculate SLA scores for each staff member
+        // Calculate scores
         foreach ($results as &$staff) {
-            $totalTickets = $staff['total_tickets'];
+            $responseTotal = $staff['response_met'] + $staff['response_breached'];
+            $resolutionTotal = $staff['resolution_met'] + $staff['resolution_breached'];
             
-            if ($totalTickets > 0) {
-                // Response SLA Score (0-50 points)
-                $responseMet = $staff['response_sla_met'];
-                $responseBreached = $staff['response_sla_breached'];
-                $responseTotal = $responseMet + $responseBreached;
-                $responseScore = $responseTotal > 0 ? ($responseMet / $responseTotal) * 50 : 0;
-                
-                // Resolution SLA Score (0-50 points)
-                $resolutionMet = $staff['resolution_sla_met'];
-                $resolutionBreached = $staff['resolution_sla_breached'];
-                $resolutionTotal = $resolutionMet + $resolutionBreached;
-                $resolutionScore = $resolutionTotal > 0 ? ($resolutionMet / $resolutionTotal) * 50 : 0;
-                
-                // Overall SLA Score (0-100)
-                $staff['sla_score'] = round($responseScore + $resolutionScore, 1);
-                $staff['response_sla_percentage'] = $responseTotal > 0 ? round(($responseMet / $responseTotal) * 100, 1) : 0;
-                $staff['resolution_sla_percentage'] = $resolutionTotal > 0 ? round(($resolutionMet / $resolutionTotal) * 100, 1) : 0;
-            } else {
-                $staff['sla_score'] = 0;
-                $staff['response_sla_percentage'] = 0;
-                $staff['resolution_sla_percentage'] = 0;
-            }
+            $responseScore = $responseTotal > 0 ? ($staff['response_met'] / $responseTotal) * 50 : 0;
+            $resolutionScore = $resolutionTotal > 0 ? ($staff['resolution_met'] / $resolutionTotal) * 50 : 0;
             
-            // Format times
-            $staff['avg_response_time'] = $staff['avg_response_time_minutes'] 
-                ? $this->formatMinutes($staff['avg_response_time_minutes']) 
-                : 'N/A';
-            $staff['avg_resolution_time'] = $staff['avg_resolution_time_hours'] 
-                ? $this->formatHours($staff['avg_resolution_time_hours']) 
-                : 'N/A';
+            $staff['sla_score'] = round($responseScore + $resolutionScore, 1);
+            $staff['response_percentage'] = $responseTotal > 0 ? round(($staff['response_met'] / $responseTotal) * 100, 1) : 0;
+            $staff['resolution_percentage'] = $resolutionTotal > 0 ? round(($staff['resolution_met'] / $resolutionTotal) * 100, 1) : 0;
+            
+            $staff['avg_response_formatted'] = $staff['avg_response_minutes'] !== null 
+                ? $this->formatMinutes($staff['avg_response_minutes']) : 'N/A';
+            $staff['avg_resolution_formatted'] = $staff['avg_resolution_minutes'] !== null 
+                ? $this->formatMinutes($staff['avg_resolution_minutes']) : 'N/A';
         }
         
         return $results;
     }
     
     /**
-     * Get overall SLA statistics
+     * Get overall stats filtered by date range
      */
-    private function getOverallStats() {
+    private function getOverallStatsByDateRange($dateFrom, $dateTo) {
+        $dateToEnd = $dateTo . ' 23:59:59';
+        
         $sql = "SELECT 
                     COUNT(DISTINCT t.id) as total_tickets,
+                    COUNT(DISTINCT CASE WHEN t.status IN ('resolved', 'closed') THEN t.id END) as resolved_tickets,
                     COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'met' THEN t.id END) as response_met,
                     COUNT(DISTINCT CASE WHEN sla.response_sla_status = 'breached' THEN t.id END) as response_breached,
                     COUNT(DISTINCT CASE WHEN sla.resolution_sla_status = 'met' THEN t.id END) as resolution_met,
@@ -138,81 +243,53 @@ class SLAPerformanceController {
                     END) as avg_response_minutes,
                     AVG(CASE 
                         WHEN sla.resolved_at IS NOT NULL 
-                        THEN TIMESTAMPDIFF(HOUR, t.created_at, sla.resolved_at) 
-                    END) as avg_resolution_hours
+                        THEN TIMESTAMPDIFF(MINUTE, t.created_at, sla.resolved_at) 
+                    END) as avg_resolution_minutes
                 FROM tickets t
                 LEFT JOIN sla_tracking sla ON t.id = sla.ticket_id
-                WHERE t.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                WHERE t.created_at >= :date_from
+                AND t.created_at <= :date_to_end";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([
+            ':date_from' => $dateFrom,
+            ':date_to_end' => $dateToEnd
+        ]);
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Calculate percentages
         $responseTotal = $stats['response_met'] + $stats['response_breached'];
         $resolutionTotal = $stats['resolution_met'] + $stats['resolution_breached'];
         
         $stats['response_percentage'] = $responseTotal > 0 
-            ? round(($stats['response_met'] / $responseTotal) * 100, 1) 
-            : 0;
+            ? round(($stats['response_met'] / $responseTotal) * 100, 1) : 0;
         $stats['resolution_percentage'] = $resolutionTotal > 0 
-            ? round(($stats['resolution_met'] / $resolutionTotal) * 100, 1) 
-            : 0;
+            ? round(($stats['resolution_met'] / $resolutionTotal) * 100, 1) : 0;
+            
+        $stats['avg_response_formatted'] = $stats['avg_response_minutes'] !== null 
+            ? $this->formatMinutes($stats['avg_response_minutes']) : 'N/A';
+        $stats['avg_resolution_formatted'] = $stats['avg_resolution_minutes'] !== null 
+            ? $this->formatMinutes($stats['avg_resolution_minutes']) : 'N/A';
         
         return $stats;
-    }
-    
-    /**
-     * Get recent SLA breaches
-     */
-    private function getRecentBreaches() {
-        $sql = "SELECT 
-                    t.id,
-                    t.ticket_number,
-                    t.title,
-                    t.priority,
-                    t.status,
-                    t.created_at,
-                    u.full_name as assigned_to_name,
-                    sla.response_sla_status,
-                    sla.resolution_sla_status,
-                    sla.first_response_at,
-                    sla.resolved_at
-                FROM tickets t
-                JOIN sla_tracking sla ON t.id = sla.ticket_id
-                LEFT JOIN users u ON t.assigned_to = u.id
-                WHERE (sla.response_sla_status = 'breached' OR sla.resolution_sla_status = 'breached')
-                AND t.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                ORDER BY t.created_at DESC
-                LIMIT 10";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**
      * Format minutes to readable string
      */
     private function formatMinutes($minutes) {
+        if ($minutes === null) return 'N/A';
+        $minutes = abs($minutes);
         if ($minutes < 60) {
             return round($minutes) . ' min';
         }
-        $hours = floor($minutes / 60);
-        $mins = round($minutes % 60);
-        return $hours . 'h ' . $mins . 'm';
-    }
-    
-    /**
-     * Format hours to readable string
-     */
-    private function formatHours($hours) {
-        if ($hours < 24) {
-            return round($hours, 1) . ' hours';
+        if ($minutes < 1440) {
+            $hours = floor($minutes / 60);
+            $mins = round($minutes % 60);
+            return $hours . 'h ' . $mins . 'm';
         }
-        $days = floor($hours / 24);
-        $hrs = round($hours % 24);
-        return $days . 'd ' . $hrs . 'h';
+        $days = floor($minutes / 1440);
+        $hours = round(($minutes % 1440) / 60);
+        return $days . 'd ' . $hours . 'h';
     }
     
     /**

@@ -57,34 +57,29 @@ include __DIR__ . '/../views/layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-    <!-- Top Bar -->
-    <div class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-md">
-        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
-            <div class="flex items-center space-x-4">
-                <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-lg">
-                    <i class="fas fa-user text-sm"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-white">My Profile</h1>
-                    <p class="text-sm text-slate-400">Manage your account settings</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="lg:ml-64 min-h-screen bg-slate-50">
+    <?php
+    // Set header variables for this page
+    $headerTitle = 'My Profile';
+    $headerSubtitle = 'Manage your account settings';
+    $showQuickActions = false;
+    $showSearch = false;
+    
+    include __DIR__ . '/../includes/top_header.php';
+    ?>
 
     <!-- Content -->
     <div class="p-4 lg:p-8">
         <!-- Alert Messages -->
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 text-red-300 rounded-lg flex items-start">
+        <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-600 rounded-lg flex items-start">
             <i class="fas fa-exclamation-circle mt-0.5 mr-3"></i>
             <div><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
         </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="mb-6 p-4 bg-green-500/20 border border-green-500/50 text-green-300 rounded-lg flex items-start">
+        <div class="mb-6 p-4 bg-green-500/10 border border-green-500/30 text-green-600 rounded-lg flex items-start">
             <i class="fas fa-check-circle mt-0.5 mr-3"></i>
             <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
         </div>
@@ -93,23 +88,23 @@ include __DIR__ . '/../views/layouts/header.php';
         <div class="max-w-3xl">
             <form method="POST" action="" class="space-y-6">
                 <!-- Profile Info Card -->
-                <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-700/50">
-                        <h2 class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-id-card mr-2 text-cyan-500"></i>
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-id-card mr-2 text-blue-600"></i>
                             Profile Information
                         </h2>
                     </div>
                     <div class="p-6 space-y-6">
                         <!-- Avatar -->
                         <div class="flex items-center space-x-4">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=06b6d4&size=128" 
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=ffffff&color=2563eb&size=128" 
                                  alt="Avatar" 
                                  class="w-20 h-20 rounded-full">
                             <div>
-                                <h3 class="text-lg font-semibold text-white"><?php echo htmlspecialchars($currentUser['full_name']); ?></h3>
-                                <p class="text-sm text-slate-400"><?php echo htmlspecialchars($currentUser['email']); ?></p>
-                                <span class="inline-flex items-center px-2 py-0.5 mt-1 text-xs font-medium border border-slate-600 text-slate-300 bg-slate-700/30 rounded">
+                                <h3 class="text-lg font-semibold text-gray-900"><?php echo htmlspecialchars($currentUser['full_name']); ?></h3>
+                                <p class="text-sm text-gray-500"><?php echo htmlspecialchars($currentUser['email']); ?></p>
+                                <span class="inline-flex items-center px-2 py-0.5 mt-1 text-xs font-medium border border-gray-300 text-gray-700 bg-gray-50 rounded">
                                     <?php echo ucfirst(str_replace('_', ' ', $currentUser['role'])); ?>
                                 </span>
                             </div>
@@ -117,38 +112,38 @@ include __DIR__ . '/../views/layouts/header.php';
 
                         <!-- Full Name -->
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">
-                                Full Name <span class="text-red-400">*</span>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">
+                                Full Name <span class="text-red-500">*</span>
                             </label>
                             <input type="text" 
                                    name="full_name" 
                                    value="<?php echo htmlspecialchars($currentUser['full_name'] ?? ''); ?>"
                                    required
-                                   class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                   class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
                         <!-- Email -->
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">
-                                Email Address <span class="text-red-400">*</span>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">
+                                Email Address <span class="text-red-500">*</span>
                             </label>
                             <input type="email" 
                                    name="email" 
                                    value="<?php echo htmlspecialchars($currentUser['email'] ?? ''); ?>"
                                    required
-                                   class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                   class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
                         <!-- Username (Read-only) -->
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">
+                            <label class="block text-sm font-medium text-gray-900 mb-2">
                                 Username
                             </label>
                             <input type="text" 
                                    value="<?php echo htmlspecialchars($currentUser['username'] ?? ''); ?>"
                                    readonly
-                                   class="w-full px-4 py-2 bg-slate-700/30 border border-slate-700 text-slate-400 rounded-lg cursor-not-allowed">
-                            <p class="mt-1 text-xs text-slate-500">
+                                   class="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
+                            <p class="mt-1 text-xs text-gray-500">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Username cannot be changed
                             </p>
@@ -157,24 +152,24 @@ include __DIR__ . '/../views/layouts/header.php';
                 </div>
 
                 <!-- Security Card -->
-                <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-700/50">
-                        <h2 class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-lock mr-2 text-cyan-500"></i>
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-lock mr-2 text-blue-600"></i>
                             Change Password
                         </h2>
                     </div>
                     <div class="p-6">
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">
+                            <label class="block text-sm font-medium text-gray-900 mb-2">
                                 New Password
                             </label>
                             <input type="password" 
                                    name="password" 
                                    placeholder="Leave blank to keep current password"
                                    autocomplete="new-password"
-                                   class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
-                            <p class="mt-2 text-xs text-slate-400">
+                                   class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p class="mt-2 text-xs text-gray-500">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Only fill this if you want to change your password
                             </p>
@@ -183,12 +178,12 @@ include __DIR__ . '/../views/layouts/header.php';
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center justify-between pt-6 border-t border-slate-700/50">
-                    <a href="dashboard.php" class="px-6 py-2.5 border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition rounded-lg">
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="dashboard.php" class="px-6 py-2.5 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition rounded-lg">
                         <i class="fas fa-arrow-left mr-2"></i>
                         Back to Dashboard
                     </a>
-                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition rounded-lg">
+                    <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white hover:bg-blue-700 transition rounded-lg">
                         <i class="fas fa-save mr-2"></i>
                         Save Changes
                     </button>

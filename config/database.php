@@ -4,11 +4,11 @@
  * Contains database connection settings
  */
 
-// Database credentials - PRODUCTION ONLY
-define('DB_HOST', 'localhost');
-define('DB_USER', 'u816220874_AyrgoResolveIT');
-define('DB_PASS', '#2js&v3+P');
-define('DB_NAME', 'u816220874_resolveIT');
+// Database credentials from environment or defaults
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_NAME', getenv('DB_NAME') ?: 'u816220874_resolveit');
 define('DB_CHARSET', 'utf8mb4');
 
 /**

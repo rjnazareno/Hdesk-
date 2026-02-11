@@ -30,8 +30,8 @@ class DashboardController {
             exit;
         }
 
-        // Only admins continue here
-        $this->auth->requireRole('admin');
+        // Only admins and internal employees continue here
+        $this->auth->requireAdminOrInternal();
 
         // Initialize models
         $this->ticketModel = new Ticket();

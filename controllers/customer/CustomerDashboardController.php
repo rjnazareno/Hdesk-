@@ -27,17 +27,31 @@ class CustomerDashboardController {
     }
     
     /**
+     * Get unread notification count for current user
+     */
+    private function getUnreadCount() {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT COUNT(*) as count FROM notifications WHERE employee_id = :employee_id AND is_read = 0";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':employee_id' => $this->currentUser['id']]);
+        $result = $stmt->fetch();
+        return $result['count'] ?? 0;
+    }
+    
+    /**
      * Display employee dashboard
      */
     public function index() {
+        // Pagination for recent tickets
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $itemsPerPage = 5;
+        $offset = ($page - 1) * $itemsPerPage;
+        
         // Get statistics for this employee only
         $stats = $this->ticketModel->getStats($this->currentUser['id'], 'employee');
         
-        // Get recent tickets for this employee
-        $recentTickets = $this->ticketModel->getAll([
-            'limit' => 10,
-            'submitter_id' => $this->currentUser['id']
-        ]);
+        // Get paginated recent tickets for this employee
+        $recentTicketsData = $this->getRecentTickets($itemsPerPage, $offset);
         
         // Get recent activity for this employee
         $recentActivity = $this->activityModel->getRecent(5, $this->currentUser['id'], 'employee');
@@ -47,15 +61,55 @@ class CustomerDashboardController {
         
         // Pass data to view
         $currentUser = $this->currentUser;
+        $recentTickets = $recentTicketsData['tickets'];
+        $recentTicketsPagination = $recentTicketsData['pagination'];
+        $unreadNotifications = $this->getUnreadCount();
         
         // Load view
         $this->loadView('customer/dashboard', compact(
             'currentUser',
             'stats',
             'recentTickets',
+            'recentTicketsPagination',
             'recentActivity',
-            'categories'
+            'categories',
+            'unreadNotifications'
         ));
+    }
+    
+    /**
+     * Get recent tickets with pagination
+     */
+    private function getRecentTickets($limit = 5, $offset = 0) {
+        $userId = $this->currentUser['id'];
+        
+        // Get tickets for pagination
+        $tickets = $this->ticketModel->getAll([
+            'submitter_id' => $userId
+        ], 'created_at', 'DESC', $limit, $offset);
+        
+        // Get total count for pagination
+        $db = Database::getInstance()->getConnection();
+        $countSql = "SELECT COUNT(*) FROM tickets WHERE submitter_id = :user_id AND submitter_type = 'employee'";
+        $stmt = $db->prepare($countSql);
+        $stmt->execute([':user_id' => $userId]);
+        $totalTickets = $stmt->fetchColumn();
+        
+        // Calculate pagination
+        $totalPages = ceil($totalTickets / $limit);
+        $currentPage = floor($offset / $limit) + 1;
+        
+        return [
+            'tickets' => $tickets,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalTickets,
+                'itemsPerPage' => $limit,
+                'hasNextPage' => $currentPage < $totalPages,
+                'hasPrevPage' => $currentPage > 1
+            ]
+        ];
     }
     
     /**

@@ -15,22 +15,41 @@ if (file_exists($env_file)) {
     $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
         list($key, $value) = explode('=', $line, 2);
         putenv(trim($key) . '=' . trim($value));
     }
 }
 
 // Environment Configuration
-define('ENVIRONMENT', getenv('APP_ENV') ?? 'development');
+define('ENVIRONMENT', getenv('APP_ENV') ?: 'production');
+define('IS_PRODUCTION', ENVIRONMENT === 'production');
 
-// Base URL Configuration - PRODUCTION ONLY
-define('BASE_URL', 'https://resolveit.resourcestaffonline.com/');
+// Base URL Configuration - Auto-detect or use environment variable
+$baseUrl = getenv('BASE_URL');
+if (!$baseUrl) {
+    // Auto-detect BASE_URL based on server configuration
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    $baseUrl = $protocol . '://' . $host . rtrim($scriptDir, '/') . '/';
+    
+    // If we're at root level, clean up the path
+    if ($scriptDir === '/' || $scriptDir === '\\') {
+        $baseUrl = $protocol . '://' . $host . '/';
+    }
+}
+define('BASE_URL', rtrim($baseUrl, '/') . '/');
 define('ASSETS_URL', BASE_URL . 'assets/');
 
 // Application Settings
-define('APP_NAME', 'ResolveIT');
-define('APP_VERSION', '1.0.0');
+define('APP_NAME', 'HDesk');
+define('APP_TAGLINE', 'Multi-Department Service Portal');
+define('APP_VERSION', '2.0.0');
 define('APP_TIMEZONE', 'Asia/Manila');
+
+// Supported Departments
+define('SUPPORTED_DEPARTMENTS', ['IT', 'HR']);
 
 // File Upload Settings
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
@@ -43,7 +62,7 @@ define('MAIL_PORT', 587);
 define('MAIL_USERNAME', 'it.resourcestaff@gmail.com');
 define('MAIL_PASSWORD', 'fqbr ocgu jcfh jwdy');
 define('MAIL_FROM_EMAIL', 'it.resourcestaff@gmail.com');
-define('MAIL_FROM_NAME', 'ResolveIT Help Desk');
+define('MAIL_FROM_NAME', 'HDesk');
 define('MAIL_ENCRYPTION', 'tls');
 
 // Pagination
@@ -55,9 +74,16 @@ define('TICKET_PREFIX', 'TKT');
 // Timezone
 date_default_timezone_set(APP_TIMEZONE);
 
-// Error Reporting (set to 0 in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Error Reporting - Production DISABLES display, Development ENABLES
+if (IS_PRODUCTION) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
+} else {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
 
 // Autoload function for classes
 spl_autoload_register(function ($class) {

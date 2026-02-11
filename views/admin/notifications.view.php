@@ -1,29 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications - IT Help Desk</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/print.css">
-    <link rel="stylesheet" href="../assets/css/dark-mode.css">
-</head>
-<body class="bg-gray-50">
-    <?php include __DIR__ . '/../../includes/admin_nav.php'; ?>
+<?php
+$pageTitle = 'Notifications - ' . APP_NAME;
+$baseUrl = '../';
+include __DIR__ . '/../layouts/header.php';
+?>
 
     <!-- Main Content -->
-    <div class="lg:ml-64 min-h-screen bg-gray-50">
+    <div class="lg:ml-64 min-h-screen bg-slate-50">
         <!-- Top Bar -->
-        <div class="bg-white border-b border-gray-200 ">
+        <div class="bg-white border-b border-slate-200 ">
             <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-gray-900 rounded-lg">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-800 rounded-lg">
                         <i class="fas fa-bell text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">Notifications</h1>
-                        <p class="text-sm text-gray-600 mt-0.5">Stay updated with your ticket activities</p>
+                        <h1 class="text-xl lg:text-2xl font-semibold text-slate-800">Notifications</h1>
+                        <p class="text-sm text-slate-500 mt-0.5">Stay updated with your ticket activities</p>
                     </div>
                 </div>
                 <div class="hidden lg:flex items-center space-x-2">
@@ -41,7 +33,7 @@
             <nav class="flex mb-4" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+                        <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-800">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                             </svg>
@@ -50,7 +42,7 @@
                     </li>
                     <li>
                         <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-6 h-6 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                             </svg>
                             <span class="ml-1 text-sm font-medium text-gray-700">Notifications</span>
@@ -69,16 +61,16 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Notifications List -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white  border border-gray-200 rounded-lg shadow-xl">
-                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                    <div class="bg-white  border border-slate-200 rounded-lg shadow-xl">
+                        <div class="p-6 border-b border-slate-200 flex justify-between items-center">
                             <div>
-                                <h2 class="text-lg font-semibold text-gray-900">All Notifications</h2>
-                                <p class="text-sm text-gray-600"><?php echo $stats['unread']; ?> unread of <?php echo $stats['total']; ?> total</p>
+                                <h2 class="text-lg font-semibold text-slate-800">All Notifications</h2>
+                                <p class="text-sm text-slate-500"><?php echo $stats['unread']; ?> unread of <?php echo $stats['total']; ?> total</p>
                             </div>
                             <?php if ($stats['unread'] > 0): ?>
                             <form method="POST" action="notifications.php">
                                 <input type="hidden" name="action" value="mark_all_read">
-                                <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-r from-teal-500 to-emerald-600 text-gray-900 hover:from-teal-700 hover:to-emerald-700 transition rounded-lg shadow-md">
+                                <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-r from-emerald-400 to-emerald-600 text-slate-800 hover:from-teal-700 hover:to-emerald-700 transition rounded-lg shadow-md">
                                     <i class="fas fa-check-double mr-2"></i>Mark All Read
                                 </button>
                             </form>
@@ -88,25 +80,25 @@
                         <div class="divide-y divide-slate-700/50">
                             <?php if (empty($notifications)): ?>
                                 <div class="text-center py-12">
-                                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-bell-slash text-gray-600 text-4xl"></i>
+                                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-bell-slash text-slate-500 text-4xl"></i>
                                     </div>
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No Notifications</h3>
-                                    <p class="text-gray-600">You're all caught up! No new notifications.</p>
+                                    <h3 class="text-lg font-semibold text-slate-800 mb-2">No Notifications</h3>
+                                    <p class="text-slate-500">You're all caught up! No new notifications.</p>
                                 </div>
                             <?php else: ?>
                                 <?php foreach ($notifications as $notification): ?>
-                                <div class="p-6 hover:bg-gray-100/30 transition <?php echo $notification['is_read'] ? 'opacity-60' : 'bg-teal-500/5'; ?>">
+                                <div class="p-6 hover:bg-slate-100/30 transition <?php echo $notification['is_read'] ? 'opacity-60' : 'bg-emerald-500/5'; ?>">
                                     <div class="flex items-start justify-between">
                                         <div class="flex-1">
                                             <div class="flex items-center space-x-2 mb-2">
                                                 <?php
                                                 $iconMap = [
-                                                    'ticket_created' => ['icon' => 'plus-circle', 'color' => 'text-teal-600'],
+                                                    'ticket_created' => ['icon' => 'plus-circle', 'color' => 'text-emerald-600'],
                                                     'ticket_assigned' => ['icon' => 'user-plus', 'color' => 'text-purple-400'],
                                                     'status_changed' => ['icon' => 'exchange-alt', 'color' => 'text-orange-400'],
                                                     'comment_added' => ['icon' => 'comment', 'color' => 'text-green-400'],
-                                                    'ticket_closed' => ['icon' => 'check-circle', 'color' => 'text-gray-600'],
+                                                    'ticket_closed' => ['icon' => 'check-circle', 'color' => 'text-slate-500'],
                                                 ];
                                                 $type = $notification['type'] ?? 'ticket_created';
                                                 $iconData = $iconMap[$type] ?? $iconMap['ticket_created'];
@@ -118,19 +110,19 @@
                                             </div>
                                             
                                             <div class="mb-2">
-                                                <p class="text-sm text-gray-900 font-medium"><?php echo htmlspecialchars($notification['title']); ?></p>
-                                                <p class="text-sm text-gray-600 mt-1"><?php echo htmlspecialchars($notification['message']); ?></p>
+                                                <p class="text-sm text-slate-800 font-medium"><?php echo htmlspecialchars($notification['title']); ?></p>
+                                                <p class="text-sm text-slate-500 mt-1"><?php echo htmlspecialchars($notification['message']); ?></p>
                                             </div>
 
                                             <?php if ($notification['ticket_number']): ?>
                                             <a href="view_ticket.php?id=<?php echo $notification['ticket_id']; ?>" 
-                                               class="inline-flex items-center text-xs text-teal-600 hover:text-teal-600 transition">
+                                               class="inline-flex items-center text-xs text-emerald-600 hover:text-emerald-600 transition">
                                                 <i class="fas fa-ticket-alt mr-1"></i>
                                                 View Ticket #<?php echo htmlspecialchars($notification['ticket_number']); ?>
                                             </a>
                                             <?php endif; ?>
 
-                                            <div class="mt-2 text-xs text-gray-600">
+                                            <div class="mt-2 text-xs text-slate-500">
                                                 <i class="far fa-clock mr-1"></i>
                                                 <?php echo date('M d, Y g:i A', strtotime($notification['created_at'])); ?>
                                             </div>
@@ -141,7 +133,7 @@
                                             <form method="POST" action="notifications.php" class="inline">
                                                 <input type="hidden" name="action" value="mark_read">
                                                 <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
-                                                <button type="submit" class="p-2 text-gray-600 hover:text-teal-600 transition rounded-lg hover:bg-gray-50" title="Mark as read">
+                                                <button type="submit" class="p-2 text-slate-500 hover:text-emerald-600 transition rounded-lg hover:bg-slate-50" title="Mark as read">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </form>
@@ -150,7 +142,7 @@
                                             <form method="POST" action="notifications.php" class="inline" onsubmit="return confirm('Delete this notification?')">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
-                                                <button type="submit" class="p-2 text-gray-600 hover:text-red-400 transition rounded-lg hover:bg-gray-50" title="Delete">
+                                                <button type="submit" class="p-2 text-slate-500 hover:text-red-400 transition rounded-lg hover:bg-slate-50" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -163,9 +155,9 @@
                         
                         <!-- Pagination -->
                         <?php if (isset($pagination)): ?>
-                        <div class="px-6 py-4 border-t border-gray-200">
+                        <div class="px-6 py-4 border-t border-slate-200">
                             <div class="flex items-center justify-between">
-                                <div class="text-sm text-gray-600">
+                                <div class="text-sm text-slate-500">
                                     <?php if ($pagination['totalPages'] > 1): ?>
                                     Page <?php echo $pagination['currentPage']; ?> of <?php echo $pagination['totalPages']; ?>
                                     <span class="mx-2">•</span>
@@ -176,7 +168,7 @@
                                 <div class="flex items-center space-x-2">
                                     <?php if ($pagination['hasPrevPage']): ?>
                                     <a href="?page=<?php echo $pagination['currentPage'] - 1; ?>" 
-                                       class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 rounded-lg transition">
+                                       class="px-3 py-1.5 text-sm border border-gray-300 bg-slate-50 text-gray-700 hover:bg-slate-600/50 hover:text-emerald-600 rounded-lg transition">
                                         <i class="fas fa-chevron-left mr-1"></i> Prev
                                     </a>
                                     <?php else: ?>
@@ -187,7 +179,7 @@
                                     
                                     <?php if ($pagination['hasNextPage']): ?>
                                     <a href="?page=<?php echo $pagination['currentPage'] + 1; ?>" 
-                                       class="px-3 py-1.5 text-sm border border-gray-300 bg-gray-50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 rounded-lg transition">
+                                       class="px-3 py-1.5 text-sm border border-gray-300 bg-slate-50 text-gray-700 hover:bg-slate-600/50 hover:text-emerald-600 rounded-lg transition">
                                         Next <i class="fas fa-chevron-right ml-1"></i>
                                     </a>
                                     <?php else: ?>
@@ -206,90 +198,90 @@
                 <!-- Sidebar -->
                 <div class="lg:col-span-1 space-y-6">
                     <!-- Stats Card -->
-                    <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-4">
-                            <i class="fas fa-chart-pie mr-2 text-teal-600"></i>Notification Stats
+                    <div class="bg-white  border border-slate-200 rounded-lg shadow-xl p-6">
+                        <h3 class="text-sm font-semibold text-slate-800 mb-4">
+                            <i class="fas fa-chart-pie mr-2 text-emerald-600"></i>Notification Stats
                         </h3>
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center p-3 bg-gray-100/30 rounded-lg">
-                                <span class="text-sm text-gray-600">Total</span>
-                                <span class="text-lg font-bold text-gray-900"><?php echo $stats['total']; ?></span>
+                            <div class="flex justify-between items-center p-3 bg-slate-100/30 rounded-lg">
+                                <span class="text-sm text-slate-500">Total</span>
+                                <span class="text-lg font-bold text-slate-800"><?php echo $stats['total']; ?></span>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-teal-500/10 rounded-lg border border-teal-500/20">
-                                <span class="text-sm text-gray-600">Unread</span>
-                                <span class="text-lg font-bold text-teal-600"><?php echo $stats['unread']; ?></span>
+                            <div class="flex justify-between items-center p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                <span class="text-sm text-slate-500">Unread</span>
+                                <span class="text-lg font-bold text-emerald-600"><?php echo $stats['unread']; ?></span>
                             </div>
                             <div class="flex justify-between items-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                                <span class="text-sm text-gray-600">Read</span>
+                                <span class="text-sm text-slate-500">Read</span>
                                 <span class="text-lg font-bold text-green-400"><?php echo $stats['read']; ?></span>
                             </div>
                             <div class="flex justify-between items-center p-3 bg-orange-500/10 rounded-lg border border-orange-500/20 mt-3">
-                                <span class="text-sm font-semibold text-gray-900">Today</span>
+                                <span class="text-sm font-semibold text-slate-800">Today</span>
                                 <span class="text-lg font-bold text-orange-400"><?php echo $stats['today']; ?></span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Notification Types -->
-                    <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-4">
-                            <i class="fas fa-bell mr-2 text-teal-600"></i>Notification Types
+                    <div class="bg-white  border border-slate-200 rounded-lg shadow-xl p-6">
+                        <h3 class="text-sm font-semibold text-slate-800 mb-4">
+                            <i class="fas fa-bell mr-2 text-emerald-600"></i>Notification Types
                         </h3>
                         <div class="space-y-3 text-sm">
-                            <div class="flex items-center space-x-3 p-2 hover:bg-gray-100/30 rounded-lg transition">
-                                <i class="fas fa-plus-circle text-teal-600"></i>
+                            <div class="flex items-center space-x-3 p-2 hover:bg-slate-100/30 rounded-lg transition">
+                                <i class="fas fa-plus-circle text-emerald-600"></i>
                                 <span class="text-gray-700">New Tickets</span>
                             </div>
-                            <div class="flex items-center space-x-3 p-2 hover:bg-gray-100/30 rounded-lg transition">
+                            <div class="flex items-center space-x-3 p-2 hover:bg-slate-100/30 rounded-lg transition">
                                 <i class="fas fa-user-plus text-purple-400"></i>
                                 <span class="text-gray-700">Assignments</span>
                             </div>
-                            <div class="flex items-center space-x-3 p-2 hover:bg-gray-100/30 rounded-lg transition">
+                            <div class="flex items-center space-x-3 p-2 hover:bg-slate-100/30 rounded-lg transition">
                                 <i class="fas fa-exchange-alt text-orange-400"></i>
                                 <span class="text-gray-700">Status Changes</span>
                             </div>
-                            <div class="flex items-center space-x-3 p-2 hover:bg-gray-100/30 rounded-lg transition">
+                            <div class="flex items-center space-x-3 p-2 hover:bg-slate-100/30 rounded-lg transition">
                                 <i class="fas fa-comment text-green-400"></i>
                                 <span class="text-gray-700">New Comments</span>
                             </div>
-                            <div class="flex items-center space-x-3 p-2 hover:bg-gray-100/30 rounded-lg transition">
-                                <i class="fas fa-check-circle text-gray-600"></i>
+                            <div class="flex items-center space-x-3 p-2 hover:bg-slate-100/30 rounded-lg transition">
+                                <i class="fas fa-check-circle text-slate-500"></i>
                                 <span class="text-gray-700">Ticket Closed</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quick Actions -->
-                    <div class="bg-white  border border-gray-200 rounded-lg shadow-xl p-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-4">
-                            <i class="fas fa-bolt mr-2 text-teal-600"></i>Quick Actions
+                    <div class="bg-white  border border-slate-200 rounded-lg shadow-xl p-6">
+                        <h3 class="text-sm font-semibold text-slate-800 mb-4">
+                            <i class="fas fa-bolt mr-2 text-emerald-600"></i>Quick Actions
                         </h3>
                         <div class="space-y-2">
-                            <a href="tickets.php" class="block px-4 py-2.5 text-sm bg-gray-50 border border-gray-300/50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 hover:border-teal-500/50 transition rounded-lg text-center">
+                            <a href="tickets.php" class="block px-4 py-2.5 text-sm bg-slate-50 border border-gray-300/50 text-gray-700 hover:bg-slate-600/50 hover:text-emerald-600 hover:border-emerald-500/50 transition rounded-lg text-center">
                                 <i class="fas fa-ticket-alt mr-2"></i>View All Tickets
                             </a>
-                            <a href="dashboard.php" class="block px-4 py-2.5 text-sm bg-gray-50 border border-gray-300/50 text-gray-700 hover:bg-slate-600/50 hover:text-teal-600 hover:border-teal-500/50 transition rounded-lg text-center">
+                            <a href="dashboard.php" class="block px-4 py-2.5 text-sm bg-slate-50 border border-gray-300/50 text-gray-700 hover:bg-slate-600/50 hover:text-emerald-600 hover:border-emerald-500/50 transition rounded-lg text-center">
                                 <i class="fas fa-tachometer-alt mr-2"></i>Go to Dashboard
                             </a>
                         </div>
                     </div>
 
                     <!-- Info Card -->
-                    <div class="bg-teal-500/10  border border-teal-500/30 rounded-lg shadow-xl p-6">
-                        <h3 class="text-sm font-semibold text-teal-600 mb-3">
+                    <div class="bg-emerald-500/10  border border-emerald-500/30 rounded-lg shadow-xl p-6">
+                        <h3 class="text-sm font-semibold text-emerald-600 mb-3">
                             <i class="fas fa-info-circle mr-2"></i>About Notifications
                         </h3>
                         <ul class="space-y-2 text-xs text-gray-700">
                             <li class="flex items-start">
-                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-teal-600"></i>
+                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-emerald-600"></i>
                                 <span>Real-time updates on tickets</span>
                             </li>
                             <li class="flex items-start">
-                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-teal-600"></i>
+                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-emerald-600"></i>
                                 <span>Email notifications sent too</span>
                             </li>
                             <li class="flex items-start">
-                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-teal-600"></i>
+                                <i class="fas fa-check-circle mr-2 mt-0.5 flex-shrink-0 text-emerald-600"></i>
                                 <span>Kept for 30 days</span>
                             </li>
                         </ul>
@@ -299,13 +291,6 @@
         </div>
     </div>
 
-    <script src="../assets/js/helpers.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initTooltips();
-            initDarkMode();
-        });
-    </script>
-</body>
-</html>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>
+
 

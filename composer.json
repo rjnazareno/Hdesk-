@@ -6,6 +6,7 @@
         "php": ">=7.4",
         "phpmailer/phpmailer": "^6.8",
         "phpoffice/phpspreadsheet": "^1.29",
+        "maennchen/zipstream-php": "^2.1",
         "kreait/firebase-php": "^7.0",
         "google/auth": "^1.28"
     },

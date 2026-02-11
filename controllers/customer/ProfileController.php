@@ -26,6 +26,18 @@ class ProfileController {
             redirect('customer/dashboard.php');
         }
     }
+    
+    /**
+     * Get unread notification count for current user
+     */
+    private function getUnreadCount() {
+        $db = Database::getInstance()->getConnection();
+        $sql = "SELECT COUNT(*) as count FROM notifications WHERE employee_id = :employee_id AND is_read = 0";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':employee_id' => $this->currentUser['id']]);
+        $result = $stmt->fetch();
+        return $result['count'] ?? 0;
+    }
 
     /**
      * Display profile page
@@ -39,7 +51,8 @@ class ProfileController {
 
         // Load the view
         $this->loadView('customer/profile', [
-            'currentUser' => $this->currentUser
+            'currentUser' => $this->currentUser,
+            'unreadNotifications' => $this->getUnreadCount()
         ]);
     }
 

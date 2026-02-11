@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password - IT Help Desk</title>
+    <title>Forgot Password - <?php echo defined('APP_NAME') ? APP_NAME : 'ServiceHub'; ?></title>
     <?php echo getTailwindCSS(); ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <p class="text-center text-slate-400 text-sm mt-6">
-            &copy; <?php echo date('Y'); ?> ResolveIT. All rights reserved.
+            &copy; <?php echo date('Y'); ?> <?php echo defined('APP_NAME') ? APP_NAME : 'ServiceHub'; ?>. All rights reserved.
         </p>
     </div>
 </body>

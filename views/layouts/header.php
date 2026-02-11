@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle ?? 'IT Help Desk'; ?></title>
+    <title><?php echo $pageTitle ?? (defined('APP_NAME') ? APP_NAME : 'ServiceHub'); ?></title>
     
     <!-- Tailwind CSS: Uses CDN in development, local file in production -->
     <?php echo getTailwindCSS(); ?>
@@ -29,14 +29,16 @@
     <style><?php echo $customStyles; ?></style>
     <?php endif; ?>
 </head>
-<body class="bg-gray-50">
+<body class="bg-slate-50">
     <?php 
-    // Load appropriate navigation based on user type
+    // Load appropriate navigation based on user type and role
     $userType = $_SESSION['user_type'] ?? 'employee';
     $userRole = $_SESSION['role'] ?? '';
     
-    // IT Staff and Admin use admin navigation, regular employees use customer navigation
-    if ($userType === 'user' || in_array($userRole, ['it_staff', 'admin'])) {
+    // Show admin navigation for:
+    // 1. Users table (IT staff/admin)
+    // 2. Employees with internal role
+    if ($userType === 'user' || $userRole === 'internal' || $userRole === 'it_staff' || $userRole === 'admin') {
         include __DIR__ . '/../../includes/admin_nav.php';
     } else {
         include __DIR__ . '/../../includes/customer_nav.php';

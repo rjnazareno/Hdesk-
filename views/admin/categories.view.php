@@ -1,6 +1,6 @@
 <?php 
 // Set page-specific variables
-$pageTitle = 'Categories - IT Help Desk';
+$pageTitle = 'Categories - ' . (defined('APP_NAME') ? APP_NAME : 'ServiceHub');
 $baseUrl = '../';
 
 // Include header layout
@@ -8,129 +8,15 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <!-- Main Content -->
-<div class="lg:ml-64 min-h-screen bg-gray-50">
-    <!-- Top Bar -->
-    <div class="bg-white border-b border-gray-200 ">
-        <div class="flex items-center justify-between px-4 lg:px-8 py-4 pt-20 lg:pt-4">
-            <!-- Left Section: Title & Stats -->
-            <div class="flex items-center space-x-4">
-                <div class="hidden lg:flex items-center justify-center w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 text-gray-900 rounded-lg">
-                    <i class="fas fa-folder-open text-sm"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl lg:text-2xl font-semibold text-gray-900">
-                        Ticket Categories
-                    </h1>
-                    <div class="flex items-center space-x-3 mt-0.5">
-                        <p class="text-sm text-gray-600">Organize and manage ticket categories</p>
-                        <span class="hidden md:inline-flex items-center px-2 py-0.5 text-xs font-medium border border-gray-300 text-gray-700 bg-gray-100/30 rounded">
-                            <i class="fas fa-layer-group mr-1"></i>
-                            <?php echo count($categories); ?> Categories
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Section: Actions & User -->
-            <div class="flex items-center space-x-3">
-                <!-- Search (Hidden on Mobile) -->
-                <div class="hidden md:block relative">
-                    <input 
-                        type="text" 
-                        placeholder="Search categories..." 
-                        class="pl-10 pr-4 py-2 w-48 lg:w-64 border border-gray-300 bg-gray-50 text-gray-900 placeholder-slate-400 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm transition-all"
-                        id="quickSearch"
-                    >
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-600 text-sm"></i>
-                </div>
-
-                <!-- Quick Actions Dropdown -->
-                <div class="relative" id="quickActionsDropdown">
-                    <button class="flex items-center space-x-2 px-4 py-2 border border-gray-300 bg-gray-50 text-gray-700 hover:text-gray-900 hover:border-teal-500/50 rounded-lg transition" id="quickActionsBtn">
-                        <i class="fas fa-bolt text-cyan-500"></i>
-                        <span class="hidden lg:inline text-sm font-medium">Quick Actions</span>
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-56 bg-gray-100 rounded-lg shadow-xl border border-gray-200 hidden z-50" id="quickActionsMenu">
-                        <div class="py-2">
-                            <a href="add_category.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition">
-                                <i class="fas fa-plus-circle w-5"></i>
-                                <span class="ml-3">Add Category</span>
-                            </a>
-                            <a href="manage_categories.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition">
-                                <i class="fas fa-edit w-5"></i>
-                                <span class="ml-3">Manage All</span>
-                            </a>
-                            <div class="border-t border-gray-200 my-1"></div>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition" onclick="viewCategoryStats(); return false;">
-                                <i class="fas fa-chart-bar w-5"></i>
-                                <span class="ml-3">View Statistics</span>
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition" onclick="printCategories(); return false;">
-                                <i class="fas fa-print w-5"></i>
-                                <span class="ml-3">Print View</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notifications Bell -->
-                <button class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition" title="Notifications" id="notificationBell">
-                    <i class="far fa-bell text-lg"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                </button>
-
-                <!-- User Avatar with Dropdown -->
-                <div class="relative" id="userMenuDropdown">
-                    <button class="flex items-center space-x-2 p-1 hover:bg-gray-50 transition" id="userMenuBtn">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser['full_name']); ?>&background=000000&color=fff" 
-                             alt="User" 
-                             class="w-10 h-10 rounded-full"
-                             title="<?php echo htmlspecialchars($currentUser['full_name']); ?>">
-                        <div class="hidden lg:block text-left">
-                            <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(explode(' ', $currentUser['full_name'])[0]); ?></div>
-                            <div class="text-xs text-gray-600"><?php echo htmlspecialchars($currentUser['email']); ?></div>
-                        </div>
-                        <i class="fas fa-chevron-down text-xs text-gray-600 hidden lg:block"></i>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-64 bg-gray-100 border border-gray-200 hidden z-50" id="userMenu">
-                        <div class="p-4 border-b border-gray-200">
-                            <div class="font-medium text-gray-900"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
-                            <div class="text-sm text-gray-600"><?php echo htmlspecialchars($currentUser['email']); ?></div>
-                        </div>
-                        <div class="py-2">
-                            <a href="profile.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition">
-                                <i class="fas fa-user w-5"></i>
-                                <span class="ml-3">My Profile</span>
-                            </a>
-                            <a href="settings.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition">
-                                <i class="fas fa-cog w-5"></i>
-                                <span class="ml-3">Settings</span>
-                            </a>
-                            <div class="border-t border-gray-200 my-1"></div>
-                            <a href="../logout.php" class="flex items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition">
-                                <i class="fas fa-sign-out-alt w-5"></i>
-                                <span class="ml-3">Logout</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Search Bar -->
-        <div class="md:hidden px-4 pb-4">
-            <div class="relative">
-                <input 
-                    type="text" 
-                    placeholder="Search categories..." 
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 bg-gray-50 text-gray-900 placeholder-slate-400 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm"
-                    id="mobileQuickSearch"
-                >
-                <i class="fas fa-search absolute left-3 top-3 text-gray-600 text-sm"></i>
-            </div>
-        </div>
-    </div>
+<div class="lg:ml-64 min-h-screen bg-slate-50">
+    <?php
+    // Set header variables for this page
+    $headerTitle = 'Ticket Categories';
+    $headerSubtitle = 'Organize and manage ticket categories · ' . count($categories) . ' Parent Categories';
+    $showQuickActions = true;
+    
+    include __DIR__ . '/../../includes/top_header.php';
+    ?>
 
     <!-- Content -->
     <div class="p-8">
@@ -138,7 +24,7 @@ include __DIR__ . '/../layouts/header.php';
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-teal-600">
+                    <a href="dashboard.php" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-emerald-600">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
@@ -156,23 +42,92 @@ include __DIR__ . '/../layouts/header.php';
             </ol>
         </nav>
         
+        <!-- Department Filter -->
+        <div class="bg-white border border-slate-200 p-6 mb-6 rounded-lg">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white rounded-lg">
+                    <i class="fas fa-filter text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Filter Categories</h3>
+                    <p class="text-sm text-slate-500">Filter by department</p>
+                </div>
+            </div>
+            <form method="GET" action="categories.php" class="flex items-center gap-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Department
+                    </label>
+                    <select name="department_id" class="w-full px-4 py-2 border border-gray-300 bg-slate-50 text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition rounded-lg">
+                        <option value="">All Departments</option>
+                        <?php foreach ($departments as $department): ?>
+                        <option value="<?php echo $department['id']; ?>" <?php echo ($selectedDepartment == $department['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($department['name']); ?> (<?php echo htmlspecialchars($department['code']); ?>)
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="flex items-end gap-3">
+                    <button type="submit" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white hover:from-emerald-500 hover:to-emerald-700 transition font-medium rounded-lg shadow-sm">
+                        <i class="fas fa-filter mr-2"></i>Apply Filter
+                    </button>
+                    <?php if ($selectedDepartment): ?>
+                    <a href="categories.php" class="inline-flex items-center px-6 py-2 border border-gray-300 text-gray-700 hover:bg-slate-50 transition font-medium rounded-lg">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+        
         <!-- Category Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($categories as $category): ?>
-            <div class="bg-white border border-gray-200 p-6 hover:border-teal-500/50 transition rounded-lg">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="w-10 h-10 flex items-center justify-center rounded-lg" style="background-color: <?php echo $category['color']; ?>20;">
-                        <i class="fas fa-folder text-sm" style="color: <?php echo $category['color']; ?>;"></i>
+            <!-- Parent Category Card -->
+            <div class="bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-emerald-500/50 transition">
+                <div class="p-6 <?php echo !empty($category['children']) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($category['children']) ? 'onclick="toggleCategory(' . $category['id'] . ')"' : ''; ?>>
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-lg" style="background-color: <?php echo $category['color']; ?>20;">
+                            <i class="fas fa-<?php echo htmlspecialchars($category['icon'] ?? 'folder'); ?> text-sm" style="color: <?php echo $category['color']; ?>;"></i>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 text-xs font-medium border border-gray-300 text-gray-700 rounded">
+                                <?php echo $category['ticket_count']; ?> tickets
+                            </span>
+                            <?php if (!empty($category['children'])): ?>
+                            <i class="fas fa-chevron-down text-slate-400 text-xs transition-transform" id="icon-<?php echo $category['id']; ?>"></i>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <span class="px-3 py-1 text-xs font-medium border border-gray-300 text-gray-700">
-                        <?php echo $category['ticket_count']; ?> tickets
-                    </span>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2"><?php echo htmlspecialchars($category['name']); ?></h3>
+                    <?php if (!empty($category['department_name'])): ?>
+                    <p class="text-xs text-slate-500 mb-3"><?php echo htmlspecialchars($category['department_name']); ?></p>
+                    <?php endif; ?>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-500">Open Tickets:</span>
+                        <span class="font-semibold text-emerald-600"><?php echo $category['open_tickets']; ?></span>
+                    </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2"><?php echo htmlspecialchars($category['name']); ?></h3>
-                <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-600">Open Tickets:</span>
-                    <span class="font-semibold text-gray-900"><?php echo $category['open_tickets']; ?></span>
+                
+                <!-- Sub-categories (Hidden by default) -->
+                <?php if (!empty($category['children'])): ?>
+                <div id="subcategories-<?php echo $category['id']; ?>" class="hidden border-t border-slate-200 bg-slate-50 p-4 space-y-2">
+                    <?php foreach ($category['children'] as $child): ?>
+                    <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded hover:border-emerald-500/50 transition">
+                        <div class="flex items-center gap-2 flex-1">
+                            <div class="w-6 h-6 flex items-center justify-center rounded" style="background-color: <?php echo $child['color']; ?>20;">
+                                <i class="fas fa-<?php echo htmlspecialchars($child['icon'] ?? 'folder'); ?> text-xs" style="color: <?php echo $child['color']; ?>;"></i>
+                            </div>
+                            <span class="text-sm font-medium text-slate-800"><?php echo htmlspecialchars($child['name']); ?></span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs">
+                            <span class="text-slate-500"><?php echo $child['ticket_count']; ?></span>
+                            <span class="text-emerald-600 font-semibold"><?php echo $child['open_tickets']; ?> open</span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
+                <?php endif; ?>
             </div>
             <?php endforeach; ?>
         </div>
@@ -181,123 +136,41 @@ include __DIR__ . '/../layouts/header.php';
 
 <!-- Page-specific JavaScript -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Quick Actions Dropdown
-        const quickActionsBtn = document.getElementById('quickActionsBtn');
-        const quickActionsMenu = document.getElementById('quickActionsMenu');
-        
-        if (quickActionsBtn && quickActionsMenu) {
-            quickActionsBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                quickActionsMenu.classList.toggle('hidden');
-                // Close user menu if open
-                const userMenu = document.getElementById('userMenu');
-                if (userMenu) userMenu.classList.add('hidden');
-            });
+function toggleCategory(categoryId) {
+    const subcategories = document.getElementById('subcategories-' + categoryId);
+    const icon = document.getElementById('icon-' + categoryId);
+    
+    if (subcategories) {
+        subcategories.classList.toggle('hidden');
+        if (icon) {
+            icon.classList.toggle('rotate-180');
         }
+    }
+}
 
-        // User Menu Dropdown
-        const userMenuBtn = document.getElementById('userMenuBtn');
-        const userMenu = document.getElementById('userMenu');
-        
-        if (userMenuBtn && userMenu) {
-            userMenuBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                userMenu.classList.toggle('hidden');
-                // Close quick actions if open
-                if (quickActionsMenu) quickActionsMenu.classList.add('hidden');
-            });
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            // Check if click is outside quick actions dropdown
-            const quickActionsDropdown = document.getElementById('quickActionsDropdown');
-            if (quickActionsMenu && quickActionsDropdown && !quickActionsDropdown.contains(e.target)) {
-                quickActionsMenu.classList.add('hidden');
-            }
-            
-            // Check if click is outside user menu dropdown
-            const userMenuDropdown = document.getElementById('userMenuDropdown');
-            if (userMenu && userMenuDropdown && !userMenuDropdown.contains(e.target)) {
-                userMenu.classList.add('hidden');
-            }
-        });
-
-        // Quick Search Functionality
-        const quickSearch = document.getElementById('quickSearch');
-        const mobileQuickSearch = document.getElementById('mobileQuickSearch');
-        
-        function handleQuickSearch(searchValue) {
-            const searchTerm = searchValue.toLowerCase().trim();
-            const categoryCards = document.querySelectorAll('.grid > div');
-            let visibleCount = 0;
-            
-            categoryCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                if (text.includes(searchTerm) || searchTerm === '') {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Update count badge if exists
-            const countBadge = document.querySelector('.bg-blue-100.text-blue-800');
-            if (countBadge && searchTerm) {
-                const icon = countBadge.querySelector('i');
-                countBadge.innerHTML = (icon ? icon.outerHTML : '<i class="fas fa-search mr-1"></i>') + 
-                                      visibleCount + ' Found';
-            } else if (countBadge && !searchTerm) {
-                // Reset to original count
-                countBadge.innerHTML = '<i class="fas fa-layer-group mr-1"></i><?php echo count($categories); ?> Categories';
-            }
-        }
-        
-        if (quickSearch) {
-            quickSearch.addEventListener('input', function() {
-                handleQuickSearch(this.value);
-                // Sync with mobile search
-                if (mobileQuickSearch) mobileQuickSearch.value = this.value;
-            });
-        }
-        
-        if (mobileQuickSearch) {
-            mobileQuickSearch.addEventListener('input', function() {
-                handleQuickSearch(this.value);
-                // Sync with desktop search
-                if (quickSearch) quickSearch.value = this.value;
-            });
-        }
-
-        // Print function
-        window.printCategories = function() {
-            window.print();
-        };
-
-        // View Statistics function
-        window.viewCategoryStats = function() {
-            // Calculate stats
-            const categoryCards = document.querySelectorAll('.grid > div');
-            let totalTickets = 0;
-            let totalOpen = 0;
-            
-            categoryCards.forEach(card => {
-                const ticketCount = card.querySelector('.bg-blue-100').textContent.match(/\d+/);
-                const openCount = card.querySelector('.font-semibold.text-gray-900').textContent;
-                
-                if (ticketCount) totalTickets += parseInt(ticketCount[0]);
-                if (openCount) totalOpen += parseInt(openCount);
-            });
-            
-            alert(`Category Statistics:\n\nTotal Categories: <?php echo count($categories); ?>\nTotal Tickets: ${totalTickets}\nOpen Tickets: ${totalOpen}\nClosed Tickets: ${totalTickets - totalOpen}`);
-        };
+// Expand/Collapse All
+function expandAll() {
+    document.querySelectorAll('[id^="subcategories-"]').forEach(el => {
+        el.classList.remove('hidden');
     });
+    document.querySelectorAll('[id^="icon-"]').forEach(icon => {
+        icon.classList.add('rotate-180');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('[id^="subcategories-"]').forEach(el => {
+        el.classList.add('hidden');
+    });
+    document.querySelectorAll('[id^="icon-"]').forEach(icon => {
+        icon.classList.remove('rotate-180');
+    });
+}
 </script>
 
 <?php 
 // Include footer layout
 include __DIR__ . '/../layouts/footer.php'; 
 ?>
+
 

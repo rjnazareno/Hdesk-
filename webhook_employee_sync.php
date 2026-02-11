@@ -122,6 +122,8 @@ foreach ($data['employees'] as $emp) {
         }
 
         // Sanitize data
+        // NOTE: 'role' and 'admin_rights_hdesk' are intentionally NOT synced
+        // These fields are managed locally for admin access control
         $employeeData = [
             'employee_id' => sanitize($emp['employee_id']),
             'fname' => sanitize($emp['fname']),

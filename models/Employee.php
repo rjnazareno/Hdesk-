@@ -15,8 +15,8 @@ class Employee {
      * Create a new employee
      */
     public function create($data) {
-        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, status, profile_picture) 
-                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :status, :profile_picture)";
+        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
+                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
         
         $stmt = $this->db->prepare($sql);
         
@@ -38,6 +38,7 @@ class Employee {
             ':contact' => $data['contact'] ?? $data['phone'] ?? null,
             ':official_sched' => $data['official_sched'] ?? null,
             ':role' => $data['role'] ?? 'employee',
+            ':admin_rights_hdesk' => $data['admin_rights_hdesk'] ?? null,
             ':status' => $data['status'] ?? 'active',
             ':profile_picture' => $data['profile_picture'] ?? null
         ]);
@@ -89,6 +90,22 @@ class Employee {
     }
     
     /**
+     * Get employees with admin rights (role='internal' AND admin_rights_hdesk IS NOT NULL)
+     * Used for ticket assignment dropdown
+     */
+    public function getAdminEmployees() {
+        $sql = "SELECT id, username, email, CONCAT(fname, ' ', lname) as full_name, fname, lname, company, position, admin_rights_hdesk 
+                FROM employees 
+                WHERE role = 'internal' 
+                AND admin_rights_hdesk IS NOT NULL 
+                AND status = 'active'
+                ORDER BY fname ASC, lname ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
      * Verify employee login
      */
     public function verifyLogin($username, $password) {
@@ -109,7 +126,7 @@ class Employee {
      * Get all employees
      */
     public function getAll($status = null) {
-        $sql = "SELECT id, username, email, personal_email, fname, lname, company, position, contact, role, status, profile_picture, created_at 
+        $sql = "SELECT id, username, email, personal_email, fname, lname, company, position, contact, role, admin_rights_hdesk, status, profile_picture, created_at 
                 FROM employees WHERE 1=1";
         
         if ($status) {
@@ -136,10 +153,11 @@ class Employee {
         $fields = [];
         $params = [':id' => $id];
         
-        $allowedFields = ['employee_id', 'username', 'email', 'personal_email', 'fname', 'lname', 'company', 'position', 'contact', 'official_sched', 'role', 'status', 'profile_picture'];
+        $allowedFields = ['employee_id', 'username', 'email', 'personal_email', 'fname', 'lname', 'company', 'position', 'contact', 'official_sched', 'role', 'admin_rights_hdesk', 'status', 'profile_picture'];
         
         foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
+            // Use array_key_exists to allow NULL values (e.g., removing admin_rights_hdesk)
+            if (array_key_exists($field, $data)) {
                 $fields[] = "$field = :$field";
                 // Map 'phone' to 'contact' if needed
                 $params[":$field"] = ($field === 'contact' && isset($data['phone'])) ? $data['phone'] : $data[$field];
@@ -176,6 +194,20 @@ class Employee {
         $sql = "UPDATE employees SET status = 'terminated' WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
+    }
+    
+    /**
+     * Update employee by employee_id (external ID from Harley)
+     * Used for syncing from external systems
+     */
+    public function updateByEmployeeId($employeeId, $data) {
+        $existing = $this->findByEmployeeId($employeeId);
+        
+        if (!$existing) {
+            return false;
+        }
+        
+        return $this->update($existing['id'], $data);
     }
     
     /**
