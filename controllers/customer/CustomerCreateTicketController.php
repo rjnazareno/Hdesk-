@@ -132,9 +132,20 @@ class CustomerCreateTicketController {
         
         // Create ticket
         try {
+            error_log("=== TICKET CREATION ATTEMPT ===");
+            error_log("Ticket Data: " . json_encode($ticketData));
+            
             $ticketId = $this->ticketModel->create($ticketData);
+            
+            error_log("Ticket ID returned: " . ($ticketId ? $ticketId : 'FALSE'));
+            
+            if (!$ticketId) {
+                error_log("TICKET CREATION FAILED - Model returned false");
+                error_log("Check database logs for more details");
+            }
         } catch (Exception $e) {
             error_log("Customer ticket creation exception: " . $e->getMessage());
+            error_log("Exception trace: " . $e->getTraceAsString());
             $_SESSION['error'] = "Database error: " . $e->getMessage();
             redirect('customer/create_ticket.php');
             return;
@@ -165,7 +176,8 @@ class CustomerCreateTicketController {
             $_SESSION['success'] = "Your request has been submitted successfully! Ticket #" . $ticketNumber;
             redirect('customer/tickets.php');
         } else {
-            $_SESSION['error'] = "Failed to create ticket. Please try again.";
+            error_log("TICKET CREATION FAILED - Redirecting with error");
+            $_SESSION['error'] = "Failed to create ticket. Please contact IT support. Error logged at " . date('Y-m-d H:i:s');
             redirect('customer/create_ticket.php');
         }
     }
