@@ -46,19 +46,26 @@ class Ticket {
             
             $insertId = $this->db->lastInsertId();
             
-            if (!$insertId || $insertId == 0) {
-                // Try to find the ticket by ticket_number as fallback
+            // MySQL bug/config issue: lastInsertId() sometimes returns 0 or empty string
+            // Always fallback to querying by ticket_number which is unique
+            if (!$insertId || $insertId == 0 || $insertId === '0') {
+                error_log("lastInsertId returned invalid value ($insertId), using fallback query");
+                // Find the ticket by ticket_number as fallback (ticket_number is unique)
                 $checkSql = "SELECT id FROM tickets WHERE ticket_number = :ticket_number ORDER BY id DESC LIMIT 1";
                 $checkStmt = $this->db->prepare($checkSql);
                 $checkStmt->execute([':ticket_number' => $data['ticket_number']]);
                 $found = $checkStmt->fetch();
                 
                 if ($found) {
-                    return $found['id'];
+                    error_log("Found ticket via fallback query: ID = " . $found['id']);
+                    return (int)$found['id'];
                 }
+                
+                error_log("Fallback query also failed to find ticket");
+                return false;
             }
             
-            return $insertId;
+            return (int)$insertId;
         } catch (PDOException $e) {
             error_log("Ticket creation error: " . $e->getMessage());
             error_log("Data: " . print_r($data, true));
