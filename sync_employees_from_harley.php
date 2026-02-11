@@ -147,7 +147,7 @@ try {
     $localDb = Database::getInstance()->getConnection();
     
     // Count Harley employees
-    $stmt = $harleyDb->query("SELECT COUNT(*) as count FROM emp_calendar WHERE emp_status = 'ACTIVE'");
+    $stmt = $harleyDb->query("SELECT COUNT(*) as count FROM employees WHERE status = 'active'");
     $harleyCount = $stmt->fetch()['count'];
     echo "<p><strong>Harley Calendar (Active):</strong> $harleyCount employees</p>";
     
@@ -166,21 +166,28 @@ try {
     }
     echo '</div>';
     
-    // Fetch employees from Harley emp_calendar
+    // Fetch employees from Harley employees table
     echo '<div class="stats">';
     echo '<h2>Step 3: Fetching Employees from Harley</h2>';
     $sql = "SELECT 
-                emp_id,
-                emp_firstname,
-                emp_lastname,
-                emp_email,
-                emp_mobilenum,
-                emp_position_id,
-                emp_company_code,
-                emp_status
-            FROM emp_calendar 
-            WHERE emp_status = 'ACTIVE'
-            ORDER BY emp_lastname, emp_firstname";
+                id,
+                fname,
+                lname,
+                email,
+                personal_email,
+                contact,
+                position,
+                company,
+                username,
+                password,
+                status,
+                role,
+                admin_rights_hdesk,
+                official_sched,
+                profile_picture
+            FROM employees 
+            WHERE status = 'active'
+            ORDER BY lname, fname";
     
     $stmt = $harleyDb->prepare($sql);
     $stmt->execute();
@@ -205,26 +212,30 @@ try {
     echo '<tbody>';
     
     foreach ($harleyEmployees as $harleyEmp) {
-        $fullName = trim($harleyEmp['emp_firstname'] . ' ' . $harleyEmp['emp_lastname']);
+        $fullName = trim($harleyEmp['fname'] . ' ' . $harleyEmp['lname']);
         
         try {
             // Check if employee already exists in local database by employee_id (external Harley ID)
-            $localEmp = $employeeModel->findByEmployeeId($harleyEmp['emp_id']);
+            $localEmp = $employeeModel->findByEmployeeId($harleyEmp['id']);
             
             if (!$localEmp) {
                 // Create new employee - use standard create() method
-                // The 'employee_id' field stores the external Harley emp_id for reference
+                // The 'employee_id' field stores the external Harley id for reference
                 $empData = [
-                    'employee_id' => $harleyEmp['emp_id'], // Harley's emp_id stored in employee_id field
-                    'fname' => $harleyEmp['emp_firstname'],
-                    'lname' => $harleyEmp['emp_lastname'],
-                    'email' => $harleyEmp['emp_email'],
-                    'username' => null, // Will be set later if they need login access
-                    'password' => password_hash('Welcome123!', PASSWORD_DEFAULT), // Default password
-                    'company' => $harleyEmp['emp_company_code'] ?? 'RSO',
-                    'position' => $harleyEmp['emp_position_id'] ?? null,
-                    'contact' => $harleyEmp['emp_mobilenum'] ?? null,
-                    'role' => 'employee',
+                    'employee_id' => $harleyEmp['id'], // Harley's id stored in employee_id field
+                    'fname' => $harleyEmp['fname'],
+                    'lname' => $harleyEmp['lname'],
+                    'email' => $harleyEmp['email'],
+                    'personal_email' => $harleyEmp['personal_email'],
+                    'username' => $harleyEmp['username'],
+                    'password' => !empty($harleyEmp['password']) ? password_hash($harleyEmp['password'], PASSWORD_DEFAULT) : password_hash('Welcome123!', PASSWORD_DEFAULT),
+                    'company' => $harleyEmp['company'] ?? 'RSO',
+                    'position' => $harleyEmp['position'],
+                    'contact' => $harleyEmp['contact'],
+                    'official_sched' => $harleyEmp['official_sched'],
+                    'role' => $harleyEmp['role'] ?? 'employee',
+                    'admin_rights_hdesk' => $harleyEmp['admin_rights_hdesk'],
+                    'profile_picture' => $harleyEmp['profile_picture'],
                     'status' => 'active'
                 ];
                 
@@ -232,17 +243,17 @@ try {
                 if ($newId) {
                     $created++;
                     echo "<tr class='status-created'>
-                            <td>{$harleyEmp['emp_id']}</td>
+                            <td>{$harleyEmp['id']}</td>
                             <td>$fullName</td>
-                            <td>{$harleyEmp['emp_email']}</td>
+                            <td>{$harleyEmp['email']}</td>
                             <td><span class='badge badge-success'>CREATED</span> (New ID: $newId)</td>
                           </tr>";
                 } else {
                     $errors++;
                     echo "<tr class='status-error'>
-                            <td>{$harleyEmp['emp_id']}</td>
+                            <td>{$harleyEmp['id']}</td>
                             <td>$fullName</td>
-                            <td>{$harleyEmp['emp_email']}</td>
+                            <td>{$harleyEmp['email']}</td>
                             <td><span class='badge badge-danger'>ERROR</span> create() returned 0</td>
                           </tr>";
                 }
@@ -251,51 +262,80 @@ try {
                 $needsUpdate = false;
                 $changes = [];
                 
-                if ($localEmp['fname'] !== $harleyEmp['emp_firstname']) {
+                if ($localEmp['fname'] !== $harleyEmp['fname']) {
                     $needsUpdate = true;
                     $changes[] = 'first name';
                 }
-                if ($localEmp['lname'] !== $harleyEmp['emp_lastname']) {
+                if ($localEmp['lname'] !== $harleyEmp['lname']) {
                     $needsUpdate = true;
                     $changes[] = 'last name';
                 }
-                if ($localEmp['email'] !== $harleyEmp['emp_email']) {
+                if ($localEmp['email'] !== $harleyEmp['email']) {
                     $needsUpdate = true;
                     $changes[] = 'email';
                 }
-                if ($localEmp['contact'] !== $harleyEmp['emp_mobilenum']) {
+                if ($localEmp['personal_email'] !== $harleyEmp['personal_email']) {
+                    $needsUpdate = true;
+                    $changes[] = 'personal email';
+                }
+                if ($localEmp['contact'] !== $harleyEmp['contact']) {
                     $needsUpdate = true;
                     $changes[] = 'contact';
                 }
+                if ($localEmp['position'] !== $harleyEmp['position']) {
+                    $needsUpdate = true;
+                    $changes[] = 'position';
+                }
+                if ($localEmp['company'] !== $harleyEmp['company']) {
+                    $needsUpdate = true;
+                    $changes[] = 'company';
+                }
+                if ($localEmp['official_sched'] != $harleyEmp['official_sched']) {
+                    $needsUpdate = true;
+                    $changes[] = 'schedule';
+                }
+                if ($localEmp['role'] !== $harleyEmp['role']) {
+                    $needsUpdate = true;
+                    $changes[] = 'role';
+                }
+                if ($localEmp['admin_rights_hdesk'] !== $harleyEmp['admin_rights_hdesk']) {
+                    $needsUpdate = true;
+                    $changes[] = 'admin rights';
+                }
                 
                 if ($needsUpdate) {
-                    // Update existing employee data from Harley
+                    // Update existing employee data from Harley (don't update username/password)
                     $empData = [
-                        'fname' => $harleyEmp['emp_firstname'],
-                        'lname' => $harleyEmp['emp_lastname'],
-                        'email' => $harleyEmp['emp_email'],
-                        'company' => $harleyEmp['emp_company_code'] ?? 'RSO',
-                        'position' => $harleyEmp['emp_position_id'] ?? null,
-                        'contact' => $harleyEmp['emp_mobilenum'] ?? null,
+                        'fname' => $harleyEmp['fname'],
+                        'lname' => $harleyEmp['lname'],
+                        'email' => $harleyEmp['email'],
+                        'personal_email' => $harleyEmp['personal_email'],
+                        'company' => $harleyEmp['company'],
+                        'position' => $harleyEmp['position'],
+                        'contact' => $harleyEmp['contact'],
+                        'official_sched' => $harleyEmp['official_sched'],
+                        'role' => $harleyEmp['role'],
+                        'admin_rights_hdesk' => $harleyEmp['admin_rights_hdesk'],
+                        'profile_picture' => $harleyEmp['profile_picture'],
                         'status' => 'active'
                     ];
                     
-                    $isUpdated = $employeeModel->updateByEmployeeId($harleyEmp['emp_id'], $empData);
+                    $isUpdated = $employeeModel->updateByEmployeeId($harleyEmp['id'], $empData);
                     if ($isUpdated) {
                         $updated++;
                         $changesStr = implode(', ', $changes);
                         echo "<tr class='status-updated'>
-                                <td>{$harleyEmp['emp_id']}</td>
+                                <td>{$harleyEmp['id']}</td>
                                 <td>$fullName</td>
-                                <td>{$harleyEmp['emp_email']}</td>
+                                <td>{$harleyEmp['email']}</td>
                                 <td><span class='badge badge-info'>UPDATED</span> ($changesStr)</td>
                               </tr>";
                     } else {
                         $errors++;
                         echo "<tr class='status-error'>
-                                <td>{$harleyEmp['emp_id']}</td>
+                                <td>{$harleyEmp['id']}</td>
                                 <td>$fullName</td>
-                                <td>{$harleyEmp['emp_email']}</td>
+                                <td>{$harleyEmp['email']}</td>
                                 <td><span class='badge badge-danger'>ERROR</span> update failed</td>
                               </tr>";
                     }
@@ -303,9 +343,9 @@ try {
                     // No changes needed
                     $skipped++;
                     echo "<tr class='status-skipped'>
-                            <td>{$harleyEmp['emp_id']}</td>
+                            <td>{$harleyEmp['id']}</td>
                             <td>$fullName</td>
-                            <td>{$harleyEmp['emp_email']}</td>
+                            <td>{$harleyEmp['email']}</td>
                             <td><span class='badge badge-warning'>SKIPPED</span> No changes needed</td>
                           </tr>";
                 }
@@ -313,9 +353,9 @@ try {
         } catch (Exception $e) {
             $errors++;
             echo "<tr class='status-error'>
-                    <td>{$harleyEmp['emp_id']}</td>
+                    <td>{$harleyEmp['id']}</td>
                     <td>$fullName</td>
-                    <td>{$harleyEmp['emp_email']}</td>
+                    <td>{$harleyEmp['email']}</td>
                     <td><span class='badge badge-danger'>ERROR</span> " . htmlspecialchars($e->getMessage()) . "</td>
                   </tr>";
         }
