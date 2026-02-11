@@ -19,12 +19,11 @@ class User {
                 VALUES (:username, :email, :password, :full_name, :role, :department, :phone)";
         
         $stmt = $this->db->prepare($sql);
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
         $stmt->execute([
             ':username' => $data['username'],
             ':email' => $data['email'],
-            ':password' => $hashedPassword,
+            ':password' => $data['password'],
             ':full_name' => $data['full_name'],
             ':role' => $data['role'] ?? 'employee',
             ':department' => $data['department'] ?? null,
@@ -77,7 +76,7 @@ class User {
             $user = $this->findByEmail($username);
         }
         
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && $password === $user['password']) {
             return $user;
         }
         
@@ -499,7 +498,6 @@ class User {
                 VALUES (:username, :email, :password, :full_name, :role, :role_id, :department, :phone, :created_by)";
         
         $stmt = $this->db->prepare($sql);
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
         // Map role_id to legacy role string for backward compatibility
         $legacyRole = 'employee';
@@ -516,7 +514,7 @@ class User {
         $result = $stmt->execute([
             ':username' => $data['username'],
             ':email' => $data['email'],
-            ':password' => $hashedPassword,
+            ':password' => $data['password'],
             ':full_name' => $data['full_name'],
             ':role' => $data['role'] ?? $legacyRole,
             ':role_id' => $data['role_id'] ?? null,

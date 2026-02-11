@@ -118,7 +118,7 @@ class ProfileController {
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         // Validate current password
-        if (!password_verify($currentPassword, $this->currentUser['password'])) {
+        if ($currentPassword !== $this->currentUser['password']) {
             $_SESSION['error'] = "Current password is incorrect.";
             redirect('customer/profile.php#change-password');
             return;
@@ -138,8 +138,7 @@ class ProfileController {
         }
 
         // Update password
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        if ($this->employeeModel->update($this->currentUser['id'], ['password' => $hashedPassword])) {
+        if ($this->employeeModel->update($this->currentUser['id'], ['password' => $newPassword])) {
             $_SESSION['success'] = "Password changed successfully!";
         } else {
             $_SESSION['error'] = "Failed to change password. Please try again.";

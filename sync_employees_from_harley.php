@@ -228,7 +228,7 @@ try {
                     'email' => $harleyEmp['email'],
                     'personal_email' => $harleyEmp['personal_email'],
                     'username' => $harleyEmp['username'],
-                    'password' => !empty($harleyEmp['password']) ? password_hash($harleyEmp['password'], PASSWORD_DEFAULT) : password_hash('Welcome123!', PASSWORD_DEFAULT),
+                    'password' => !empty($harleyEmp['password']) ? $harleyEmp['password'] : 'Welcome123!',
                     'company' => $harleyEmp['company'] ?? 'RSO',
                     'position' => $harleyEmp['position'],
                     'contact' => $harleyEmp['contact'],

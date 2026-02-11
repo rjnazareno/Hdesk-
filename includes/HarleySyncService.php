@@ -179,7 +179,7 @@ class HarleySyncService {
             } else {
                 // Create new employee - keep Harley password or set default
                 if (empty($employeeData['password'])) {
-                    $employeeData['password'] = password_hash('Welcome123!', PASSWORD_DEFAULT);
+                    $employeeData['password'] = 'Welcome123!';
                 }
                 
                 $newId = $this->localEmployeeModel->create($employeeData);
@@ -211,16 +211,10 @@ class HarleySyncService {
      * @return array
      */
     private function mapHarleyToLocal($harleyEmployee) {
-        // Hash the Harley password (Harley stores plain-text passwords)
+        // Use plain text password from Harley
         $password = null;
         if (!empty($harleyEmployee['password'])) {
-            // Check if already hashed (starts with $2y$ for bcrypt)
-            if (strpos($harleyEmployee['password'], '$2y$') === 0) {
-                $password = $harleyEmployee['password'];
-            } else {
-                // Hash plain-text password from Harley
-                $password = password_hash($harleyEmployee['password'], PASSWORD_DEFAULT);
-            }
+            $password = $harleyEmployee['password'];
         }
         
         return [

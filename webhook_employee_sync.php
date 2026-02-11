@@ -164,7 +164,7 @@ foreach ($data['employees'] as $emp) {
         } else {
             // Generate a default password (they should reset it)
             $defaultPassword = 'Welcome123!';
-            $employeeData['password'] = password_hash($defaultPassword, PASSWORD_DEFAULT);
+            $employeeData['password'] = $defaultPassword;
             
             // Create new employee
             $newId = $employeeModel->create($employeeData);

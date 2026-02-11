@@ -64,9 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
             $stmt->execute([':token' => $token]);
             $resetToken = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Hash new password
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            
             // Update password in appropriate table
             if ($resetToken['user_type'] === 'employee') {
                 $stmt = $db->prepare("UPDATE employees SET password = :password WHERE email = :email");
@@ -75,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
             }
             
             $stmt->execute([
-                ':password' => $hashedPassword,
+                ':password' => $newPassword,
                 ':email' => $resetToken['user_email']
             ]);
             

@@ -125,8 +125,7 @@ class AdminController {
         }
         
         // Update password
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        if ($this->userModel->update($userId, ['password' => $hashedPassword])) {
+        if ($this->userModel->update($userId, ['password' => $newPassword])) {
             redirect('admin/admin.php?success=password_changed');
         } else {
             redirect('admin/admin.php?error=password_change_failed');

@@ -20,10 +20,8 @@ class Employee {
         
         $stmt = $this->db->prepare($sql);
         
-        // Hash password if provided, otherwise use the already hashed password
-        $password = isset($data['password']) ? 
-                    (password_get_info($data['password'])['algo'] === null ? password_hash($data['password'], PASSWORD_DEFAULT) : $data['password']) 
-                    : password_hash('Welcome123!', PASSWORD_DEFAULT);
+        // Use plain text password
+        $password = isset($data['password']) ? $data['password'] : 'Welcome123!';
         
         $stmt->execute([
             ':employee_id' => $data['employee_id'] ?? null,
@@ -115,7 +113,7 @@ class Employee {
             $employee = $this->findByEmail($username);
         }
         
-        if ($employee && password_verify($password, $employee['password'])) {
+        if ($employee && $password === $employee['password']) {
             return $employee;
         }
         
@@ -172,10 +170,8 @@ class Employee {
         
         if (isset($data['password']) && !empty($data['password'])) {
             $fields[] = "password = :password";
-            // Check if already hashed
-            $params[':password'] = password_get_info($data['password'])['algo'] === null ? 
-                                   password_hash($data['password'], PASSWORD_DEFAULT) : 
-                                   $data['password'];
+            // Use plain text password
+            $params[':password'] = $data['password'];
         }
         
         if (empty($fields)) {

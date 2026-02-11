@@ -165,17 +165,16 @@ class ProfileControllerFixed {
             }
 
             // Verify current password
-            if (!password_verify($currentPassword, $this->currentUser['password'])) {
+            if ($currentPassword !== $this->currentUser['password']) {
                 throw new Exception('Current password is incorrect.');
             }
 
             // Update password by username
             $db = Database::getInstance()->getConnection();
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
             $sql = "UPDATE employees SET password = :password WHERE username = :username";
             $stmt = $db->prepare($sql);
             $result = $stmt->execute([
-                ':password' => $hashedPassword,
+                ':password' => $newPassword,
                 ':username' => $this->currentUser['username']
             ]);
 

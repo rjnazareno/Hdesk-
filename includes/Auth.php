@@ -203,7 +203,7 @@ class Auth {
         // Try users table first (IT staff/admin)
         $user = $this->userModel->findByUsername($username);
         
-        if ($user && $user['is_active'] && password_verify($password, $user['password'])) {
+        if ($user && $user['is_active'] && $password === $user['password']) {
             return [
                 'user' => $user,
                 'type' => 'user'
