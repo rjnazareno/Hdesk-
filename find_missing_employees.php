@@ -58,17 +58,30 @@ try {
     $localEmployees = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Create lookup array by employee_id (Harley ID)
+    // Note: Local database stores employee_id as numbers (1, 2, 3...) from old records
+    // or as strings like "HRLY-1", "HRLY-2" from new synced records
     $localByHarleyId = [];
     foreach ($localEmployees as $emp) {
         if ($emp['employee_id']) {
+            // Store by both formats to handle old and new records
             $localByHarleyId[$emp['employee_id']] = $emp;
+            
+            // If it starts with HRLY-, also store by numeric ID
+            if (strpos($emp['employee_id'], 'HRLY-') === 0) {
+                $numericId = str_replace('HRLY-', '', $emp['employee_id']);
+                $localByHarleyId[$numericId] = $emp;
+            }
         }
     }
     
     // Find missing employees
     $missing = [];
     foreach ($harleyEmployees as $harleyEmp) {
-        if (!isset($localByHarleyId[$harleyEmp['id']])) {
+        // Check both the numeric ID and the HRLY- prefixed version
+        $harleyId = $harleyEmp['id'];
+        $harleyIdPrefixed = 'HRLY-' . $harleyId;
+        
+        if (!isset($localByHarleyId[$harleyId]) && !isset($localByHarleyId[$harleyIdPrefixed])) {
             $missing[] = $harleyEmp;
         }
     }

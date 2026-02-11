@@ -31,13 +31,34 @@ if ($_POST && isset($_POST['confirm']) && $_POST['confirm'] === 'YES_RESET_ALL_R
         echo "<li><strong>Super Admins:</strong> {$before['superadmin_count']}</li>";
         echo "</ul>";
         
-        // Reset all admin rights (but keep superadmin protected)
+        // Reset all admin rights (but keep superadmin protected)  
+        // First, get count of current superadmins for protection
+        $sqlCheck = "SELECT COUNT(*) as superadmin_count FROM employees WHERE admin_rights_hdesk = 'superadmin'";
+        $stmtCheck = $db->prepare($sqlCheck);
+        $stmtCheck->execute();
+        $superadminCheck = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        
+        echo "<p><strong>Protecting {$superadminCheck['superadmin_count']} Super Admin accounts from reset...</strong></p>";
+        
+        // More explicit SQL to avoid affecting superadmin accounts
         $sql = "UPDATE employees 
                 SET admin_rights_hdesk = NULL, role = 'employee' 
-                WHERE admin_rights_hdesk != 'superadmin' OR admin_rights_hdesk IS NULL";
+                WHERE (admin_rights_hdesk = 'hr' OR admin_rights_hdesk = 'it' OR admin_rights_hdesk IS NULL)
+                AND admin_rights_hdesk != 'superadmin'";
         $stmt = $db->prepare($sql);
         $result = $stmt->execute();
         $affectedRows = $stmt->rowCount();
+        
+        // Verify superadmins are still there
+        $stmtCheck->execute();
+        $superadminAfter = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        
+        if ($superadminAfter['superadmin_count'] != $superadminCheck['superadmin_count']) {
+            echo "<p style='color: red;'>⚠️ WARNING: Super Admin count changed from {$superadminCheck['superadmin_count']} to {$superadminAfter['superadmin_count']}!</p>";
+            echo "<p><a href='restore_superadmin.php'>🔧 Click here to restore Super Admin accounts</a></p>";
+        } else {
+            echo "<p style='color: green;'>✅ Super Admin accounts protected successfully.</p>";
+        }
         
         if ($result) {
             echo "<p style='color: green;'>✅ <strong>SUCCESS!</strong> Reset {$affectedRows} employee admin rights.</p>";
