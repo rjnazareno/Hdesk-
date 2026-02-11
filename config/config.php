@@ -187,14 +187,16 @@ function generateTicketNumber() {
 
 /**
  * Helper function to load Tailwind CSS appropriately
- * Development: Uses CDN (faster iteration)
- * Production: Uses local compiled CSS with glass morphism support
+ * Always uses local minified CSS for best performance
  * 
  * @return string HTML string with Tailwind CSS
  */
 function getTailwindCSS() {
-    // Use locally built Tailwind CSS v3
-    return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/tailwind.css">';
+    // Use minified version for faster loading
+    $cssFile = file_exists(__DIR__ . '/../assets/css/tailwind.min.css') 
+        ? 'tailwind.min.css' 
+        : 'tailwind.css';
+    return '<link rel="stylesheet" href="' . ASSETS_URL . 'css/' . $cssFile . '">';
 }
 
 // Explicitly load Auth class to ensure it's always available

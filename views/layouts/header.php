@@ -5,13 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle ?? (defined('APP_NAME') ? APP_NAME : 'ServiceHub'); ?></title>
     
-    <!-- Tailwind CSS: Uses CDN in development, local file in production -->
-    <?php echo getTailwindCSS(); ?>
+    <!-- Tailwind CSS: Optimized local build -->
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>css/tailwind.min.css">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome: Check for local or CDN fallback -->
+    <?php if (file_exists(__DIR__ . '/../../assets/css/fontawesome.min.css')): ?>
+        <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>css/fontawesome.min.css">
+        <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>css/solid.min.css">
+    <?php else: ?>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <?php endif; ?>
     
     <?php if (isset($includeChartJs) && $includeChartJs): ?>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+        <?php if (file_exists(__DIR__ . '/../../assets/js/chart.min.js')): ?>
+            <script src="<?php echo ASSETS_URL; ?>js/chart.min.js"></script>
+        <?php else: ?>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+        <?php endif; ?>
     <?php endif; ?>
     
     <!-- Firebase SDK for Cloud Messaging -->
