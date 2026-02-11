@@ -68,10 +68,10 @@ try {
     
     // Show recent HR admin assignments
     echo "<h2>4. Recent HR Admin Employees</h2>";
-    $sql = "SELECT id, fname, lname, username, employee_id, admin_rights_hdesk, created_at, updated_at 
+    $sql = "SELECT id, fname, lname, username, employee_id, admin_rights_hdesk, created_at 
             FROM employees 
             WHERE admin_rights_hdesk = 'hr' 
-            ORDER BY updated_at DESC 
+            ORDER BY id DESC 
             LIMIT 10";
     $stmt = $db->prepare($sql);
     $stmt->execute();
@@ -81,16 +81,15 @@ try {
         echo "<p>No HR admins found.</p>";
     } else {
         echo "<table border='1' cellpadding='5'>";
-        echo "<tr><th>ID</th><th>Name</th><th>Username</th><th>Employee_ID</th><th>Rights</th><th>Created</th><th>Updated</th></tr>";
+        echo "<tr><th>ID</th><th>Name</th><th>Username</th><th>Employee_ID</th><th>Rights</th><th>Created</th></tr>";
         foreach ($hrAdmins as $admin) {
             echo "<tr>";
-            echo "<td>{$admin['id']}</td>";
+            echo "<td style='background-color: " . ($admin['id'] == 0 ? '#ffe6e6' : '#e6ffe6') . ";'>{$admin['id']}</td>";
             echo "<td>{$admin['fname']} {$admin['lname']}</td>";
             echo "<td>{$admin['username']}</td>";
             echo "<td>{$admin['employee_id']}</td>";
             echo "<td>{$admin['admin_rights_hdesk']}</td>";
             echo "<td>{$admin['created_at']}</td>";
-            echo "<td>{$admin['updated_at']}</td>";
             echo "</tr>";
         }
         echo "</table>";
