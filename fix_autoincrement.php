@@ -45,47 +45,50 @@ try {
     echo "   Highest ID: $maxId\n";
     echo "   Next ID will be: $nextId\n\n";
     
-    // Step 4: Fix the id column to be AUTO_INCREMENT
-    echo "5. Modifying tickets table to add AUTO_INCREMENT...\n";
+    // Step 4: Check if PRIMARY KEY exists
+    echo "5. Checking for PRIMARY KEY on id column...\n";
+    $stmt = $db->query("SHOW KEYS FROM tickets WHERE Key_name = 'PRIMARY'");
+    $hasPrimaryKey = $stmt->rowCount() > 0;
     
-    // First, let's make sure id is the primary key and auto_increment
-    $sql = "ALTER TABLE tickets MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT";
-    
-    try {
-        $db->exec($sql);
-        echo "   ✓ Successfully set id column to AUTO_INCREMENT\n\n";
-    } catch (PDOException $e) {
-        // If that fails, try dropping and recreating
-        echo "   First attempt failed, trying alternative method...\n";
-        echo "   Error: " . $e->getMessage() . "\n\n";
-        
-        // Alternative: Drop primary key, modify, add back
+    if ($hasPrimaryKey) {
+        echo "   ✓ PRIMARY KEY exists\n\n";
+    } else {
+        echo "   ✗ No PRIMARY KEY found, adding it now...\n";
         try {
-            echo "   Attempting to fix primary key...\n";
-            $db->exec("ALTER TABLE tickets DROP PRIMARY KEY");
-            $db->exec("ALTER TABLE tickets MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY");
-            echo "   ✓ Successfully fixed using alternative method\n\n";
-        } catch (PDOException $e2) {
-            echo "   ✗ Alternative method also failed: " . $e2->getMessage() . "\n";
-            throw $e2;
+            $db->exec("ALTER TABLE tickets ADD PRIMARY KEY (id)");
+            echo "   ✓ PRIMARY KEY added to id column\n\n";
+        } catch (PDOException $e) {
+            echo "   ✗ Failed to add PRIMARY KEY: " . $e->getMessage() . "\n\n";
+            throw $e;
         }
     }
     
-    // Step 6: Set the auto_increment value
-    echo "6. Setting AUTO_INCREMENT to start at $nextId...\n";
+    // Step 5: Now add AUTO_INCREMENT
+    echo "6. Adding AUTO_INCREMENT to id column...\n";
+    
+    try {
+        $db->exec("ALTER TABLE tickets MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT");
+        echo "   ✓ Successfully set id column to AUTO_INCREMENT\n\n";
+    } catch (PDOException $e) {
+        echo "   ✗ Failed to add AUTO_INCREMENT: " . $e->getMessage() . "\n\n";
+        throw $e;
+    }
+    
+    // Step 7: Set the auto_increment value
+    echo "7. Setting AUTO_INCREMENT to start at $nextId...\n";
     $db->exec("ALTER TABLE tickets AUTO_INCREMENT = $nextId");
     echo "   ✓ AUTO_INCREMENT set to $nextId\n\n";
     
-    // Step 7: Verify the fix
-    echo "7. Verifying the fix...\n";
+    // Step 8: Verify the fix
+    echo "8. Verifying the fix...\n";
     $stmt = $db->query("SHOW CREATE TABLE tickets");
     $result = $stmt->fetch();
     
     if (strpos($result['Create Table'], 'AUTO_INCREMENT') !== false) {
         echo "   ✓ AUTO_INCREMENT is now enabled!\n\n";
         
-        // Step 8: Test with a real insert
-        echo "8. Testing with a real ticket insert...\n";
+        // Step 9: Test with a real insert
+        echo "9. Testing with a real ticket insert...\n";
         $testTicket = [
             'ticket_number' => 'FIX-TEST-' . time(),
             'title' => 'Auto-increment test',
