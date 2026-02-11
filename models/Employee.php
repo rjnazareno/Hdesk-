@@ -145,6 +145,30 @@ class Employee {
     }
     
     /**
+     * Get employees by role (internal/employee)
+     */
+    public function getByRole($role, $status = 'active') {
+        $sql = "SELECT id, username, email, personal_email, fname, lname, company, position, contact, role, admin_rights_hdesk, status, profile_picture, created_at 
+                FROM employees WHERE role = :role";
+        
+        if ($status) {
+            $sql .= " AND status = :status";
+        }
+        
+        $sql .= " ORDER BY fname ASC, lname ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $params = [':role' => $role];
+        
+        if ($status) {
+            $params[':status'] = $status;
+        }
+        
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+    
+    /**
      * Update employee
      */
     public function update($id, $data) {

@@ -57,19 +57,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['employee_id']) && iss
     exit;
 }
 
-// Get all employees
-$employees = $employeeModel->getAll('active');
+// Get all employees with role='internal' (eligible for admin rights)
+// Regular employees (role='employee') cannot have admin rights
+$internalEmployees = $employeeModel->getByRole('internal', 'active');
 
-// Separate admin employees from regular employees
-$adminEmployees = array_filter($employees, fn($e) => !empty($e['admin_rights_hdesk']));
-$regularEmployees = array_filter($employees, fn($e) => empty($e['admin_rights_hdesk']));
+// Separate admin employees from internal employees without rights
+$adminEmployees = array_filter($internalEmployees, fn($e) => !empty($e['admin_rights_hdesk']));
+$regularEmployees = array_filter($internalEmployees, fn($e) => empty($e['admin_rights_hdesk']));
 
 // Stats
 $stats = [
-    'total' => count($employees),
-    'superadmin' => count(array_filter($employees, fn($e) => $e['admin_rights_hdesk'] === 'superadmin')),
-    'it' => count(array_filter($employees, fn($e) => $e['admin_rights_hdesk'] === 'it')),
-    'hr' => count(array_filter($employees, fn($e) => $e['admin_rights_hdesk'] === 'hr'))
+    'total' => count($internalEmployees),
+    'superadmin' => count(array_filter($internalEmployees, fn($e) => $e['admin_rights_hdesk'] === 'superadmin')),
+    'it' => count(array_filter($internalEmployees, fn($e) => $e['admin_rights_hdesk'] === 'it')),
+    'hr' => count(array_filter($internalEmployees, fn($e) => $e['admin_rights_hdesk'] === 'hr'))
 ];
 
 $pageTitle = 'Manage Employee Admin Rights';
@@ -85,7 +86,7 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">Employee Admin Rights</h1>
-                <p class="text-sm text-gray-500">Manage admin access for employees</p>
+                <p class="text-sm text-gray-500">Manage admin access for internal employees (role='internal' only)</p>
             </div>
         </div>
     </div>
@@ -98,7 +99,7 @@ include __DIR__ . '/../views/layouts/header.php';
                     <i class="fas fa-users text-gray-600"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">Total Employees</p>
+                    <p class="text-sm text-gray-500">Internal Employees</p>
                     <p class="text-2xl font-bold text-gray-900"><?= $stats['total'] ?></p>
                 </div>
             </div>
@@ -254,7 +255,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         <h2 class="text-lg font-semibold text-gray-900">
                             <i class="fas fa-user-plus mr-2 text-blue-600"></i>Assign Admin Rights
                         </h2>
-                        <p class="text-sm text-gray-500 mt-1">Grant admin access to regular employees</p>
+                        <p class="text-sm text-gray-500 mt-1">Grant admin access to internal employees (role='internal' without rights)</p>
                     </div>
                     <div class="relative">
                         <input type="text" id="employeeSearch" placeholder="Search employees..." 
@@ -265,10 +266,18 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             
             <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <?php if (empty($regularEmployees)): ?>
+                <div class="p-8 text-center text-gray-500">
+                    <i class="fas fa-trophy text-4xl mb-3 text-yellow-500"></i>
+                    <p class="font-medium">All internal employees have admin rights!</p>
+                    <p class="text-sm mt-1">No more internal staff to assign rights to.</p>
+                    <p class="text-xs mt-2 text-gray-400">Tip: Regular employees (role='employee') cannot have admin rights.</p>
+                </div>
+                <?php else: ?>
                 <table class="w-full">
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Internal Employee</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assign Rights</th>
@@ -308,6 +317,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <?php endif; ?>
             </div>
         </div>
     </div>
