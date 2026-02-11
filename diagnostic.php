@@ -15,6 +15,9 @@ echo "=== IT Help Desk Diagnostic ===\n\n";
 echo "1. Testing Database Connection...\n";
 try {
     $db = Database::getInstance()->getConnection();
+    if ($db === null) {
+        throw new Exception("Database connection returned null");
+    }
     echo "   ✓ Database connected successfully\n";
     echo "   Database: " . DB_NAME . "\n\n";
 } catch (Exception $e) {
