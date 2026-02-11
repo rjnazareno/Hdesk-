@@ -5,7 +5,7 @@
  * This file handles push notifications when the app is closed or in background
  */
 
-// Import Firebase scripts
+// Import Firebase scriptsssssss
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
 
