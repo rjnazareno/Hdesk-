@@ -5,9 +5,9 @@
  */
 
 // ============================================================
-// PRODUCTION: Hostinger Remote Database
+// PRODUCTION: Hostinger Database (localhost - same server)
 // ============================================================
-define('HARLEY_DB_HOST', 'srv1866.hstgr.io');
+define('HARLEY_DB_HOST', 'localhost');
 define('HARLEY_DB_NAME', 'u816220874_calendartype');
 define('HARLEY_DB_USER', 'u816220874_calendartype');
 define('HARLEY_DB_PASS', 'Gr33n$$wRf');
