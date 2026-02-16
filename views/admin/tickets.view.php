@@ -264,8 +264,8 @@ include __DIR__ . '/../layouts/header.php';
                     <tbody class="divide-y divide-gray-100">
                         <?php if (empty($tickets)): ?>
                         <tr>
-                            <td colspan="<?php echo $currentView === 'pool' ? '5' : ($isITStaff ? '9' : '6'); ?>" class="px-6 py-20 text-center">
-                                <div class="flex flex-col items-center justify-center gap-4">
+                            <td colspan="<?php echo $currentView === 'pool' ? '5' : ($isITStaff ? '9' : '6'); ?>" class="px-6 text-center">
+                                <div class="flex flex-col items-center justify-center gap-5 py-32">
                                     <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                                         <i class="fas fa-inbox text-3xl text-gray-400"></i>
                                     </div>
@@ -273,7 +273,7 @@ include __DIR__ . '/../layouts/header.php';
                                         <p class="text-gray-900 font-semibold text-lg">No tickets found</p>
                                         <p class="text-sm text-gray-500 mt-1">Try adjusting your filters or create a new ticket</p>
                                     </div>
-                                    <a href="create_ticket.php" class="mt-2 inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium">
+                                    <a href="create_ticket.php" class="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium shadow-sm">
                                         <i class="fas fa-plus mr-2"></i>Create Ticket
                                     </a>
                                 </div>
