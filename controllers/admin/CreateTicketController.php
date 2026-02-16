@@ -156,7 +156,7 @@ class CreateTicketController {
             'status' => 'pending',
             'submitter_id' => (int)$_POST['submitter_id'],
             'submitter_type' => 'employee',
-            'assigned_to' => isset($_POST['assigned_to']) && !empty($_POST['assigned_to']) ? (int)$_POST['assigned_to'] : null
+            'assigned_to' => null // Tickets go directly to pool, no auto-assignment
         ];
         
         // Handle file upload

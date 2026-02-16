@@ -500,25 +500,6 @@ include __DIR__ . '/../layouts/header.php';
                         </div>
                     </div>
                     
-                    <!-- Assign To (Admin Only) -->
-                    <div class="mb-6">
-                        <label class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                            <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center mr-2">
-                                <i class="fas fa-user-tag text-indigo-600 text-sm"></i>
-                            </div>
-                            Assign To <span class="text-gray-400 font-normal ml-1">(Optional)</span>
-                        </label>
-                        <select name="assigned_to" id="assigned_to" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white text-sm cursor-pointer">
-                            <option value="">Auto-assign (leave empty)</option>
-                            <?php foreach ($itStaff as $staff): ?>
-                            <option value="<?php echo $staff['id']; ?>">
-                                <?php echo htmlspecialchars($staff['full_name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-2">Leave empty for automatic assignment based on department</p>
-                    </div>
-                    
                     <!-- Description -->
                     <div class="mb-6">
                         <label for="description" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
@@ -600,10 +581,6 @@ include __DIR__ . '/../layouts/header.php';
                             <div class="bg-white p-4">
                                 <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Priority</p>
                                 <p class="text-sm font-semibold text-slate-800" id="reviewPriority">-</p>
-                            </div>
-                            <div class="bg-white p-4">
-                                <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Assigned To</p>
-                                <p class="text-sm font-semibold text-slate-800" id="reviewAssigned">Auto-assign</p>
                             </div>
                             <div class="bg-white p-4">
                                 <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Attachment</p>
@@ -1022,10 +999,6 @@ include __DIR__ . '/../layouts/header.php';
         const priority = document.querySelector('input[name="priority"]:checked');
         const priorityLabels = { low: '🟢 Low', medium: '🟡 Medium', high: '� High' };
         document.getElementById('reviewPriority').textContent = priority ? priorityLabels[priority.value] : '-';
-        
-        const assignedSelect = document.getElementById('assigned_to');
-        const assignedText = assignedSelect.value ? assignedSelect.options[assignedSelect.selectedIndex].text : 'Auto-assign';
-        document.getElementById('reviewAssigned').textContent = assignedText;
         
         document.getElementById('reviewTitle').textContent = document.getElementById('title').value || '-';
         document.getElementById('reviewDescription').textContent = document.getElementById('description').value || '-';
