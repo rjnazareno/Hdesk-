@@ -155,7 +155,7 @@
                                         </span>
                                         <span class="text-[10px] text-gray-400"><?= date('M d, g:i A', strtotime($reply['created_at'])) ?></span>
                                     </div>
-                                    <div class="<?= $isMe ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-800' ?> rounded-2xl px-4 py-3 text-sm leading-relaxed <?= $isMe ? 'rounded-tr-md' : 'rounded-tl-md' ?>">
+                                    <div class="<?= $isMe ? 'bg-blue-50 text-gray-800 border border-blue-200' : 'bg-gray-100 text-gray-800' ?> rounded-2xl px-4 py-3 text-sm leading-relaxed <?= $isMe ? 'rounded-tr-md' : 'rounded-tl-md' ?>">
                                         <?= nl2br(htmlspecialchars($reply['message'])) ?>
                                     </div>
                                 </div>
