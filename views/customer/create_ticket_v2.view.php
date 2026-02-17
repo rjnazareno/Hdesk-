@@ -385,7 +385,7 @@
                                             Priority is automatically assigned based on your issue type
                                         </span>
                                         <p class="text-xs text-amber-700 mt-1">
-                                            IT staff will review and adjust if necessary
+                                            You can change the priority if needed. Our team will review and adjust if necessary
                                         </p>
                                     </div>
                                 </div>
@@ -404,28 +404,28 @@
                                 </div>
                             </div>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 opacity-60 pointer-events-none">
-                                <label class="priority-option relative">
-                                    <input type="radio" name="priority" value="low" class="hidden peer" disabled>
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-green-500 peer-checked:bg-green-50 transition-all bg-gray-50">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <label class="priority-option relative cursor-pointer">
+                                    <input type="radio" name="priority" value="low" class="hidden peer">
+                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-green-500 peer-checked:bg-green-50 transition-all hover:border-green-300 hover:bg-green-50/50">
                                         <span class="text-2xl">🟢</span>
                                         <p class="text-sm font-medium mt-1">Low</p>
                                         <p class="text-xs text-gray-500">Response: 1 day</p>
                                         <p class="text-xs text-gray-400">Resolution: 3–5 days</p>
                                     </div>
                                 </label>
-                                <label class="priority-option relative">
-                                    <input type="radio" name="priority" value="medium" class="hidden peer" checked disabled>
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-yellow-500 peer-checked:bg-yellow-50 transition-all bg-gray-50">
+                                <label class="priority-option relative cursor-pointer">
+                                    <input type="radio" name="priority" value="medium" class="hidden peer" checked>
+                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-yellow-500 peer-checked:bg-yellow-50 transition-all hover:border-yellow-300 hover:bg-yellow-50/50">
                                         <span class="text-2xl">🟡</span>
                                         <p class="text-sm font-medium mt-1">Medium</p>
                                         <p class="text-xs text-gray-500">Response: 4 hours</p>
                                         <p class="text-xs text-gray-400">Resolution: 2–3 days</p>
                                     </div>
                                 </label>
-                                <label class="priority-option relative">
-                                    <input type="radio" name="priority" value="high" class="hidden peer" disabled>
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-red-500 peer-checked:bg-red-50 transition-all bg-gray-50">
+                                <label class="priority-option relative cursor-pointer">
+                                    <input type="radio" name="priority" value="high" class="hidden peer">
+                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-red-500 peer-checked:bg-red-50 transition-all hover:border-red-300 hover:bg-red-50/50">
                                         <span class="text-2xl">🔴</span>
                                         <p class="text-sm font-medium mt-1">High</p>
                                         <p class="text-xs text-gray-500">Response: 30 mins</p>

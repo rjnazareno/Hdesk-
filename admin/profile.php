@@ -15,11 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'email' => sanitize($_POST['email'] ?? '')
     ];
     
-    // Only update password if provided
-    if (!empty($_POST['password'])) {
-        $data['password'] = $_POST['password'];
-    }
-    
     // Validate
     $errors = [];
     if (empty($data['full_name'])) $errors[] = 'Full name is required';
@@ -146,32 +141,6 @@ include __DIR__ . '/../views/layouts/header.php';
                             <p class="mt-1 text-xs text-gray-500">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Username cannot be changed
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Security Card -->
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                            <i class="fas fa-lock mr-2 text-blue-600"></i>
-                            Change Password
-                        </h2>
-                    </div>
-                    <div class="p-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-900 mb-2">
-                                New Password
-                            </label>
-                            <input type="password" 
-                                   name="password" 
-                                   placeholder="Leave blank to keep current password"
-                                   autocomplete="new-password"
-                                   class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <p class="mt-2 text-xs text-gray-500">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Only fill this if you want to change your password
                             </p>
                         </div>
                     </div>

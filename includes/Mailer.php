@@ -181,7 +181,7 @@ class Mailer {
                 <div style='background-color: #fff; padding: 30px; border-radius: 5px;'>
                     <h2 style='color: #2563eb; margin-bottom: 20px;'>Ticket Created Successfully</h2>
                     <p>Dear {$submitter['full_name']},</p>
-                    <p>Your support ticket has been created successfully. Our IT team will review it shortly.</p>
+                    <p>Your support ticket has been created successfully. Our team will review it shortly.</p>
                     
                     <div style='background-color: #f9fafb; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0;'>
                         <p style='margin: 5px 0;'><strong>Ticket Number:</strong> {$ticket['ticket_number']}</p>
@@ -192,7 +192,7 @@ class Mailer {
                     
                     <p>You can track your ticket status by logging into the IT Help Desk portal.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>IT Help Desk Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
                 </div>
             </div>
         </body>
@@ -222,7 +222,7 @@ class Mailer {
                     
                     <p>Please log in to the IT Help Desk portal to view and manage this ticket.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>IT Help Desk System</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
                 </div>
             </div>
         </body>
@@ -252,7 +252,7 @@ class Mailer {
                     
                     <p>You can view more details by logging into the IT Help Desk portal.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>IT Help Desk Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
                 </div>
             </div>
         </body>
@@ -281,7 +281,7 @@ class Mailer {
                     
                     <p>If you have any further issues or questions, please don't hesitate to create a new ticket.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>IT Help Desk Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
                 </div>
             </div>
         </body>
@@ -357,7 +357,7 @@ class Mailer {
                     <p style='font-size: 14px; color: #64748b;'>If the button doesn't work, copy and paste this link into your browser:</p>
                     <p style='font-size: 12px; color: #0ea5e9; word-break: break-all;'>{$resetLink}</p>
                     
-                    <p style='margin-top: 30px; font-size: 14px;'>Best regards,<br><strong>IT Help Desk Team</strong></p>
+                    <p style='margin-top: 30px; font-size: 14px;'>Best regards,<br><strong>Our Team</strong></p>
                     
                     <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'>
                     <p style='font-size: 12px; color: #94a3b8; text-align: center;'>
@@ -492,19 +492,19 @@ class Mailer {
                                     </td>
                                     <td style='padding: 12px 0;'>
                                         <strong style='color: #1e293b; font-size: 15px;'>Direct Communication</strong><br>
-                                        <span style='color: #64748b; font-size: 14px;'>Chat with IT staff about your issues</span>
+                                        <span style='color: #64748b; font-size: 14px;'>Chat with our staff about your issues</span>
                                     </td>
                                 </tr>
                             </table>
                         </div>
                         
                         <p style='margin-top: 35px; font-size: 15px; color: #475569; line-height: 1.6;'>
-                            If you have any questions or need assistance, feel free to reach out to our IT support team.
+                            If you have any questions or need assistance, feel free to reach out to our support team.
                         </p>
                         
                         <p style='margin-top: 25px; font-size: 15px; color: #1e293b;'>
                             Best regards,<br>
-                            <strong style='color: #2563eb;'>IT Help Desk Team</strong>
+                            <strong style='color: #2563eb;'>Our Team</strong>
                         </p>
                     </div>
                     
