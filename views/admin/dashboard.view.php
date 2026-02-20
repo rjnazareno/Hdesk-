@@ -91,42 +91,6 @@ include __DIR__ . '/../layouts/header.php';
             </a>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-8">
-            <div class="flex items-center justify-between mb-5">
-                <div>
-                    <h3 class="text-lg font-semibold text-slate-800">Recent Activity</h3>
-                    <p class="text-sm text-slate-500">Latest ticket updates</p>
-                </div>
-            </div>
-
-            <?php if (!empty($recentActivity)): ?>
-                <div class="space-y-3">
-                    <?php foreach ($recentActivity as $activity): ?>
-                        <a href="view_ticket.php?id=<?php echo (int) $activity['ticket_id']; ?>" class="block p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <p class="text-sm text-slate-800 font-medium truncate">
-                                        <?php echo htmlspecialchars($activity['ticket_number'] ?? 'Ticket #' . $activity['ticket_id']); ?>
-                                        <span class="text-slate-500 font-normal">· <?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $activity['action_type'] ?? 'updated'))); ?></span>
-                                    </p>
-                                    <p class="text-xs text-slate-500 truncate">
-                                        <?php echo htmlspecialchars($activity['user_name'] ?? 'System'); ?>
-                                        <?php if (!empty($activity['ticket_title'])): ?>
-                                            · <?php echo htmlspecialchars($activity['ticket_title']); ?>
-                                        <?php endif; ?>
-                                    </p>
-                                </div>
-                                <span class="text-xs text-slate-400 whitespace-nowrap"><?php echo date('M d, h:i A', strtotime($activity['created_at'])); ?></span>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="py-8 text-center text-sm text-slate-500">No recent activity yet.</div>
-            <?php endif; ?>
-        </div>
-
         <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- Ticket Trends Chart -->
