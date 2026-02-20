@@ -43,7 +43,7 @@ include __DIR__ . '/../layouts/header.php';
             </a>
 
             <!-- Pending -->
-            <a href="tickets.php?status=pending" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-amber-100 hover:border-amber-300 transition-all cursor-pointer group">
+            <a href="tickets.php" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-amber-100 hover:border-amber-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-clock text-amber-500"></i>
@@ -55,7 +55,7 @@ include __DIR__ . '/../layouts/header.php';
             </a>
 
             <!-- Open -->
-            <a href="tickets.php?status=open" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group">
+            <a href="tickets.php" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-folder-open text-blue-500"></i>
@@ -67,7 +67,7 @@ include __DIR__ . '/../layouts/header.php';
             </a>
 
             <!-- In Progress -->
-            <a href="tickets.php?status=in_progress" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-purple-100 hover:border-purple-300 transition-all cursor-pointer group">
+            <a href="tickets.php" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-purple-100 hover:border-purple-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-spinner text-purple-500"></i>
@@ -79,7 +79,7 @@ include __DIR__ . '/../layouts/header.php';
             </a>
 
             <!-- Resolved -->
-            <a href="tickets.php?status=closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group">
+            <a href="tickets.php" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-teal-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-check-circle text-teal-500"></i>
