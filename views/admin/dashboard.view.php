@@ -31,8 +31,7 @@ include __DIR__ . '/../layouts/header.php';
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <!-- Total Tickets -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-slate-200/50 hover:border-teal-300 transition-all cursor-pointer group"
-                 onclick="filterByStatus('all')">
+            <a href="tickets.php" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-slate-200/50 hover:border-teal-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-teal-100 transition">
                         <i class="fas fa-ticket-alt text-slate-600 group-hover:text-teal-600 transition"></i>
@@ -41,11 +40,10 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['total'] ?? 0; ?></div>
                 <div class="text-xs text-slate-500 mt-1">All tickets</div>
-            </div>
-            
+            </a>
+
             <!-- Pending -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-amber-100 hover:border-amber-300 transition-all cursor-pointer group"
-                 onclick="filterByStatus('pending')">
+            <a href="tickets.php?status=pending" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-amber-100 hover:border-amber-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-clock text-amber-500"></i>
@@ -54,11 +52,10 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['pending'] ?? 0; ?></div>
                 <div class="text-xs text-amber-600 mt-1">Awaiting action</div>
-            </div>
-            
+            </a>
+
             <!-- Open -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group"
-                 onclick="filterByStatus('open')">
+            <a href="tickets.php?status=open" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-folder-open text-blue-500"></i>
@@ -67,11 +64,10 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['open'] ?? 0; ?></div>
                 <div class="text-xs text-blue-600 mt-1">Active tickets</div>
-            </div>
-            
+            </a>
+
             <!-- In Progress -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-purple-100 hover:border-purple-300 transition-all cursor-pointer group"
-                 onclick="filterByStatus('in_progress')">
+            <a href="tickets.php?status=in_progress" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-purple-100 hover:border-purple-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-spinner text-purple-500"></i>
@@ -80,11 +76,10 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['in_progress'] ?? 0; ?></div>
                 <div class="text-xs text-purple-600 mt-1">Being worked on</div>
-            </div>
-            
+            </a>
+
             <!-- Resolved -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group"
-                 onclick="filterByStatus('closed')">
+            <a href="tickets.php?status=closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-teal-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-check-circle text-teal-500"></i>
@@ -93,7 +88,43 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['closed'] ?? 0; ?></div>
                 <div class="text-xs text-teal-600 mt-1"><?php echo $stats['total'] > 0 ? round(($stats['closed'] / $stats['total']) * 100) : 0; ?>% completed</div>
+            </a>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-8">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Recent Activity</h3>
+                    <p class="text-sm text-slate-500">Latest ticket updates</p>
+                </div>
             </div>
+
+            <?php if (!empty($recentActivity)): ?>
+                <div class="space-y-3">
+                    <?php foreach ($recentActivity as $activity): ?>
+                        <a href="view_ticket.php?id=<?php echo (int) $activity['ticket_id']; ?>" class="block p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="text-sm text-slate-800 font-medium truncate">
+                                        <?php echo htmlspecialchars($activity['ticket_number'] ?? 'Ticket #' . $activity['ticket_id']); ?>
+                                        <span class="text-slate-500 font-normal">· <?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $activity['action_type'] ?? 'updated'))); ?></span>
+                                    </p>
+                                    <p class="text-xs text-slate-500 truncate">
+                                        <?php echo htmlspecialchars($activity['user_name'] ?? 'System'); ?>
+                                        <?php if (!empty($activity['ticket_title'])): ?>
+                                            · <?php echo htmlspecialchars($activity['ticket_title']); ?>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <span class="text-xs text-slate-400 whitespace-nowrap"><?php echo date('M d, h:i A', strtotime($activity['created_at'])); ?></span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="py-8 text-center text-sm text-slate-500">No recent activity yet.</div>
+            <?php endif; ?>
         </div>
 
         <!-- Charts Row -->
@@ -262,7 +293,6 @@ include __DIR__ . '/../layouts/header.php';
 </div>
 
 <!-- Dashboard JavaScript -->
-<script src="../assets/js/filters.js"></script>
 <script>
     // Set greeting based on time
     document.addEventListener('DOMContentLoaded', function() {
@@ -270,19 +300,6 @@ include __DIR__ . '/../layouts/header.php';
         const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
         document.getElementById('greetingText').textContent = greeting;
     });
-    
-    // Filter by status
-    function filterByStatus(status) {
-        const rows = document.querySelectorAll('[data-ticket-row]');
-        rows.forEach(row => {
-            if (status === 'all') {
-                row.style.display = '';
-            } else {
-                const rowStatus = row.getAttribute('data-ticket-status');
-                row.style.display = rowStatus === status ? '' : 'none';
-            }
-        });
-    }
     
     // Search tickets
     function searchDashboard(query) {
