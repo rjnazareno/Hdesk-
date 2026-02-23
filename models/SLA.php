@@ -2,6 +2,10 @@
 /**
  * SLA (Service Level Agreement) Model
  * Handles SLA policy management, tracking, and breach detection
+ * 
+ * Business Hours: Mon-Thu 8AM-4PM, Fri 8AM-4PM
+ * Special Rule: FRT clock pauses for tickets submitted after 4 PM on Fridays
+ *               and resumes at 8 AM on Mondays
  */
 
 class SLA {
@@ -9,7 +13,7 @@ class SLA {
     
     // Business hours configuration
     private const BUSINESS_START_HOUR = 8;  // 8:00 AM
-    private const BUSINESS_END_HOUR = 17;   // 5:00 PM
+    private const BUSINESS_END_HOUR = 16;   // 4:00 PM
     
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
@@ -27,7 +31,8 @@ class SLA {
     }
     
     /**
-     * Check if a given datetime is within business hours (Mon-Fri, 8AM-5PM)
+     * Check if a given datetime is within business hours
+     * Mon-Thu: 8AM-4PM, Fri: 8AM-4PM (FRT clock pauses after 4 PM on Fridays)
      * 
      * @param DateTime $date The date to check
      * @return bool True if within business hours
@@ -39,11 +44,14 @@ class SLA {
         }
         
         $hour = (int)$date->format('H');
+        
+        // All weekdays: 8 AM to 4 PM
         return $hour >= self::BUSINESS_START_HOUR && $hour < self::BUSINESS_END_HOUR;
     }
     
     /**
      * Calculate business minutes between two dates (excludes weekends and after-hours)
+     * Special rule: Friday after 4 PM counts as end of week, resumes Monday 8 AM
      * 
      * @param DateTime $start Start date
      * @param DateTime $end End date
@@ -74,6 +82,14 @@ class SLA {
             
             $currentHour = (int)$current->format('H');
             $currentMinute = (int)$current->format('i');
+            $dayOfWeek = (int)$current->format('N'); // 1=Monday, 5=Friday
+            
+            // Special Friday rule: After 4 PM on Friday, jump to Monday 8 AM
+            if ($dayOfWeek === 5 && $currentHour >= 16) {
+                $current->modify('next Monday');
+                $current->setTime(self::BUSINESS_START_HOUR, 0, 0);
+                continue;
+            }
             
             // If before business hours, jump to start
             if ($currentHour < self::BUSINESS_START_HOUR) {
@@ -88,7 +104,7 @@ class SLA {
                 continue;
             }
             
-            // Calculate end of current business day
+            // Calculate end of current business day (4 PM for all weekdays)
             $endOfBusinessDay = clone $current;
             $endOfBusinessDay->setTime(self::BUSINESS_END_HOUR, 0, 0);
             
@@ -296,10 +312,21 @@ class SLA {
             return $dueDate;
         }
         
-        // Business hours: Mon-Fri, 8:00 AM - 5:00 PM
+        // Business hours: Mon-Thu 8:00 AM - 4:00 PM, Fri 8:00 AM - 4:00 PM
+        // Special rule: Tickets submitted after 4 PM on Fridays pause until Monday 8 AM
         $businessStartHour = 8;
-        $businessEndHour = 17;
-        $businessHoursPerDay = $businessEndHour - $businessStartHour; // 9 hours
+        $businessEndHour = 16;
+        $businessHoursPerDay = $businessEndHour - $businessStartHour; // 8 hours
+        
+        // Check if ticket was submitted after 4 PM on Friday
+        $dayOfWeek = (int)$dueDate->format('N'); // 1=Monday, 7=Sunday, 5=Friday
+        $currentHour = (int)$dueDate->format('H');
+        
+        if ($dayOfWeek === 5 && $currentHour >= 16) { // Friday after 4 PM (16:00)
+            // Pause FRT clock until Monday 8 AM
+            $dueDate->modify('next Monday');
+            $dueDate->setTime($businessStartHour, 0, 0);
+        }
         
         $remainingMinutes = $minutes;
         
@@ -312,6 +339,14 @@ class SLA {
             
             $currentHour = (int)$dueDate->format('H');
             $currentMinute = (int)$dueDate->format('i');
+            $currentDayOfWeek = (int)$dueDate->format('N');
+            
+            // Check if Friday after 4 PM - jump to Monday
+            if ($currentDayOfWeek === 5 && $currentHour >= 16) {
+                $dueDate->modify('next Monday');
+                $dueDate->setTime($businessStartHour, 0, 0);
+                continue;
+            }
             
             // If before business hours, jump to start
             if ($currentHour < $businessStartHour) {
@@ -327,6 +362,7 @@ class SLA {
             }
             
             // Calculate remaining minutes in current business day
+            // All weekdays end at 4 PM
             $endOfDay = clone $dueDate;
             $endOfDay->setTime($businessEndHour, 0, 0);
             $minutesUntilEndOfDay = (int)round(($endOfDay->getTimestamp() - $dueDate->getTimestamp()) / 60);
