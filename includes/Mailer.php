@@ -190,9 +190,9 @@ class Mailer {
                         <p style='margin: 5px 0;'><strong>Status:</strong> <span style='text-transform: uppercase;'>{$ticket['status']}</span></p>
                     </div>
                     
-                    <p>You can track your ticket status by logging into the IT Help Desk portal.</p>
+                    <p>You can track your ticket status by logging into the Hdesk portal.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Hdesk Team</p>
                 </div>
             </div>
         </body>
@@ -220,9 +220,9 @@ class Mailer {
                         <p style='margin: 5px 0;'><strong>Description:</strong> {$ticket['description']}</p>
                     </div>
                     
-                    <p>Please log in to the IT Help Desk portal to view and manage this ticket.</p>
+                    <p>Please log in to the Hdesk portal to view and manage this ticket.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Hdesk Team</p>
                 </div>
             </div>
         </body>
@@ -250,9 +250,9 @@ class Mailer {
                         <p style='margin: 5px 0;'><strong>New Status:</strong> <span style='text-transform: uppercase;'>{$newStatus}</span></p>
                     </div>
                     
-                    <p>You can view more details by logging into the IT Help Desk portal.</p>
+                    <p>You can view more details by logging into the Hdesk portal.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Hdesk Team</p>
                 </div>
             </div>
         </body>
@@ -281,7 +281,7 @@ class Mailer {
                     
                     <p>If you have any further issues or questions, please don't hesitate to create a new ticket.</p>
                     
-                    <p style='margin-top: 30px;'>Best regards,<br>Our Team</p>
+                    <p style='margin-top: 30px;'>Best regards,<br>Hdesk Team</p>
                 </div>
             </div>
         </body>
@@ -299,7 +299,7 @@ class Mailer {
      */
     public function sendPasswordResetEmail($email, $name, $resetLink) {
         try {
-            $subject = "Password Reset Request - ResolveIT Help Desk";
+            $subject = "Password Reset Request - Hdesk";
             $body = $this->getPasswordResetTemplate($name, $resetLink);
             
             if ($this->usePHPMailer) {
@@ -336,7 +336,7 @@ class Mailer {
                     
                     <h2 style='color: #1e293b; margin-bottom: 20px;'>Password Reset Request</h2>
                     <p>Hello {$name},</p>
-                    <p>We received a request to reset your password for your ResolveIT Help Desk account.</p>
+                    <p>We received a request to reset your password for your Hdesk account.</p>
                     
                     <div style='text-align: center; margin: 30px 0;'>
                         <a href='{$resetLink}' 
@@ -357,7 +357,7 @@ class Mailer {
                     <p style='font-size: 14px; color: #64748b;'>If the button doesn't work, copy and paste this link into your browser:</p>
                     <p style='font-size: 12px; color: #0ea5e9; word-break: break-all;'>{$resetLink}</p>
                     
-                    <p style='margin-top: 30px; font-size: 14px;'>Best regards,<br><strong>Our Team</strong></p>
+                    <p style='margin-top: 30px; font-size: 14px;'>Best regards,<br><strong>Hdesk Team</strong></p>
                     
                     <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'>
                     <p style='font-size: 12px; color: #94a3b8; text-align: center;'>
@@ -375,7 +375,7 @@ class Mailer {
      */
     public function sendWelcomeEmail($email, $name, $username, $password) {
         try {
-            $subject = 'Welcome to ResolveIT Help Desk - Your Account Details';
+            $subject = 'Welcome to Hdesk - Your Account Details';
             $body = $this->getWelcomeEmailTemplate($name, $username, $password);
             
             if ($this->usePHPMailer) {
@@ -419,7 +419,7 @@ class Mailer {
                     <div style='background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 40px 30px; text-align: center;'>
                         <img src='{$logoUrl}' alt='ResolveIT Logo' style='width: 80px; height: 80px; margin-bottom: 20px; filter: brightness(0) invert(1);'>
                         <h1 style='color: white; margin: 0; font-size: 28px; font-weight: bold;'>Welcome to ResolveIT!</h1>
-                        <p style='color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 16px;'>Your IT Help Desk Portal</p>
+                        <p style='color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 16px;'>Your Hdesk Portal</p>
                     </div>
                     
                     <!-- Main Content -->
@@ -504,14 +504,14 @@ class Mailer {
                         
                         <p style='margin-top: 25px; font-size: 15px; color: #1e293b;'>
                             Best regards,<br>
-                            <strong style='color: #2563eb;'>Our Team</strong>
+                            <strong style='color: #2563eb;'>Hdesk Team</strong>
                         </p>
                     </div>
                     
                     <!-- Footer -->
                     <div style='background-color: #f8fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0;'>
                         <p style='margin: 0; font-size: 13px; color: #64748b;'>
-                            This is an automated message from ResolveIT Help Desk System
+                            This is an automated message from Hdesk System
                         </p>
                         <p style='margin: 8px 0 0 0; font-size: 12px; color: #94a3b8;'>
                             Please do not reply to this email
