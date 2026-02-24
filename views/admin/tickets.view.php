@@ -107,7 +107,6 @@ include __DIR__ . '/../layouts/header.php';
                             <option value="open" <?php echo $filters['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
                             <option value="in_progress" <?php echo $filters['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                             <option value="resolved" <?php echo $filters['status'] === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                            <option value="closed" <?php echo $filters['status'] === 'closed' ? 'selected' : ''; ?>>Closed</option>
                         </select>
                     </div>
                     
@@ -328,10 +327,9 @@ include __DIR__ . '/../layouts/header.php';
                                             'pending' => ['bg' => 'bg-amber-100 text-amber-700', 'icon' => 'fa-clock'],
                                             'open' => ['bg' => 'bg-blue-100 text-blue-700', 'icon' => 'fa-folder-open'],
                                             'in_progress' => ['bg' => 'bg-purple-100 text-purple-700', 'icon' => 'fa-spinner'],
-                                            'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle'],
-                                            'closed' => ['bg' => 'bg-gray-100 text-gray-600', 'icon' => 'fa-lock']
+                                            'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle']
                                         ];
-                                        $config = $statusConfig[$ticket['status']];
+                                        $config = $statusConfig[$ticket['status']] ?? $statusConfig['resolved'];
                                         ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-full <?php echo $config['bg']; ?>">
                                             <i class="fas <?php echo $config['icon']; ?> text-[10px]"></i>

@@ -40,8 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
         $slaModel->recordFirstResponse($ticketId);
     }
     
-    if (($newStatus === 'resolved' || $newStatus === 'closed') && 
-        ($oldStatus !== 'resolved' && $oldStatus !== 'closed')) {
+    if ($newStatus === 'resolved' && $oldStatus !== 'resolved') {
         $slaModel->recordResolution($ticketId);
     }
     
@@ -57,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
     try {
         $db = Database::getInstance()->getConnection();
         $notificationModel = new Notification($db);
-        $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
+        $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved'];
         $newStatusLabel = $statusLabels[$newStatus] ?? ucfirst($newStatus);
-        $notifType = in_array($newStatus, ['resolved', 'closed']) ? 'ticket_resolved' : 'status_changed';
+        $notifType = $newStatus === 'resolved' ? 'ticket_resolved' : 'status_changed';
         
         $notificationModel->create([
             'user_id' => $ticket['submitter_type'] === 'employee' ? null : $ticket['submitter_id'],
@@ -128,8 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
             $slaModel->recordFirstResponse($ticketId);
         }
         
-        if (($updateData['status'] === 'resolved' || $updateData['status'] === 'closed') && 
-            ($oldTicket['status'] !== 'resolved' && $oldTicket['status'] !== 'closed')) {
+        if ($updateData['status'] === 'resolved' && $oldTicket['status'] !== 'resolved') {
             $slaModel->recordResolution($ticketId);
         }
         
@@ -145,9 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
         try {
             $db = Database::getInstance()->getConnection();
             $notificationModel = new Notification($db);
-            $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
+            $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved'];
             $newStatusLabel = $statusLabels[$updateData['status']] ?? ucfirst($updateData['status']);
-            $notifType = in_array($updateData['status'], ['resolved', 'closed']) ? 'ticket_resolved' : 'status_changed';
+            $notifType = $updateData['status'] === 'resolved' ? 'ticket_resolved' : 'status_changed';
             
             $notificationModel->create([
                 'user_id' => $ticket['submitter_type'] === 'employee' ? null : $ticket['submitter_id'],
@@ -324,8 +322,7 @@ $statusConfig = [
     'pending' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'icon' => 'fa-clock', 'label' => 'Pending'],
     'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'border' => 'border-blue-200', 'icon' => 'fa-folder-open', 'label' => 'Open'],
     'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'icon' => 'fa-spinner', 'label' => 'In Progress'],
-    'resolved' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200', 'icon' => 'fa-check-circle', 'label' => 'Resolved'],
-    'closed' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-600', 'border' => 'border-gray-200', 'icon' => 'fa-lock', 'label' => 'Closed']
+    'resolved' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200', 'icon' => 'fa-check-circle', 'label' => 'Resolved']
 ];
 $priorityConfig = [
     'low' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'icon' => 'fa-arrow-down'],
@@ -516,7 +513,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         </div>
                         
                         <!-- Reply Form -->
-                        <?php if (!in_array($ticket['status'], ['closed'])): ?>
+                        <?php if (!in_array($ticket['status'], ['resolved'])): ?>
                         <form method="POST" class="border-t border-gray-100 pt-4">
                             <div class="flex gap-3">
                                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32" 
@@ -536,7 +533,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         </form>
                         <?php else: ?>
                         <div class="border-t border-gray-100 pt-4 text-center">
-                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is closed. Replies are disabled.</p>
+                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is resolved. Replies are disabled.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -559,19 +556,13 @@ include __DIR__ . '/../views/layouts/header.php';
                                      alt="" class="w-8 h-8 rounded-full flex-shrink-0">
                                 <div class="flex-1">
                                     <?php 
-                                    $commentPlaceholder = $ticket['status'] === 'closed' 
-                                        ? "Add a comment to this closed ticket..." 
-                                        : "Add a comment or update...";
+                                    $commentPlaceholder = "Add a comment or update...";
                                     ?>
                                     <textarea name="comment" rows="2" 
                                               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
                                               placeholder="<?= $commentPlaceholder ?>" required></textarea>
                                     <div class="mt-2 flex items-center justify-between">
-                                        <?php if ($ticket['status'] === 'closed'): ?>
-                                        <span class="text-xs text-amber-600"><i class="fas fa-info-circle mr-1"></i>Comments allowed on closed tickets</span>
-                                        <?php else: ?>
                                         <span class="text-xs text-gray-400">Press Enter to submit, Shift+Enter for new line</span>
-                                        <?php endif; ?>
                                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
                                             <i class="fas fa-paper-plane"></i>
                                             <span>Comment</span>
@@ -803,7 +794,6 @@ include __DIR__ . '/../views/layouts/header.php';
                                 <option value="open" <?= $ticket['status'] === 'open' ? 'selected' : '' ?>>Open</option>
                                 <option value="in_progress" <?= $ticket['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
                                 <option value="resolved" <?= $ticket['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
-                                <option value="closed" <?= $ticket['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
                             </select>
                         </div>
                         
@@ -844,7 +834,7 @@ include __DIR__ . '/../views/layouts/header.php';
 </div>
 
 <!-- Resolve Modal -->
-<?php if ($isITStaff && $ticket['status'] !== 'resolved' && $ticket['status'] !== 'closed'): ?>
+<?php if ($isITStaff && $ticket['status'] !== 'resolved'): ?>
 <div id="resolveModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="document.getElementById('resolveModal').classList.add('hidden')"></div>

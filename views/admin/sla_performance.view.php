@@ -215,7 +215,6 @@ function getScoreColor($score) {
                                             'open' => 'bg-blue-600 text-white',
                                             'in_progress' => 'bg-purple-600 text-white',
                                             'resolved' => 'bg-green-600 text-white',
-                                            'closed' => 'bg-gray-600 text-white',
                                             default => 'bg-gray-100 text-gray-600'
                                         };
                                     ?>">

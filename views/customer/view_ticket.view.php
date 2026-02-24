@@ -29,8 +29,7 @@
                                 'pending' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'label' => 'Pending'],
                                 'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'label' => 'Open'],
                                 'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'label' => 'In Progress'],
-                                'resolved' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved'],
-                                'closed' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => 'Closed']
+                                'resolved' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved']
                             ];
                             $status = $statusConfig[$ticket['status']] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => ucfirst($ticket['status'])];
                             ?>
@@ -165,7 +164,7 @@
                         </div>
                         
                         <!-- Reply Form -->
-                        <?php if (!in_array($ticket['status'], ['closed'])): ?>
+                        <?php if (!in_array($ticket['status'], ['resolved'])): ?>
                         <form method="POST" action="view_ticket.php?id=<?= $ticket['id'] ?>" class="border-t border-gray-100 pt-4">
                             <input type="hidden" name="ticket_id" value="<?= $ticket['id'] ?>">
                             <div class="flex gap-3">
@@ -187,7 +186,7 @@
                         </form>
                         <?php else: ?>
                         <div class="border-t border-gray-100 pt-4 text-center">
-                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is closed. Replies are disabled.</p>
+                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is resolved. Replies are disabled.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -263,7 +262,6 @@
                                         <option value="open" <?php echo $ticket['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
                                         <option value="in_progress" <?php echo $ticket['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                                         <option value="resolved" <?php echo $ticket['status'] === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                                        <option value="closed" <?php echo $ticket['status'] === 'closed' ? 'selected' : ''; ?>>Closed</option>
                                     </select>
                                 </div>
 

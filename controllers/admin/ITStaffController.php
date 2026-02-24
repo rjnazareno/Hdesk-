@@ -67,8 +67,7 @@ class ITStaffController {
                 COUNT(*) as total_assigned,
                 SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open_tickets,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-                SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_today,
-                SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_tickets,
+                SUM(CASE WHEN status IN ('resolved', 'closed') THEN 1 ELSE 0 END) as resolved_today,
                 SUM(CASE WHEN priority = 'high' AND status IN ('open', 'in_progress') THEN 1 ELSE 0 END) as high_pending
                 FROM tickets 
                 WHERE assigned_to = :user_id";

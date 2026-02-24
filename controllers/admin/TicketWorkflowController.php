@@ -339,7 +339,7 @@ class TicketWorkflowController {
             }
         }
         
-        $validStatuses = ['pending', 'open', 'in_progress', 'resolved', 'closed'];
+        $validStatuses = ['pending', 'open', 'in_progress', 'resolved'];
         if (!in_array($newStatus, $validStatuses)) {
             return ['success' => false, 'message' => 'Invalid status'];
         }
@@ -351,8 +351,6 @@ class TicketWorkflowController {
             if ($resolution) {
                 $updateData['resolution'] = $resolution;
             }
-        } elseif ($newStatus === 'closed') {
-            $updateData['closed_at'] = date('Y-m-d H:i:s');
         }
         
         $result = $this->ticketModel->update($ticketId, $updateData);
@@ -361,7 +359,7 @@ class TicketWorkflowController {
             $this->logTicketActivity($ticketId, 'status_change', $ticket['status'], $newStatus, $resolution);
             
             // Notify submitter on resolution
-            if (in_array($newStatus, ['resolved', 'closed'])) {
+            if ($newStatus === 'resolved') {
                 $this->notifySubmitter($ticket, $newStatus);
             }
             

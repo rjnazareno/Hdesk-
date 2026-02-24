@@ -99,8 +99,8 @@ class CustomerCreateTicketController {
             $mappedPriority = $this->priorityMapModel->getDefaultPriority($categoryId);
         }
         
-        // For customers, always use the mapped priority (no override option)
-        $finalPriority = $mappedPriority ?? $submittedPriority;
+        // Use submitted priority first; fall back to category-mapped priority if nothing was submitted
+        $finalPriority = $submittedPriority ?: ($mappedPriority ?? 'medium');
         
         // Prepare ticket data WITHOUT department (Super Admin will assign)
         $ticketData = [

@@ -410,10 +410,9 @@ include __DIR__ . '/../layouts/header.php';
                                         'pending' => ['color' => 'text-yellow-400', 'bg' => 'bg-yellow-500/20', 'border' => 'border-yellow-500/30'],
                                         'open' => ['color' => 'text-blue-400', 'bg' => 'bg-blue-500/20', 'border' => 'border-blue-500/30'],
                                         'in_progress' => ['color' => 'text-purple-400', 'bg' => 'bg-purple-500/20', 'border' => 'border-purple-500/30'],
-                                        'resolved' => ['color' => 'text-green-400', 'bg' => 'bg-green-500/20', 'border' => 'border-green-500/30'],
-                                        'closed' => ['color' => 'text-slate-500', 'bg' => 'bg-slate-500/20', 'border' => 'border-slate-500/30']
+                                        'resolved' => ['color' => 'text-green-400', 'bg' => 'bg-green-500/20', 'border' => 'border-green-500/30']
                                     ];
-                                    $config = $statusConfig[$ticket['status']];
+                                    $config = $statusConfig[$ticket['status']] ?? $statusConfig['resolved'];
                                     ?>
                                     <span class="inline-flex items-center px-2 py-1 text-xs font-medium border <?php echo $config['color'] . ' ' . $config['bg'] . ' ' . $config['border']; ?>">
                                         <?php echo str_replace('_', ' ', ucfirst($ticket['status'])); ?>

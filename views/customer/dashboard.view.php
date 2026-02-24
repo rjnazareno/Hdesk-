@@ -167,7 +167,7 @@
                         </div>
                         <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-lg">Done</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-slate-800 mb-1"><?= $stats['closed'] ?></h3>
+                    <h3 class="text-3xl font-bold text-slate-800 mb-1"><?= $stats['resolved'] ?></h3>
                     <p class="text-sm text-slate-500">Resolved</p>
                 </div>
             </div>
@@ -249,8 +249,7 @@
                                                 'pending' => 'bg-yellow-100 text-yellow-700',
                                                 'open' => 'bg-emerald-100 text-emerald-700',
                                                 'in_progress' => 'bg-purple-100 text-purple-700',
-                                                'resolved' => 'bg-emerald-100 text-emerald-700',
-                                                'closed' => 'bg-slate-100 text-slate-600'
+                                                'resolved' => 'bg-emerald-100 text-emerald-700'
                                             ];
                                             $statusColor = $statusColors[$ticket['status']] ?? 'bg-slate-100 text-slate-600';
                                             ?>

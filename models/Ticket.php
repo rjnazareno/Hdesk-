@@ -244,7 +244,7 @@ class Ticket {
             $sql .= " AND t.status = :status";
             $params[':status'] = $filters['status'];
         } else {
-            $sql .= " AND t.status NOT IN ('closed')";
+            $sql .= " AND t.status NOT IN ('resolved', 'closed')";
         }
         
         $sql .= " ORDER BY FIELD(t.priority, 'high', 'medium', 'low'), t.grabbed_at DESC";
@@ -631,11 +631,6 @@ class Ticket {
             $fields[] = "resolved_at = NOW()";
         }
         
-        // Set closed_at timestamp when status changes to closed
-        if (isset($data['status']) && $data['status'] === 'closed') {
-            $fields[] = "closed_at = NOW()";
-        }
-        
         if (empty($fields)) {
             return false;
         }
@@ -663,8 +658,7 @@ class Ticket {
                 SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
                 SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-                SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
-                SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed,
+                SUM(CASE WHEN status = 'resolved' OR status = 'closed' THEN 1 ELSE 0 END) as resolved,
                 SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) as high,
                 SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) as medium
                 FROM tickets WHERE 1=1";
@@ -752,7 +746,7 @@ class Ticket {
         $sql = "SELECT 
                 SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as new,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-                SUM(CASE WHEN status = 'closed' AND DATE(updated_at) = CURDATE() THEN 1 ELSE 0 END) as closed,
+                SUM(CASE WHEN (status = 'resolved' OR status = 'closed') AND DATE(updated_at) = CURDATE() THEN 1 ELSE 0 END) as closed,
                 SUM(CASE WHEN status IN ('open', 'pending', 'in_progress') THEN 1 ELSE 0 END) as open
                 FROM tickets";
         

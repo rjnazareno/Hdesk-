@@ -225,7 +225,7 @@ class Department {
                 LEFT JOIN sla_tracking st ON t.id = st.ticket_id
                 WHERE t.department_id = :department_id
                 AND t.grabbed_by = :user_id
-                AND t.status NOT IN ('closed')
+                AND t.status NOT IN ('closed', 'resolved')
                 ORDER BY 
                   FIELD(t.priority, 'high', 'medium', 'low'),
                   t.grabbed_at DESC";

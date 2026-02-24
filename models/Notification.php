@@ -251,8 +251,7 @@ class Notification {
         $statusLabels = [
             'open' => 'Open',
             'in_progress' => 'In Progress',
-            'resolved' => 'Resolved',
-            'closed' => 'Closed'
+            'resolved' => 'Resolved'
         ];
         
         $statusLabel = $statusLabels[$newStatus] ?? ucfirst($newStatus);

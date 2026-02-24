@@ -79,15 +79,15 @@ include __DIR__ . '/../layouts/header.php';
             </a>
 
             <!-- Resolved -->
-            <a href="tickets.php?status=closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group">
+            <a href="tickets.php?status=resolved" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-teal-100 hover:border-teal-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-teal-50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-check-circle text-teal-500"></i>
                     </div>
                     <span class="text-xs font-medium text-teal-500 uppercase">Resolved</span>
                 </div>
-                <div class="text-3xl font-bold text-slate-800"><?php echo $stats['closed'] ?? 0; ?></div>
-                <div class="text-xs text-teal-600 mt-1"><?php echo $stats['total'] > 0 ? round(($stats['closed'] / $stats['total']) * 100) : 0; ?>% completed</div>
+                <div class="text-3xl font-bold text-slate-800"><?php echo $stats['resolved'] ?? 0; ?></div>
+                <div class="text-xs text-teal-600 mt-1"><?php echo $stats['total'] > 0 ? round(($stats['resolved'] / $stats['total']) * 100) : 0; ?>% completed</div>
             </a>
         </div>
 
@@ -124,7 +124,7 @@ include __DIR__ . '/../layouts/header.php';
                         ['label' => 'Pending', 'count' => $stats['pending'], 'color' => 'bg-amber-500', 'bg' => 'bg-amber-100'],
                         ['label' => 'Open', 'count' => $stats['open'], 'color' => 'bg-blue-500', 'bg' => 'bg-blue-100'],
                         ['label' => 'In Progress', 'count' => $stats['in_progress'], 'color' => 'bg-purple-500', 'bg' => 'bg-purple-100'],
-                        ['label' => 'Resolved', 'count' => $stats['closed'], 'color' => 'bg-teal-500', 'bg' => 'bg-teal-100']
+                        ['label' => 'Resolved', 'count' => $stats['resolved'], 'color' => 'bg-teal-500', 'bg' => 'bg-teal-100']
                     ];
                     
                     foreach ($statusData as $data):
@@ -149,7 +149,7 @@ include __DIR__ . '/../layouts/header.php';
                         <div class="text-xs text-slate-500 uppercase">Active Tickets</div>
                     </div>
                     <div class="text-center p-4 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl">
-                        <div class="text-2xl font-bold text-teal-600"><?php echo $stats['total'] > 0 ? round(($stats['closed'] / $stats['total']) * 100) : 0; ?>%</div>
+                        <div class="text-2xl font-bold text-teal-600"><?php echo $stats['total'] > 0 ? round(($stats['resolved'] / $stats['total']) * 100) : 0; ?>%</div>
                         <div class="text-xs text-teal-600 uppercase">Resolution Rate</div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@ include __DIR__ . '/../layouts/header.php';
                                     'pending' => 'bg-amber-100 text-amber-700',
                                     'open' => 'bg-blue-100 text-blue-700',
                                     'in_progress' => 'bg-purple-100 text-purple-700',
-                                    'closed' => 'bg-teal-100 text-teal-700'
+                                    'resolved' => 'bg-teal-100 text-teal-700'
                                 ];
                                 $priorityColors = [
                                     'high' => 'bg-red-100 text-red-700',
