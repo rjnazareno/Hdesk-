@@ -245,10 +245,10 @@ include __DIR__ . '/../layouts/header.php';
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Submitter
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Assigned
-                            </th>
                             <?php endif; ?>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Assignee
+                            </th>
                             <?php if ($currentView !== 'pool'): ?>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <a href="<?php echo getSortUrl('created_at', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
@@ -263,7 +263,7 @@ include __DIR__ . '/../layouts/header.php';
                     <tbody class="divide-y divide-gray-100">
                         <?php if (empty($tickets)): ?>
                         <tr>
-                            <td colspan="<?php echo $currentView === 'pool' ? '5' : ($isITStaff ? '9' : '6'); ?>" class="px-6 text-center">
+                            <td colspan="<?php echo $currentView === 'pool' ? '6' : ($isITStaff ? '9' : '7'); ?>" class="px-6 text-center">
                                 <div class="flex flex-col items-center justify-center gap-5 py-32">
                                     <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                                         <i class="fas fa-inbox text-3xl text-gray-400"></i>
@@ -327,7 +327,8 @@ include __DIR__ . '/../layouts/header.php';
                                             'pending' => ['bg' => 'bg-amber-100 text-amber-700', 'icon' => 'fa-clock'],
                                             'open' => ['bg' => 'bg-blue-100 text-blue-700', 'icon' => 'fa-folder-open'],
                                             'in_progress' => ['bg' => 'bg-purple-100 text-purple-700', 'icon' => 'fa-spinner'],
-                                            'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle']
+                                            'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle'],
+                                            'closed' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle']
                                         ];
                                         $config = $statusConfig[$ticket['status']] ?? $statusConfig['resolved'];
                                         ?>
@@ -415,8 +416,9 @@ include __DIR__ . '/../layouts/header.php';
                                         <span class="font-medium text-gray-900 truncate max-w-[120px]"><?php echo htmlspecialchars($ticket['submitter_name']); ?></span>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                                 <td class="px-6 py-4 text-sm text-gray-700">
-                                    <?php if ($ticket['assigned_name']): ?>
+                                    <?php if (!empty($ticket['assigned_name'])): ?>
                                     <div class="flex items-center gap-2">
                                         <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-semibold">
                                             <?php echo strtoupper(substr($ticket['assigned_name'], 0, 1)); ?>
@@ -424,10 +426,9 @@ include __DIR__ . '/../layouts/header.php';
                                         <span class="font-medium text-gray-900 truncate max-w-[120px]"><?php echo htmlspecialchars($ticket['assigned_name']); ?></span>
                                     </div>
                                     <?php else: ?>
-                                    <span class="text-gray-400 text-xs italic">Unassigned</span>
+                                    <span class="text-gray-400 text-xs">None</span>
                                     <?php endif; ?>
                                 </td>
-                                <?php endif; ?>
                                 <?php if ($currentView !== 'pool'): ?>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex flex-col">

@@ -183,7 +183,8 @@ include __DIR__ . '/../layouts/header.php';
                                     'pending' => 'bg-amber-100 text-amber-700',
                                     'open' => 'bg-blue-100 text-blue-700',
                                     'in_progress' => 'bg-purple-100 text-purple-700',
-                                    'resolved' => 'bg-teal-100 text-teal-700'
+                                    'resolved' => 'bg-teal-100 text-teal-700',
+                                    'closed' => 'bg-teal-100 text-teal-700'
                                 ];
                                 $priorityColors = [
                                     'high' => 'bg-red-100 text-red-700',
@@ -211,7 +212,7 @@ include __DIR__ . '/../layouts/header.php';
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-lg <?php echo $statusColors[$ticket['status']] ?? 'bg-slate-100 text-slate-700'; ?>">
-                                        <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
+                                        <?php echo $ticket['status'] === 'closed' ? 'Resolved' : ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">

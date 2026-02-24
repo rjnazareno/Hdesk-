@@ -214,11 +214,11 @@ function getScoreColor($score) {
                                             'pending' => 'bg-yellow-600 text-white',
                                             'open' => 'bg-blue-600 text-white',
                                             'in_progress' => 'bg-purple-600 text-white',
-                                            'resolved' => 'bg-green-600 text-white',
+                                            'resolved', 'closed' => 'bg-green-600 text-white',
                                             default => 'bg-gray-100 text-gray-600'
                                         };
                                     ?>">
-                                        <?php echo ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
+                                        <?php echo $ticket['status'] === 'closed' ? 'Resolved' : ucfirst(str_replace('_', ' ', $ticket['status'])); ?>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">

@@ -216,7 +216,8 @@
                                             'pending' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'label' => 'Pending'],
                                             'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'label' => 'Open'],
                                             'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'label' => 'In Progress'],
-                                            'resolved' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved']
+                                            'resolved' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved'],
+                                            'closed' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-700', 'label' => 'Resolved']
                                         ];
                                         $status = $statusConfig[$ticket['status']] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => ucfirst($ticket['status'])];
                                         ?>
