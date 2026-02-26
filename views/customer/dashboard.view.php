@@ -250,7 +250,7 @@
                                                 'open' => 'bg-emerald-100 text-emerald-700',
                                                 'in_progress' => 'bg-purple-100 text-purple-700',
                                                 'resolved' => 'bg-emerald-100 text-emerald-700',
-                                                'closed' => 'bg-emerald-100 text-emerald-700'
+                                                'closed' => 'bg-gray-100 text-gray-700'
                                             ];
                                             $statusColor = $statusColors[$ticket['status']] ?? 'bg-slate-100 text-slate-600';
                                             ?>

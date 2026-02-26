@@ -180,7 +180,7 @@ function handleReleaseTicket($ticketModel, $activityModel, $ticketId, $currentUs
             'user_id' => $currentUser['id'],
             'action_type' => 'released',
             'old_value' => $currentUser['full_name'],
-            'new_value' => 'Unassigned',
+            'new_value' => 'New',
             'comment' => 'Ticket released back to queue'
         ]);
         

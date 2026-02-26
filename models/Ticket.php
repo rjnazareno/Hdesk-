@@ -390,6 +390,16 @@ class Ticket {
             $sql .= " AND t.grabbed_by IS NULL";
         }
         
+        // Handle assigned-only filter (for open tickets view)
+        if (!empty($filters['assigned_only'])) {
+            $sql .= " AND t.assigned_to IS NOT NULL AND t.status NOT IN ('resolved','closed')";
+        }
+        
+        // Exclude resolved/closed (for pool view - matches dashboard formula)
+        if (!empty($filters['exclude_closed'])) {
+            $sql .= " AND t.status NOT IN ('resolved','closed')";
+        }
+        
         if (!empty($filters['status'])) {
             // Support comma-separated status values
             if (strpos($filters['status'], ',') !== false) {
@@ -532,6 +542,16 @@ class Ticket {
             $sql .= " AND t.grabbed_by IS NULL";
         }
         
+        // Handle assigned-only filter (for open tickets view)
+        if (!empty($filters['assigned_only'])) {
+            $sql .= " AND t.assigned_to IS NOT NULL AND t.status NOT IN ('resolved','closed')";
+        }
+        
+        // Exclude resolved/closed (for pool view - matches dashboard formula)
+        if (!empty($filters['exclude_closed'])) {
+            $sql .= " AND t.status NOT IN ('resolved','closed')";
+        }
+        
         if (isset($filters['status']) && !empty($filters['status'])) {
             // Support comma-separated status values
             if (strpos($filters['status'], ',') !== false) {
@@ -655,9 +675,12 @@ class Ticket {
     public function getStats($userId = null, $userRole = null) {
         $sql = "SELECT 
                 COUNT(*) as total,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open,
+                SUM(CASE WHEN grabbed_by IS NULL AND status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) as new_tickets,
+                SUM(CASE WHEN status IN ('open','in_progress','pending') THEN 1 ELSE 0 END) as open_tickets,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status IN ('resolved','closed') THEN 1 ELSE 0 END) as closed_tickets,
+                SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open,
                 SUM(CASE WHEN status = 'resolved' OR status = 'closed' THEN 1 ELSE 0 END) as resolved,
                 SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) as high,
                 SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) as medium
@@ -692,6 +715,43 @@ class Ticket {
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':days' => $days]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Get daily new vs closed ticket counts for workload trend chart
+     */
+    public function getDailyNewVsClosedStats($days = 10) {
+        $days = max(1, (int)$days);
+
+        $sql = "SELECT
+                    trend_date,
+                    SUM(new_count) as new_count,
+                    SUM(closed_count) as closed_count
+                FROM (
+                    SELECT
+                        DATE(created_at) as trend_date,
+                        COUNT(*) as new_count,
+                        0 as closed_count
+                    FROM tickets
+                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL {$days} DAY)
+                    GROUP BY DATE(created_at)
+
+                    UNION ALL
+
+                    SELECT
+                                                DATE(updated_at) as trend_date,
+                        0 as new_count,
+                        COUNT(*) as closed_count
+                    FROM tickets
+                    WHERE status IN ('resolved', 'closed')
+                                            AND updated_at >= DATE_SUB(CURDATE(), INTERVAL {$days} DAY)
+                                        GROUP BY DATE(updated_at)
+                ) daily_rollup
+                GROUP BY trend_date
+                ORDER BY trend_date ASC";
+
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**

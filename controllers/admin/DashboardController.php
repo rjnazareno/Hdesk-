@@ -7,6 +7,7 @@
 class DashboardController {
     private $auth;
     private $ticketModel;
+    private $slaModel;
     private $userModel;
     private $employeeModel;
     private $categoryModel;
@@ -35,6 +36,7 @@ class DashboardController {
 
         // Initialize models
         $this->ticketModel = new Ticket();
+        $this->slaModel = new SLA();
         $this->userModel = new User();
         $this->employeeModel = new Employee();
         $this->categoryModel = new Category();
@@ -66,7 +68,8 @@ class DashboardController {
             'recentActivity' => $this->getRecentActivity(),
             'dailyStats' => $this->getDailyStatistics(),
             'chartData' => $this->prepareChartData(),
-            'statusBreakdown' => $this->ticketModel->getStatusBreakdown()
+            'statusBreakdown' => $this->ticketModel->getStatusBreakdown(),
+            'monthlySlaReport' => $this->getMonthlySlaReport()
         ];
 
         // Load the view
@@ -129,19 +132,40 @@ class DashboardController {
      * Prepare chart data for JavaScript
      */
     private function prepareChartData() {
-        $dailyStats = $this->getDailyStatistics();
+        $days = 10;
+        $trendRows = $this->ticketModel->getDailyNewVsClosedStats($days);
+        $trendByDate = [];
+
+        foreach ($trendRows as $row) {
+            $trendByDate[$row['trend_date']] = [
+                'new' => (int)$row['new_count'],
+                'closed' => (int)$row['closed_count']
+            ];
+        }
+
         $chartLabels = [];
-        $chartData = [];
-        
-        foreach ($dailyStats as $stat) {
-            $chartLabels[] = date('M d', strtotime($stat['date']));
-            $chartData[] = $stat['count'];
+        $newData = [];
+        $closedData = [];
+
+        for ($offset = $days - 1; $offset >= 0; $offset--) {
+            $dateKey = date('Y-m-d', strtotime("-{$offset} days"));
+            $chartLabels[] = date('M d', strtotime($dateKey));
+            $newData[] = $trendByDate[$dateKey]['new'] ?? 0;
+            $closedData[] = $trendByDate[$dateKey]['closed'] ?? 0;
         }
 
         return [
             'labels' => $chartLabels,
-            'data' => $chartData
+            'newData' => $newData,
+            'closedData' => $closedData
         ];
+    }
+
+    /**
+     * Get current month SLA summary metrics
+     */
+    private function getMonthlySlaReport() {
+        return $this->slaModel->getMonthlySummary();
     }
 
     /**

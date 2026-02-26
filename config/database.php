@@ -20,9 +20,10 @@ if (file_exists($envFile)) {
 }
 
 // Database credentials from environment or defaults
+$_db_pass = getenv('DB_PASS');
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_USER', getenv('DB_USER') ?: 'u816220874_ticketing');
-define('DB_PASS', getenv('DB_PASS') ?: 'Gr33n$$wRf');
+define('DB_PASS', $_db_pass !== false ? $_db_pass : 'Gr33n$$wRf');
 define('DB_NAME', getenv('DB_NAME') ?: 'u816220874_ticketing');
 define('DB_CHARSET', 'utf8mb4');
 

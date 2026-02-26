@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
     try {
         $db = Database::getInstance()->getConnection();
         $notificationModel = new Notification($db);
-        $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved'];
+        $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
         $newStatusLabel = $statusLabels[$newStatus] ?? ucfirst($newStatus);
         $notifType = $newStatus === 'resolved' ? 'ticket_resolved' : 'status_changed';
         
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
         try {
             $db = Database::getInstance()->getConnection();
             $notificationModel = new Notification($db);
-            $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved'];
+            $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
             $newStatusLabel = $statusLabels[$updateData['status']] ?? ucfirst($updateData['status']);
             $notifType = $updateData['status'] === 'resolved' ? 'ticket_resolved' : 'status_changed';
             
@@ -323,7 +323,7 @@ $statusConfig = [
     'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'border' => 'border-blue-200', 'icon' => 'fa-folder-open', 'label' => 'Open'],
     'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'icon' => 'fa-spinner', 'label' => 'In Progress'],
     'resolved' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200', 'icon' => 'fa-check-circle', 'label' => 'Resolved'],
-    'closed' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200', 'icon' => 'fa-check-circle', 'label' => 'Resolved']
+    'closed' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'border' => 'border-gray-200', 'icon' => 'fa-check-double', 'label' => 'Closed']
 ];
 $priorityConfig = [
     'low' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'icon' => 'fa-arrow-down'],
@@ -792,9 +792,9 @@ include __DIR__ . '/../views/layouts/header.php';
                             <label class="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
                             <select name="status" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="pending" <?= $ticket['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                <option value="open" <?= $ticket['status'] === 'open' ? 'selected' : '' ?>>Open</option>
                                 <option value="in_progress" <?= $ticket['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
                                 <option value="resolved" <?= $ticket['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
+                                <option value="closed" <?= $ticket['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
                             </select>
                         </div>
                         

@@ -56,7 +56,7 @@ class ReportGenerator {
             $sheet->setCellValue('D' . $row, strtoupper($ticket['priority']));
             $sheet->setCellValue('E' . $row, strtoupper($ticket['status']));
             $sheet->setCellValue('F' . $row, $ticket['submitter_name']);
-            $sheet->setCellValue('G' . $row, $ticket['assigned_name'] ?? 'Unassigned');
+            $sheet->setCellValue('G' . $row, $ticket['assigned_name'] ?? 'New');
             $sheet->setCellValue('H' . $row, date('Y-m-d H:i', strtotime($ticket['created_at'])));
             $sheet->setCellValue('I' . $row, date('Y-m-d H:i', strtotime($ticket['updated_at'])));
             

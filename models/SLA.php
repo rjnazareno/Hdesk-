@@ -913,6 +913,85 @@ class SLA {
         $stmt->execute($params);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Get monthly SLA summary for dashboard reporting
+     *
+     * @param int|null $year Year (defaults to current year)
+     * @param int|null $month Month 1-12 (defaults to current month)
+     * @return array Monthly SLA summary
+     */
+    public function getMonthlySummary($year = null, $month = null) {
+        $year = $year ?: (int)date('Y');
+        $month = $month ?: (int)date('n');
+
+        $startDate = sprintf('%04d-%02d-01 00:00:00', $year, $month);
+        $endDate = date('Y-m-d 23:59:59', strtotime($startDate . ' +1 month -1 day'));
+
+        $sql = "SELECT
+                    SUM(CASE WHEN t.created_at BETWEEN :start_entered AND :end_entered THEN 1 ELSE 0 END) as total_entered,
+                    SUM(CASE
+                            WHEN t.status IN ('resolved', 'closed')
+                            AND COALESCE(st.resolved_at, t.updated_at) BETWEEN :start_resolved AND :end_resolved
+                            THEN 1 ELSE 0
+                        END) as total_resolved,
+                    SUM(CASE
+                            WHEN t.created_at BETWEEN :start_pending AND :end_pending
+                            AND t.status IN ('pending', 'open', 'in_progress')
+                            THEN 1 ELSE 0
+                        END) as total_pending,
+                    SUM(CASE
+                            WHEN t.created_at BETWEEN :start_response_met AND :end_response_met
+                            AND st.response_sla_status = 'met'
+                            THEN 1 ELSE 0
+                        END) as response_met,
+                    SUM(CASE
+                            WHEN t.created_at BETWEEN :start_response_tracked AND :end_response_tracked
+                            AND st.response_sla_status IN ('met', 'breached')
+                            THEN 1 ELSE 0
+                        END) as response_tracked,
+                    AVG(CASE
+                            WHEN t.created_at BETWEEN :start_avg_response AND :end_avg_response
+                            THEN st.response_time_minutes
+                            ELSE NULL
+                        END) as avg_first_response_minutes,
+                    AVG(CASE
+                            WHEN COALESCE(st.resolved_at, t.updated_at) BETWEEN :start_avg_close AND :end_avg_close
+                            THEN st.resolution_time_minutes
+                            ELSE NULL
+                        END) as avg_close_minutes
+                FROM tickets t
+                LEFT JOIN sla_tracking st ON t.id = st.ticket_id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':start_entered' => $startDate,
+            ':end_entered' => $endDate,
+            ':start_resolved' => $startDate,
+            ':end_resolved' => $endDate,
+            ':start_pending' => $startDate,
+            ':end_pending' => $endDate,
+            ':start_response_met' => $startDate,
+            ':end_response_met' => $endDate,
+            ':start_response_tracked' => $startDate,
+            ':end_response_tracked' => $endDate,
+            ':start_avg_response' => $startDate,
+            ':end_avg_response' => $endDate,
+            ':start_avg_close' => $startDate,
+            ':end_avg_close' => $endDate
+        ]);
+
+        $summary = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        $responseTracked = (int)($summary['response_tracked'] ?? 0);
+        $responseMet = (int)($summary['response_met'] ?? 0);
+
+        $summary['response_sla_met_percent'] = $responseTracked > 0
+            ? round(($responseMet / $responseTracked) * 100, 2)
+            : 0;
+        $summary['month_label'] = date('F Y', strtotime($startDate));
+
+        return $summary;
+    }
     
     /**
      * Update SLA policy

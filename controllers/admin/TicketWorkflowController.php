@@ -339,7 +339,7 @@ class TicketWorkflowController {
             }
         }
         
-        $validStatuses = ['pending', 'open', 'in_progress', 'resolved'];
+        $validStatuses = ['pending', 'open', 'in_progress', 'resolved', 'closed'];
         if (!in_array($newStatus, $validStatuses)) {
             return ['success' => false, 'message' => 'Invalid status'];
         }

@@ -124,8 +124,16 @@ class TicketsController {
             'view' => $_GET['view'] ?? '',
             'date_from' => $_GET['date_from'] ?? '',
             'date_to' => $_GET['date_to'] ?? '',
-            'sla_status' => $_GET['sla_status'] ?? ''
+            'sla_status' => $_GET['sla_status'] ?? '',
+            'assigned' => $_GET['assigned'] ?? ''
         ];
+        
+        // Handle assigned= query param from dashboard cards
+        if ($filters['assigned'] === 'unassigned') {
+            $filters['unassigned'] = true;
+        } elseif ($filters['assigned'] === 'assigned') {
+            $filters['assigned_only'] = true;
+        }
         
         // Handle special views
         if ($filters['view'] === 'my_tickets') {
@@ -134,11 +142,11 @@ class TicketsController {
             $filters['assignee_type'] = ($_SESSION['user_type'] ?? 'user') === 'employee' ? 'employee' : 'user';
         } elseif ($filters['view'] === 'pool') {
             $filters['unassigned'] = true;
-            $filters['status'] = $filters['status'] ?: 'pending,open'; // Default to pending/open for pool
+            $filters['exclude_closed'] = true;
         } elseif ($filters['view'] === 'queue') {
             // Legacy support - redirect queue to pool
             $filters['unassigned'] = true;
-            $filters['status'] = $filters['status'] ?: 'pending,open';
+            $filters['exclude_closed'] = true;
         }
         
         return $filters;

@@ -16,7 +16,7 @@ $headerConfig = [
     ],
     'pool' => [
         'title' => 'Ticket Pool',
-        'subtitle' => 'Unassigned tickets available to grab',
+        'subtitle' => 'New tickets available to grab',
         'icon' => 'fa-inbox'
     ],
     '' => [
@@ -107,6 +107,7 @@ include __DIR__ . '/../layouts/header.php';
                             <option value="open" <?php echo $filters['status'] === 'open' ? 'selected' : ''; ?>>Open</option>
                             <option value="in_progress" <?php echo $filters['status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                             <option value="resolved" <?php echo $filters['status'] === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
+                            <option value="closed" <?php echo $filters['status'] === 'closed' ? 'selected' : ''; ?>>Closed</option>
                         </select>
                     </div>
                     
@@ -227,6 +228,7 @@ include __DIR__ . '/../layouts/header.php';
                                     <?php echo getSortIcon('priority', $sorting['sort_by'], $sorting['sort_dir']); ?>
                                 </a>
                             </th>
+                            <?php if ($currentView !== 'pool'): ?>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <a href="<?php echo getSortUrl('status', $sorting['sort_by'], $sorting['sort_dir']); ?>" 
                                    class="flex items-center hover:text-gray-900 transition">
@@ -234,6 +236,7 @@ include __DIR__ . '/../layouts/header.php';
                                     <?php echo getSortIcon('status', $sorting['sort_by'], $sorting['sort_dir']); ?>
                                 </a>
                             </th>
+                            <?php endif; ?>
                             <?php if ($currentView === 'pool' || $currentView === 'my_tickets'): ?>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <?php echo $currentView === 'my_tickets' ? 'Transfer To' : 'Assignee'; ?>
@@ -263,7 +266,7 @@ include __DIR__ . '/../layouts/header.php';
                     <tbody class="divide-y divide-gray-100">
                         <?php if (empty($tickets)): ?>
                         <tr>
-                            <td colspan="<?php echo $currentView === 'pool' ? '6' : ($isITStaff ? '9' : '7'); ?>" class="px-6 text-center">
+                            <td colspan="<?php echo $currentView === 'pool' ? '5' : ($isITStaff ? '9' : '7'); ?>" class="px-6 text-center">
                                 <div class="flex flex-col items-center justify-center gap-5 py-32">
                                     <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                                         <i class="fas fa-inbox text-3xl text-gray-400"></i>
@@ -320,6 +323,7 @@ include __DIR__ . '/../layouts/header.php';
                                         </span>
                                     </div>
                                 </td>
+                                <?php if ($currentView !== 'pool'): ?>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
                                         <?php
@@ -328,7 +332,7 @@ include __DIR__ . '/../layouts/header.php';
                                             'open' => ['bg' => 'bg-blue-100 text-blue-700', 'icon' => 'fa-folder-open'],
                                             'in_progress' => ['bg' => 'bg-purple-100 text-purple-700', 'icon' => 'fa-spinner'],
                                             'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle'],
-                                            'closed' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle']
+                                            'closed' => ['bg' => 'bg-gray-100 text-gray-700', 'icon' => 'fa-check-double']
                                         ];
                                         $config = $statusConfig[$ticket['status']] ?? $statusConfig['resolved'];
                                         ?>
@@ -338,6 +342,7 @@ include __DIR__ . '/../layouts/header.php';
                                         </span>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                                 <?php if ($currentView === 'pool' || $currentView === 'my_tickets'): ?>
                                 <!-- Assignee/Transfer Dropdown -->
                                 <td class="px-6 py-4">
@@ -346,7 +351,7 @@ include __DIR__ . '/../layouts/header.php';
                                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                         <select name="assigned_to" onchange="this.form.submit()" 
                                                 class="w-full text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-gray-900 focus:border-transparent cursor-pointer min-w-[140px] max-w-[160px]">
-                                            <option value="" class="text-gray-400">-- <?php echo $currentView === 'my_tickets' ? 'Transfer to' : 'Unassigned'; ?> --</option>
+                                            <option value="" class="text-gray-400">-- <?php echo $currentView === 'my_tickets' ? 'Transfer to' : 'New'; ?> --</option>
                                             <?php if (!empty($employeeAdmins)): ?>
                                                 <?php foreach ($employeeAdmins as $admin): ?>
                                                 <?php 
