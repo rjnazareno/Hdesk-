@@ -32,17 +32,17 @@ $myTicketsCount = 0;
 try {
     $navDb = Database::getInstance()->getConnection();
     // Count ungrabbed tickets in pool
-    $poolStmt = $navDb->prepare('SELECT COUNT(*) as count FROM tickets WHERE grabbed_by IS NULL AND status IN ("pending", "open")');
+    $poolStmt = $navDb->prepare('SELECT COUNT(*) as count FROM tickets WHERE grabbed_by IS NULL AND status NOT IN ("resolved", "closed")');
     $poolStmt->execute();
     $poolCount = $poolStmt->fetch(PDO::FETCH_ASSOC)['count'];
     
-    // Count my tickets (pending + open) - check both user and employee assignees
+    // Count my active tickets - check both user and employee assignees
     if (isset($currentUser['id'])) {
         // Determine expected assignee_type based on user_type in session
         $expectedAssigneeType = ($_SESSION['user_type'] ?? 'user') === 'employee' ? 'employee' : 'user';
         
-        // Count tickets assigned to this user/employee with matching assignee_type
-        $myStmt = $navDb->prepare('SELECT COUNT(*) as count FROM tickets WHERE assigned_to = ? AND assignee_type = ? AND status IN ("pending", "open")');
+        // Count tickets assigned to this user/employee that are not resolved/closed
+        $myStmt = $navDb->prepare('SELECT COUNT(*) as count FROM tickets WHERE assigned_to = ? AND assignee_type = ? AND status NOT IN ("resolved", "closed")');
         $myStmt->execute([$currentUser['id'], $expectedAssigneeType]);
         $myTicketsCount = $myStmt->fetch(PDO::FETCH_ASSOC)['count'];
     }
