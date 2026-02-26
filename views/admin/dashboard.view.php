@@ -55,6 +55,29 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="text-xs text-cyan-600 mt-1">New tickets</div>
             </a>
 
+            <!-- Open Tickets (with sub-breakdown) -->
+            <div onclick="window.location.href='tickets.php?assigned=assigned'" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition">
+                        <i class="fas fa-folder-open text-blue-500"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-blue-500 uppercase tracking-wide">Open</span>
+                </div>
+                <div class="text-3xl font-bold text-slate-800"><?php echo $stats['open_tickets'] ?? 0; ?></div>
+                <div class="flex items-center gap-2 mt-2">
+                    <a href="tickets.php?status=in_progress" onclick="event.stopPropagation();"
+                       class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 text-xs font-medium hover:bg-purple-200 transition">
+                        <i class="fas fa-spinner fa-spin text-[9px]"></i>
+                        <?php echo $stats['in_progress'] ?? 0; ?> In Progress
+                    </a>
+                    <a href="tickets.php?status=pending" onclick="event.stopPropagation();"
+                       class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-xs font-medium hover:bg-amber-200 transition">
+                        <i class="fas fa-clock text-[9px]"></i>
+                        <?php echo $stats['pending'] ?? 0; ?> Pending
+                    </a>
+                </div>
+            </div>
+
             <!-- Closed Tickets -->
             <a href="tickets.php?status=resolved,closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-gray-100 hover:border-gray-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
@@ -126,7 +149,11 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
                 
                 <!-- Summary -->
-                <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 gap-4">
+                <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
+                    <div class="text-center p-4 bg-slate-50 rounded-xl">
+                        <div class="text-2xl font-bold text-slate-800"><?php echo $stats['open_tickets'] ?? 0; ?></div>
+                        <div class="text-xs text-slate-500 uppercase">Open Tickets</div>
+                    </div>
                     <div class="text-center p-4 bg-gray-50 rounded-xl">
                         <div class="text-2xl font-bold text-gray-600"><?php echo $stats['total'] > 0 ? round(($stats['closed_tickets'] / $stats['total']) * 100) : 0; ?>%</div>
                         <div class="text-xs text-gray-500 uppercase">Completion Rate</div>
