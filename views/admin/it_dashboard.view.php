@@ -66,15 +66,15 @@ include __DIR__ . '/../layouts/header.php';
                 </div>
             </a>
 
-            <!-- Open Tickets -->
-            <a href="tickets.php?view=my_tickets&status=open" class="block bg-white border border-slate-200 p-5 hover:border-emerald-500/50 hover:shadow-md transition-all rounded-lg cursor-pointer">
+            <!-- In Progress Tickets -->
+            <a href="tickets.php?view=my_tickets&status=in_progress" class="block bg-white border border-slate-200 p-5 hover:border-purple-500/50 hover:shadow-md transition-all rounded-lg cursor-pointer">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
-                        <p class="text-xs text-slate-500 uppercase tracking-wide mb-2">Open Tickets</p>
+                        <p class="text-xs text-slate-500 uppercase tracking-wide mb-2">In Progress</p>
                         <h3 class="text-2xl font-semibold text-slate-800"><?php echo $myStats['open_tickets'] ?? 0; ?></h3>
                     </div>
                     <div class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded">
-                        <i class="fas fa-folder-open text-emerald-600"></i>
+                        <i class="fas fa-spinner text-purple-600"></i>
                     </div>
                 </div>
             </a>

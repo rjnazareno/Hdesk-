@@ -93,8 +93,8 @@ class Ticket {
                 return false;
             }
             
-            // Can only grab pending/open tickets that aren't already grabbed
-            if (!in_array($ticket['status'], ['pending', 'open']) || $ticket['grabbed_by'] !== null) {
+            // Can only grab pending/in_progress tickets that aren't already grabbed
+            if (!in_array($ticket['status'], ['pending', 'in_progress']) || $ticket['grabbed_by'] !== null) {
                 return false;
             }
             
@@ -103,7 +103,7 @@ class Ticket {
                         grabbed_at = NOW(),
                         assigned_to = :user_id,
                         assignee_type = :assignee_type,
-                        status = CASE WHEN status = 'pending' THEN 'open' ELSE status END
+                        status = CASE WHEN status = 'pending' THEN 'in_progress' ELSE status END
                     WHERE id = :id 
                     AND grabbed_by IS NULL";
             
@@ -676,11 +676,11 @@ class Ticket {
         $sql = "SELECT 
                 COUNT(*) as total,
                 SUM(CASE WHEN grabbed_by IS NULL AND status != 'closed' THEN 1 ELSE 0 END) as new_tickets,
-                SUM(CASE WHEN status IN ('open','in_progress','pending') THEN 1 ELSE 0 END) as open_tickets,
+                SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as open_tickets,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
                 SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
                 SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_tickets,
-                SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open,
+                SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as open,
                 SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as resolved,
                 SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) as high,
                 SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) as medium

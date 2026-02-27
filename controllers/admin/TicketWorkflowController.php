@@ -71,7 +71,7 @@ class TicketWorkflowController {
         // Update ticket
         $result = $this->ticketModel->update($ticketId, [
             'department_id' => $departmentId,
-            'status' => 'open'
+            'status' => 'in_progress'
         ]);
         
         if ($result) {
@@ -168,7 +168,7 @@ class TicketWorkflowController {
         // Update ticket
         $result = $this->ticketModel->update($ticketId, [
             'assigned_to' => $staffId,
-            'status' => $ticket['status'] === 'pending' ? 'open' : $ticket['status']
+            'status' => $ticket['status'] === 'pending' ? 'in_progress' : $ticket['status']
         ]);
         
         if ($result) {
@@ -339,7 +339,7 @@ class TicketWorkflowController {
             }
         }
         
-        $validStatuses = ['pending', 'open', 'in_progress', 'resolved', 'closed'];
+        $validStatuses = ['pending', 'in_progress', 'closed'];
         if (!in_array($newStatus, $validStatuses)) {
             return ['success' => false, 'message' => 'Invalid status'];
         }
@@ -461,7 +461,7 @@ class TicketWorkflowController {
         
         return $this->ticketModel->getAll([
             'department_id' => null,
-            'status' => ['pending', 'open']
+            'status' => ['pending']
         ]);
     }
     

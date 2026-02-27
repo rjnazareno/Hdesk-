@@ -130,16 +130,16 @@
                     <p class="text-sm text-slate-500">Total Requests</p>
                 </div>
 
-                <!-- Open Tickets -->
+                <!-- In Progress Tickets -->
                 <div class="stat-card bg-white rounded-2xl p-5 border border-slate-200/50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="stat-icon w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                            <i class="fas fa-folder-open text-white text-lg"></i>
+                        <div class="stat-icon w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                            <i class="fas fa-spinner text-white text-lg"></i>
                         </div>
-                        <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">Active</span>
+                        <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">Active</span>
                     </div>
                     <h3 class="text-3xl font-bold text-slate-800 mb-1"><?= $stats['open'] ?></h3>
-                    <p class="text-sm text-slate-500">Open Tickets</p>
+                    <p class="text-sm text-slate-500">In Progress</p>
                 </div>
 
                 <!-- Pending Tickets -->

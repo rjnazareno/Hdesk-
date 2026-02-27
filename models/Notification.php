@@ -249,9 +249,9 @@ class Notification {
         $notification = new self($db);
         
         $statusLabels = [
-            'open' => 'Open',
+            'pending'     => 'Pending',
             'in_progress' => 'In Progress',
-            'resolved' => 'Resolved'
+            'closed'      => 'Closed',
         ];
         
         $statusLabel = $statusLabels[$newStatus] ?? ucfirst($newStatus);

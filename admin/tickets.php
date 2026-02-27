@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
             $ticketModel->update($ticketId, [
                 'assigned_to' => $id,
                 'assignee_type' => $type,
-                'status' => 'open',
+                'status' => 'in_progress',
                 'grabbed_by' => $id
             ]);
             

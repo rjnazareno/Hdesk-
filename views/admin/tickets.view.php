@@ -326,13 +326,11 @@ include __DIR__ . '/../layouts/header.php';
                                     <div class="flex items-center">
                                         <?php
                                         $statusConfig = [
-                                            'pending' => ['bg' => 'bg-amber-100 text-amber-700', 'icon' => 'fa-clock'],
-                                            'open' => ['bg' => 'bg-blue-100 text-blue-700', 'icon' => 'fa-folder-open'],
+                                            'pending'     => ['bg' => 'bg-amber-100 text-amber-700',  'icon' => 'fa-clock'],
                                             'in_progress' => ['bg' => 'bg-purple-100 text-purple-700', 'icon' => 'fa-spinner'],
-                                            'resolved' => ['bg' => 'bg-green-100 text-green-700', 'icon' => 'fa-check-circle'],
-                                            'closed' => ['bg' => 'bg-gray-100 text-gray-700', 'icon' => 'fa-check-double']
+                                            'closed'      => ['bg' => 'bg-gray-100 text-gray-700',   'icon' => 'fa-check-double'],
                                         ];
-                                        $config = $statusConfig[$ticket['status']] ?? $statusConfig['resolved'];
+                                        $config = $statusConfig[$ticket['status']] ?? $statusConfig['in_progress'];
                                         ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-full <?php echo $config['bg']; ?>">
                                             <i class="fas <?php echo $config['icon']; ?> text-[10px]"></i>

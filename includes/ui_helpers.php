@@ -86,23 +86,19 @@ function priorityBadge($priority) {
  */
 function statusBadge($status) {
     $classes = [
-        'pending' => 'bg-yellow-100 text-yellow-800',
-        'open' => 'bg-blue-100 text-blue-800',
+        'pending'     => 'bg-yellow-100 text-yellow-800',
         'in_progress' => 'bg-purple-100 text-purple-800',
-        'resolved' => 'bg-green-100 text-green-800',
-        'closed' => 'bg-gray-100 text-gray-800'
+        'closed'      => 'bg-gray-100 text-gray-800',
     ];
     
     $icons = [
-        'pending' => 'fa-clock',
-        'open' => 'fa-folder-open',
+        'pending'     => 'fa-clock',
         'in_progress' => 'fa-spinner',
-        'resolved' => 'fa-check-circle',
-        'closed' => 'fa-check-double'
+        'closed'      => 'fa-check-double',
     ];
     
-    $class = $classes[$status] ?? $classes['open'];
-    $icon = $icons[$status] ?? $icons['open'];
+    $class = $classes[$status] ?? $classes['in_progress'];
+    $icon = $icons[$status] ?? $icons['in_progress'];
     $label = str_replace('_', ' ', ucfirst($status));
     
     return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' . $class . '">
