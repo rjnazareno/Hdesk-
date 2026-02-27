@@ -464,8 +464,8 @@ include __DIR__ . '/../layouts/header.php';
                                 <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-green-500 peer-checked:bg-green-50 transition-all hover:border-green-300">
                                     <span class="text-2xl">🟢</span>
                                     <p class="text-sm font-medium mt-1">Low</p>
-                                    <p class="text-xs text-gray-500">Response: 1 day</p>
-                                    <p class="text-xs text-gray-400">Resolution: 3–5 days</p>
+                                    <p class="text-xs text-gray-500">Response: 24 hours</p>
+                                    <p class="text-xs text-gray-400">Resolution: 56–120 hours</p>
                                 </div>
                             </label>
                             <label class="priority-option relative cursor-pointer">
@@ -473,8 +473,8 @@ include __DIR__ . '/../layouts/header.php';
                                 <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-yellow-500 peer-checked:bg-yellow-50 transition-all hover:border-yellow-300">
                                     <span class="text-2xl">🟡</span>
                                     <p class="text-sm font-medium mt-1">Medium</p>
-                                    <p class="text-xs text-gray-500">Response: 4 hours</p>
-                                    <p class="text-xs text-gray-400">Resolution: 2–3 days</p>
+                                    <p class="text-xs text-gray-500">Response: 24 hours</p>
+                                    <p class="text-xs text-gray-400">Resolution: 48–72 hours</p>
                                 </div>
                             </label>
                             <label class="priority-option relative cursor-pointer">
@@ -482,8 +482,8 @@ include __DIR__ . '/../layouts/header.php';
                                 <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-red-500 peer-checked:bg-red-50 transition-all hover:border-red-300">
                                     <span class="text-2xl">🔴</span>
                                     <p class="text-sm font-medium mt-1">High</p>
-                                    <p class="text-xs text-gray-500">Response: 30 mins</p>
-                                    <p class="text-xs text-gray-400">Resolution: 1 business day</p>
+                                    <p class="text-xs text-gray-500">Response: 24 hours</p>
+                                    <p class="text-xs text-gray-400">Resolution: 24 hours</p>
                                 </div>
                             </label>
                         </div>
@@ -884,9 +884,9 @@ include __DIR__ . '/../layouts/header.php';
             // Update banner
             const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High' };
             const slaInfo = {
-                high: 'Response: 30 min | Resolution: 1 business day',
-                medium: 'Response: 4 hrs | Resolution: 2–3 days',
-                low: 'Response: 1 day | Resolution: 3–5 days'
+                high: 'Response: 24h | Resolution: 24h',
+                medium: 'Response: 24h | Resolution: 48–72h',
+                low: 'Response: 24h | Resolution: 56–120h'
             };
             
             document.getElementById('autoPriorityLabel').textContent = priorityLabels[mappedPriority];

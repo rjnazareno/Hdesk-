@@ -1,6 +1,5 @@
 # HDESK - Quick Employee Guide Video Script
 **Duration: 3-4 minutes | Target Audience: All Employees**
-
 ---
 
 ## SCENE 1: INTRODUCTION
@@ -19,7 +18,7 @@
 **[Screen: Shows browser opening and login page]**
 
 **Narrator:**
-"Access HDESK through your browser and log in with your employee username and password - the same credentials you use for your Harley credentials email.
+"Access HDESK through your browser and log in with your employee username and password - the same credentials you use for your Harley credentials.
 
 **[Screen: Dashboard loads]**
 
@@ -142,15 +141,13 @@ Ready to get started? Log in to HDESK today and experience fast, reliable suppor
 ### Call-to-Action
 - Display website URL throughout bottom third
 - End with clear "Log in now" message
-- Include helpdesk phone number on end screen
-
+- Here is the link https://hdesk.resourcestaffonline.com/
 ---
 
 **Total Duration: 3-4 minutes**
 **Format: Single comprehensive video - no segments needed**
 
 ---
-
 **Total Duration: 3-4 minutes**
 **Format: Single comprehensive video - no segments needed**
 

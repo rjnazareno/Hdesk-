@@ -362,24 +362,24 @@ include __DIR__ . '/../layouts/header.php';
                         <span class="text-lg mr-2">🔴</span>
                         <span class="font-semibold text-red-700">HIGH</span>
                     </div>
-                    <p class="text-sm text-red-600">Response: <strong>30 minutes</strong></p>
-                    <p class="text-sm text-red-600">Resolution: <strong>1 business day</strong></p>
+                    <p class="text-sm text-red-600">Response: <strong>24 hours</strong></p>
+                    <p class="text-sm text-red-600">Resolution: <strong>24 hours</strong></p>
                 </div>
                 <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div class="flex items-center mb-2">
                         <span class="text-lg mr-2">🟡</span>
                         <span class="font-semibold text-yellow-700">MEDIUM</span>
                     </div>
-                    <p class="text-sm text-yellow-600">Response: <strong>4 hours</strong></p>
-                    <p class="text-sm text-yellow-600">Resolution: <strong>2–3 days</strong></p>
+                    <p class="text-sm text-yellow-600">Response: <strong>24 hours</strong></p>
+                    <p class="text-sm text-yellow-600">Resolution: <strong>48–72 hours</strong></p>
                 </div>
                 <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div class="flex items-center mb-2">
                         <span class="text-lg mr-2">🟢</span>
                         <span class="font-semibold text-green-700">LOW</span>
                     </div>
-                    <p class="text-sm text-green-600">Response: <strong>1 day</strong></p>
-                    <p class="text-sm text-green-600">Resolution: <strong>3–5 days</strong></p>
+                    <p class="text-sm text-green-600">Response: <strong>24 hours</strong></p>
+                    <p class="text-sm text-green-600">Resolution: <strong>56–120 hours</strong></p>
                 </div>
             </div>
 
