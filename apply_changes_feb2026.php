@@ -61,7 +61,7 @@ try {
         $salaryId = $catSalary->fetchColumn();
 
         if ($salaryId) {
-            // Rename
+            // Rename "Payslip Disputes" / "Payslip Dispute (after cutoff)"
             $rename = $db->prepare(
                 "UPDATE categories 
                  SET name = 'Payslip Dispute', 
@@ -71,6 +71,14 @@ try {
             );
             $rename->execute([$salaryId]);
             $results[] = "Renamed Payslip Disputes → Payslip Dispute ({$rename->rowCount()} row(s))";
+
+            // Rename "Payslip Dispute (a day before cutoff)" → "Draft Payslip"
+            $renameDraft = $db->prepare(
+                "UPDATE categories SET name = 'Draft Payslip'
+                 WHERE name = 'Payslip Dispute (a day before cutoff)'"
+            );
+            $renameDraft->execute();
+            $results[] = "Renamed Payslip Dispute (a day before cutoff) → Draft Payslip ({$renameDraft->rowCount()} row(s))";
 
             // Upsert priority HIGH for Payslip Dispute
             $db->prepare(
@@ -107,6 +115,50 @@ try {
             $deactivate->execute([$leaveId]);
             $results[] = "Leave Assistance deactivated ({$deactivate->rowCount()} row(s))";
         }
+    }
+
+    // -------------------------------------------------------
+    // 3b. DEPARTMENT-SPECIFIC SLA POLICIES
+    // -------------------------------------------------------
+    $db->exec("CREATE TABLE IF NOT EXISTS sla_department_policies (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        department_id INT NOT NULL,
+        priority ENUM('low','medium','high') NOT NULL,
+        response_time INT NOT NULL,
+        resolution_time INT NOT NULL,
+        is_business_hours TINYINT(1) DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uk_dept_priority (department_id, priority),
+        FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $deptIT = $db->query("SELECT id FROM departments WHERE code='IT' OR name LIKE '%IT%' OR name LIKE '%Information Tech%' LIMIT 1")->fetchColumn();
+    $deptHrForSla = $db->query("SELECT id FROM departments WHERE code='HR' LIMIT 1")->fetchColumn();
+
+    $upsertDeptSla = $db->prepare(
+        "INSERT INTO sla_department_policies (department_id, priority, response_time, resolution_time)
+         VALUES (:dept, :p, :rt, :res)
+         ON DUPLICATE KEY UPDATE response_time=VALUES(response_time), resolution_time=VALUES(resolution_time), updated_at=NOW()"
+    );
+
+    if ($deptIT) {
+        // IT SLA: High=48h, Medium=96h, Low=120h resolution; all 24h response
+        foreach ([['high',1440,2880],['medium',1440,5760],['low',1440,7200]] as [$p,$rt,$res]) {
+            $upsertDeptSla->execute([':dept'=>$deptIT,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+        }
+        $results[] = "IT dept SLA: High=48h, Medium=96h, Low=120h resolution";
+    } else {
+        $errors[] = "IT department not found — check departments table code/name.";
+    }
+
+    if ($deptHrForSla) {
+        // HR SLA: High=24h, Medium=72h, Low=120h resolution; all 24h response
+        foreach ([['high',1440,1440],['medium',1440,4320],['low',1440,7200]] as [$p,$rt,$res]) {
+            $upsertDeptSla->execute([':dept'=>$deptHrForSla,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+        }
+        $results[] = "HR dept SLA: High=24h, Medium=72h, Low=120h resolution";
     }
 
     // -------------------------------------------------------

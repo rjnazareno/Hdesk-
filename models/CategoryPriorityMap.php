@@ -117,20 +117,20 @@ class CategoryPriorityMap {
     public static function getSLATargets($priority) {
         $targets = [
             'high' => [
-                'response' => '30 minutes',
-                'resolution' => '1 business day',
-                'response_minutes' => 30,
+                'response' => '24 hours',
+                'resolution' => '24 hours',
+                'response_minutes' => 1440,
                 'resolution_minutes' => 1440
             ],
             'medium' => [
-                'response' => '4 hours',
-                'resolution' => '2-3 days',
-                'response_minutes' => 240,
+                'response' => '24 hours',
+                'resolution' => '48–72 hours',
+                'response_minutes' => 1440,
                 'resolution_minutes' => 4320
             ],
             'low' => [
-                'response' => '1 day',
-                'resolution' => '3-5 days',
+                'response' => '24 hours',
+                'resolution' => '56–120 hours',
                 'response_minutes' => 1440,
                 'resolution_minutes' => 7200
             ]

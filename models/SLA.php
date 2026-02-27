@@ -225,11 +225,32 @@ class SLA {
      * @param string $priority The ticket priority (low, medium, high)
      * @return array|false SLA policy or false if not found
      */
-    public function getPolicyByPriority($priority) {
+    public function getPolicyByPriority($priority, $departmentId = null) {
         $sql = "SELECT * FROM sla_policies WHERE priority = :priority AND is_active = 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':priority' => $priority]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $policy = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($policy && $departmentId) {
+            try {
+                $deptStmt = $this->db->prepare(
+                    "SELECT response_time, resolution_time, is_business_hours
+                     FROM sla_department_policies
+                     WHERE department_id = :dept AND priority = :p AND is_active = 1 LIMIT 1"
+                );
+                $deptStmt->execute([':dept' => $departmentId, ':p' => $priority]);
+                $deptPolicy = $deptStmt->fetch(PDO::FETCH_ASSOC);
+                if ($deptPolicy) {
+                    $policy['response_time']   = $deptPolicy['response_time'];
+                    $policy['resolution_time'] = $deptPolicy['resolution_time'];
+                    $policy['is_business_hours'] = $deptPolicy['is_business_hours'];
+                }
+            } catch (PDOException $e) {
+                // Table may not exist yet — fall back to global policy
+            }
+        }
+
+        return $policy;
     }
     
     /**
@@ -252,8 +273,22 @@ class SLA {
      * @return bool Success status
      */
     public function createTracking($ticketId, $priority) {
-        // Get SLA policy for this priority
-        $policy = $this->getPolicyByPriority($priority);
+        // Resolve department from ticket's category for dept-specific SLA
+        $departmentId = null;
+        try {
+            $deptSql = "SELECT COALESCE(t.department_id, c.department_id, pc.department_id) AS dept_id
+                        FROM tickets t
+                        LEFT JOIN categories c ON t.category_id = c.id
+                        LEFT JOIN categories pc ON c.parent_id = pc.id
+                        WHERE t.id = :tid LIMIT 1";
+            $deptStmt = $this->db->prepare($deptSql);
+            $deptStmt->execute([':tid' => $ticketId]);
+            $deptRow = $deptStmt->fetch(PDO::FETCH_ASSOC);
+            $departmentId = $deptRow ? $deptRow['dept_id'] : null;
+        } catch (PDOException $e) { /* ignore */ }
+
+        // Get SLA policy (dept-specific override or global fallback)
+        $policy = $this->getPolicyByPriority($priority, $departmentId);
         if (!$policy) {
             return false;
         }
