@@ -292,6 +292,9 @@ class SLA {
         if (!$policy) {
             return false;
         }
+
+        // First response is ALWAYS 24 hours (1440 minutes) regardless of policy
+        $policy['response_time'] = 1440;
         
         // Get the actual ticket creation time from database
         $ticketSql = "SELECT created_at FROM tickets WHERE id = :ticket_id";
