@@ -79,7 +79,7 @@ include __DIR__ . '/../layouts/header.php';
             </div>
 
             <!-- Closed Tickets -->
-            <a href="tickets.php?status=resolved,closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-gray-100 hover:border-gray-300 transition-all cursor-pointer group">
+            <a href="tickets.php?status=closed" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-gray-100 hover:border-gray-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition">
                         <i class="fas fa-check-double text-gray-500"></i>
@@ -130,7 +130,7 @@ include __DIR__ . '/../layouts/header.php';
                         ['label' => 'New Tickets', 'count' => $stats['new_tickets'], 'color' => 'bg-cyan-500', 'bg' => 'bg-cyan-100', 'href' => 'tickets.php?assigned=unassigned'],
                         ['label' => 'Open — In Progress', 'count' => $stats['in_progress'], 'color' => 'bg-purple-500', 'bg' => 'bg-purple-100', 'href' => 'tickets.php?status=in_progress'],
                         ['label' => 'Open — Pending', 'count' => $stats['pending'], 'color' => 'bg-amber-500', 'bg' => 'bg-amber-100', 'href' => 'tickets.php?status=pending'],
-                        ['label' => 'Closed', 'count' => $stats['closed_tickets'], 'color' => 'bg-gray-500', 'bg' => 'bg-gray-100', 'href' => 'tickets.php?status=resolved,closed'],
+                        ['label' => 'Closed', 'count' => $stats['closed_tickets'], 'color' => 'bg-gray-500', 'bg' => 'bg-gray-100', 'href' => 'tickets.php?status=closed'],
                     ];
                     
                     foreach ($statusData as $data):
@@ -255,11 +255,9 @@ include __DIR__ . '/../layouts/header.php';
                         <tbody id="dashboardTableBody" class="divide-y divide-slate-100">
                             <?php foreach ($recentTickets as $ticket): 
                                 $statusColors = [
-                                    'pending' => 'bg-amber-100 text-amber-700',
-                                    'open' => 'bg-blue-100 text-blue-700',
+                                    'pending'     => 'bg-amber-100 text-amber-700',
                                     'in_progress' => 'bg-purple-100 text-purple-700',
-                                    'resolved' => 'bg-teal-100 text-teal-700',
-                                    'closed' => 'bg-gray-100 text-gray-700'
+                                    'closed'      => 'bg-gray-100 text-gray-700',
                                 ];
                                 $priorityColors = [
                                     'high' => 'bg-red-100 text-red-700',

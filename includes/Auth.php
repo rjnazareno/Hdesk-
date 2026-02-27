@@ -258,16 +258,7 @@ class Auth {
             return false;
         }
         
-        // Check for session timeout (30 minutes of inactivity)
-        $timeout = 1800; // 30 minutes in seconds
-        
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
-            $this->logout();
-            return false;
-        }
-        
-        // Update last activity timestamp
-        $_SESSION['last_activity'] = time();
+        // No inactivity timeout for any user — session lasts 8 hours (set in config.php)
         
         return true;
     }

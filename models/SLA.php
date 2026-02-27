@@ -810,7 +810,7 @@ class SLA {
                 FROM tickets t
                 JOIN sla_tracking st ON t.id = st.ticket_id
                 JOIN sla_policies sp ON st.sla_policy_id = sp.id
-                WHERE t.status NOT IN ('closed', 'resolved')
+                WHERE t.status != 'closed'
                 AND st.is_paused = 0
                 AND st.resolved_at IS NULL
                 AND st.resolution_sla_status = 'pending'
@@ -966,7 +966,7 @@ class SLA {
         $sql = "SELECT
                     SUM(CASE WHEN t.created_at BETWEEN :start_entered AND :end_entered THEN 1 ELSE 0 END) as total_entered,
                     SUM(CASE
-                            WHEN t.status IN ('resolved', 'closed')
+                            WHEN t.status = 'closed'
                             AND COALESCE(st.resolved_at, t.updated_at) BETWEEN :start_resolved AND :end_resolved
                             THEN 1 ELSE 0
                         END) as total_resolved,

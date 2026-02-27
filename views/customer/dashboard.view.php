@@ -159,7 +159,7 @@
                     <p class="text-sm text-slate-500">Pending</p>
                 </div>
 
-                <!-- Resolved Tickets -->
+                <!-- Closed Tickets -->
                 <div class="stat-card bg-white rounded-2xl p-5 border border-slate-200/50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50">
                     <div class="flex items-start justify-between mb-4">
                         <div class="stat-icon w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30">
@@ -167,8 +167,8 @@
                         </div>
                         <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-lg">Done</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-slate-800 mb-1"><?= $stats['resolved'] ?></h3>
-                    <p class="text-sm text-slate-500">Resolved</p>
+                    <h3 class="text-3xl font-bold text-slate-800 mb-1"><?= $stats['closed_tickets'] ?></h3>
+                    <p class="text-sm text-slate-500">Closed</p>
                 </div>
             </div>
 
@@ -246,16 +246,14 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <?php
                                             $statusColors = [
-                                                'pending' => 'bg-yellow-100 text-yellow-700',
-                                                'open' => 'bg-emerald-100 text-emerald-700',
+                                                'pending'     => 'bg-yellow-100 text-yellow-700',
                                                 'in_progress' => 'bg-purple-100 text-purple-700',
-                                                'resolved' => 'bg-emerald-100 text-emerald-700',
-                                                'closed' => 'bg-gray-100 text-gray-700'
+                                                'closed'      => 'bg-gray-100 text-gray-700',
                                             ];
                                             $statusColor = $statusColors[$ticket['status']] ?? 'bg-slate-100 text-slate-600';
                                             ?>
                                             <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium <?= $statusColor ?>">
-                                                <?= $ticket['status'] === 'closed' ? 'Resolved' : ucfirst(str_replace('_', ' ', $ticket['status'])) ?>
+                                                <?= ucfirst(str_replace('_', ' ', $ticket['status'])) ?>
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">

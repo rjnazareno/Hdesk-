@@ -6,6 +6,11 @@
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
+    // Keep session alive for 8 hours (PHP default is only 24 min)
+    // Auth.php enforces a 30-min inactivity timeout for IT staff/admins separately
+    $sessionLifetime = 28800; // 8 hours in seconds
+    ini_set('session.gc_maxlifetime', $sessionLifetime);
+    session_set_cookie_params($sessionLifetime);
     session_start();
 }
 

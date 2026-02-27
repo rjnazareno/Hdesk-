@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
         $slaModel->recordFirstResponse($ticketId);
     }
     
-    if ($newStatus === 'resolved' && $oldStatus !== 'resolved') {
+    if ($newStatus === 'closed' && $oldStatus !== 'closed') {
         $slaModel->recordResolution($ticketId);
     }
     
@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
     try {
         $db = Database::getInstance()->getConnection();
         $notificationModel = new Notification($db);
-        $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
+        $statusLabels = ['pending' => 'Pending', 'in_progress' => 'In Progress', 'closed' => 'Closed'];
         $newStatusLabel = $statusLabels[$newStatus] ?? ucfirst($newStatus);
-        $notifType = $newStatus === 'resolved' ? 'ticket_resolved' : 'status_changed';
+        $notifType = $newStatus === 'closed' ? 'ticket_resolved' : 'status_changed';
         
         $notificationModel->create([
             'user_id' => $ticket['submitter_type'] === 'employee' ? null : $ticket['submitter_id'],
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
             $slaModel->recordFirstResponse($ticketId);
         }
         
-        if ($updateData['status'] === 'resolved' && $oldTicket['status'] !== 'resolved') {
+        if ($updateData['status'] === 'closed' && $oldTicket['status'] !== 'closed') {
             $slaModel->recordResolution($ticketId);
         }
         
@@ -143,9 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
         try {
             $db = Database::getInstance()->getConnection();
             $notificationModel = new Notification($db);
-            $statusLabels = ['pending' => 'Pending', 'open' => 'Open', 'in_progress' => 'In Progress', 'resolved' => 'Resolved', 'closed' => 'Closed'];
+            $statusLabels = ['pending' => 'Pending', 'in_progress' => 'In Progress', 'closed' => 'Closed'];
             $newStatusLabel = $statusLabels[$updateData['status']] ?? ucfirst($updateData['status']);
-            $notifType = $updateData['status'] === 'resolved' ? 'ticket_resolved' : 'status_changed';
+            $notifType = $updateData['status'] === 'closed' ? 'ticket_resolved' : 'status_changed';
             
             $notificationModel->create([
                 'user_id' => $ticket['submitter_type'] === 'employee' ? null : $ticket['submitter_id'],
@@ -284,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['resolve
     }
     $slaModel->recordResolution($ticketId);
     
-    $updateData = ['status' => 'resolved'];
+    $updateData = ['status' => 'closed'];
     if (!empty($resolution)) {
         $updateData['resolution'] = $resolution;
     }
@@ -294,8 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['resolve
         'user_id' => $currentUser['id'],
         'action_type' => 'status_change',
         'old_value' => $oldStatus,
-        'new_value' => 'resolved',
-        'comment' => !empty($resolution) ? "Resolved: " . $resolution : 'Ticket resolved'
+        'new_value' => 'closed',
+        'comment' => !empty($resolution) ? "Closed: " . $resolution : 'Ticket closed'
     ]);
     
     try {
@@ -305,25 +305,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['resolve
             'user_id' => $ticket['submitter_type'] === 'employee' ? null : $ticket['submitter_id'],
             'employee_id' => $ticket['submitter_type'] === 'employee' ? $ticket['submitter_id'] : null,
             'type' => 'ticket_resolved',
-            'title' => 'Ticket Resolved',
-            'message' => "Ticket #{$ticket['ticket_number']} has been resolved",
+            'title' => 'Ticket Closed',
+            'message' => "Ticket #{$ticket['ticket_number']} has been closed",
             'ticket_id' => $ticketId,
             'related_user_id' => $currentUser['id']
         ]);
     } catch (Exception $e) { error_log("Notification error: " . $e->getMessage()); }
     
     $ticketModel->update($ticketId, $updateData);
-    header("Location: view_ticket.php?id=" . $ticketId . "&success=resolved");
+    header("Location: view_ticket.php?id=" . $ticketId . "&success=closed");
     exit();
 }
 
 // Config arrays
 $statusConfig = [
-    'pending' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'icon' => 'fa-clock', 'label' => 'Pending'],
-    'open' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'border' => 'border-blue-200', 'icon' => 'fa-folder-open', 'label' => 'Open'],
-    'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'icon' => 'fa-spinner', 'label' => 'In Progress'],
-    'resolved' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'border' => 'border-green-200', 'icon' => 'fa-check-circle', 'label' => 'Resolved'],
-    'closed' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'border' => 'border-gray-200', 'icon' => 'fa-check-double', 'label' => 'Closed']
+    'pending'     => ['bg' => 'bg-amber-100',  'text' => 'text-amber-700',  'border' => 'border-amber-200',  'icon' => 'fa-clock',        'label' => 'Pending'],
+    'in_progress' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'icon' => 'fa-spinner',      'label' => 'In Progress'],
+    'closed'      => ['bg' => 'bg-gray-100',   'text' => 'text-gray-700',   'border' => 'border-gray-200',   'icon' => 'fa-check-double', 'label' => 'Closed'],
 ];
 $priorityConfig = [
     'low' => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'icon' => 'fa-arrow-down'],
@@ -374,7 +372,7 @@ include __DIR__ . '/../views/layouts/header.php';
                     'assigned' => 'Ticket assigned to you',
                     'comment' => 'Comment added',
                     'reply' => 'Reply sent',
-                    'resolved' => 'Ticket resolved',
+                    'closed' => 'Ticket closed successfully',
                     default => 'Updated successfully'
                 };
                 echo $successMsg;
@@ -514,7 +512,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         </div>
                         
                         <!-- Reply Form -->
-                        <?php if (!in_array($ticket['status'], ['resolved'])): ?>
+                        <?php if ($ticket['status'] !== 'closed'): ?>
                         <form method="POST" class="border-t border-gray-100 pt-4">
                             <div class="flex gap-3">
                                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32" 
@@ -534,7 +532,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         </form>
                         <?php else: ?>
                         <div class="border-t border-gray-100 pt-4 text-center">
-                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is resolved. Replies are disabled.</p>
+                            <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is closed. Replies are disabled.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -793,7 +791,6 @@ include __DIR__ . '/../views/layouts/header.php';
                             <select name="status" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="pending" <?= $ticket['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
                                 <option value="in_progress" <?= $ticket['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="resolved" <?= $ticket['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
                                 <option value="closed" <?= $ticket['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
                             </select>
                         </div>
@@ -835,7 +832,7 @@ include __DIR__ . '/../views/layouts/header.php';
 </div>
 
 <!-- Resolve Modal -->
-<?php if ($isITStaff && $ticket['status'] !== 'resolved'): ?>
+<?php if ($isITStaff && $ticket['status'] !== 'closed'): ?>
 <div id="resolveModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="document.getElementById('resolveModal').classList.add('hidden')"></div>
@@ -848,7 +845,7 @@ include __DIR__ . '/../views/layouts/header.php';
                     <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-check-circle text-green-600 text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Resolve Ticket</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Close Ticket</h3>
                     <p class="text-sm text-gray-500 mb-4">Add a resolution note to let the submitter know how their issue was resolved.</p>
                     
                     <textarea name="resolution_note" rows="4" 
@@ -862,7 +859,7 @@ include __DIR__ . '/../views/layouts/header.php';
                         Cancel
                     </button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                        <i class="fas fa-check mr-1"></i>Resolve Ticket
+                        <i class="fas fa-check mr-1"></i>Close Ticket
                     </button>
                 </div>
             </form>

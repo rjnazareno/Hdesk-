@@ -224,7 +224,7 @@ class Ticket {
                 END as submitter_name,
                 st.resolution_due_at,
                 CASE 
-                    WHEN t.status IN ('resolved', 'closed') THEN 'completed'
+                    WHEN t.status = 'closed' THEN 'completed'
                     WHEN NOW() > st.resolution_due_at THEN 'breached'
                     WHEN TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= 60 THEN 'at_risk'
                     ELSE 'safe'
@@ -244,7 +244,7 @@ class Ticket {
             $sql .= " AND t.status = :status";
             $params[':status'] = $filters['status'];
         } else {
-            $sql .= " AND t.status NOT IN ('resolved', 'closed')";
+            $sql .= " AND t.status != 'closed'";
         }
         
         $sql .= " ORDER BY FIELD(t.priority, 'high', 'medium', 'low'), t.grabbed_at DESC";
@@ -364,7 +364,7 @@ class Ticket {
                 st.response_due_at, st.resolution_due_at,
                 st.response_sla_status, st.resolution_sla_status,
                 CASE 
-                    WHEN t.status IN ('resolved', 'closed') THEN 
+                    WHEN t.status = 'closed' THEN 
                         CASE WHEN st.resolution_sla_status = 'met' THEN 'met' ELSE 'breached' END
                     WHEN NOW() > st.resolution_due_at THEN 'breached'
                     WHEN TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= 60 THEN 'at_risk'
@@ -392,12 +392,12 @@ class Ticket {
         
         // Handle assigned-only filter (for open tickets view)
         if (!empty($filters['assigned_only'])) {
-            $sql .= " AND t.assigned_to IS NOT NULL AND t.status NOT IN ('resolved','closed')";
+            $sql .= " AND t.assigned_to IS NOT NULL AND t.status != 'closed'";
         }
         
-        // Exclude resolved/closed (for pool view - matches dashboard formula)
+        // Exclude closed (for pool view - matches dashboard formula)
         if (!empty($filters['exclude_closed'])) {
-            $sql .= " AND t.status NOT IN ('resolved','closed')";
+            $sql .= " AND t.status != 'closed'";
         }
         
         if (!empty($filters['status'])) {
@@ -544,12 +544,12 @@ class Ticket {
         
         // Handle assigned-only filter (for open tickets view)
         if (!empty($filters['assigned_only'])) {
-            $sql .= " AND t.assigned_to IS NOT NULL AND t.status NOT IN ('resolved','closed')";
+            $sql .= " AND t.assigned_to IS NOT NULL AND t.status != 'closed'";
         }
         
-        // Exclude resolved/closed (for pool view - matches dashboard formula)
+        // Exclude closed (for pool view - matches dashboard formula)
         if (!empty($filters['exclude_closed'])) {
-            $sql .= " AND t.status NOT IN ('resolved','closed')";
+            $sql .= " AND t.status != 'closed'";
         }
         
         if (isset($filters['status']) && !empty($filters['status'])) {
@@ -646,8 +646,8 @@ class Ticket {
             $fields[] = "grabbed_at = NOW()";
         }
         
-        // Set resolved_at timestamp when status changes to resolved
-        if (isset($data['status']) && $data['status'] === 'resolved') {
+        // Set resolved_at timestamp when status changes to closed
+        if (isset($data['status']) && $data['status'] === 'closed') {
             $fields[] = "resolved_at = NOW()";
         }
         
@@ -675,13 +675,13 @@ class Ticket {
     public function getStats($userId = null, $userRole = null) {
         $sql = "SELECT 
                 COUNT(*) as total,
-                SUM(CASE WHEN grabbed_by IS NULL AND status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) as new_tickets,
+                SUM(CASE WHEN grabbed_by IS NULL AND status != 'closed' THEN 1 ELSE 0 END) as new_tickets,
                 SUM(CASE WHEN status IN ('open','in_progress','pending') THEN 1 ELSE 0 END) as open_tickets,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
                 SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN status IN ('resolved','closed') THEN 1 ELSE 0 END) as closed_tickets,
+                SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_tickets,
                 SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open,
-                SUM(CASE WHEN status = 'resolved' OR status = 'closed' THEN 1 ELSE 0 END) as resolved,
+                SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as resolved,
                 SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) as high,
                 SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) as medium
                 FROM tickets WHERE 1=1";
@@ -743,7 +743,7 @@ class Ticket {
                         0 as new_count,
                         COUNT(*) as closed_count
                     FROM tickets
-                    WHERE status IN ('resolved', 'closed')
+                    WHERE status = 'closed'
                                             AND updated_at >= DATE_SUB(CURDATE(), INTERVAL {$days} DAY)
                                         GROUP BY DATE(updated_at)
                 ) daily_rollup
@@ -806,7 +806,7 @@ class Ticket {
         $sql = "SELECT 
                 SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as new,
                 SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-                SUM(CASE WHEN (status = 'resolved' OR status = 'closed') AND DATE(updated_at) = CURDATE() THEN 1 ELSE 0 END) as closed,
+                SUM(CASE WHEN status = 'closed' AND DATE(updated_at) = CURDATE() THEN 1 ELSE 0 END) as closed,
                 SUM(CASE WHEN status IN ('open', 'pending', 'in_progress') THEN 1 ELSE 0 END) as open
                 FROM tickets";
         
