@@ -102,13 +102,22 @@ class CustomerCreateTicketController {
         // Use submitted priority first; fall back to category-mapped priority if nothing was submitted
         $finalPriority = $submittedPriority ?: ($mappedPriority ?? 'medium');
         
-        // Prepare ticket data WITHOUT department (Super Admin will assign)
+        // Determine department_id: use submitted value, else derive from category
+        $departmentId = !empty($_POST['department_id']) ? (int)$_POST['department_id'] : null;
+        if (!$departmentId && $categoryId) {
+            $db = Database::getInstance()->getConnection();
+            $catRow = $db->prepare("SELECT department_id FROM categories WHERE id = ? LIMIT 1");
+            $catRow->execute([$categoryId]);
+            $departmentId = (int)($catRow->fetchColumn() ?: 0) ?: null;
+        }
+
+        // Prepare ticket data
         $ticketData = [
             'ticket_number' => $ticketNumber,
             'title' => sanitize($_POST['title']),
             'description' => sanitize($_POST['description']),
             'category_id' => $categoryId,
-            'department_id' => null, // Super Admin assigns department
+            'department_id' => $departmentId,
             'priority' => $finalPriority,
             'status' => 'pending',
             'submitter_id' => $this->currentUser['id'],
