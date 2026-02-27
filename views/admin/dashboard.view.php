@@ -166,7 +166,7 @@ include __DIR__ . '/../layouts/header.php';
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-8">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="text-lg font-semibold text-slate-800">SLA Report</h3>
+                    <h3 class="text-lg font-semibold text-slate-800">My SLA Report</h3>
                     <p class="text-sm text-slate-500"><?php echo htmlspecialchars($monthlySlaReport['month_label'] ?? date('F Y')); ?> summary for workload and capacity planning</p>
                 </div>
                 <a href="sla_performance.php" class="text-sm text-teal-600 hover:text-teal-700 font-medium">View Details →</a>
@@ -200,7 +200,7 @@ include __DIR__ . '/../layouts/header.php';
 
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">Entered</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wide">Received</div>
                     <div class="text-2xl font-bold text-slate-800 mt-1"><?php echo (int)($monthlySlaReport['total_entered'] ?? 0); ?></div>
                     <div class="text-xs text-slate-500 mt-1">Tickets created this month</div>
                 </div>
