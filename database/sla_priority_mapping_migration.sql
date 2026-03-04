@@ -56,7 +56,7 @@ SET @cat_salary = (SELECT id FROM categories WHERE name = 'Salary Dispute' AND d
 
 INSERT IGNORE INTO `categories` (`department_id`, `parent_id`, `name`, `description`, `icon`, `color`, `sort_order`) VALUES
 (@dept_hr, @cat_salary, 'Payslip Dispute (a day before cutoff)', 'Urgent payslip dispute before payroll cutoff', 'exclamation-circle', '#EF4444', 1),
-(@dept_hr, @cat_salary, 'Payslip Dispute (after cutoff)', 'Payslip dispute after payroll cutoff date', 'clock', '#EF4444', 2);
+(@dept_hr, @cat_salary, 'Draft Payslip', 'Draft payslip review and disputes', 'clock', '#EF4444', 2);
 
 -- Timekeeping Sub-categories (Harley)
 SET @cat_timekeeping = (SELECT id FROM categories WHERE name = 'Timekeeping concerns' AND department_id = @dept_hr LIMIT 1);
@@ -300,7 +300,7 @@ ON DUPLICATE KEY UPDATE default_priority = 'high';
 
 -- Payslip Dispute (after cutoff) → LOW
 INSERT INTO category_priority_map (category_id, default_priority)
-SELECT id, 'low' FROM categories WHERE name = 'Payslip Dispute (after cutoff)' AND parent_id = @cat_salary LIMIT 1
+SELECT id, 'low' FROM categories WHERE name = 'Draft Payslip' AND parent_id = @cat_salary LIMIT 1
 ON DUPLICATE KEY UPDATE default_priority = 'low';
 
 -- === Timekeeping Sub-categories ===

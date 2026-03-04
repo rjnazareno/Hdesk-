@@ -61,16 +61,16 @@ try {
         $salaryId = $catSalary->fetchColumn();
 
         if ($salaryId) {
-            // Rename "Payslip Disputes" / "Payslip Dispute (after cutoff)"
+            // Rename "Payslip Disputes" / "Payslip Dispute (after cutoff)" → "Draft Payslip"
             $rename = $db->prepare(
                 "UPDATE categories 
-                 SET name = 'Payslip Dispute', 
-                     description = 'Disputes regarding payslip entries and amounts'
+                 SET name = 'Draft Payslip', 
+                     description = 'Draft payslip review and disputes'
                  WHERE name IN ('Payslip Disputes', 'Payslip Dispute (after cutoff)')
                    AND parent_id = ?"
             );
             $rename->execute([$salaryId]);
-            $results[] = "Renamed Payslip Disputes → Payslip Dispute ({$rename->rowCount()} row(s))";
+            $results[] = "Renamed Payslip Disputes → Draft Payslip ({$rename->rowCount()} row(s))";
 
             // Rename "Payslip Dispute (a day before cutoff)" → "Draft Payslip"
             $renameDraft = $db->prepare(
