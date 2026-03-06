@@ -391,26 +391,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Level 3: Specific Concern -->
-                            <div class="dropdown-level hidden" id="level3Wrapper">
-                                <label class="flex items-center text-sm font-semibold text-gray-700 mb-2">
-                                    <div class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center mr-2">
-                                        <span class="text-sm font-bold text-teal-600">3</span>
-                                    </div>
-                                    Specific Concern <span class="text-red-500 ml-1">*</span>
-                                </label>
-                                <select id="specificConcernSelect" 
-                                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all bg-white"
-                                        onchange="onSpecificConcernChange(this.value)">
-                                    <option value="">-- Select specific concern --</option>
-                                </select>
-                                <!-- Other text input for specific concern -->
-                                <div id="specificOtherInput" class="hidden mt-2">
-                                    <input type="text" id="specificOtherText" 
-                                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                           placeholder="Please describe your specific concern..." oninput="updateAutoTitle()">
-                                </div>
-                            </div>
+
                         </div>
 
                         <!-- Auto-Generated Title -->
@@ -605,7 +586,7 @@
         // Tracks the selection at each dropdown level
         let selectedLevel1 = null; // category id or 'other'
         let selectedLevel2 = null; // subcategory id or 'other'
-        let selectedLevel3 = null; // specific concern id or 'other'
+
         
         // ─── Department Selection (Step 1) ───
         function selectDepartment(element, deptId, deptCode) {
@@ -665,7 +646,6 @@
             
             // Reset downstream
             resetLevel(2);
-            resetLevel(3);
             selectedLevel1 = null;
             updateAutoTitle();
         }
@@ -673,13 +653,11 @@
         // ─── Level 1: Category Changed ───
         function onCategoryChange(value) {
             resetLevel(2);
-            resetLevel(3);
             selectedLevel1 = value || null;
             
             if (value === 'other') {
                 document.getElementById('categoryOtherInput').classList.remove('hidden');
                 document.getElementById('level2Wrapper').classList.add('hidden');
-                document.getElementById('level3Wrapper').classList.add('hidden');
                 document.getElementById('category_id').value = '';
                 applyAutoPriority(null);
             } else if (value) {
@@ -694,12 +672,10 @@
                     document.getElementById('level2Wrapper').classList.remove('hidden');
                 } else {
                     document.getElementById('level2Wrapper').classList.add('hidden');
-                    document.getElementById('level3Wrapper').classList.add('hidden');
                 }
             } else {
                 document.getElementById('categoryOtherInput').classList.add('hidden');
                 document.getElementById('level2Wrapper').classList.add('hidden');
-                document.getElementById('level3Wrapper').classList.add('hidden');
                 document.getElementById('category_id').value = '';
                 applyAutoPriority(null);
             }
@@ -726,12 +702,10 @@
         
         // ─── Level 2: Subcategory Changed ───
         function onSubcategoryChange(value) {
-            resetLevel(3);
             selectedLevel2 = value || null;
             
             if (value === 'other') {
                 document.getElementById('subcategoryOtherInput').classList.remove('hidden');
-                document.getElementById('level3Wrapper').classList.add('hidden');
                 if (selectedLevel1 && selectedLevel1 !== 'other') {
                     document.getElementById('category_id').value = selectedLevel1;
                 }
@@ -740,18 +714,8 @@
                 document.getElementById('subcategoryOtherInput').classList.add('hidden');
                 document.getElementById('category_id').value = value;
                 applyAutoPriority(value);
-                
-                // Check if this subcategory also has children (specific concerns)
-                const children = getChildCategories(value);
-                if (children.length > 0) {
-                    populateSpecificConcernDropdown(children);
-                    document.getElementById('level3Wrapper').classList.remove('hidden');
-                } else {
-                    document.getElementById('level3Wrapper').classList.add('hidden');
-                }
             } else {
                 document.getElementById('subcategoryOtherInput').classList.add('hidden');
-                document.getElementById('level3Wrapper').classList.add('hidden');
                 if (selectedLevel1 && selectedLevel1 !== 'other') {
                     document.getElementById('category_id').value = selectedLevel1;
                     applyAutoPriority(selectedLevel1);
@@ -762,47 +726,7 @@
             updateBreadcrumb();
         }
         
-        // ─── Populate Level 3: Specific Concern ───
-        function populateSpecificConcernDropdown(children) {
-            const select = document.getElementById('specificConcernSelect');
-            select.innerHTML = '<option value="">-- Select specific concern --</option>';
-            children.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat.id;
-                opt.textContent = cat.name;
-                select.appendChild(opt);
-            });
-            const otherOpt = document.createElement('option');
-            otherOpt.value = 'other';
-            otherOpt.textContent = 'Other (not listed above)';
-            select.appendChild(otherOpt);
-        }
-        
-        // ─── Level 3: Specific Concern Changed ───
-        function onSpecificConcernChange(value) {
-            selectedLevel3 = value || null;
-            
-            if (value === 'other') {
-                document.getElementById('specificOtherInput').classList.remove('hidden');
-                if (selectedLevel2 && selectedLevel2 !== 'other') {
-                    document.getElementById('category_id').value = selectedLevel2;
-                }
-                applyAutoPriority(selectedLevel2);
-            } else if (value) {
-                document.getElementById('specificOtherInput').classList.add('hidden');
-                document.getElementById('category_id').value = value;
-                applyAutoPriority(value);
-            } else {
-                document.getElementById('specificOtherInput').classList.add('hidden');
-                if (selectedLevel2 && selectedLevel2 !== 'other') {
-                    document.getElementById('category_id').value = selectedLevel2;
-                    applyAutoPriority(selectedLevel2);
-                }
-            }
-            
-            updateAutoTitle();
-            updateBreadcrumb();
-        }
+
         
         // ─── Reset a dropdown level ───
         function resetLevel(level) {
@@ -813,13 +737,7 @@
                 document.getElementById('subcategoryOtherText').value = '';
                 document.getElementById('level2Wrapper').classList.add('hidden');
             }
-            if (level <= 3) {
-                selectedLevel3 = null;
-                document.getElementById('specificConcernSelect').innerHTML = '<option value="">-- Select specific concern --</option>';
-                document.getElementById('specificOtherInput').classList.add('hidden');
-                document.getElementById('specificOtherText').value = '';
-                document.getElementById('level3Wrapper').classList.add('hidden');
-            }
+
         }
         
         // ─── Auto-Generate Title ───
@@ -840,14 +758,6 @@
                 parts.push(otherText ? 'Other: ' + otherText : 'Other');
             } else if (selectedLevel2) {
                 parts.push(getCategoryName(selectedLevel2));
-            }
-            
-            // Level 3
-            if (selectedLevel3 === 'other') {
-                const otherText = document.getElementById('specificOtherText').value.trim();
-                parts.push(otherText ? 'Other: ' + otherText : 'Other');
-            } else if (selectedLevel3) {
-                parts.push(getCategoryName(selectedLevel3));
             }
             
             const title = parts.join(' - ');
@@ -891,15 +801,8 @@
                 parts.push(getCategoryName(selectedLevel2));
             }
             
-            if (selectedLevel3 === 'other') {
-                const t = document.getElementById('specificOtherText').value.trim();
-                parts.push(t ? 'Other: ' + t : 'Other');
-            } else if (selectedLevel3) {
-                parts.push(getCategoryName(selectedLevel3));
-            }
-            
             if (parts.length > 0) {
-                const colors = ['text-blue-700', 'text-purple-700', 'text-teal-700'];
+                const colors = ['text-blue-700', 'text-purple-700'];
                 textEl.innerHTML = parts.map(function(p, i) {
                     var separator = i < parts.length - 1 ? ' <i class="fas fa-chevron-right text-emerald-400 text-xs mx-1"></i> ' : '';
                     return '<span class="' + colors[i] + ' font-medium">' + p + '</span>' + separator;
@@ -1072,14 +975,8 @@
             } else if (selectedLevel2) {
                 pathParts.push(getCategoryName(selectedLevel2));
             }
-            if (selectedLevel3 === 'other') {
-                var t3 = document.getElementById('specificOtherText').value.trim();
-                pathParts.push(t3 ? 'Other: ' + t3 : 'Other');
-            } else if (selectedLevel3) {
-                pathParts.push(getCategoryName(selectedLevel3));
-            }
             
-            var colors = ['bg-blue-100 text-blue-700', 'bg-purple-100 text-purple-700', 'bg-teal-100 text-teal-700'];
+            var colors = ['bg-blue-100 text-blue-700', 'bg-purple-100 text-purple-700'];
             pathContainer.innerHTML = pathParts.map(function(p, i) {
                 var arrow = i < pathParts.length - 1 ? '<i class="fas fa-arrow-right text-gray-400 text-xs"></i>' : '';
                 return '<span class="px-2.5 py-1 rounded-lg text-xs font-medium ' + colors[i] + '">' + p + '</span>' + arrow;
