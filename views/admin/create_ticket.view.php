@@ -418,9 +418,7 @@ include __DIR__ . '/../layouts/header.php';
                             </div>
                         </div>
                         
-                        <select id="category_id" name="category_id" required class="hidden">
-                            <option value="">Select category...</option>
-                        </select>
+                        <input type="hidden" id="category_id" name="category_id" value="">
                     </div>
                     
                     <!-- Title -->

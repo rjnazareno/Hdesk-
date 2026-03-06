@@ -430,9 +430,7 @@
                         </div>
 
                         <!-- Hidden category_id (set by JS) -->
-                        <select id="category_id" name="category_id" required class="hidden">
-                            <option value="">Select category...</option>
-                        </select>
+                        <input type="hidden" id="category_id" name="category_id" value="">
                         
                         <!-- Description (below title for better context) -->
                         <div class="mb-6">
@@ -480,34 +478,14 @@
                                 </div>
                             </div>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <label class="priority-option relative cursor-pointer">
-                                    <input type="radio" name="priority" value="low" class="hidden peer">
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-green-500 peer-checked:bg-green-50 transition-all hover:border-green-300 hover:bg-green-50/50">
-                                        <span class="text-2xl">🟢</span>
-                                        <p class="text-sm font-medium mt-1">Low</p>
-                                        <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400" id="slaResLow">Resolution: 56–120 hours</p>
-                                    </div>
-                                </label>
-                                <label class="priority-option relative cursor-pointer">
-                                    <input type="radio" name="priority" value="medium" class="hidden peer" checked>
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-yellow-500 peer-checked:bg-yellow-50 transition-all hover:border-yellow-300 hover:bg-yellow-50/50">
-                                        <span class="text-2xl">🟡</span>
-                                        <p class="text-sm font-medium mt-1">Medium</p>
-                                        <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400" id="slaResMed">Resolution: 48–72 hours</p>
-                                    </div>
-                                </label>
-                                <label class="priority-option relative cursor-pointer">
-                                    <input type="radio" name="priority" value="high" class="hidden peer">
-                                    <div class="p-3 border-2 border-gray-200 rounded-xl text-center peer-checked:border-red-500 peer-checked:bg-red-50 transition-all hover:border-red-300 hover:bg-red-50/50">
-                                        <span class="text-2xl">🔴</span>
-                                        <p class="text-sm font-medium mt-1">High</p>
-                                        <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400" id="slaResHigh">Resolution: 24 hours</p>
-                                    </div>
-                                </label>
+                            <div>
+                                <label for="prioritySelect" class="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
+                                <select id="prioritySelect" name="priority" class="w-full p-3 border-2 border-gray-200 rounded-xl bg-white focus:border-cyan-500 focus:ring-0 transition-colors">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                                <p id="prioritySlaHint" class="text-xs text-gray-500 mt-2">Response: 24 hours | Resolution: 48-72 hours</p>
                             </div>
                         </div>
                         
@@ -649,8 +627,8 @@
             // Populate the Level 1 (Category) dropdown
             populateCategoryDropdown(deptId);
             
-            // Update SLA resolution text on priority cards per department
-            updateSlaCards();
+            // Update SLA hint text based on selected department and priority
+            updatePrioritySlaHint();
         }
         
         // ─── Helpers ───
@@ -682,7 +660,7 @@
             // Add "Other" option
             const otherOpt = document.createElement('option');
             otherOpt.value = 'other';
-            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            otherOpt.textContent = 'Other (not listed above)';
             select.appendChild(otherOpt);
             
             // Reset downstream
@@ -742,7 +720,7 @@
             });
             const otherOpt = document.createElement('option');
             otherOpt.value = 'other';
-            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            otherOpt.textContent = 'Other (not listed above)';
             select.appendChild(otherOpt);
         }
         
@@ -796,7 +774,7 @@
             });
             const otherOpt = document.createElement('option');
             otherOpt.value = 'other';
-            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            otherOpt.textContent = 'Other (not listed above)';
             select.appendChild(otherOpt);
         }
         
@@ -936,16 +914,15 @@
         function applyAutoPriority(categoryId) {
             const banner = document.getElementById('autoPriorityBanner');
             const mappedPriority = categoryId ? priorityMapData[categoryId] : null;
+            const prioritySelect = document.getElementById('prioritySelect');
             
             // Get department-specific SLA info
             const deptCode = selectedDepartmentCode ? selectedDepartmentCode.toUpperCase() : 'HR';
             const deptSla = slaTargetsData[deptCode] || slaTargetsData['HR'] || slaTargetsDefault;
 
             if (mappedPriority) {
-                const radio = document.querySelector('input[name="priority"][value="' + mappedPriority + '"]');
-                if (radio) {
-                    document.querySelectorAll('input[name="priority"]').forEach(function(r) { r.checked = false; });
-                    radio.checked = true;
+                if (prioritySelect) {
+                    prioritySelect.value = mappedPriority;
                 }
                 const labels = { low: 'Low', medium: 'Medium', high: 'High' };
                 const slaHigh = deptSla.high || {};
@@ -960,25 +937,29 @@
                 document.getElementById('slaInfoText').textContent = slaInfo[mappedPriority];
                 banner.classList.remove('hidden');
             } else {
-                const medRadio = document.querySelector('input[name="priority"][value="medium"]');
-                if (medRadio) {
-                    document.querySelectorAll('input[name="priority"]').forEach(function(r) { r.checked = false; });
-                    medRadio.checked = true;
+                if (prioritySelect) {
+                    prioritySelect.value = 'medium';
                 }
                 banner.classList.add('hidden');
             }
+
+            updatePrioritySlaHint();
         }
 
-        // ─── Update SLA Display on Priority Cards ───
-        function updateSlaCards() {
+        // ─── Update SLA Hint for Selected Priority ───
+        function updatePrioritySlaHint() {
+            const prioritySelect = document.getElementById('prioritySelect');
+            const selectedPriority = prioritySelect ? prioritySelect.value : 'medium';
             const deptCode = selectedDepartmentCode ? selectedDepartmentCode.toUpperCase() : 'HR';
             const deptSla = slaTargetsData[deptCode] || slaTargetsData['HR'] || slaTargetsDefault;
-            if (deptSla.high && document.getElementById('slaResHigh'))
-                document.getElementById('slaResHigh').textContent = 'Resolution: ' + deptSla.high.resolution;
-            if (deptSla.medium && document.getElementById('slaResMed'))
-                document.getElementById('slaResMed').textContent = 'Resolution: ' + deptSla.medium.resolution;
-            if (deptSla.low && document.getElementById('slaResLow'))
-                document.getElementById('slaResLow').textContent = 'Resolution: ' + deptSla.low.resolution;
+
+            const sla = (deptSla && deptSla[selectedPriority]) ? deptSla[selectedPriority] : null;
+            const hint = document.getElementById('prioritySlaHint');
+            if (hint) {
+                const response = sla && sla.response ? sla.response : '24 hours';
+                const resolution = sla && sla.resolution ? sla.resolution : '48-72 hours';
+                hint.textContent = 'Response: ' + response + ' | Resolution: ' + resolution;
+            }
         }
         
         // ─── Step Navigation ───
@@ -1012,10 +993,27 @@
                     return;
                 }
                 
-                // If category_id is empty (all "Other"), set a fallback
-                if (!categoryId && selectedLevel1 === 'other') {
-                    var fallback = categoriesData.find(function(c) { return Number(c.department_id) === Number(selectedDepartmentId) && !c.parent_id; });
-                    document.getElementById('category_id').value = fallback ? fallback.id : '';
+                // If category_id is empty ("Other" selected at Level 1), use the department's
+                // General Inquiry / IT General Inquiry "Others" subcategory as fallback
+                if (!categoryId) {
+                    var generalParent = categoriesData.find(function(c) {
+                        return Number(c.department_id) === Number(selectedDepartmentId) 
+                            && !c.parent_id 
+                            && (c.name === 'General Inquiry' || c.name === 'IT General Inquiry');
+                    });
+                    if (generalParent) {
+                        // Try to find "Others" sub under General Inquiry
+                        var othersSub = categoriesData.find(function(c) {
+                            return Number(c.parent_id) === Number(generalParent.id) && c.name === 'Others';
+                        });
+                        document.getElementById('category_id').value = othersSub ? othersSub.id : generalParent.id;
+                    } else {
+                        // Last resort: first parent in this department
+                        var fallback = categoriesData.find(function(c) {
+                            return Number(c.department_id) === Number(selectedDepartmentId) && !c.parent_id;
+                        });
+                        document.getElementById('category_id').value = fallback ? fallback.id : '0';
+                    }
                 }
                 
                 populateReview();
@@ -1088,7 +1086,7 @@
             }).join(' ');
             
             // Priority
-            var priority = document.querySelector('input[name="priority"]:checked');
+            var priority = document.getElementById('prioritySelect');
             var priorityLabels = { low: '\uD83D\uDFE2 Low', medium: '\uD83D\uDFE1 Medium', high: '\uD83D\uDD34 High' };
             document.getElementById('reviewPriority').textContent = priority ? priorityLabels[priority.value] : '-';
             
@@ -1123,6 +1121,14 @@
             uploadPlaceholder.classList.remove('hidden');
             filePreview.classList.add('hidden');
             filePreview.classList.remove('flex');
+        }
+
+        var prioritySelect = document.getElementById('prioritySelect');
+        if (prioritySelect) {
+            prioritySelect.addEventListener('change', function() {
+                updatePrioritySlaHint();
+            });
+            updatePrioritySlaHint();
         }
         
         // ─── Form Submission ───

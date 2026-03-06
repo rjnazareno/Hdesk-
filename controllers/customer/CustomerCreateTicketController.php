@@ -96,7 +96,7 @@ class CustomerCreateTicketController {
         $submittedPriority = sanitize($_POST['priority']);
         $mappedPriority = null;
         
-        if ($this->priorityMapModel->tableExists()) {
+        if ($categoryId > 0 && $this->priorityMapModel->tableExists()) {
             $mappedPriority = $this->priorityMapModel->getDefaultPriority($categoryId);
         }
         
