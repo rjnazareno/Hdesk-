@@ -77,9 +77,30 @@ try {
     $db->beginTransaction();
 
     // =========================================================
+    // STEP 0: Purge ALL '*HR to file Ticket' rows
+    //   These are OnBoarding/OffBoarding subs created by broken
+    //   migration (lastInsertId=0 bug). They got parent_id=0
+    //   which makes them float as pseudo-parents in dropdowns.
+    //   Migration will recreate them correctly after cleanup.
+    // =========================================================
+    echo "--- STEP 0: Purge orphaned '*HR to file Ticket' ---\n";
+    $hrFileRows = $db->query("SELECT id, parent_id FROM categories WHERE name = '*HR to file Ticket'")->fetchAll(PDO::FETCH_ASSOC);
+    $purged = 0;
+    $deleteStmt0 = $db->prepare("DELETE FROM categories WHERE id = :id");
+    $deletePri0  = $db->prepare("DELETE FROM category_priority_map WHERE category_id = :id");
+    foreach ($hrFileRows as $row) {
+        $deletePri0->execute([':id' => $row['id']]);
+        $deleteStmt0->execute([':id' => $row['id']]);
+        $purged++;
+        echo "  PURGED '*HR to file Ticket' id={$row['id']} (parent_id=" . ($row['parent_id'] ?? 'NULL') . ")\n";
+    }
+    if ($purged === 0) echo "  None found.\n";
+    else echo "  Total purged: $purged (migration will recreate correctly)\n";
+
+    // =========================================================
     // STEP 1: Fix parent_id = 0 → NULL
     // =========================================================
-    echo "--- STEP 1: Normalize parent_id ---\n";
+    echo "\n--- STEP 1: Normalize parent_id ---\n";
     $fixed = $db->exec("UPDATE categories SET parent_id = NULL WHERE parent_id = 0");
     echo "  Fixed $fixed rows (parent_id 0 → NULL)\n";
 
