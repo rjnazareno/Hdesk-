@@ -590,7 +590,7 @@
         // ─── Helpers ───
         function getChildCategories(parentId) {
             return categoriesData
-                .filter(c => Number(c.parent_id) === Number(parentId))
+                .filter(c => Number(c.parent_id) === Number(parentId) && !c.name.startsWith('*'))
                 .sort((a, b) => a.name.localeCompare(b.name));
         }
         
@@ -603,7 +603,7 @@
         function populateCategoryDropdown(deptId) {
             const select = document.getElementById('categorySelect');
             const parentCats = categoriesData
-                .filter(c => Number(c.department_id) === Number(deptId) && !c.parent_id)
+                .filter(c => Number(c.department_id) === Number(deptId) && !c.parent_id && !c.name.startsWith('*'))
                 .sort((a, b) => a.name.localeCompare(b.name));
             
             select.innerHTML = '<option value="">-- Select a category --</option>';
