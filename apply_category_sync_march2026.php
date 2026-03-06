@@ -78,6 +78,73 @@ try {
         echo "  Note: " . htmlspecialchars($e->getMessage()) . "\n";
     }
 }
+
+// =====================================================
+// PRE-MIGRATION: Deduplicate categories table
+// =====================================================
+echo "\n--- PRE-MIGRATION: Deduplicating categories ---\n";
+try {
+    // 1. Deduplicate PARENT categories (same name + department_id + parent_id IS NULL)
+    //    Keep the one with the lowest id, reassign children of extras, then deactivate extras
+    $dupParents = $db->query("
+        SELECT name, department_id, MIN(id) AS keep_id, GROUP_CONCAT(id ORDER BY id) AS all_ids, COUNT(*) AS cnt
+        FROM categories
+        WHERE parent_id IS NULL
+        GROUP BY name, department_id
+        HAVING COUNT(*) > 1
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    $parentsMerged = 0;
+    foreach ($dupParents as $dup) {
+        $keepId = $dup['keep_id'];
+        $allIds = explode(',', $dup['all_ids']);
+        $extraIds = array_filter($allIds, function($id) use ($keepId) { return $id != $keepId; });
+        if (empty($extraIds)) continue;
+
+        $extraList = implode(',', array_map('intval', $extraIds));
+        // Reassign children of duplicate parents to the kept parent
+        $db->exec("UPDATE categories SET parent_id = $keepId WHERE parent_id IN ($extraList)");
+        // Deactivate and mark duplicate parents
+        $db->exec("UPDATE categories SET is_active = 0 WHERE id IN ($extraList)");
+        // Delete orphaned priority mappings for the deactivated parents
+        $db->exec("DELETE FROM category_priority_map WHERE category_id IN ($extraList)");
+        $parentsMerged += count($extraIds);
+    }
+    if ($parentsMerged > 0) echo "  Merged $parentsMerged duplicate parent categories\n";
+
+    // 2. Deduplicate CHILD categories (same name + parent_id)
+    //    Keep the one with lowest id, deactivate extras
+    $dupChildren = $db->query("
+        SELECT name, parent_id, MIN(id) AS keep_id, GROUP_CONCAT(id ORDER BY id) AS all_ids, COUNT(*) AS cnt
+        FROM categories
+        WHERE parent_id IS NOT NULL
+        GROUP BY name, parent_id
+        HAVING COUNT(*) > 1
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    $childrenMerged = 0;
+    foreach ($dupChildren as $dup) {
+        $keepId = $dup['keep_id'];
+        $allIds = explode(',', $dup['all_ids']);
+        $extraIds = array_filter($allIds, function($id) use ($keepId) { return $id != $keepId; });
+        if (empty($extraIds)) continue;
+
+        $extraList = implode(',', array_map('intval', $extraIds));
+        // Update any tickets pointing to duplicate categories to use the kept one
+        $db->exec("UPDATE tickets SET category_id = $keepId WHERE category_id IN ($extraList)");
+        // Deactivate duplicate children
+        $db->exec("UPDATE categories SET is_active = 0 WHERE id IN ($extraList)");
+        // Remove their priority mappings
+        $db->exec("DELETE FROM category_priority_map WHERE category_id IN ($extraList)");
+        $childrenMerged += count($extraIds);
+    }
+    if ($childrenMerged > 0) echo "  Merged $childrenMerged duplicate sub-categories\n";
+
+    if ($parentsMerged == 0 && $childrenMerged == 0) echo "  No duplicates found — OK\n";
+} catch (PDOException $e) {
+    echo "  Note: " . htmlspecialchars($e->getMessage()) . "\n";
+}
+
 echo "\n";
 
 try {
@@ -120,18 +187,24 @@ try {
     echo "Departments: HR=id$deptHR, IT=id$deptIT\n\n";
 
     // Helper: find-or-create a parent category (checks multiple possible old names)
+    // ALWAYS reactivates the parent if found (fixes deactivated-parent bug)
     function findOrCreateParent($db, $findParent, $insertParent, $deptId, $targetName, $oldNames, $desc, $icon, $color, $sort, &$results) {
         // Try current target name first
         $findParent->execute([':name' => $targetName, ':dept' => $deptId]);
         $id = $findParent->fetchColumn();
-        if ($id) return $id;
+        if ($id) {
+            // Ensure it's active and has correct description
+            $db->prepare("UPDATE categories SET is_active = 1, description = :d WHERE id = :id")
+               ->execute([':d' => $desc, ':id' => $id]);
+            return $id;
+        }
 
         // Try old names and rename if found
         foreach ($oldNames as $old) {
             $findParent->execute([':name' => $old, ':dept' => $deptId]);
             $id = $findParent->fetchColumn();
             if ($id) {
-                $db->prepare("UPDATE categories SET name = :n, description = :d WHERE id = :id")
+                $db->prepare("UPDATE categories SET name = :n, description = :d, is_active = 1 WHERE id = :id")
                    ->execute([':n' => $targetName, ':d' => $desc, ':id' => $id]);
                 $results[] = "Renamed '$old' → '$targetName' (id=$id)";
                 return $id;
