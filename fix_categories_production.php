@@ -175,12 +175,23 @@ try {
 }
 
 // ─── PHASE 2: SYNC CATEGORIES TO MATCH SPREADSHEET ───
-// NOTE: NO transaction here — each INSERT auto-commits so LAST_INSERT_ID() works on Hostinger
 echo "═══ PHASE 2: SYNC CATEGORIES ═══\n\n";
+
+// Force emulated prepares + buffered queries for Hostinger compatibility
+$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+$db->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 
 $results = [];
 
-// Ensure unique index on priority map
+// Clean priority map duplicates before adding unique index
+$db->exec("
+    DELETE cpm1 FROM category_priority_map cpm1
+    INNER JOIN category_priority_map cpm2
+    ON cpm1.category_id = cpm2.category_id AND cpm1.id > cpm2.id
+");
+// Also remove any rows for category_id = 0 (from previous buggy runs)
+$db->exec("DELETE FROM category_priority_map WHERE category_id = 0");
+
 try {
     $db->exec("ALTER TABLE category_priority_map ADD UNIQUE INDEX uk_category (category_id)");
 } catch (PDOException $e) {
@@ -188,9 +199,19 @@ try {
 }
 
 /**
- * Hostinger-proof helper: find or create a parent category.
- * Uses fresh prepare() calls each time (no reused statements).
- * Uses SQL LAST_INSERT_ID() instead of PHP lastInsertId().
+ * Get new category ID after INSERT using MAX(id) comparison.
+ * This works on ALL hosting including Hostinger where LAST_INSERT_ID() returns 0.
+ */
+function getMaxCatId($db) {
+    $s = $db->query("SELECT MAX(id) FROM categories");
+    $v = (int) $s->fetchColumn();
+    $s->closeCursor();
+    $s = null;
+    return $v;
+}
+
+/**
+ * Find or create a parent category. Uses MAX(id) to detect new ID.
  */
 function findOrCreateParent($db, $deptId, $name, $oldNames, $desc, $icon, $color, $sort, &$results) {
     // Check current name
@@ -198,8 +219,12 @@ function findOrCreateParent($db, $deptId, $name, $oldNames, $desc, $icon, $color
     $stmt->execute([$name, $deptId]);
     $id = $stmt->fetchColumn();
     $stmt->closeCursor();
+    $stmt = null;
     if ($id) {
-        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?")->execute([$id]);
+        $u = $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?");
+        $u->execute([$id]);
+        $u->closeCursor();
+        $u = null;
         return (int)$id;
     }
     // Check old names and rename
@@ -208,50 +233,67 @@ function findOrCreateParent($db, $deptId, $name, $oldNames, $desc, $icon, $color
         $stmt->execute([$old, $deptId]);
         $id = $stmt->fetchColumn();
         $stmt->closeCursor();
+        $stmt = null;
         if ($id) {
-            $db->prepare("UPDATE categories SET name = ?, is_active = 1 WHERE id = ?")->execute([$name, $id]);
-            $results[] = "✓ Renamed '$old' → '$name' (id=$id)";
+            $u = $db->prepare("UPDATE categories SET name = ?, is_active = 1 WHERE id = ?");
+            $u->execute([$name, $id]);
+            $u->closeCursor();
+            $u = null;
+            $results[] = "  ✓ Renamed '$old' → '$name' (id=$id)";
             return (int)$id;
         }
     }
-    // Create new
-    $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, NULL, ?, ?, ?, ?, ?, 1)")
-       ->execute([$deptId, $name, $desc, $icon, $color, $sort]);
-    // Get ID — use SQL LAST_INSERT_ID() (works on Hostinger unlike PHP lastInsertId)
-    $id = $db->query("SELECT LAST_INSERT_ID()")->fetchColumn();
-    if (!$id) {
-        // Final fallback: query by name, newest first
+    // Capture MAX(id) before insert
+    $maxBefore = getMaxCatId($db);
+    // INSERT
+    $ins = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, NULL, ?, ?, ?, ?, ?, 1)");
+    $ins->execute([$deptId, $name, $desc, $icon, $color, $sort]);
+    $ins->closeCursor();
+    $ins = null;
+    // Get ID: MAX(id) must be higher now
+    $id = getMaxCatId($db);
+    if ($id <= $maxBefore) {
+        // Fallback: query by name
         $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND department_id = ? AND parent_id IS NULL ORDER BY id DESC LIMIT 1");
         $stmt->execute([$name, $deptId]);
-        $id = $stmt->fetchColumn();
+        $id = (int) $stmt->fetchColumn();
         $stmt->closeCursor();
+        $stmt = null;
     }
-    $results[] = "✓ Created parent '$name' (id=$id)";
+    $results[] = "  ✓ Created parent '$name' (id=$id)";
     return (int)$id;
 }
 
 /**
- * Hostinger-proof helper: ensure a child category exists under given parent.
+ * Ensure a child category exists under given parent. Uses MAX(id) for new inserts.
  */
 function ensureChild($db, $deptId, $parentId, $name, $desc, $icon, $color, $sort, &$results) {
     $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND parent_id = ? LIMIT 1");
     $stmt->execute([$name, $parentId]);
     $id = $stmt->fetchColumn();
     $stmt->closeCursor();
+    $stmt = null;
     if ($id) {
-        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?")->execute([$id]);
+        $u = $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?");
+        $u->execute([$id]);
+        $u->closeCursor();
+        $u = null;
         return (int)$id;
     }
-    $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)")
-       ->execute([$deptId, $parentId, $name, $desc, $icon, $color, $sort]);
-    $id = $db->query("SELECT LAST_INSERT_ID()")->fetchColumn();
-    if (!$id) {
+    $maxBefore = getMaxCatId($db);
+    $ins = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+    $ins->execute([$deptId, $parentId, $name, $desc, $icon, $color, $sort]);
+    $ins->closeCursor();
+    $ins = null;
+    $id = getMaxCatId($db);
+    if ($id <= $maxBefore) {
         $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND parent_id = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$name, $parentId]);
-        $id = $stmt->fetchColumn();
+        $id = (int) $stmt->fetchColumn();
         $stmt->closeCursor();
+        $stmt = null;
     }
-    $results[] = "  + Added '$name' (id=$id)";
+    $results[] = "    + Added '$name' (id=$id)";
     return (int)$id;
 }
 
@@ -264,19 +306,26 @@ function deactivateUnlisted($db, $parentId, $keepNames, &$results) {
     $stmt->execute(array_merge([$parentId], $keepNames));
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
+    $stmt = null;
     foreach ($rows as $row) {
-        $db->prepare("UPDATE categories SET is_active = 0 WHERE id = ?")->execute([$row['id']]);
-        $results[] = "  - Deactivated '{$row['name']}' (id={$row['id']})";
+        $u = $db->prepare("UPDATE categories SET is_active = 0 WHERE id = ?");
+        $u->execute([$row['id']]);
+        $u->closeCursor();
+        $u = null;
+        $results[] = "    - Deactivated '{$row['name']}' (id={$row['id']})";
     }
 }
 
 /**
- * Upsert priority mapping for a category.
+ * Upsert priority mapping for a category (skips id=0).
  */
 function setPriority($db, $categoryId, $priority) {
-    $db->prepare("INSERT INTO category_priority_map (category_id, default_priority) VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE default_priority = VALUES(default_priority)")
-       ->execute([$categoryId, $priority]);
+    if ($categoryId <= 0) return; // Skip invalid IDs
+    $s = $db->prepare("INSERT INTO category_priority_map (category_id, default_priority) VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE default_priority = VALUES(default_priority)");
+    $s->execute([$categoryId, $priority]);
+    $s->closeCursor();
+    $s = null;
 }
 
 // ═══ HR CATEGORIES ═══
@@ -514,30 +563,121 @@ setPriority($db, $parentId, 'low');
 echo "\n=== Sync Results ===\n";
 foreach ($results as $line) echo "  $line\n";
 
-// ═══ PHASE 3: FINAL VERIFICATION ═══
-echo "\n═══ PHASE 3: VERIFICATION ═══\n\n";
+// ═══ PHASE 2.5: POST-SYNC *HR TO FILE TICKET FIXUP ═══
+echo "\n═══ POST-SYNC: *HR to file Ticket FIXUP ═══\n";
 
+// Get real parent IDs by name
+$stmt = $db->prepare("SELECT id FROM categories WHERE name = 'OnBoarding' AND department_id = ? AND parent_id IS NULL AND is_active = 1 LIMIT 1");
+$stmt->execute([$deptIT]);
+$onboardId = (int) $stmt->fetchColumn();
+$stmt->closeCursor();
+$stmt = null;
+
+$stmt = $db->prepare("SELECT id FROM categories WHERE name = 'OffBoarding' AND department_id = ? AND parent_id IS NULL AND is_active = 1 LIMIT 1");
+$stmt->execute([$deptIT]);
+$offboardId = (int) $stmt->fetchColumn();
+$stmt->closeCursor();
+$stmt = null;
+
+echo "  OnBoarding parent id=$onboardId, OffBoarding parent id=$offboardId\n";
+
+// Delete any *HR rows with wrong parent_id (orphans from id=0 bug)
+$stmt = $db->query("SELECT id, parent_id FROM categories WHERE name = '*HR to file Ticket'");
+$allHR = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+$stmt = null;
+
+foreach ($allHR as $hr) {
+    $pid = (int)$hr['parent_id'];
+    if ($pid !== $onboardId && $pid !== $offboardId) {
+        $db->exec("DELETE FROM category_priority_map WHERE category_id = " . (int)$hr['id']);
+        $db->exec("DELETE FROM categories WHERE id = " . (int)$hr['id']);
+        echo "  DELETED orphan *HR id={$hr['id']} (parent_id=$pid)\n";
+    }
+}
+
+// Ensure exactly 1 active *HR under OnBoarding
+$stmt = $db->prepare("SELECT id FROM categories WHERE name = '*HR to file Ticket' AND parent_id = ? AND is_active = 1 ORDER BY id");
+$stmt->execute([$onboardId]);
+$onHRs = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$stmt->closeCursor();
+$stmt = null;
+
+if (count($onHRs) == 0) {
+    $maxB = getMaxCatId($db);
+    $ins = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, ?, '*HR to file Ticket', 'HR files onboarding ticket', 'user-tie', '#10B981', 1, 1)");
+    $ins->execute([$deptIT, $onboardId]);
+    $ins->closeCursor();
+    $ins = null;
+    $newId = getMaxCatId($db);
+    setPriority($db, $newId, 'low');
+    echo "  Created *HR under OnBoarding (id=$newId)\n";
+} elseif (count($onHRs) > 1) {
+    for ($i = 1; $i < count($onHRs); $i++) {
+        $db->exec("DELETE FROM category_priority_map WHERE category_id = " . (int)$onHRs[$i]);
+        $db->exec("DELETE FROM categories WHERE id = " . (int)$onHRs[$i]);
+        echo "  DELETED extra *HR under OnBoarding (id={$onHRs[$i]})\n";
+    }
+} else {
+    setPriority($db, (int)$onHRs[0], 'low');
+    echo "  ✓ OnBoarding has 1 *HR (id={$onHRs[0]})\n";
+}
+
+// Ensure exactly 1 active *HR under OffBoarding
+$stmt = $db->prepare("SELECT id FROM categories WHERE name = '*HR to file Ticket' AND parent_id = ? AND is_active = 1 ORDER BY id");
+$stmt->execute([$offboardId]);
+$offHRs = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$stmt->closeCursor();
+$stmt = null;
+
+if (count($offHRs) == 0) {
+    $maxB = getMaxCatId($db);
+    $ins = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, ?, '*HR to file Ticket', 'HR files offboarding ticket', 'user-times', '#EF4444', 1, 1)");
+    $ins->execute([$deptIT, $offboardId]);
+    $ins->closeCursor();
+    $ins = null;
+    $newId = getMaxCatId($db);
+    setPriority($db, $newId, 'low');
+    echo "  Created *HR under OffBoarding (id=$newId)\n";
+} elseif (count($offHRs) > 1) {
+    for ($i = 1; $i < count($offHRs); $i++) {
+        $db->exec("DELETE FROM category_priority_map WHERE category_id = " . (int)$offHRs[$i]);
+        $db->exec("DELETE FROM categories WHERE id = " . (int)$offHRs[$i]);
+        echo "  DELETED extra *HR under OffBoarding (id={$offHRs[$i]})\n";
+    }
+} else {
+    setPriority($db, (int)$offHRs[0], 'low');
+    echo "  ✓ OffBoarding has 1 *HR (id={$offHRs[0]})\n";
+}
+
+echo "\n";
+
+// ═══ PHASE 3: FINAL VERIFICATION ═══
+echo "═══ PHASE 3: VERIFICATION ═══\n\n";
+
+// Use scalar subquery for priority to avoid JOIN duplicates
 $stmt = $db->query("
-    SELECT c.name AS parent, sc.name AS sub, 
+    SELECT c.name AS parent, sc.name AS sub, sc.id AS sub_id, sc.parent_id,
            CASE WHEN c.department_id = $deptHR THEN 'HR' ELSE 'IT' END AS dept,
-           COALESCE(cpm.default_priority, '-') AS priority
+           (SELECT cpm.default_priority FROM category_priority_map cpm WHERE cpm.category_id = sc.id LIMIT 1) AS priority
     FROM categories c
-    LEFT JOIN categories sc ON sc.parent_id = c.id AND sc.is_active = 1
-    LEFT JOIN category_priority_map cpm ON cpm.category_id = COALESCE(sc.id, c.id)
+    JOIN categories sc ON sc.parent_id = c.id AND sc.is_active = 1
     WHERE c.parent_id IS NULL AND c.is_active = 1
     ORDER BY dept, c.sort_order, sc.sort_order
 ");
 
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+$stmt = null;
 $currentDept = '';
-printf("%-5s %-24s %-40s %-8s\n", "DEPT", "PARENT", "SUBCATEGORY", "PRIORITY");
-echo str_repeat('─', 82) . "\n";
+printf("%-5s %-24s %-40s %-6s %-8s\n", "DEPT", "PARENT", "SUBCATEGORY", "ID", "PRIORITY");
+echo str_repeat('─', 90) . "\n";
 foreach ($rows as $r) {
     if ($r['dept'] !== $currentDept) {
         $currentDept = $r['dept'];
         echo "\n";
     }
-    printf("%-5s %-24s %-40s %-8s\n", $r['dept'], $r['parent'], $r['sub'] ?? '(no subs)', strtoupper($r['priority']));
+    printf("%-5s %-24s %-40s %-6s %-8s\n", $r['dept'], $r['parent'], $r['sub'] ?? '(no subs)', $r['sub_id'], strtoupper($r['priority'] ?? '-'));
 }
 
 // Count check
