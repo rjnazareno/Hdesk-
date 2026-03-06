@@ -8,11 +8,11 @@
  * This script is IDEMPOTENT — safe to run multiple times.
  * It will create, rename, deactivate, and update priorities as needed.
  *
- * HR Categories (5 parents):
+ * HR Categories (4 parents):
  *   1. Request a Document → COE (COC) [LOW], Certification of Leave [LOW], Others [LOW]
- *   2. Payroll Inquiry    → Draft Payslip Discrepancy [HIGH], Post-Payroll Payslip Concerns [MEDIUM]
- *   3. Timekeeping Concerns → Log In Error [HIGH], Missing Log In/Log Out [LOW], Leave Inquiry [LOW]
- *   4. General Inquiry     → HMO Inquiry [MEDIUM], Others [LOW]
+ *   2. Payroll            → Draft Payslip Discrepancy [HIGH], Post-Payroll Payslip Concerns [MEDIUM]
+ *   3. Harley             → Log In Error [HIGH], Missing Log In/Log Out [LOW], Leave Inquiry [LOW]
+ *   4. General Inquiry    → HMO Inquiry [MEDIUM], Others [LOW]
  *
  * IT Categories (8 parents):
  *   1. Access           → Account Deactivation [HIGH], Password Reset [HIGH], Account Locked [HIGH],
@@ -174,10 +174,10 @@ try {
     $upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
     $results[] = "HR: 'Request a Document' synced (3 subs)";
 
-    // ---- 1b. Payroll Inquiry ----
+    // ---- 1b. Payroll ----
     $parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-        'Payroll Inquiry',
-        ['Salary Dispute', 'Payroll', 'Payroll Inquiry'],
+        'Payroll',
+        ['Salary Dispute', 'Payroll Inquiry', 'Payroll'],
         'Payroll and payslip concerns',
         'money-bill-wave', '#EF4444', 2, $results
     );
@@ -207,12 +207,12 @@ try {
     }
     deactivateUnlisted($db, $parentId, $keepNames, $results);
     $upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
-    $results[] = "HR: 'Payroll Inquiry' synced (2 subs)";
+    $results[] = "HR: 'Payroll' synced (2 subs)";
 
-    // ---- 1c. Timekeeping Concerns ----
+    // ---- 1c. Harley ----
     $parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-        'Timekeeping Concerns',
-        ['Timekeeping concerns', 'Harley (Timekeeping)', 'Timekeeping Concerns'],
+        'Harley',
+        ['Timekeeping concerns', 'Harley (Timekeeping)', 'Timekeeping Concerns', 'Harley'],
         'Harley timekeeping system concerns',
         'clock', '#F59E0B', 3, $results
     );
@@ -230,7 +230,7 @@ try {
     }
     deactivateUnlisted($db, $parentId, $keepNames, $results);
     $upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
-    $results[] = "HR: 'Timekeeping Concerns' synced (3 subs)";
+    $results[] = "HR: 'Harley' synced (3 subs)";
 
     // ---- 1d. General Inquiry ----
     $parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
@@ -283,7 +283,7 @@ try {
     }
 
     // Deactivate any other HR parents not in the final 4
-    $validHrParents = ['Request a Document', 'Payroll Inquiry', 'Timekeeping Concerns', 'General Inquiry'];
+    $validHrParents = ['Request a Document', 'Payroll', 'Harley', 'General Inquiry'];
     $hrParentsStmt = $db->prepare(
         "SELECT id, name FROM categories WHERE department_id = ? AND parent_id IS NULL AND is_active = 1"
     );
