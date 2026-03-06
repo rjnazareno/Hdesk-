@@ -58,9 +58,8 @@ class SLAManagementController {
         }
         
         $slaTargetReference = [
-            'high' => CategoryPriorityMap::getSLATargets('high'),
-            'medium' => CategoryPriorityMap::getSLATargets('medium'),
-            'low' => CategoryPriorityMap::getSLATargets('low')
+            'HR' => CategoryPriorityMap::getAllSLATargets('HR'),
+            'IT' => CategoryPriorityMap::getAllSLATargets('IT'),
         ];
         
         $this->loadView('admin/sla_management', compact(

@@ -403,7 +403,7 @@ include __DIR__ . '/../layouts/header.php';
                             $deptName = $mapping['department_name'] ?? 'Unknown';
                             $parentName = $mapping['parent_category_name'] ?? '-';
                             $isSubcategory = !empty($mapping['parent_id']);
-                            $target = CategoryPriorityMap::getSLATargets($mapping['default_priority']);
+                            $target = CategoryPriorityMap::getSLATargets($mapping['default_priority'], $mapping['department_code'] ?? null);
                             
                             $priorityBadges = [
                                 'high' => 'bg-red-600 text-white',

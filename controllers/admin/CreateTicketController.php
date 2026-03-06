@@ -59,12 +59,12 @@ class CreateTicketController {
             $priorityMap = $this->priorityMapModel->getAllAsLookup();
         }
         
-        // SLA targets for display
+        // SLA targets for display (per department)
         $slaTargets = [
-            'high' => CategoryPriorityMap::getSLATargets('high'),
-            'medium' => CategoryPriorityMap::getSLATargets('medium'),
-            'low' => CategoryPriorityMap::getSLATargets('low')
+            'HR' => CategoryPriorityMap::getAllSLATargets('HR'),
+            'IT' => CategoryPriorityMap::getAllSLATargets('IT'),
         ];
+        $slaTargetsDefault = CategoryPriorityMap::getAllSLATargets('HR');
         
         // Load view
         $this->loadView('admin/create_ticket', compact(
@@ -79,7 +79,8 @@ class CreateTicketController {
             'totalRecent',
             'itemsPerPage',
             'priorityMap',
-            'slaTargets'
+            'slaTargets',
+            'slaTargetsDefault'
         ));
     }
     

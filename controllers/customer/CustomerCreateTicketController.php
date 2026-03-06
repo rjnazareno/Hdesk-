@@ -66,17 +66,18 @@ class CustomerCreateTicketController {
             $priorityMap = $this->priorityMapModel->getAllAsLookup();
         }
         
-        // SLA targets for display
+        // SLA targets for display (per department)
         $slaTargets = [
-            'high' => CategoryPriorityMap::getSLATargets('high'),
-            'medium' => CategoryPriorityMap::getSLATargets('medium'),
-            'low' => CategoryPriorityMap::getSLATargets('low')
+            'HR' => CategoryPriorityMap::getAllSLATargets('HR'),
+            'IT' => CategoryPriorityMap::getAllSLATargets('IT'),
         ];
+        // Keep a flat default for backward compatibility
+        $slaTargetsDefault = CategoryPriorityMap::getAllSLATargets('HR');
         
         // Use new multi-step view
         $this->loadView('customer/create_ticket_v2', compact(
             'currentUser', 'departments', 'categories', 'error', 'unreadNotifications',
-            'priorityMap', 'slaTargets'
+            'priorityMap', 'slaTargets', 'slaTargetsDefault'
         ));
     }
     

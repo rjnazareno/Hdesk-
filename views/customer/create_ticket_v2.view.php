@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -166,6 +166,28 @@
             background: #10b981;
             border-radius: 50%;
         }
+        
+        /* Guided dropdown styles */
+        .dropdown-level {
+            animation: fadeInUp 0.35s ease forwards;
+        }
+        .dropdown-level select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236B7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        .dropdown-level select:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .auto-title-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 1px solid #bbf7d0;
+        }
+        .auto-title-box.has-title {
+            border-color: #10b981;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -310,64 +332,122 @@
                     <div id="step2" class="form-section">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <h2 class="text-lg font-semibold text-gray-800">Request Details</h2>
-                                <p class="text-sm text-gray-500 mt-1">Provide details about your request for <span id="selectedDeptName" class="font-medium text-emerald-600"></span></p>
+                                <h2 class="text-lg font-semibold text-gray-800">Select Your Concern</h2>
+                                <p class="text-sm text-gray-500 mt-1">Follow the guided selection for <span id="selectedDeptName" class="font-medium text-emerald-600"></span></p>
                             </div>
                             <button type="button" onclick="goToStep(1)" class="text-sm text-gray-500 hover:text-emerald-600 flex items-center">
                                 <i class="fas fa-arrow-left mr-1"></i> Change Department
                             </button>
                         </div>
                         
-                        <!-- Category Selection -->
-                        <div class="mb-6">
-                            <label class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center mr-2">
-                                    <i class="fas fa-folder-open text-blue-600 text-sm"></i>
-                                </div>
-                                Category <span class="text-red-500 ml-1">*</span>
-                            </label>
-                            
-                            <div id="categoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <!-- Parent categories will be populated via JavaScript -->
-                            </div>
-                            
-                            <!-- Sub-category Selection (hidden by default) -->
-                            <div id="subCategorySection" class="hidden mt-4">
-                                <div class="flex items-center justify-between mb-3">
-                                    <label class="flex items-center text-sm font-semibold text-gray-700">
-                                        <div class="w-7 h-7 bg-purple-50 rounded-lg flex items-center justify-center mr-2">
-                                            <i class="fas fa-list text-purple-600 text-xs"></i>
-                                        </div>
-                                        Specify Issue Type <span class="text-gray-400 font-normal ml-1">(Optional)</span>
-                                    </label>
-                                    <button type="button" onclick="clearSubCategory()" class="text-xs text-gray-500 hover:text-emerald-600">
-                                        <i class="fas fa-times mr-1"></i>Skip
-                                    </button>
-                                </div>
-                                <div id="subCategoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    <!-- Sub-categories will be populated via JavaScript -->
-                                </div>
-                            </div>
-                            
-                            <select id="category_id" name="category_id" required class="hidden">
-                                <option value="">Select category...</option>
-                            </select>
+                        <!-- Breadcrumb trail -->
+                        <div id="selectionBreadcrumb" class="hidden flex items-center flex-wrap gap-1 text-sm bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5 mb-5">
+                            <i class="fas fa-route text-emerald-500 mr-1.5"></i>
+                            <span id="breadcrumbText" class="text-emerald-700 font-medium"></span>
                         </div>
-                        
-                        <!-- Title -->
+
+                        <!-- Guided Dropdown Sequence -->
+                        <div class="space-y-5 mb-6">
+                            
+                            <!-- Level 1: Category -->
+                            <div class="dropdown-level" id="level1Wrapper">
+                                <label class="flex items-center text-sm font-semibold text-gray-700 mb-2">
+                                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center mr-2">
+                                        <span class="text-sm font-bold text-blue-600">1</span>
+                                    </div>
+                                    Category <span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <select id="categorySelect" 
+                                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all bg-white"
+                                        onchange="onCategoryChange(this.value)">
+                                    <option value="">-- Select a category --</option>
+                                </select>
+                                <!-- Other text input for category -->
+                                <div id="categoryOtherInput" class="hidden mt-2">
+                                    <input type="text" id="categoryOtherText" 
+                                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                           placeholder="Please describe your concern..." oninput="updateAutoTitle()">
+                                </div>
+                            </div>
+                            
+                            <!-- Level 2: Subcategory -->
+                            <div class="dropdown-level hidden" id="level2Wrapper">
+                                <label class="flex items-center text-sm font-semibold text-gray-700 mb-2">
+                                    <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center mr-2">
+                                        <span class="text-sm font-bold text-purple-600">2</span>
+                                    </div>
+                                    Subcategory <span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <select id="subcategorySelect" 
+                                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all bg-white"
+                                        onchange="onSubcategoryChange(this.value)">
+                                    <option value="">-- Select a subcategory --</option>
+                                </select>
+                                <!-- Other text input for subcategory -->
+                                <div id="subcategoryOtherInput" class="hidden mt-2">
+                                    <input type="text" id="subcategoryOtherText" 
+                                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                                           placeholder="Please specify your subcategory..." oninput="updateAutoTitle()">
+                                </div>
+                            </div>
+                            
+                            <!-- Level 3: Specific Concern -->
+                            <div class="dropdown-level hidden" id="level3Wrapper">
+                                <label class="flex items-center text-sm font-semibold text-gray-700 mb-2">
+                                    <div class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center mr-2">
+                                        <span class="text-sm font-bold text-teal-600">3</span>
+                                    </div>
+                                    Specific Concern <span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <select id="specificConcernSelect" 
+                                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all bg-white"
+                                        onchange="onSpecificConcernChange(this.value)">
+                                    <option value="">-- Select specific concern --</option>
+                                </select>
+                                <!-- Other text input for specific concern -->
+                                <div id="specificOtherInput" class="hidden mt-2">
+                                    <input type="text" id="specificOtherText" 
+                                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
+                                           placeholder="Please describe your specific concern..." oninput="updateAutoTitle()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Auto-Generated Title -->
                         <div class="mb-6">
-                            <label for="title" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
+                            <label class="flex items-center text-sm font-semibold text-gray-700 mb-2">
                                 <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center mr-2">
                                     <i class="fas fa-heading text-emerald-600 text-sm"></i>
                                 </div>
-                                Title <span class="text-red-500 ml-1">*</span>
+                                Ticket Title
                             </label>
-                            <input type="text" id="title" name="title" required
-                                   class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all"
-                                   placeholder="Brief description of your request">
+                            <div id="autoTitleDisplay" class="auto-title-box w-full px-4 py-3.5 rounded-xl text-sm text-gray-700 min-h-[48px] flex items-center transition-all">
+                                <span class="text-gray-400 italic" id="autoTitlePlaceholder">Title will be generated from your selections above</span>
+                                <span class="hidden font-medium text-gray-800" id="autoTitleText"></span>
+                            </div>
+                            <input type="hidden" id="title" name="title" value="">
+                            <p class="text-xs text-gray-400 mt-1.5"><i class="fas fa-info-circle mr-1"></i>Auto-generated from your dropdown selections</p>
+                        </div>
+
+                        <!-- Hidden category_id (set by JS) -->
+                        <select id="category_id" name="category_id" required class="hidden">
+                            <option value="">Select category...</option>
+                        </select>
+                        
+                        <!-- Description (below title for better context) -->
+                        <div class="mb-6">
+                            <label for="description" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
+                                <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center mr-2">
+                                    <i class="fas fa-align-left text-purple-600 text-sm"></i>
+                                </div>
+                                Description <span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <textarea id="description" name="description" rows="5" required
+                                      class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all resize-none"
+                                      placeholder="Please provide detailed information about your request..."></textarea>
                         </div>
                         
-                        <!-- Priority (Auto-assigned, Read-only) -->
+                        <!-- Priority (Auto-assigned) -->
                         <div class="mb-6">
                             <label for="priority" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
                                 <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center mr-2">
@@ -376,17 +456,13 @@
                                 Priority <span class="text-red-500 ml-1">*</span>
                             </label>
                             
-                            <!-- Auto-priority notice (always visible) -->
+                            <!-- Auto-priority notice -->
                             <div class="mb-3 p-3 bg-amber-50 border border-amber-300 rounded-xl">
                                 <div class="flex items-start">
                                     <i class="fas fa-info-circle text-amber-600 mr-2 mt-0.5"></i>
                                     <div class="flex-1">
-                                        <span class="text-sm text-amber-800 font-medium">
-                                            Priority is automatically assigned based on your issue type
-                                        </span>
-                                        <p class="text-xs text-amber-700 mt-1">
-                                            You can change the priority if needed. Our team will review and adjust if necessary
-                                        </p>
+                                        <span class="text-sm text-amber-800 font-medium">Priority is automatically assigned based on your issue type</span>
+                                        <p class="text-xs text-amber-700 mt-1">You can change the priority if needed. Our team will review and adjust if necessary</p>
                                     </div>
                                 </div>
                             </div>
@@ -411,7 +487,7 @@
                                         <span class="text-2xl">🟢</span>
                                         <p class="text-sm font-medium mt-1">Low</p>
                                         <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400">Resolution: 56–120 hours</p>
+                                        <p class="text-xs text-gray-400" id="slaResLow">Resolution: 56–120 hours</p>
                                     </div>
                                 </label>
                                 <label class="priority-option relative cursor-pointer">
@@ -420,7 +496,7 @@
                                         <span class="text-2xl">🟡</span>
                                         <p class="text-sm font-medium mt-1">Medium</p>
                                         <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400">Resolution: 48–72 hours</p>
+                                        <p class="text-xs text-gray-400" id="slaResMed">Resolution: 48–72 hours</p>
                                     </div>
                                 </label>
                                 <label class="priority-option relative cursor-pointer">
@@ -429,23 +505,10 @@
                                         <span class="text-2xl">🔴</span>
                                         <p class="text-sm font-medium mt-1">High</p>
                                         <p class="text-xs text-gray-500">Response: 24 hours</p>
-                                        <p class="text-xs text-gray-400">Resolution: 24 hours</p>
+                                        <p class="text-xs text-gray-400" id="slaResHigh">Resolution: 24 hours</p>
                                     </div>
                                 </label>
                             </div>
-                        </div>
-                        
-                        <!-- Description -->
-                        <div class="mb-6">
-                            <label for="description" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center mr-2">
-                                    <i class="fas fa-align-left text-purple-600 text-sm"></i>
-                                </div>
-                                Description <span class="text-red-500 ml-1">*</span>
-                            </label>
-                            <textarea id="description" name="description" rows="5" required
-                                      class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-all resize-none"
-                                      placeholder="Please provide detailed information about your request..."></textarea>
                         </div>
                         
                         <!-- Attachment -->
@@ -498,25 +561,30 @@
                                     <p class="text-sm font-medium text-gray-800" id="reviewDepartment">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500 uppercase">Category</p>
-                                    <p class="text-sm font-medium text-gray-800" id="reviewCategory">-</p>
-                                </div>
-                                <div>
                                     <p class="text-xs text-gray-500 uppercase">Priority</p>
                                     <p class="text-sm font-medium text-gray-800" id="reviewPriority">-</p>
                                 </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 uppercase">Attachment</p>
-                                    <p class="text-sm font-medium text-gray-800" id="reviewAttachment">None</p>
+                            </div>
+                            <!-- Selection path -->
+                            <div class="border-t border-gray-200 pt-4">
+                                <p class="text-xs text-gray-500 uppercase mb-2">Concern Path</p>
+                                <div id="reviewSelectionPath" class="flex items-center flex-wrap gap-2 text-sm">
+                                    <span class="text-gray-400">-</span>
                                 </div>
                             </div>
                             <div class="border-t border-gray-200 pt-4">
-                                <p class="text-xs text-gray-500 uppercase">Title</p>
-                                <p class="text-sm font-medium text-gray-800" id="reviewTitle">-</p>
+                                <p class="text-xs text-gray-500 uppercase">Ticket Title</p>
+                                <p class="text-sm font-semibold text-gray-800" id="reviewTitle">-</p>
                             </div>
                             <div class="border-t border-gray-200 pt-4">
                                 <p class="text-xs text-gray-500 uppercase">Description</p>
                                 <p class="text-sm text-gray-700 whitespace-pre-wrap" id="reviewDescription">-</p>
+                            </div>
+                            <div class="border-t border-gray-200 pt-4 grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase">Attachment</p>
+                                    <p class="text-sm font-medium text-gray-800" id="reviewAttachment">None</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -544,315 +612,398 @@
     </div>
 
     <script>
-        // Store categories data from PHP
+        // ─── Data from PHP ───
         const categoriesData = <?php echo json_encode($categories, JSON_NUMERIC_CHECK); ?>;
         const departmentsData = <?php echo json_encode($departments, JSON_NUMERIC_CHECK); ?>;
         const priorityMapData = <?php echo json_encode($priorityMap ?? [], JSON_NUMERIC_CHECK); ?>;
         const slaTargetsData = <?php echo json_encode($slaTargets ?? [], JSON_HEX_TAG); ?>;
+        const slaTargetsDefault = <?php echo json_encode($slaTargetsDefault ?? [], JSON_HEX_TAG); ?>;
         
+        // ─── State ───
         let selectedDepartmentId = null;
         let selectedDepartmentCode = null;
-        let selectedCategoryId = null;
-        let selectedParentCategoryId = null;
         let currentStep = 1;
-        let autoPrioritySet = false;
         
-        // Department selection
+        // Tracks the selection at each dropdown level
+        let selectedLevel1 = null; // category id or 'other'
+        let selectedLevel2 = null; // subcategory id or 'other'
+        let selectedLevel3 = null; // specific concern id or 'other'
+        
+        // ─── Department Selection (Step 1) ───
         function selectDepartment(element, deptId, deptCode) {
-            // Remove selection from all cards
-            document.querySelectorAll('.dept-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Add selection to clicked card
+            document.querySelectorAll('.dept-card').forEach(c => c.classList.remove('selected'));
             element.classList.add('selected');
             
-            // Store selection
             selectedDepartmentId = deptId;
             selectedDepartmentCode = deptCode;
             document.getElementById('department_id').value = deptId;
             
-            // Update department name in step 2
             const dept = departmentsData.find(d => d.id == deptId);
             document.getElementById('selectedDeptName').textContent = dept ? dept.name : '';
             
-            // Enable next button
             const nextBtn = document.getElementById('nextStep1');
             nextBtn.disabled = false;
             nextBtn.classList.remove('bg-gray-200', 'text-gray-400', 'cursor-not-allowed');
             nextBtn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-600', 'text-white', 'hover:from-emerald-600', 'hover:to-teal-700', 'shadow-lg', 'shadow-emerald-500/30');
             
-            // Populate categories for this department
-            populateCategories(deptId);
+            // Populate the Level 1 (Category) dropdown
+            populateCategoryDropdown(deptId);
+            
+            // Update SLA resolution text on priority cards per department
+            updateSlaCards();
         }
         
-        // Populate categories based on department
-        function populateCategories(deptId) {
-            const grid = document.getElementById('categoryGrid');
-            const select = document.getElementById('category_id');
-            const subSection = document.getElementById('subCategorySection');
-            
-            // Hide sub-category section when repopulating
-            subSection.classList.add('hidden');
-            selectedParentCategoryId = null;
-            
-            // Filter categories for this department (parent categories only - where parent_id is null/empty/0)
-            const deptCategories = categoriesData.filter(cat => {
-                const matchesDept = Number(cat.department_id) === Number(deptId);
-                const isParent = !cat.parent_id; // null, undefined, 0, '' all evaluate to false
-                return matchesDept && isParent;
-            });
-            
-            // Sort categories alphabetically
-            deptCategories.sort((a, b) => a.name.localeCompare(b.name));
-            
-            // Clear existing
-            grid.innerHTML = '';
-            select.innerHTML = '<option value="">Select category...</option>';
-            
-            if (deptCategories.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500"><i class="fas fa-folder-open text-4xl mb-3 text-gray-300"></i><p>No categories available for this department</p></div>';
-                return;
-            }
-            
-            deptCategories.forEach((cat, index) => {
-                // Check if this category has children
-                const hasChildren = categoriesData.some(c => Number(c.parent_id) === Number(cat.id));
-                const childCount = categoriesData.filter(c => Number(c.parent_id) === Number(cat.id)).length;
-                
-                // Grid card - improved design
-                const card = document.createElement('div');
-                card.className = 'category-card relative p-4 border-2 border-gray-200 rounded-xl bg-white' + (hasChildren ? ' has-children' : '');
-                card.dataset.categoryId = cat.id;
-                card.dataset.hasChildren = hasChildren;
-                card.style.animationDelay = `${index * 0.05}s`;
-                card.onclick = () => selectCategory(cat.id, hasChildren);
-                
-                // Get icon and color with fallbacks
-                const icon = cat.icon || 'folder';
-                const color = cat.color || '#6B7280';
-                const description = cat.description || '';
-                
-                card.innerHTML = `
-                    <div class="cat-check absolute top-3 right-3 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center opacity-0 transition-all shadow-md">
-                        <i class="fas fa-check text-white text-xs"></i>
-                    </div>
-                    <div class="flex items-start space-x-3">
-                        <div class="cat-icon w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all" style="background-color: ${color}15;">
-                            <i class="fas fa-${icon} text-lg transition-colors" style="color: ${color};"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-800">${cat.name}</p>
-                            ${description ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${description}</p>` : ''}
-                            ${hasChildren ? `<p class="text-xs text-emerald-600 mt-1 font-medium"><i class="fas fa-layer-group mr-1"></i>${childCount} specific options</p>` : ''}
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-                
-                // Select option
-                const option = document.createElement('option');
-                option.value = cat.id;
-                option.textContent = cat.name;
-                select.appendChild(option);
-            });
-        }
-        
-        // Get sub-categories for a parent
-        function getSubCategories(parentId) {
-            return categoriesData.filter(cat => Number(cat.parent_id) === Number(parentId))
+        // ─── Helpers ───
+        function getChildCategories(parentId) {
+            return categoriesData
+                .filter(c => Number(c.parent_id) === Number(parentId))
                 .sort((a, b) => a.name.localeCompare(b.name));
         }
         
-        // Show sub-categories
-        function showSubCategories(parentId) {
-            const subSection = document.getElementById('subCategorySection');
-            const subGrid = document.getElementById('subCategoryGrid');
-            const select = document.getElementById('category_id');
-            const subCategories = getSubCategories(parentId);
+        function getCategoryName(catId) {
+            const cat = categoriesData.find(c => c.id == catId);
+            return cat ? cat.name : '';
+        }
+        
+        // ─── Populate Level 1: Category ───
+        function populateCategoryDropdown(deptId) {
+            const select = document.getElementById('categorySelect');
+            const parentCats = categoriesData
+                .filter(c => Number(c.department_id) === Number(deptId) && !c.parent_id)
+                .sort((a, b) => a.name.localeCompare(b.name));
             
-            if (subCategories.length === 0) {
-                subSection.classList.add('hidden');
-                return;
-            }
+            select.innerHTML = '<option value="">-- Select a category --</option>';
+            parentCats.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
+            // Add "Other" option
+            const otherOpt = document.createElement('option');
+            otherOpt.value = 'other';
+            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            select.appendChild(otherOpt);
             
-            // Add sub-categories to the hidden select so their values can be set
-            subCategories.forEach(cat => {
-                // Check if option already exists
-                if (!select.querySelector(`option[value="${cat.id}"]`)) {
-                    const option = document.createElement('option');
-                    option.value = cat.id;
-                    option.textContent = cat.name;
-                    select.appendChild(option);
+            // Reset downstream
+            resetLevel(2);
+            resetLevel(3);
+            selectedLevel1 = null;
+            updateAutoTitle();
+        }
+        
+        // ─── Level 1: Category Changed ───
+        function onCategoryChange(value) {
+            resetLevel(2);
+            resetLevel(3);
+            selectedLevel1 = value || null;
+            
+            if (value === 'other') {
+                document.getElementById('categoryOtherInput').classList.remove('hidden');
+                document.getElementById('level2Wrapper').classList.add('hidden');
+                document.getElementById('level3Wrapper').classList.add('hidden');
+                document.getElementById('category_id').value = '';
+                applyAutoPriority(null);
+            } else if (value) {
+                document.getElementById('categoryOtherInput').classList.add('hidden');
+                document.getElementById('category_id').value = value;
+                applyAutoPriority(value);
+                
+                // Check if this category has children (subcategories)
+                const children = getChildCategories(value);
+                if (children.length > 0) {
+                    populateSubcategoryDropdown(children);
+                    document.getElementById('level2Wrapper').classList.remove('hidden');
+                } else {
+                    document.getElementById('level2Wrapper').classList.add('hidden');
+                    document.getElementById('level3Wrapper').classList.add('hidden');
                 }
-            });
-            
-            subGrid.innerHTML = '';
-            
-            subCategories.forEach((cat, index) => {
-                const card = document.createElement('div');
-                card.className = 'subcategory-card relative p-3 border-2 border-gray-200 rounded-lg bg-white';
-                card.dataset.categoryId = cat.id;
-                card.style.animationDelay = `${index * 0.03}s`;
-                card.onclick = (e) => { e.stopPropagation(); selectSubCategory(cat.id); };
-                
-                const icon = cat.icon || 'tag';
-                const color = cat.color || '#8B5CF6';
-                
-                card.innerHTML = `
-                    <div class="subcat-check absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center opacity-0 transition-all">
-                        <i class="fas fa-check text-white text-xs"></i>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background-color: ${color}15;">
-                            <i class="fas fa-${icon} text-sm" style="color: ${color};"></i>
-                        </div>
-                        <p class="text-sm font-medium text-gray-700">${cat.name}</p>
-                    </div>
-                `;
-                subGrid.appendChild(card);
-            });
-            
-            subSection.classList.remove('hidden');
-            
-            // Smooth scroll to sub-categories
-            setTimeout(() => {
-                subSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
-        
-        // Category selection
-        function selectCategory(catId, hasChildren) {
-            // Remove selection from all parent category cards
-            document.querySelectorAll('.category-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Clear sub-category selection
-            document.querySelectorAll('.subcategory-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Add selection to clicked card
-            const selectedCard = document.querySelector(`.category-card[data-category-id="${catId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-            }
-            
-            // Store parent category selection
-            selectedParentCategoryId = catId;
-            selectedCategoryId = catId;
-            document.getElementById('category_id').value = catId;
-            
-            // Auto-set priority based on category mapping
-            applyAutoPriority(catId);
-            
-            // If category has children, show sub-categories
-            if (hasChildren) {
-                showSubCategories(catId);
             } else {
-                document.getElementById('subCategorySection').classList.add('hidden');
+                document.getElementById('categoryOtherInput').classList.add('hidden');
+                document.getElementById('level2Wrapper').classList.add('hidden');
+                document.getElementById('level3Wrapper').classList.add('hidden');
+                document.getElementById('category_id').value = '';
+                applyAutoPriority(null);
             }
+            
+            updateAutoTitle();
+            updateBreadcrumb();
         }
         
-        // Sub-category selection
-        function selectSubCategory(catId) {
-            // Remove selection from all sub-category cards
-            document.querySelectorAll('.subcategory-card').forEach(card => {
-                card.classList.remove('selected');
+        // ─── Populate Level 2: Subcategory ───
+        function populateSubcategoryDropdown(children) {
+            const select = document.getElementById('subcategorySelect');
+            select.innerHTML = '<option value="">-- Select a subcategory --</option>';
+            children.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
             });
-            
-            // Add selection to clicked card
-            const selectedCard = document.querySelector(`.subcategory-card[data-category-id="${catId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-            }
-            
-            // Update the final selected category (more specific)
-            selectedCategoryId = catId;
-            document.getElementById('category_id').value = catId;
-            
-            // Auto-set priority based on subcategory mapping (more specific)
-            applyAutoPriority(catId);
+            const otherOpt = document.createElement('option');
+            otherOpt.value = 'other';
+            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            select.appendChild(otherOpt);
         }
         
-        // Clear sub-category selection (use parent category)
-        function clearSubCategory() {
-            document.querySelectorAll('.subcategory-card').forEach(card => {
-                card.classList.remove('selected');
+        // ─── Level 2: Subcategory Changed ───
+        function onSubcategoryChange(value) {
+            resetLevel(3);
+            selectedLevel2 = value || null;
+            
+            if (value === 'other') {
+                document.getElementById('subcategoryOtherInput').classList.remove('hidden');
+                document.getElementById('level3Wrapper').classList.add('hidden');
+                if (selectedLevel1 && selectedLevel1 !== 'other') {
+                    document.getElementById('category_id').value = selectedLevel1;
+                }
+                applyAutoPriority(selectedLevel1);
+            } else if (value) {
+                document.getElementById('subcategoryOtherInput').classList.add('hidden');
+                document.getElementById('category_id').value = value;
+                applyAutoPriority(value);
+                
+                // Check if this subcategory also has children (specific concerns)
+                const children = getChildCategories(value);
+                if (children.length > 0) {
+                    populateSpecificConcernDropdown(children);
+                    document.getElementById('level3Wrapper').classList.remove('hidden');
+                } else {
+                    document.getElementById('level3Wrapper').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('subcategoryOtherInput').classList.add('hidden');
+                document.getElementById('level3Wrapper').classList.add('hidden');
+                if (selectedLevel1 && selectedLevel1 !== 'other') {
+                    document.getElementById('category_id').value = selectedLevel1;
+                    applyAutoPriority(selectedLevel1);
+                }
+            }
+            
+            updateAutoTitle();
+            updateBreadcrumb();
+        }
+        
+        // ─── Populate Level 3: Specific Concern ───
+        function populateSpecificConcernDropdown(children) {
+            const select = document.getElementById('specificConcernSelect');
+            select.innerHTML = '<option value="">-- Select specific concern --</option>';
+            children.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
             });
-            
-            // Revert to parent category
-            if (selectedParentCategoryId) {
-                selectedCategoryId = selectedParentCategoryId;
-                document.getElementById('category_id').value = selectedParentCategoryId;
-                // Revert to parent category priority
-                applyAutoPriority(selectedParentCategoryId);
-            }
-            
-            document.getElementById('subCategorySection').classList.add('hidden');
+            const otherOpt = document.createElement('option');
+            otherOpt.value = 'other';
+            otherOpt.textContent = '\u2B21 Other (not listed above)';
+            select.appendChild(otherOpt);
         }
         
-        // Auto-set priority based on category priority map from SLA guide
+        // ─── Level 3: Specific Concern Changed ───
+        function onSpecificConcernChange(value) {
+            selectedLevel3 = value || null;
+            
+            if (value === 'other') {
+                document.getElementById('specificOtherInput').classList.remove('hidden');
+                if (selectedLevel2 && selectedLevel2 !== 'other') {
+                    document.getElementById('category_id').value = selectedLevel2;
+                }
+                applyAutoPriority(selectedLevel2);
+            } else if (value) {
+                document.getElementById('specificOtherInput').classList.add('hidden');
+                document.getElementById('category_id').value = value;
+                applyAutoPriority(value);
+            } else {
+                document.getElementById('specificOtherInput').classList.add('hidden');
+                if (selectedLevel2 && selectedLevel2 !== 'other') {
+                    document.getElementById('category_id').value = selectedLevel2;
+                    applyAutoPriority(selectedLevel2);
+                }
+            }
+            
+            updateAutoTitle();
+            updateBreadcrumb();
+        }
+        
+        // ─── Reset a dropdown level ───
+        function resetLevel(level) {
+            if (level <= 2) {
+                selectedLevel2 = null;
+                document.getElementById('subcategorySelect').innerHTML = '<option value="">-- Select a subcategory --</option>';
+                document.getElementById('subcategoryOtherInput').classList.add('hidden');
+                document.getElementById('subcategoryOtherText').value = '';
+                document.getElementById('level2Wrapper').classList.add('hidden');
+            }
+            if (level <= 3) {
+                selectedLevel3 = null;
+                document.getElementById('specificConcernSelect').innerHTML = '<option value="">-- Select specific concern --</option>';
+                document.getElementById('specificOtherInput').classList.add('hidden');
+                document.getElementById('specificOtherText').value = '';
+                document.getElementById('level3Wrapper').classList.add('hidden');
+            }
+        }
+        
+        // ─── Auto-Generate Title ───
+        function updateAutoTitle() {
+            const parts = [];
+            
+            // Level 1
+            if (selectedLevel1 === 'other') {
+                const otherText = document.getElementById('categoryOtherText').value.trim();
+                parts.push(otherText ? 'Other: ' + otherText : 'Other');
+            } else if (selectedLevel1) {
+                parts.push(getCategoryName(selectedLevel1));
+            }
+            
+            // Level 2
+            if (selectedLevel2 === 'other') {
+                const otherText = document.getElementById('subcategoryOtherText').value.trim();
+                parts.push(otherText ? 'Other: ' + otherText : 'Other');
+            } else if (selectedLevel2) {
+                parts.push(getCategoryName(selectedLevel2));
+            }
+            
+            // Level 3
+            if (selectedLevel3 === 'other') {
+                const otherText = document.getElementById('specificOtherText').value.trim();
+                parts.push(otherText ? 'Other: ' + otherText : 'Other');
+            } else if (selectedLevel3) {
+                parts.push(getCategoryName(selectedLevel3));
+            }
+            
+            const title = parts.join(' - ');
+            const titleInput = document.getElementById('title');
+            const display = document.getElementById('autoTitleDisplay');
+            const placeholder = document.getElementById('autoTitlePlaceholder');
+            const textEl = document.getElementById('autoTitleText');
+            
+            if (title) {
+                titleInput.value = title;
+                placeholder.classList.add('hidden');
+                textEl.classList.remove('hidden');
+                textEl.textContent = title;
+                display.classList.add('has-title');
+            } else {
+                titleInput.value = '';
+                placeholder.classList.remove('hidden');
+                textEl.classList.add('hidden');
+                textEl.textContent = '';
+                display.classList.remove('has-title');
+            }
+        }
+        
+        // ─── Breadcrumb ───
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('selectionBreadcrumb');
+            const textEl = document.getElementById('breadcrumbText');
+            const parts = [];
+            
+            if (selectedLevel1 === 'other') {
+                const t = document.getElementById('categoryOtherText').value.trim();
+                parts.push(t ? 'Other: ' + t : 'Other');
+            } else if (selectedLevel1) {
+                parts.push(getCategoryName(selectedLevel1));
+            }
+            
+            if (selectedLevel2 === 'other') {
+                const t = document.getElementById('subcategoryOtherText').value.trim();
+                parts.push(t ? 'Other: ' + t : 'Other');
+            } else if (selectedLevel2) {
+                parts.push(getCategoryName(selectedLevel2));
+            }
+            
+            if (selectedLevel3 === 'other') {
+                const t = document.getElementById('specificOtherText').value.trim();
+                parts.push(t ? 'Other: ' + t : 'Other');
+            } else if (selectedLevel3) {
+                parts.push(getCategoryName(selectedLevel3));
+            }
+            
+            if (parts.length > 0) {
+                const colors = ['text-blue-700', 'text-purple-700', 'text-teal-700'];
+                textEl.innerHTML = parts.map(function(p, i) {
+                    var separator = i < parts.length - 1 ? ' <i class="fas fa-chevron-right text-emerald-400 text-xs mx-1"></i> ' : '';
+                    return '<span class="' + colors[i] + ' font-medium">' + p + '</span>' + separator;
+                }).join('');
+                breadcrumb.classList.remove('hidden');
+            } else {
+                breadcrumb.classList.add('hidden');
+            }
+        }
+        
+        // ─── Auto-Priority ───
         function applyAutoPriority(categoryId) {
-            const mappedPriority = priorityMapData[categoryId];
             const banner = document.getElementById('autoPriorityBanner');
+            const mappedPriority = categoryId ? priorityMapData[categoryId] : null;
             
+            // Get department-specific SLA info
+            const deptCode = selectedDepartmentCode ? selectedDepartmentCode.toUpperCase() : 'HR';
+            const deptSla = slaTargetsData[deptCode] || slaTargetsData['HR'] || slaTargetsDefault;
+
             if (mappedPriority) {
-                // Select the mapped priority radio button (disabled, so this only updates UI)
-                const radio = document.querySelector(`input[name="priority"][value="${mappedPriority}"]`);
+                const radio = document.querySelector('input[name="priority"][value="' + mappedPriority + '"]');
                 if (radio) {
-                    // Remove checked from all first
-                    document.querySelectorAll('input[name="priority"]').forEach(r => r.checked = false);
+                    document.querySelectorAll('input[name="priority"]').forEach(function(r) { r.checked = false; });
                     radio.checked = true;
                 }
-                
-                // Update banner text
-                const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High' };
+                const labels = { low: 'Low', medium: 'Medium', high: 'High' };
+                const slaHigh = deptSla.high || {};
+                const slaMed = deptSla.medium || {};
+                const slaLow = deptSla.low || {};
                 const slaInfo = {
-                    high: 'Response: 24h | Resolution: 24h',
-                    medium: 'Response: 24h | Resolution: 48–72h',
-                    low: 'Response: 24h | Resolution: 56–120h'
+                    high: 'Response: ' + (slaHigh.response || '24h') + ' | Resolution: ' + (slaHigh.resolution || '24h'),
+                    medium: 'Response: ' + (slaMed.response || '24h') + ' | Resolution: ' + (slaMed.resolution || '48–72h'),
+                    low: 'Response: ' + (slaLow.response || '24h') + ' | Resolution: ' + (slaLow.resolution || '56–120h')
                 };
-                
-                document.getElementById('autoPriorityLabel').textContent = priorityLabels[mappedPriority];
+                document.getElementById('autoPriorityLabel').textContent = labels[mappedPriority];
                 document.getElementById('slaInfoText').textContent = slaInfo[mappedPriority];
-                
                 banner.classList.remove('hidden');
-                autoPrioritySet = true;
             } else {
-                // If no mapping, default to medium
-                const mediumRadio = document.querySelector('input[name="priority"][value="medium"]');
-                if (mediumRadio) {
-                    document.querySelectorAll('input[name="priority"]').forEach(r => r.checked = false);
-                    mediumRadio.checked = true;
+                const medRadio = document.querySelector('input[name="priority"][value="medium"]');
+                if (medRadio) {
+                    document.querySelectorAll('input[name="priority"]').forEach(function(r) { r.checked = false; });
+                    medRadio.checked = true;
                 }
                 banner.classList.add('hidden');
-                autoPrioritySet = false;
             }
         }
+
+        // ─── Update SLA Display on Priority Cards ───
+        function updateSlaCards() {
+            const deptCode = selectedDepartmentCode ? selectedDepartmentCode.toUpperCase() : 'HR';
+            const deptSla = slaTargetsData[deptCode] || slaTargetsData['HR'] || slaTargetsDefault;
+            if (deptSla.high && document.getElementById('slaResHigh'))
+                document.getElementById('slaResHigh').textContent = 'Resolution: ' + deptSla.high.resolution;
+            if (deptSla.medium && document.getElementById('slaResMed'))
+                document.getElementById('slaResMed').textContent = 'Resolution: ' + deptSla.medium.resolution;
+            if (deptSla.low && document.getElementById('slaResLow'))
+                document.getElementById('slaResLow').textContent = 'Resolution: ' + deptSla.low.resolution;
+        }
         
-        // Step navigation
+        // ─── Step Navigation ───
         function goToStep(step) {
-            // Validate before moving to next step
             if (step === 2 && !selectedDepartmentId) {
                 alert('Please select a department');
                 return;
             }
             
             if (step === 3) {
-                // Validate step 2 fields
-                const title = document.getElementById('title').value.trim();
-                const description = document.getElementById('description').value.trim();
-                const category = document.getElementById('category_id').value;
+                var title = document.getElementById('title').value.trim();
+                var description = document.getElementById('description').value.trim();
+                var categoryId = document.getElementById('category_id').value;
                 
-                if (!category) {
+                if (!selectedLevel1) {
                     alert('Please select a category');
                     return;
                 }
+                if (selectedLevel1 === 'other' && !document.getElementById('categoryOtherText').value.trim()) {
+                    alert('Please describe your concern in the "Other" text field');
+                    document.getElementById('categoryOtherText').focus();
+                    return;
+                }
                 if (!title) {
-                    alert('Please enter a title');
-                    document.getElementById('title').focus();
+                    alert('Please make a selection to generate the ticket title');
                     return;
                 }
                 if (!description) {
@@ -861,49 +1012,39 @@
                     return;
                 }
                 
-                // Populate review section
+                // If category_id is empty (all "Other"), set a fallback
+                if (!categoryId && selectedLevel1 === 'other') {
+                    var fallback = categoriesData.find(function(c) { return Number(c.department_id) === Number(selectedDepartmentId) && !c.parent_id; });
+                    document.getElementById('category_id').value = fallback ? fallback.id : '';
+                }
+                
                 populateReview();
             }
             
-            // Hide all sections
-            document.querySelectorAll('.form-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show target section
+            document.querySelectorAll('.form-section').forEach(function(s) { s.classList.remove('active'); });
             document.getElementById('step' + step).classList.add('active');
-            
-            // Update step indicators
             updateStepIndicators(step);
-            
             currentStep = step;
         }
         
         function updateStepIndicators(activeStep) {
-            for (let i = 1; i <= 3; i++) {
-                const indicator = document.getElementById(`step${i}-indicator`);
-                const label = document.getElementById(`step${i}-label`);
-                const line = document.getElementById(`step-line-${i-1}`);
+            for (var i = 1; i <= 3; i++) {
+                var indicator = document.getElementById('step' + i + '-indicator');
+                var label = document.getElementById('step' + i + '-label');
+                var line = document.getElementById('step-line-' + (i - 1));
                 
                 indicator.classList.remove('active', 'completed');
-                if (label) label.classList.remove('text-gray-700', 'text-emerald-600');
-                if (label) label.classList.add('text-gray-400');
+                if (label) { label.classList.remove('text-gray-700', 'text-emerald-600'); label.classList.add('text-gray-400'); }
                 
                 if (i < activeStep) {
                     indicator.classList.add('completed');
                     indicator.innerHTML = '<i class="fas fa-check text-sm"></i>';
-                    if (label) {
-                        label.classList.remove('text-gray-400');
-                        label.classList.add('text-emerald-600');
-                    }
+                    if (label) { label.classList.remove('text-gray-400'); label.classList.add('text-emerald-600'); }
                     if (line) line.classList.add('bg-emerald-500');
                 } else if (i === activeStep) {
                     indicator.classList.add('active');
                     indicator.textContent = i;
-                    if (label) {
-                        label.classList.remove('text-gray-400');
-                        label.classList.add('text-gray-700');
-                    }
+                    if (label) { label.classList.remove('text-gray-400'); label.classList.add('text-gray-700'); }
                 } else {
                     indicator.textContent = i;
                     indicator.classList.add('bg-gray-100', 'text-gray-400');
@@ -911,43 +1052,60 @@
             }
         }
         
+        // ─── Populate Review ───
         function populateReview() {
             // Department
-            const dept = departmentsData.find(d => d.id == selectedDepartmentId);
+            var dept = departmentsData.find(function(d) { return d.id == selectedDepartmentId; });
             document.getElementById('reviewDepartment').textContent = dept ? dept.name : '-';
             
-            // Category - show both parent and sub-category if applicable
-            const cat = categoriesData.find(c => c.id == selectedCategoryId);
-            let categoryText = '-';
-            if (cat) {
-                if (cat.parent_id && selectedParentCategoryId) {
-                    const parentCat = categoriesData.find(c => c.id == selectedParentCategoryId);
-                    categoryText = parentCat ? `${parentCat.name} → ${cat.name}` : cat.name;
-                } else {
-                    categoryText = cat.name;
-                }
+            // Selection path (visual breadcrumb in review)
+            var pathContainer = document.getElementById('reviewSelectionPath');
+            var pathParts = [];
+            
+            if (selectedLevel1 === 'other') {
+                var t1 = document.getElementById('categoryOtherText').value.trim();
+                pathParts.push(t1 ? 'Other: ' + t1 : 'Other');
+            } else if (selectedLevel1) {
+                pathParts.push(getCategoryName(selectedLevel1));
             }
-            document.getElementById('reviewCategory').textContent = categoryText;
+            if (selectedLevel2 === 'other') {
+                var t2 = document.getElementById('subcategoryOtherText').value.trim();
+                pathParts.push(t2 ? 'Other: ' + t2 : 'Other');
+            } else if (selectedLevel2) {
+                pathParts.push(getCategoryName(selectedLevel2));
+            }
+            if (selectedLevel3 === 'other') {
+                var t3 = document.getElementById('specificOtherText').value.trim();
+                pathParts.push(t3 ? 'Other: ' + t3 : 'Other');
+            } else if (selectedLevel3) {
+                pathParts.push(getCategoryName(selectedLevel3));
+            }
+            
+            var colors = ['bg-blue-100 text-blue-700', 'bg-purple-100 text-purple-700', 'bg-teal-100 text-teal-700'];
+            pathContainer.innerHTML = pathParts.map(function(p, i) {
+                var arrow = i < pathParts.length - 1 ? '<i class="fas fa-arrow-right text-gray-400 text-xs"></i>' : '';
+                return '<span class="px-2.5 py-1 rounded-lg text-xs font-medium ' + colors[i] + '">' + p + '</span>' + arrow;
+            }).join(' ');
             
             // Priority
-            const priority = document.querySelector('input[name="priority"]:checked');
-            const priorityLabels = { low: '🟢 Low', medium: '🟡 Medium', high: '� High' };
+            var priority = document.querySelector('input[name="priority"]:checked');
+            var priorityLabels = { low: '\uD83D\uDFE2 Low', medium: '\uD83D\uDFE1 Medium', high: '\uD83D\uDD34 High' };
             document.getElementById('reviewPriority').textContent = priority ? priorityLabels[priority.value] : '-';
             
-            // Title & Description
+            // Title and Description
             document.getElementById('reviewTitle').textContent = document.getElementById('title').value || '-';
             document.getElementById('reviewDescription').textContent = document.getElementById('description').value || '-';
             
             // Attachment
-            const fileInput = document.getElementById('attachment');
-            document.getElementById('reviewAttachment').textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'None';
+            var fileEl = document.getElementById('attachment');
+            document.getElementById('reviewAttachment').textContent = fileEl.files.length > 0 ? fileEl.files[0].name : 'None';
         }
         
-        // File upload handling
-        const fileInput = document.getElementById('attachment');
-        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-        const filePreview = document.getElementById('filePreview');
-        const fileName = document.getElementById('fileName');
+        // ─── File Upload ───
+        var fileInput = document.getElementById('attachment');
+        var uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        var filePreview = document.getElementById('filePreview');
+        var fileName = document.getElementById('fileName');
         
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
@@ -967,16 +1125,21 @@
             filePreview.classList.remove('flex');
         }
         
-        // Form submission
-        const form = document.getElementById('createTicketForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const submitText = document.getElementById('submitText');
-        const submitLoading = document.getElementById('submitLoading');
-        let isSubmitting = false;
+        // ─── Form Submission ───
+        var form = document.getElementById('createTicketForm');
+        var submitBtn = document.getElementById('submitBtn');
+        var submitText = document.getElementById('submitText');
+        var submitLoading = document.getElementById('submitLoading');
+        var isSubmitting = false;
         
         form.addEventListener('submit', function(e) {
-            if (isSubmitting) {
+            if (isSubmitting) { e.preventDefault(); return false; }
+            
+            // Final check: ensure title is set
+            if (!document.getElementById('title').value.trim()) {
                 e.preventDefault();
+                alert('Please complete your category selections to generate a title.');
+                goToStep(2);
                 return false;
             }
             

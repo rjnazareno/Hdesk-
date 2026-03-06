@@ -8,7 +8,7 @@
  * 3. Deactivate "Leave Assistance" subcategory
  * 4. Employee data UPSERT from Harley database export
  * 
- * Run once via browser: http://localhost/IThelp/apply_changes_feb2026.php
+ * Run once via browser: http://localhost/IThelp/pply_changes_feb2026.phpa
  */
 
 error_reporting(E_ALL);

@@ -2,12 +2,11 @@
 /**
  * CategoryPriorityMap Model
  * Maps categories (issue types/subcategories) to their default priorities
- * Based on IT Help Desk SLA Guide spreadsheet
+ * Based on IT Help Desk SLA Guide spreadsheet (March 2026)
  * 
- * SLA Response/Resolution Times:
- *   HIGH:   Response → 30 mins,  Resolution → 1 business day
- *   MEDIUM: Response → 4 hours,  Resolution → 2-3 days
- *   LOW:    Response → 1 day,    Resolution → 3-5 days
+ * SLA Response/Resolution Times (all priorities: 24h response):
+ *   HR:  HIGH → 24h/24h  | MEDIUM → 24h/48–72h  | LOW → 24h/56–120h
+ *   IT:  HIGH → 24h/48h  | MEDIUM → 24h/72–96h  | LOW → 24h/72–120h
  */
 
 class CategoryPriorityMap {
@@ -43,7 +42,8 @@ class CategoryPriorityMap {
                        c.parent_id,
                        c.department_id,
                        pc.name as parent_category_name,
-                       d.name as department_name
+                       d.name as department_name,
+                       d.code as department_code
                 FROM category_priority_map cpm
                 JOIN categories c ON cpm.category_id = c.id
                 LEFT JOIN categories pc ON c.parent_id = pc.id
@@ -108,14 +108,16 @@ class CategoryPriorityMap {
     }
     
     /**
-     * Get SLA targets for a given priority
+     * Get SLA targets for a given priority and optional department
      * Returns human-readable response and resolution times
      * 
      * @param string $priority The priority level
+     * @param string|null $department Department code ('HR', 'IT') or null for HR defaults
      * @return array SLA target details
      */
-    public static function getSLATargets($priority) {
-        $targets = [
+    public static function getSLATargets($priority, $department = null) {
+        // HR department SLA targets (also used as default)
+        $hrTargets = [
             'high' => [
                 'response' => '24 hours',
                 'resolution' => '24 hours',
@@ -135,8 +137,48 @@ class CategoryPriorityMap {
                 'resolution_minutes' => 7200
             ]
         ];
-        
+
+        // IT department SLA targets
+        $itTargets = [
+            'high' => [
+                'response' => '24 hours',
+                'resolution' => '48 hours',
+                'response_minutes' => 1440,
+                'resolution_minutes' => 2880
+            ],
+            'medium' => [
+                'response' => '24 hours',
+                'resolution' => '72–96 hours',
+                'response_minutes' => 1440,
+                'resolution_minutes' => 5760
+            ],
+            'low' => [
+                'response' => '24 hours',
+                'resolution' => '72–120 hours',
+                'response_minutes' => 1440,
+                'resolution_minutes' => 7200
+            ]
+        ];
+
+        $dept = strtoupper($department ?? '');
+        $targets = ($dept === 'IT') ? $itTargets : $hrTargets;
+
         return $targets[$priority] ?? $targets['medium'];
+    }
+
+    /**
+     * Get all SLA targets keyed by priority for a specific department
+     * Useful for passing to views as JSON
+     *
+     * @param string|null $department Department code ('HR', 'IT') or null
+     * @return array ['high' => [...], 'medium' => [...], 'low' => [...]]
+     */
+    public static function getAllSLATargets($department = null) {
+        return [
+            'high'   => self::getSLATargets('high', $department),
+            'medium' => self::getSLATargets('medium', $department),
+            'low'    => self::getSLATargets('low', $department),
+        ];
     }
     
     /**

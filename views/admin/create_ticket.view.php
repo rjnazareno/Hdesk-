@@ -881,12 +881,17 @@ include __DIR__ . '/../layouts/header.php';
             const radio = document.querySelector(`input[name="priority"][value="${mappedPriority}"]`);
             if (radio) radio.checked = true;
             
-            // Update banner
+            // Get department-specific SLA info
+            const deptCode = selectedDepartmentCode ? selectedDepartmentCode.toUpperCase() : 'HR';
+            const deptSla = slaTargetsData[deptCode] || slaTargetsData['HR'] || {};
+            const slaHigh = deptSla.high || {};
+            const slaMed = deptSla.medium || {};
+            const slaLow = deptSla.low || {};
             const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High' };
             const slaInfo = {
-                high: 'Response: 24h | Resolution: 24h',
-                medium: 'Response: 24h | Resolution: 48–72h',
-                low: 'Response: 24h | Resolution: 56–120h'
+                high: 'Response: ' + (slaHigh.response || '24h') + ' | Resolution: ' + (slaHigh.resolution || '24h'),
+                medium: 'Response: ' + (slaMed.response || '24h') + ' | Resolution: ' + (slaMed.resolution || '48–72h'),
+                low: 'Response: ' + (slaLow.response || '24h') + ' | Resolution: ' + (slaLow.resolution || '56–120h')
             };
             
             document.getElementById('autoPriorityLabel').textContent = priorityLabels[mappedPriority];
