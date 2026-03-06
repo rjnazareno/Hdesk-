@@ -175,93 +175,116 @@ try {
 }
 
 // ─── PHASE 2: SYNC CATEGORIES TO MATCH SPREADSHEET ───
+// NOTE: NO transaction here — each INSERT auto-commits so LAST_INSERT_ID() works on Hostinger
 echo "═══ PHASE 2: SYNC CATEGORIES ═══\n\n";
 
 $results = [];
-
-// Prepared statements
-$findParent = $db->prepare("SELECT id FROM categories WHERE name = :name AND department_id = :dept AND parent_id IS NULL LIMIT 1");
-$insertParent = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active)
-    VALUES (:dept, NULL, :name, :desc, :icon, :color, :sort, 1)");
-$findChild = $db->prepare("SELECT id FROM categories WHERE name = :name AND parent_id = :parent LIMIT 1");
-$insertChild = $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active)
-    VALUES (:dept, :parent, :name, :desc, :icon, :color, :sort, 1)");
 
 // Ensure unique index on priority map
 try {
     $db->exec("ALTER TABLE category_priority_map ADD UNIQUE INDEX uk_category (category_id)");
 } catch (PDOException $e) {
-    // Already exists
+    // Already exists — OK
 }
 
-$upsertPriority = $db->prepare("
-    INSERT INTO category_priority_map (category_id, default_priority) VALUES (:cid, :pri)
-    ON DUPLICATE KEY UPDATE default_priority = VALUES(default_priority)
-");
-
-// Helper: find or create parent
-function findOrCreateParent($db, $findParent, $insertParent, $deptId, $name, $oldNames, $desc, $icon, $color, $sort, &$results) {
-    $findParent->execute([':name' => $name, ':dept' => $deptId]);
-    $id = $findParent->fetchColumn();
+/**
+ * Hostinger-proof helper: find or create a parent category.
+ * Uses fresh prepare() calls each time (no reused statements).
+ * Uses SQL LAST_INSERT_ID() instead of PHP lastInsertId().
+ */
+function findOrCreateParent($db, $deptId, $name, $oldNames, $desc, $icon, $color, $sort, &$results) {
+    // Check current name
+    $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND department_id = ? AND parent_id IS NULL LIMIT 1");
+    $stmt->execute([$name, $deptId]);
+    $id = $stmt->fetchColumn();
+    $stmt->closeCursor();
     if ($id) {
-        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = :id")->execute([':id' => $id]);
+        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?")->execute([$id]);
         return (int)$id;
     }
+    // Check old names and rename
     foreach ($oldNames as $old) {
-        $findParent->execute([':name' => $old, ':dept' => $deptId]);
-        $id = $findParent->fetchColumn();
+        $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND department_id = ? AND parent_id IS NULL LIMIT 1");
+        $stmt->execute([$old, $deptId]);
+        $id = $stmt->fetchColumn();
+        $stmt->closeCursor();
         if ($id) {
-            $db->prepare("UPDATE categories SET name = :name, is_active = 1 WHERE id = :id")
-               ->execute([':name' => $name, ':id' => $id]);
+            $db->prepare("UPDATE categories SET name = ?, is_active = 1 WHERE id = ?")->execute([$name, $id]);
             $results[] = "✓ Renamed '$old' → '$name' (id=$id)";
             return (int)$id;
         }
     }
-    $insertParent->execute([':dept' => $deptId, ':name' => $name, ':desc' => $desc, ':icon' => $icon, ':color' => $color, ':sort' => $sort]);
-    $id = $db->lastInsertId();
+    // Create new
+    $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, NULL, ?, ?, ?, ?, ?, 1)")
+       ->execute([$deptId, $name, $desc, $icon, $color, $sort]);
+    // Get ID — use SQL LAST_INSERT_ID() (works on Hostinger unlike PHP lastInsertId)
+    $id = $db->query("SELECT LAST_INSERT_ID()")->fetchColumn();
     if (!$id) {
-        $findParent->execute([':name' => $name, ':dept' => $deptId]);
-        $id = $findParent->fetchColumn();
+        // Final fallback: query by name, newest first
+        $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND department_id = ? AND parent_id IS NULL ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$name, $deptId]);
+        $id = $stmt->fetchColumn();
+        $stmt->closeCursor();
     }
-    $results[] = "✓ Created '$name' (id=$id)";
+    $results[] = "✓ Created parent '$name' (id=$id)";
     return (int)$id;
 }
 
-// Helper: ensure child exists
-function ensureChild($db, $findChild, $insertChild, $deptId, $parentId, $name, $desc, $icon, $color, $sort, &$results) {
-    $findChild->execute([':name' => $name, ':parent' => $parentId]);
-    $id = $findChild->fetchColumn();
+/**
+ * Hostinger-proof helper: ensure a child category exists under given parent.
+ */
+function ensureChild($db, $deptId, $parentId, $name, $desc, $icon, $color, $sort, &$results) {
+    $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND parent_id = ? LIMIT 1");
+    $stmt->execute([$name, $parentId]);
+    $id = $stmt->fetchColumn();
+    $stmt->closeCursor();
     if ($id) {
-        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = :id")->execute([':id' => $id]);
+        $db->prepare("UPDATE categories SET is_active = 1 WHERE id = ?")->execute([$id]);
         return (int)$id;
     }
-    $insertChild->execute([':dept' => $deptId, ':parent' => $parentId, ':name' => $name, ':desc' => $desc, ':icon' => $icon, ':color' => $color, ':sort' => $sort]);
-    $id = $db->lastInsertId();
+    $db->prepare("INSERT INTO categories (department_id, parent_id, name, description, icon, color, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)")
+       ->execute([$deptId, $parentId, $name, $desc, $icon, $color, $sort]);
+    $id = $db->query("SELECT LAST_INSERT_ID()")->fetchColumn();
     if (!$id) {
-        $findChild->execute([':name' => $name, ':parent' => $parentId]);
-        $id = $findChild->fetchColumn();
+        $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? AND parent_id = ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$name, $parentId]);
+        $id = $stmt->fetchColumn();
+        $stmt->closeCursor();
     }
     $results[] = "  + Added '$name' (id=$id)";
     return (int)$id;
 }
 
-// Helper: deactivate unlisted children
+/**
+ * Deactivate children under $parentId that are NOT in $keepNames list.
+ */
 function deactivateUnlisted($db, $parentId, $keepNames, &$results) {
     $placeholders = implode(',', array_fill(0, count($keepNames), '?'));
     $stmt = $db->prepare("SELECT id, name FROM categories WHERE parent_id = ? AND is_active = 1 AND name NOT IN ($placeholders)");
     $stmt->execute(array_merge([$parentId], $keepNames));
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    foreach ($rows as $row) {
         $db->prepare("UPDATE categories SET is_active = 0 WHERE id = ?")->execute([$row['id']]);
         $results[] = "  - Deactivated '{$row['name']}' (id={$row['id']})";
     }
+}
+
+/**
+ * Upsert priority mapping for a category.
+ */
+function setPriority($db, $categoryId, $priority) {
+    $db->prepare("INSERT INTO category_priority_map (category_id, default_priority) VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE default_priority = VALUES(default_priority)")
+       ->execute([$categoryId, $priority]);
 }
 
 // ═══ HR CATEGORIES ═══
 echo "--- HR CATEGORIES ---\n";
 
 // 1. Request a Document
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-    'Request a Document', ['Certificate of Employment (COE)', 'Request a Document'],
+$parentId = findOrCreateParent($db, $deptHR, 'Request a Document',
+    ['Certificate of Employment (COE)', 'Request a Document'],
     'Document request services', 'file-alt', '#3B82F6', 1, $results);
 $subs = [
     ['Certificate of Employment (COC)', 'Request for Certificate of Employment', 'file-contract', '#3B82F6', 1, 'low'],
@@ -270,17 +293,17 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
+setPriority($db, $parentId, 'low');
 $results[] = "HR: 'Request a Document' synced (3 subs)";
 
 // 2. Payroll
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-    'Payroll', ['Salary Dispute', 'Payroll'],
+$parentId = findOrCreateParent($db, $deptHR, 'Payroll',
+    ['Salary Dispute', 'Payroll'],
     'Payroll and salary concerns', 'money-bill-wave', '#F59E0B', 2, $results);
 $subs = [
     ['Draft Payslip Discrepancy', 'Issues with draft payslip before cutoff', 'exclamation-circle', '#EF4444', 1, 'high'],
@@ -288,17 +311,17 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 $results[] = "HR: 'Payroll' synced (2 subs)";
 
 // 3. Harley (Timekeeping)
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-    'Harley', ['Timekeeping concerns', 'Harley (Timekeeping)', 'Timekeeping Concerns', 'Harley'],
+$parentId = findOrCreateParent($db, $deptHR, 'Harley',
+    ['Timekeeping concerns', 'Harley (Timekeeping)', 'Timekeeping Concerns', 'Harley'],
     'Harley timekeeping system concerns', 'clock', '#F59E0B', 3, $results);
 $subs = [
     ['Log In Error', 'Cannot log in to Harley timekeeping system', 'exclamation-triangle', '#EF4444', 1, 'high'],
@@ -307,12 +330,12 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 $results[] = "HR: 'Harley' synced (3 subs)";
 
 // Deactivate old standalone Leave parents
@@ -323,8 +346,8 @@ foreach ($oldLeave as $oldId) {
 }
 
 // 4. General Inquiry
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptHR,
-    'General Inquiry', ['HR General Inquiry', 'General Inquiry'],
+$parentId = findOrCreateParent($db, $deptHR, 'General Inquiry',
+    ['HR General Inquiry', 'General Inquiry'],
     'General HR inquiries', 'info-circle', '#6B7280', 4, $results);
 $subs = [
     ['HMO Inquiry', 'Health insurance and HMO questions', 'heartbeat', '#EF4444', 1, 'medium'],
@@ -332,20 +355,20 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptHR, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
+setPriority($db, $parentId, 'low');
 $results[] = "HR: 'General Inquiry' synced (2 subs)";
 
 // ═══ IT CATEGORIES ═══
 echo "--- IT CATEGORIES ---\n";
 
 // 1. Access
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'Access', ['Access'], 'System access and permissions', 'key', '#8B5CF6', 1, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'Access',
+    ['Access'], 'System access and permissions', 'key', '#8B5CF6', 1, $results);
 $subs = [
     ['Account Deactivation', 'Deactivate user account', 'user-slash', '#EF4444', 1, 'high'],
     ['Password Reset', 'Reset user password', 'lock', '#F59E0B', 2, 'high'],
@@ -356,16 +379,16 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'high']);
+setPriority($db, $parentId, 'high');
 
 // 2. Email
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'Email', ['Email'], 'Email services', 'envelope', '#EF4444', 2, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'Email',
+    ['Email'], 'Email services', 'envelope', '#EF4444', 2, $results);
 $subs = [
     ['Cannot Send/Receive Email', 'Email sending or receiving issues', 'exclamation-triangle', '#EF4444', 1, 'high'],
     ['Email Recovery', 'Recover deleted or lost emails', 'undo', '#F59E0B', 2, 'high'],
@@ -374,16 +397,16 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 
 // 3. Hardware
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'Hardware', ['Hardware'], 'Hardware issues', 'desktop', '#3B82F6', 3, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'Hardware',
+    ['Hardware'], 'Hardware issues', 'desktop', '#3B82F6', 3, $results);
 $subs = [
     ['Desktop/Laptop Issue', 'Computer hardware problems', 'laptop', '#EF4444', 1, 'high'],
     ['Keyboard/Mouse', 'Input device issues', 'keyboard', '#F59E0B', 2, 'medium'],
@@ -394,16 +417,16 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 
 // 4. Software
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'Software', ['Software'], 'Software issues', 'code', '#10B981', 4, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'Software',
+    ['Software'], 'Software issues', 'code', '#10B981', 4, $results);
 $subs = [
     ['Antivirus/Security', 'Security software issues', 'shield-alt', '#EF4444', 1, 'high'],
     ['Application Error', 'Application crashes or errors', 'exclamation-triangle', '#F59E0B', 2, 'medium'],
@@ -415,16 +438,16 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 
 // 5. Network
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'Network', ['Network'], 'Network issues', 'wifi', '#F59E0B', 5, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'Network',
+    ['Network'], 'Network issues', 'wifi', '#F59E0B', 5, $results);
 $subs = [
     ['Network Drive Access', 'Cannot access shared drives', 'hdd', '#F59E0B', 1, 'medium'],
     ['Network Printer', 'Network printer issues', 'print', '#F59E0B', 2, 'medium'],
@@ -435,60 +458,61 @@ $subs = [
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'medium']);
+setPriority($db, $parentId, 'medium');
 
 // 6. IT General Inquiry
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'IT General Inquiry', ['IT General Inquiry'], 'General IT questions', 'question-circle', '#6B7280', 6, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'IT General Inquiry',
+    ['IT General Inquiry'], 'General IT questions', 'question-circle', '#6B7280', 6, $results);
 $subs = [
     ['General IT Questions/How-To/Advice', 'General IT help', 'info-circle', '#6B7280', 1, 'low'],
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
+setPriority($db, $parentId, 'low');
 
 // 7. OnBoarding
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'OnBoarding', ['OnBoarding'], 'New employee onboarding', 'user-plus', '#10B981', 7, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'OnBoarding',
+    ['OnBoarding'], 'New employee onboarding', 'user-plus', '#10B981', 7, $results);
 $subs = [
     ['*HR to file Ticket', 'HR files onboarding ticket for new employee', 'user-tie', '#10B981', 1, 'low'],
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
+setPriority($db, $parentId, 'low');
 
 // 8. OffBoarding
-$parentId = findOrCreateParent($db, $findParent, $insertParent, $deptIT,
-    'OffBoarding', ['OffBoarding'], 'Employee offboarding', 'user-minus', '#EF4444', 8, $results);
+$parentId = findOrCreateParent($db, $deptIT, 'OffBoarding',
+    ['OffBoarding'], 'Employee offboarding', 'user-minus', '#EF4444', 8, $results);
 $subs = [
     ['*HR to file Ticket', 'HR files offboarding ticket for departing employee', 'user-times', '#EF4444', 1, 'low'],
 ];
 $keepNames = [];
 foreach ($subs as [$n, $d, $i, $c, $s, $p]) {
-    $subId = ensureChild($db, $findChild, $insertChild, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
-    $upsertPriority->execute([':cid' => $subId, ':pri' => $p]);
+    $subId = ensureChild($db, $deptIT, $parentId, $n, $d, $i, $c, $s, $results);
+    setPriority($db, $subId, $p);
     $keepNames[] = $n;
 }
 deactivateUnlisted($db, $parentId, $keepNames, $results);
-$upsertPriority->execute([':cid' => $parentId, ':pri' => 'low']);
+setPriority($db, $parentId, 'low');
 
 // Print sync results
-foreach ($results as $line) echo "$line\n";
+echo "\n=== Sync Results ===\n";
+foreach ($results as $line) echo "  $line\n";
 
 // ═══ PHASE 3: FINAL VERIFICATION ═══
 echo "\n═══ PHASE 3: VERIFICATION ═══\n\n";
@@ -519,11 +543,13 @@ foreach ($rows as $r) {
 // Count check
 $activeParents = $db->query("SELECT COUNT(*) FROM categories WHERE parent_id IS NULL AND is_active = 1")->fetchColumn();
 $activeChildren = $db->query("SELECT COUNT(*) FROM categories WHERE parent_id IS NOT NULL AND is_active = 1")->fetchColumn();
-$hrFile = $db->query("SELECT COUNT(*) FROM categories WHERE name = '*HR to file Ticket'")->fetchColumn();
+$hrFile = $db->query("SELECT COUNT(*) FROM categories WHERE name = '*HR to file Ticket' AND is_active = 1")->fetchColumn();
+$hrFileTotal = $db->query("SELECT COUNT(*) FROM categories WHERE name = '*HR to file Ticket'")->fetchColumn();
 
 echo "\n═══ SUMMARY ═══\n";
 echo "Active parents: $activeParents (expected: 12)\n";
 echo "Active children: $activeChildren (expected: 42)\n";
-echo "'*HR to file Ticket' rows: $hrFile (expected: 2)\n";
-echo ($activeParents == 12 && $hrFile == 2) ? "\n✅ ALL GOOD!\n" : "\n⚠ Check counts above\n";
+echo "Active '*HR to file Ticket' rows: $hrFile (expected: 2)\n";
+echo "Total '*HR to file Ticket' rows (incl inactive): $hrFileTotal\n";
+echo ($activeParents == 12 && $activeChildren == 42 && $hrFile == 2) ? "\n✅ ALL GOOD!\n" : "\n⚠ Check counts above\n";
 echo "</pre>";
