@@ -214,6 +214,11 @@ try {
         // Create fresh
         $insertParent->execute([':dept' => $deptId, ':name' => $targetName, ':desc' => $desc, ':icon' => $icon, ':color' => $color, ':sort' => $sort]);
         $id = $db->lastInsertId();
+        if (!$id) {
+            // Fallback: re-query (lastInsertId can return 0 on some hosts)
+            $findParent->execute([':name' => $targetName, ':dept' => $deptId]);
+            $id = $findParent->fetchColumn();
+        }
         $results[] = "Created parent '$targetName' (id=$id)";
         return $id;
     }
@@ -229,6 +234,11 @@ try {
         }
         $insertChild->execute([':dept' => $deptId, ':parent' => $parentId, ':name' => $name, ':desc' => $desc, ':icon' => $icon, ':color' => $color, ':sort' => $sort]);
         $id = $db->lastInsertId();
+        if (!$id) {
+            // Fallback: re-query (lastInsertId can return 0 on some hosts)
+            $findChild->execute([':name' => $name, ':parent' => $parentId]);
+            $id = $findChild->fetchColumn();
+        }
         $results[] = "  + Added '$name' (id=$id)";
         return $id;
     }
