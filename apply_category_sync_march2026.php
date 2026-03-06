@@ -50,6 +50,36 @@ echo "==============================================\n";
 echo " Category & Priority Sync — March 2026 Final\n";
 echo "==============================================\n\n";
 
+// =====================================================
+// PRE-MIGRATION: Fix category_priority_map duplicates
+// =====================================================
+echo "--- PRE-MIGRATION: Cleaning up category_priority_map ---\n";
+try {
+    // Remove duplicate rows — keep only the latest entry per category_id
+    $dupCount = $db->exec("
+        DELETE cpm FROM category_priority_map cpm
+        INNER JOIN (
+            SELECT category_id, MAX(id) AS keep_id
+            FROM category_priority_map
+            GROUP BY category_id
+            HAVING COUNT(*) > 1
+        ) dupes ON cpm.category_id = dupes.category_id AND cpm.id < dupes.keep_id
+    ");
+    if ($dupCount > 0) echo "  Removed $dupCount duplicate rows from category_priority_map\n";
+
+    // Ensure unique index exists on category_id
+    $db->exec("ALTER TABLE category_priority_map ADD UNIQUE INDEX uk_category (category_id)");
+    echo "  Added unique index on category_priority_map(category_id)\n";
+} catch (PDOException $e) {
+    if (strpos($e->getMessage(), 'Duplicate key name') !== false
+        || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        echo "  Unique index already exists — OK\n";
+    } else {
+        echo "  Note: " . htmlspecialchars($e->getMessage()) . "\n";
+    }
+}
+echo "\n";
+
 try {
     $db->beginTransaction();
 
@@ -510,7 +540,26 @@ try {
     $db->exec("UPDATE sla_policies SET resolution_time = 7200 WHERE priority = 'low' AND is_active = 1");
     $results[] = "Global SLA: all 24h response; High=24h, Med=72h, Low=120h resolution";
 
-    // Department SLA (create table if needed)
+    // NOTE: Department SLA table (DDL) moved OUTSIDE transaction to prevent implicit commit
+
+    // =====================================================
+    // COMMIT (categories + global SLA only — no DDL here)
+    // =====================================================
+    $db->commit();
+    echo "\n✅ Category sync committed successfully!\n\n";
+
+} catch (Exception $e) {
+    if ($db->inTransaction()) $db->rollBack();
+    echo "\n❌ Category sync ROLLED BACK: " . htmlspecialchars($e->getMessage()) . "\n\n";
+    $errors[] = "ROLLBACK: " . $e->getMessage();
+}
+
+// =====================================================
+// POST-COMMIT: Department SLA (DDL must be outside transaction)
+// =====================================================
+echo "--- DEPARTMENT SLA POLICIES ---\n";
+try {
+    // Create table WITHOUT FK first (avoids errno 150 on mismatched column types)
     $db->exec("CREATE TABLE IF NOT EXISTS sla_department_policies (
         id INT AUTO_INCREMENT PRIMARY KEY,
         department_id INT NOT NULL,
@@ -521,39 +570,49 @@ try {
         is_active TINYINT(1) DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        UNIQUE KEY uk_dept_priority (department_id, priority),
-        FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE
+        UNIQUE KEY uk_dept_priority (department_id, priority)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $upsertDeptSla = $db->prepare(
-        "INSERT INTO sla_department_policies (department_id, priority, response_time, resolution_time)
-         VALUES (:dept, :p, :rt, :res)
-         ON DUPLICATE KEY UPDATE response_time=VALUES(response_time), resolution_time=VALUES(resolution_time), updated_at=NOW()"
-    );
-
-    // IT: High=24h/48h, Medium=24h/96h, Low=24h/120h
-    foreach ([['high',1440,2880],['medium',1440,5760],['low',1440,7200]] as [$p,$rt,$res]) {
-        $upsertDeptSla->execute([':dept'=>$deptIT,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+    // Try adding FK separately (non-fatal if it fails)
+    try {
+        $db->exec("ALTER TABLE sla_department_policies ADD CONSTRAINT fk_sdp_dept FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE");
+    } catch (PDOException $fkErr) {
+        if (strpos($fkErr->getMessage(), 'Duplicate key name') !== false
+            || strpos($fkErr->getMessage(), 'already exists') !== false) {
+            // FK already exists — fine
+        } else {
+            echo "  ⚠ FK constraint skipped: " . htmlspecialchars($fkErr->getMessage()) . "\n";
+        }
     }
-    $results[] = "IT SLA: High=24h/48h, Medium=24h/96h, Low=24h/120h";
 
-    // HR: High=24h/24h, Medium=24h/72h, Low=24h/120h
-    foreach ([['high',1440,1440],['medium',1440,4320],['low',1440,7200]] as [$p,$rt,$res]) {
-        $upsertDeptSla->execute([':dept'=>$deptHR,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+    // Re-fetch department IDs (they may not be in scope if category sync errored)
+    $deptHR_sla = $db->query("SELECT id FROM departments WHERE code = 'HR' LIMIT 1")->fetchColumn();
+    $deptIT_sla = $db->query("SELECT id FROM departments WHERE code = 'IT' OR name LIKE '%Information Tech%' LIMIT 1")->fetchColumn();
+
+    if ($deptIT_sla && $deptHR_sla) {
+        $upsertDeptSla = $db->prepare(
+            "INSERT INTO sla_department_policies (department_id, priority, response_time, resolution_time)
+             VALUES (:dept, :p, :rt, :res)
+             ON DUPLICATE KEY UPDATE response_time=VALUES(response_time), resolution_time=VALUES(resolution_time), updated_at=NOW()"
+        );
+
+        // IT: High=24h/48h, Medium=24h/96h, Low=24h/120h
+        foreach ([['high',1440,2880],['medium',1440,5760],['low',1440,7200]] as [$p,$rt,$res]) {
+            $upsertDeptSla->execute([':dept'=>$deptIT_sla,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+        }
+        $results[] = "IT SLA: High=24h/48h, Medium=24h/96h, Low=24h/120h";
+
+        // HR: High=24h/24h, Medium=24h/72h, Low=24h/120h
+        foreach ([['high',1440,1440],['medium',1440,4320],['low',1440,7200]] as [$p,$rt,$res]) {
+            $upsertDeptSla->execute([':dept'=>$deptHR_sla,':p'=>$p,':rt'=>$rt,':res'=>$res]);
+        }
+        $results[] = "HR SLA: High=24h/24h, Medium=24h/72h, Low=24h/120h";
     }
-    $results[] = "HR SLA: High=24h/24h, Medium=24h/72h, Low=24h/120h";
 
-
-    // =====================================================
-    // COMMIT
-    // =====================================================
-    $db->commit();
-    echo "\n✅ Migration committed successfully!\n\n";
-
+    echo "  ✅ Department SLA policies synced\n\n";
 } catch (Exception $e) {
-    if ($db->inTransaction()) $db->rollBack();
-    echo "\n❌ Migration ROLLED BACK: " . htmlspecialchars($e->getMessage()) . "\n\n";
-    $errors[] = "ROLLBACK: " . $e->getMessage();
+    echo "  ⚠ Department SLA setup failed (non-fatal): " . htmlspecialchars($e->getMessage()) . "\n\n";
+    $errors[] = "Department SLA: " . $e->getMessage();
 }
 
 
@@ -573,11 +632,15 @@ $verify = $db->query("
            c.name AS parent_category,
            sub.name AS issue_type,
            sub.is_active,
-           COALESCE(cpm.default_priority, '—') AS priority
+           COALESCE((
+               SELECT cpm.default_priority
+               FROM category_priority_map cpm
+               WHERE cpm.category_id = sub.id
+               LIMIT 1
+           ), '—') AS priority
     FROM categories c
     LEFT JOIN categories sub ON sub.parent_id = c.id AND sub.is_active = 1
     LEFT JOIN departments d ON c.department_id = d.id
-    LEFT JOIN category_priority_map cpm ON cpm.category_id = sub.id
     WHERE c.parent_id IS NULL AND c.is_active = 1
     ORDER BY d.code, c.sort_order, sub.sort_order
 ")->fetchAll(PDO::FETCH_ASSOC);
