@@ -60,6 +60,9 @@ class CustomerCreateTicketController {
         unset($_SESSION['error']);
         $unreadNotifications = $this->getUnreadCount();
         
+        // Generate form token to prevent duplicate submissions
+        $_SESSION['ticket_form_token'] = bin2hex(random_bytes(32));
+        
         // Get category priority map for auto-priority assignment
         $priorityMap = [];
         if ($this->priorityMapModel->tableExists()) {
@@ -85,6 +88,16 @@ class CustomerCreateTicketController {
      * Handle ticket creation with department routing
      */
     public function create() {
+        // Validate form token to prevent duplicate submissions
+        if (!isset($_POST['form_token']) || $_POST['form_token'] !== ($_SESSION['ticket_form_token'] ?? '')) {
+            // Token mismatch - likely a duplicate submit or browser back/refresh
+            unset($_SESSION['ticket_form_token']);
+            $_SESSION['error'] = "Duplicate submission detected. Your previous ticket was already submitted.";
+            redirect('customer/tickets.php');
+            return;
+        }
+        unset($_SESSION['ticket_form_token']); // Consume token — prevents replay
+        
         // Generate unique ticket number
         do {
             $ticketNumber = generateTicketNumber();

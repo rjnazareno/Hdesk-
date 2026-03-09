@@ -53,6 +53,9 @@ class CreateTicketController {
         // Get paginated recent tickets
         $recentTickets = $this->ticketModel->getAll([], 'created_at', 'DESC', $itemsPerPage, $offset);
         
+        // Generate form token to prevent duplicate submissions
+        $_SESSION['admin_ticket_form_token'] = bin2hex(random_bytes(32));
+        
         // Get category priority map for auto-priority assignment
         $priorityMap = [];
         if ($this->priorityMapModel->tableExists()) {
@@ -91,6 +94,15 @@ class CreateTicketController {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('admin/create_ticket.php');
         }
+        
+        // Validate form token to prevent duplicate submissions
+        if (!isset($_POST['form_token']) || $_POST['form_token'] !== ($_SESSION['admin_ticket_form_token'] ?? '')) {
+            unset($_SESSION['admin_ticket_form_token']);
+            $_SESSION['error'] = "Duplicate submission detected. Your previous ticket was already submitted.";
+            redirect('admin/tickets.php');
+            return;
+        }
+        unset($_SESSION['admin_ticket_form_token']); // Consume token
         
         $currentUser = $this->auth->getCurrentUser();
         

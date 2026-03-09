@@ -268,6 +268,7 @@
                 </div>
 
                 <form action="create_ticket.php" method="POST" enctype="multipart/form-data" id="createTicketForm" class="p-8">
+                    <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($_SESSION['ticket_form_token'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     
                     <!-- STEP 1: Department Selection -->
                     <div id="step1" class="form-section active">
@@ -619,7 +620,9 @@
         
         function getCategoryName(catId) {
             const cat = categoriesData.find(c => c.id == catId);
-            return cat ? cat.name : '';
+            if (!cat) return '';
+            // Strip hidden * prefix if present
+            return cat.name.startsWith('*') ? cat.name.substring(1).trim() : cat.name;
         }
         
         // ─── Populate Level 1: Category ───
