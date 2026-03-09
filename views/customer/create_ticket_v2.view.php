@@ -589,9 +589,23 @@
         
         // ─── Helpers ───
         function getChildCategories(parentId) {
-            return categoriesData
-                .filter(c => Number(c.parent_id) === Number(parentId) && !c.name.startsWith('*'))
-                .sort((a, b) => a.name.localeCompare(b.name));
+            var allChildren = categoriesData.filter(function(c) {
+                return Number(c.parent_id) === Number(parentId);
+            });
+            var visible = allChildren.filter(function(c) { return !c.name.startsWith('*'); });
+            // If all direct children are hidden (*-prefixed), collect their children (grandchildren)
+            if (visible.length === 0 && allChildren.length > 0) {
+                var grandchildren = [];
+                allChildren.forEach(function(hidden) {
+                    categoriesData.forEach(function(c) {
+                        if (Number(c.parent_id) === Number(hidden.id) && !c.name.startsWith('*')) {
+                            grandchildren.push(c);
+                        }
+                    });
+                });
+                return grandchildren.sort(function(a, b) { return a.name.localeCompare(b.name); });
+            }
+            return visible.sort(function(a, b) { return a.name.localeCompare(b.name); });
         }
         
         function getCategoryName(catId) {
@@ -826,7 +840,7 @@
         // ─── Step Navigation ───
         function goToStep(step) {
             if (step === 2 && !selectedDepartmentId) {
-                alert('Please select a department');
+                showAlert('Please select a department', 'warning');
                 return;
             }
             
@@ -836,20 +850,20 @@
                 var categoryId = document.getElementById('category_id').value;
                 
                 if (!selectedLevel1) {
-                    alert('Please select a category');
+                    showAlert('Please select a category', 'warning');
                     return;
                 }
                 if (selectedLevel1 === 'other' && !document.getElementById('categoryOtherText').value.trim()) {
-                    alert('Please describe your concern in the "Other" text field');
+                    showAlert('Please describe your concern in the "Other" text field', 'warning');
                     document.getElementById('categoryOtherText').focus();
                     return;
                 }
                 if (!title) {
-                    alert('Please make a selection to generate the ticket title');
+                    showAlert('Please make a selection to generate the ticket title', 'warning');
                     return;
                 }
                 if (!description) {
-                    alert('Please enter a description');
+                    showAlert('Please enter a description', 'warning');
                     document.getElementById('description').focus();
                     return;
                 }
@@ -869,9 +883,9 @@
                         });
                         document.getElementById('category_id').value = othersSub ? othersSub.id : generalParent.id;
                     } else {
-                        // Last resort: first parent in this department
+                        // Last resort: first parent in this department (exclude hidden * categories)
                         var fallback = categoriesData.find(function(c) {
-                            return Number(c.department_id) === Number(selectedDepartmentId) && !c.parent_id;
+                            return Number(c.department_id) === Number(selectedDepartmentId) && !c.parent_id && !c.name.startsWith('*');
                         });
                         document.getElementById('category_id').value = fallback ? fallback.id : '0';
                     }
@@ -986,6 +1000,48 @@
         }
         
         // ─── Form Submission ───
+        // ─── Custom Alert Modal ───
+        function showAlert(message, type) {
+            type = type || 'warning';
+            var overlay = document.getElementById('alertOverlay');
+            var icon = document.getElementById('alertIcon');
+            var msg = document.getElementById('alertMessage');
+            var btn = document.getElementById('alertOkBtn');
+            
+            msg.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fas fa-times-circle text-4xl text-red-500';
+                btn.className = 'w-full px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2';
+            } else if (type === 'success') {
+                icon.className = 'fas fa-check-circle text-4xl text-emerald-500';
+                btn.className = 'w-full px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2';
+            } else {
+                icon.className = 'fas fa-exclamation-triangle text-4xl text-amber-500';
+                btn.className = 'w-full px-6 py-2.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2';
+            }
+            
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(function() {
+                overlay.classList.add('show');
+            });
+            btn.focus();
+        }
+        
+        function closeAlert() {
+            var overlay = document.getElementById('alertOverlay');
+            overlay.classList.remove('show');
+            setTimeout(function() { overlay.classList.add('hidden'); }, 200);
+        }
+        
+        document.getElementById('alertOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeAlert();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('alertOverlay').classList.contains('hidden')) closeAlert();
+        });
+
         var form = document.getElementById('createTicketForm');
         var submitBtn = document.getElementById('submitBtn');
         var submitText = document.getElementById('submitText');
@@ -998,7 +1054,7 @@
             // Final check: ensure title is set
             if (!document.getElementById('title').value.trim()) {
                 e.preventDefault();
-                alert('Please complete your category selections to generate a title.');
+                showAlert('Please complete your category selections to generate a title.', 'warning');
                 goToStep(2);
                 return false;
             }
@@ -1010,5 +1066,25 @@
             submitLoading.classList.remove('hidden');
         });
     </script>
+
+<!-- Alert Modal -->
+<div id="alertOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0);transition:background .2s ease">
+    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 transform scale-95 transition-all duration-200" id="alertBox" style="opacity:0;transition:opacity .2s ease,transform .2s ease">
+        <div class="text-center">
+            <div class="mb-4">
+                <i id="alertIcon" class="fas fa-exclamation-triangle text-4xl text-amber-500"></i>
+            </div>
+            <p id="alertMessage" class="text-gray-700 text-sm leading-relaxed mb-6"></p>
+            <button id="alertOkBtn" onclick="closeAlert()" class="w-full px-6 py-2.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+<style>
+    #alertOverlay.show { background: rgba(0,0,0,0.5) !important; }
+    #alertOverlay.show #alertBox { opacity: 1 !important; transform: scale(1) !important; }
+</style>
+
 </body>
 </html>
