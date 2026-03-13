@@ -55,13 +55,13 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="text-xs text-cyan-600 mt-1">New tickets</div>
             </a>
 
-            <!-- In Progress Tickets (with sub-breakdown) -->
-            <div onclick="window.location.href='tickets.php?status=in_progress'" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-purple-100 hover:border-purple-300 transition-all cursor-pointer group">
+            <!-- Open Tickets (with sub-breakdown: in_progress + pending) -->
+            <div onclick="window.location.href='tickets.php?status=pending,in_progress'" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-300 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition">
-                        <i class="fas fa-spinner text-purple-500"></i>
+                    <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition">
+                        <i class="fas fa-folder-open text-blue-500"></i>
                     </div>
-                    <span class="text-xs font-semibold text-purple-500 uppercase tracking-wide">In Progress</span>
+                    <span class="text-xs font-semibold text-blue-500 uppercase tracking-wide">Open</span>
                 </div>
                 <div class="text-3xl font-bold text-slate-800"><?php echo $stats['open_tickets'] ?? 0; ?></div>
                 <div class="flex items-center gap-2 mt-2">
