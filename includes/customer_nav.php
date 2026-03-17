@@ -41,9 +41,9 @@ $position = $currentUser['position'] ?? 'Employee';
     <div class="flex flex-col h-full">
         <!-- Logo/Header -->
         <div class="flex items-center justify-center h-24 px-5 border-b border-gray-200 bg-white relative">
-            <span class="text-4xl font-bold">
+            <a href="<?= $basePath ?>dashboard.php" class="text-4xl font-bold">
                 <span class="text-emerald-500">H</span><span class="text-slate-800">desk</span>
-            </span>
+            </a>
             <!-- Close button for mobile -->
             <button id="close-sidebar" class="lg:hidden absolute right-4 text-gray-400 hover:text-gray-600 p-2">
                 <i class="fas fa-times"></i>

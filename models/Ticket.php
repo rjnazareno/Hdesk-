@@ -98,13 +98,12 @@ class Ticket {
                 return false;
             }
             
-            $sql = "UPDATE tickets 
-                    SET grabbed_by = :user_id, 
+            $sql = "UPDATE tickets
+                    SET grabbed_by = :user_id,
                         grabbed_at = NOW(),
                         assigned_to = :user_id,
-                        assignee_type = :assignee_type,
-                        status = CASE WHEN status = 'pending' THEN 'in_progress' ELSE status END
-                    WHERE id = :id 
+                        assignee_type = :assignee_type
+                    WHERE id = :id
                     AND grabbed_by IS NULL";
             
             $stmt = $this->db->prepare($sql);

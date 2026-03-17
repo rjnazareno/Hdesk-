@@ -159,13 +159,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
         } catch (Exception $e) { error_log("Notification error: " . $e->getMessage()); }
     }
     
-    if (isset($_POST['assigned_to']) && $_POST['assigned_to'] != $ticket['assigned_to']) {
-        $updateData['assigned_to'] = $_POST['assigned_to'] ? (int)$_POST['assigned_to'] : null;
+    $postedAssignedTo = $_POST['assigned_to'] ?? '';
+    $assigneeChanged = $postedAssignedTo != $ticket['assigned_to'];
+    $assigneeTypeMismatch = $postedAssignedTo && $ticket['assignee_type'] !== 'employee';
+    if (isset($_POST['assigned_to']) && ($assigneeChanged || $assigneeTypeMismatch)) {
+        $updateData['assigned_to'] = $postedAssignedTo ? (int)$postedAssignedTo : null;
+        $updateData['assignee_type'] = $updateData['assigned_to'] ? 'employee' : null;
         
-        if ($updateData['assigned_to']) {
+        if ($updateData['assigned_to'] && $assigneeChanged) {
             $assignee = $employeeModel->findById($updateData['assigned_to']);
             $assigneeName = $assignee ? ($assignee['fname'] . ' ' . $assignee['lname']) : 'Unknown';
-            
+
             $activityModel->log([
                 'ticket_id' => $ticketId,
                 'user_id' => $currentUser['id'],
