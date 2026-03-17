@@ -36,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_s
     $newStatus = sanitize($_POST['quick_status']);
     $oldStatus = $ticket['status'];
     
-    if ($oldStatus === 'pending' && $newStatus !== 'pending') {
+    if ($oldStatus === 'pending' && $newStatus === 'in_progress') {
         $slaModel->recordFirstResponse($ticketId);
     }
-    
+
     if ($newStatus === 'closed' && $oldStatus !== 'closed') {
         $slaModel->recordResolution($ticketId);
     }
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
     if (isset($_POST['status']) && $_POST['status'] !== $ticket['status']) {
         $updateData['status'] = sanitize($_POST['status']);
         
-        if ($oldTicket['status'] === 'pending' && $updateData['status'] !== 'pending') {
+        if ($oldTicket['status'] === 'pending' && $updateData['status'] === 'in_progress') {
             $slaModel->recordFirstResponse($ticketId);
         }
         
@@ -215,10 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['update_
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment']) && !empty($_POST['comment'])) {
     $comment = sanitize($_POST['comment']);
     
-    if ($isITStaff && $ticket['status'] === 'pending') {
-        $slaModel->recordFirstResponse($ticketId);
-    }
-    
     $activityModel->log([
         'ticket_id' => $ticketId,
         'user_id' => $currentUser['id'],
@@ -242,11 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !
         'user_type' => $userType,
         'message' => $replyMsg
     ]);
-
-    // Record first response for SLA if admin is replying to pending ticket
-    if ($isITStaff && $ticket['status'] === 'pending') {
-        $slaModel->recordFirstResponse($ticketId);
-    }
 
     // Log activity
     $activityModel->log([
@@ -279,10 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['resolve_ticket'])) {
     $resolution = sanitize($_POST['resolution_note'] ?? '');
     $oldStatus = $ticket['status'];
-    
-    if ($oldStatus === 'pending') {
-        $slaModel->recordFirstResponse($ticketId);
-    }
+
     $slaModel->recordResolution($ticketId);
     
     $updateData = ['status' => 'closed'];
