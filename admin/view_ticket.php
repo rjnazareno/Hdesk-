@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment']) && !empty(
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !empty(trim($_POST['reply_message']))) {
     $replyMsg = sanitize(trim($_POST['reply_message']));
     $userType = ($_SESSION['user_type'] ?? 'user') === 'employee' ? 'employee' : 'user';
-    
+
     $replyModel = new TicketReply();
     $replyModel->create([
         'ticket_id' => $ticketId,
@@ -238,6 +238,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !
         'user_type' => $userType,
         'message' => $replyMsg
     ]);
+
+    // Auto-change status to in_progress and record first response when admin replies to pending ticket
+    if ($isITStaff && $ticket['status'] === 'pending') {
+        $ticketModel->update($ticketId, ['status' => 'in_progress']);
+        $slaModel->recordFirstResponse($ticketId);
+
+        $activityModel->log([
+            'ticket_id' => $ticketId,
+            'user_id' => $currentUser['id'],
+            'action_type' => 'status_change',
+            'old_value' => 'pending',
+            'new_value' => 'in_progress',
+            'comment' => 'Status automatically changed to in_progress (admin reply)'
+        ]);
+    }
 
     // Log activity
     $activityModel->log([
