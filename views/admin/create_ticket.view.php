@@ -945,6 +945,14 @@ include __DIR__ . '/../layouts/header.php';
     // Priority select change listener
     document.getElementById('prioritySelect')?.addEventListener('change', function() {
         updatePrioritySlaHint();
+
+        // Automatically enable override when admin manually changes priority
+        const overrideCheckbox = document.getElementById('adminOverrideCheckbox');
+        if (overrideCheckbox && !overrideCheckbox.checked) {
+            overrideCheckbox.checked = true;
+            // Hide the auto-priority banner since we're now overriding
+            document.getElementById('autoPriorityBanner')?.classList.add('hidden');
+        }
     });
     
     // Step Navigation
