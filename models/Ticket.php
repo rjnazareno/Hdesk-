@@ -624,10 +624,24 @@ class Ticket {
     
     /**
      * Update ticket
+     * 
+     * @param int $id Ticket ID
+     * @param array $data Data to update
+     * @param bool $recalculateSLA Whether to recalculate SLA on priority change (default: true)
+     * @return bool|array Success status, or array with SLA recalculation details if priority changed
      */
-    public function update($id, $data) {
+    public function update($id, $data, $recalculateSLA = true) {
         $fields = [];
         $params = [':id' => $id];
+        
+        // Get current ticket data for priority change detection
+        $oldPriority = null;
+        if (isset($data['priority']) && $recalculateSLA) {
+            $currentTicket = $this->findById($id);
+            if ($currentTicket) {
+                $oldPriority = $currentTicket['priority'];
+            }
+        }
         
         $allowedFields = ['title', 'description', 'category_id', 'priority', 'admin_priority', 'status', 'assigned_to', 'assignee_type', 'grabbed_by', 'resolution', 'attachments'];
         
@@ -656,7 +670,41 @@ class Ticket {
         
         $sql = "UPDATE tickets SET " . implode(', ', $fields) . " WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($params);
+        $result = $stmt->execute($params);
+        
+        // Recalculate SLA if priority changed
+        $slaRecalcResult = null;
+        if ($result && isset($data['priority']) && $oldPriority !== null && $oldPriority !== $data['priority'] && $recalculateSLA) {
+            $sla = new SLA();
+            $slaRecalcResult = $sla->recalculateOnPriorityChange($id, $oldPriority, $data['priority']);
+            
+            // Log the priority change with SLA recalculation in activity
+            if (class_exists('TicketActivity')) {
+                $activityModel = new TicketActivity();
+                $userId = $_SESSION['user_id'] ?? null;
+                $userType = $_SESSION['user_type'] ?? 'user';
+                
+                $comment = "Priority changed from {$oldPriority} to {$data['priority']}. ";
+                if ($slaRecalcResult && $slaRecalcResult['success']) {
+                    $details = $slaRecalcResult['details'] ?? [];
+                    $oldDue = isset($details['old_resolution_due']) ? date('M d, Y h:i A', strtotime($details['old_resolution_due'])) : 'N/A';
+                    $newDue = isset($details['new_resolution_due']) ? date('M d, Y h:i A', strtotime($details['new_resolution_due'])) : 'N/A';
+                    $comment .= "SLA recalculated: Resolution due changed from {$oldDue} to {$newDue}";
+                }
+                
+                $activityModel->log([
+                    'ticket_id' => $id,
+                    'user_id' => $userId,
+                    'user_type' => $userType,
+                    'action_type' => 'priority_changed',
+                    'old_value' => $oldPriority,
+                    'new_value' => $data['priority'],
+                    'comment' => $comment
+                ]);
+            }
+        }
+        
+        return $result;
     }
     
     /**

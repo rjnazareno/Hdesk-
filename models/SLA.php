@@ -333,6 +333,127 @@ class SLA {
     }
     
     /**
+     * Recalculate SLA tracking when ticket priority changes
+     * 
+     * IMPORTANT: This calculates new due dates from the ORIGINAL ticket creation time,
+     * then subtracts the elapsed time to ensure accurate remaining time.
+     * 
+     * Example: Ticket created 2 hours ago with LOW priority (24 hour resolution)
+     *          Changed to HIGH priority (4 hour resolution)
+     *          New resolution due = ticket_created_at + 4 hours (not now + 4 hours)
+     *          So effectively 2 hours already used, 2 hours remaining
+     * 
+     * @param int $ticketId The ticket ID
+     * @param string $oldPriority The previous priority
+     * @param string $newPriority The new priority
+     * @return array Result with success status and details
+     */
+    public function recalculateOnPriorityChange($ticketId, $oldPriority, $newPriority) {
+        // Don't recalculate if priority didn't actually change
+        if ($oldPriority === $newPriority) {
+            return ['success' => true, 'message' => 'No priority change detected'];
+        }
+        
+        // Get the ticket's original creation time and department
+        $ticketSql = "SELECT t.created_at, t.status,
+                      COALESCE(t.department_id, c.department_id, pc.department_id) AS dept_id
+                      FROM tickets t
+                      LEFT JOIN categories c ON t.category_id = c.id
+                      LEFT JOIN categories pc ON c.parent_id = pc.id
+                      WHERE t.id = :ticket_id";
+        $ticketStmt = $this->db->prepare($ticketSql);
+        $ticketStmt->execute([':ticket_id' => $ticketId]);
+        $ticketData = $ticketStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$ticketData) {
+            return ['success' => false, 'message' => 'Ticket not found'];
+        }
+        
+        // Don't recalculate for closed tickets
+        if ($ticketData['status'] === 'closed') {
+            return ['success' => false, 'message' => 'Cannot recalculate SLA for closed ticket'];
+        }
+        
+        // Get the new SLA policy based on new priority
+        $newPolicy = $this->getPolicyByPriority($newPriority, $ticketData['dept_id']);
+        if (!$newPolicy) {
+            return ['success' => false, 'message' => "No SLA policy found for priority: $newPriority"];
+        }
+        
+        // Get current SLA tracking to preserve response_at and other data
+        $currentSlaSql = "SELECT * FROM sla_tracking WHERE ticket_id = :ticket_id";
+        $currentSlaStmt = $this->db->prepare($currentSlaSql);
+        $currentSlaStmt->execute([':ticket_id' => $ticketId]);
+        $currentSla = $currentSlaStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$currentSla) {
+            // No existing SLA tracking - create new one instead
+            return [
+                'success' => $this->createTracking($ticketId, $newPriority),
+                'message' => 'Created new SLA tracking (none existed)'
+            ];
+        }
+        
+        // Get old policy for logging
+        $oldPolicy = $this->getPolicyByPriority($oldPriority, $ticketData['dept_id']);
+        
+        // Use the ORIGINAL ticket creation time for calculation
+        $ticketCreatedAt = new DateTime($ticketData['created_at']);
+        
+        // First response is ALWAYS 24 hours regardless of priority
+        $newPolicy['response_time'] = 1440;
+        
+        // Calculate new due dates from original creation time
+        $newResponseDue = $this->calculateDueDate($ticketCreatedAt, $newPolicy['response_time'], $newPolicy['is_business_hours']);
+        $newResolutionDue = $this->calculateDueDate($ticketCreatedAt, $newPolicy['resolution_time'], $newPolicy['is_business_hours']);
+        
+        // Store old due dates for logging
+        $oldResponseDue = $currentSla['response_due_at'];
+        $oldResolutionDue = $currentSla['resolution_due_at'];
+        
+        // Update SLA tracking with new policy and due dates
+        $updateSql = "UPDATE sla_tracking 
+                      SET sla_policy_id = :policy_id,
+                          response_due_at = :response_due,
+                          resolution_due_at = :resolution_due,
+                          updated_at = NOW()
+                      WHERE ticket_id = :ticket_id";
+        
+        $updateStmt = $this->db->prepare($updateSql);
+        $result = $updateStmt->execute([
+            ':policy_id' => $newPolicy['id'],
+            ':response_due' => $newResponseDue->format('Y-m-d H:i:s'),
+            ':resolution_due' => $newResolutionDue->format('Y-m-d H:i:s'),
+            ':ticket_id' => $ticketId
+        ]);
+        
+        if ($result) {
+            // Update ticket's SLA status
+            $this->updateTicketSLAStatus($ticketId);
+            
+            // Calculate time difference for logging
+            $oldResolutionTime = $oldPolicy ? $oldPolicy['resolution_time'] : 'N/A';
+            $newResolutionTime = $newPolicy['resolution_time'];
+            
+            return [
+                'success' => true,
+                'message' => 'SLA recalculated successfully',
+                'details' => [
+                    'old_priority' => $oldPriority,
+                    'new_priority' => $newPriority,
+                    'old_resolution_due' => $oldResolutionDue,
+                    'new_resolution_due' => $newResolutionDue->format('Y-m-d H:i:s'),
+                    'old_resolution_time_minutes' => $oldResolutionTime,
+                    'new_resolution_time_minutes' => $newResolutionTime,
+                    'calculated_from' => $ticketData['created_at']
+                ]
+            ];
+        }
+        
+        return ['success' => false, 'message' => 'Failed to update SLA tracking'];
+    }
+    
+    /**
      * Calculate due date based on minutes and business hours setting
      * 
      * @param DateTime $startDate Start date
