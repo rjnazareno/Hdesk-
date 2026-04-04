@@ -47,6 +47,9 @@ class Database {
             
             // Set MySQL session timezone to Asia/Manila (UTC+8)
             $this->connection->exec("SET SESSION time_zone = '+08:00'");
+            
+            // Disable NO_AUTO_VALUE_ON_ZERO to prevent id=0 inserts
+            $this->connection->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_AUTO_VALUE_ON_ZERO',''))");
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
         }
