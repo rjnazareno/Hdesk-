@@ -18,8 +18,8 @@ class Employee {
         // First, disable NO_AUTO_VALUE_ON_ZERO to prevent id=0 inserts
         $this->db->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_AUTO_VALUE_ON_ZERO',''))");
         
-        $sql = "INSERT INTO employees (id, employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
-                VALUES (NULL, :employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
+        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
+                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
         
         $stmt = $this->db->prepare($sql);
         
