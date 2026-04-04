@@ -72,7 +72,22 @@ try {
             // Fix AUTO_INCREMENT before import to ensure proper ID sequence
             try {
                 $hdeskDb = Database::getInstance()->getConnection();
-                $hdeskDb->exec("ALTER TABLE employees AUTO_INCREMENT = 1");
+                
+                // Get current max ID from employees table
+                $stmt = $hdeskDb->query("SELECT COALESCE(MAX(id), 1063) + 1 AS next_id FROM employees");
+                $nextId = $stmt->fetch(PDO::FETCH_ASSOC)['next_id'];
+                
+                // Ensure next ID is at least 1064
+                if ($nextId < 1064) {
+                    $nextId = 1064;
+                }
+                
+                // Set AUTO_INCREMENT to the next proper ID
+                $hdeskDb->exec("ALTER TABLE employees AUTO_INCREMENT = $nextId");
+                
+                // Disable NO_AUTO_VALUE_ON_ZERO mode to prevent id=0 inserts
+                $hdeskDb->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_AUTO_VALUE_ON_ZERO',''))");
+                
             } catch (Exception $e) {
                 // Log but don't fail - AUTO_INCREMENT will still work
                 error_log("AUTO_INCREMENT reset warning: " . $e->getMessage());
