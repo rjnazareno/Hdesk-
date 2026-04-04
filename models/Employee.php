@@ -15,8 +15,11 @@ class Employee {
      * Create a new employee
      */
     public function create($data) {
-        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
-                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
+        // First, disable NO_AUTO_VALUE_ON_ZERO to prevent id=0 inserts
+        $this->db->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_AUTO_VALUE_ON_ZERO',''))");
+        
+        $sql = "INSERT INTO employees (id, employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
+                VALUES (NULL, :employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
         
         $stmt = $this->db->prepare($sql);
         
@@ -41,7 +44,14 @@ class Employee {
             ':profile_picture' => $data['profile_picture'] ?? null
         ]);
         
-        return $this->db->lastInsertId();
+        $newId = $this->db->lastInsertId();
+        
+        // If lastInsertId returns 0, it means something went wrong
+        if ($newId == 0) {
+            throw new Exception('AUTO_INCREMENT failed - id cannot be 0');
+        }
+        
+        return $newId;
     }
     
     /**
