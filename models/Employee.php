@@ -124,7 +124,7 @@ class Employee {
      * Get all employees
      */
     public function getAll($status = null) {
-        $sql = "SELECT id, username, email, personal_email, fname, lname, company, position, contact, role, admin_rights_hdesk, status, profile_picture, created_at 
+        $sql = "SELECT id, employee_id, username, email, personal_email, fname, lname, company, position, contact, role, admin_rights_hdesk, status, profile_picture, created_at 
                 FROM employees WHERE 1=1";
         
         if ($status) {
