@@ -15,11 +15,17 @@ class Employee {
      * Create a new employee
      */
     public function create($data) {
-        // First, disable NO_AUTO_VALUE_ON_ZERO to prevent id=0 inserts
-        $this->db->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_AUTO_VALUE_ON_ZERO',''))");
+        // Get the next ID manually to avoid AUTO_INCREMENT issues
+        $stmt = $this->db->query("SELECT COALESCE(MAX(id), 1063) + 1 AS next_id FROM employees");
+        $nextId = (int)$stmt->fetch()['next_id'];
         
-        $sql = "INSERT INTO employees (employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
-                VALUES (:employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
+        // Ensure minimum ID of 1064
+        if ($nextId < 1064) {
+            $nextId = 1064;
+        }
+        
+        $sql = "INSERT INTO employees (id, employee_id, username, email, personal_email, password, fname, lname, company, position, contact, official_sched, role, admin_rights_hdesk, status, profile_picture) 
+                VALUES (:id, :employee_id, :username, :email, :personal_email, :password, :fname, :lname, :company, :position, :contact, :official_sched, :role, :admin_rights_hdesk, :status, :profile_picture)";
         
         $stmt = $this->db->prepare($sql);
         
@@ -27,6 +33,7 @@ class Employee {
         $password = isset($data['password']) ? $data['password'] : 'Welcome123!';
         
         $stmt->execute([
+            ':id' => $nextId,
             ':employee_id' => $data['employee_id'] ?? null,
             ':username' => $data['username'] ?? null,
             ':email' => $data['email'] ?? null,
@@ -44,14 +51,7 @@ class Employee {
             ':profile_picture' => $data['profile_picture'] ?? null
         ]);
         
-        $newId = $this->db->lastInsertId();
-        
-        // If lastInsertId returns 0, it means something went wrong
-        if ($newId == 0) {
-            throw new Exception('AUTO_INCREMENT failed - id cannot be 0');
-        }
-        
-        return $newId;
+        return $nextId;
     }
     
     /**
