@@ -35,10 +35,10 @@ if (!$hasAccess) {
     exit;
 }
 
-// Harley database configuration (same server, different database)
+// Harley database configuration (separate user for Harley database)
 define('HARLEY_DB_HOST', DB_HOST);
-define('HARLEY_DB_USER', DB_USER);
-define('HARLEY_DB_PASS', DB_PASS);
+define('HARLEY_DB_USER', 'u816220874_calendartype');
+define('HARLEY_DB_PASS', 'Gr33n$$wRf');
 define('HARLEY_DB_NAME', 'u816220874_calendartype');
 
 // Handle different actions
