@@ -69,6 +69,15 @@ try {
                 exit;
             }
             
+            // Fix AUTO_INCREMENT before import to ensure proper ID sequence
+            try {
+                $hdeskDb = Database::getInstance()->getConnection();
+                $hdeskDb->exec("ALTER TABLE employees AUTO_INCREMENT = 1");
+            } catch (Exception $e) {
+                // Log but don't fail - AUTO_INCREMENT will still work
+                error_log("AUTO_INCREMENT reset warning: " . $e->getMessage());
+            }
+            
             $result = importEmployees($data['employee_ids']);
             echo json_encode($result);
             break;
