@@ -299,6 +299,19 @@ function importEmployees($harleyIds) {
                 continue;
             }
             
+            // Also check by username
+            $hdeskDb = Database::getInstance()->getConnection();
+            $usernameCheck = $hdeskDb->prepare("SELECT id FROM employees WHERE username = :username LIMIT 1");
+            $usernameCheck->execute([':username' => $emp['username']]);
+            if ($usernameCheck->fetch()) {
+                $results['skipped'][] = [
+                    'harley_id' => $emp['id'],
+                    'name' => $emp['fname'] . ' ' . $emp['lname'],
+                    'reason' => 'Username already exists'
+                ];
+                continue;
+            }
+            
             // Prepare data for Hdesk
             // KEY: Store Harley's id as employee_id in Hdesk
             $employeeData = [
@@ -319,19 +332,23 @@ function importEmployees($harleyIds) {
                 'profile_picture' => null // Don't copy profile pictures
             ];
             
-            // Create the employee in Hdesk
-            $newId = $employeeModel->create($employeeData);
-            
-            if ($newId) {
-                $results['imported'][] = [
-                    'hdesk_id' => $newId,
-                    'harley_id' => $emp['id'],
-                    'employee_id' => (string)$emp['id'],
-                    'name' => $emp['fname'] . ' ' . $emp['lname'],
-                    'email' => $employeeData['email']
-                ];
-            } else {
-                throw new Exception('Create returned false');
+            // Create the employee in Hdesk with better error handling
+            try {
+                $newId = $employeeModel->create($employeeData);
+                
+                if ($newId) {
+                    $results['imported'][] = [
+                        'hdesk_id' => $newId,
+                        'harley_id' => $emp['id'],
+                        'employee_id' => (string)$emp['id'],
+                        'name' => $emp['fname'] . ' ' . $emp['lname'],
+                        'email' => $employeeData['email']
+                    ];
+                } else {
+                    throw new Exception('Insert failed - no ID returned');
+                }
+            } catch (PDOException $pdoEx) {
+                throw new Exception('Database error: ' . $pdoEx->getMessage());
             }
             
         } catch (Exception $e) {
