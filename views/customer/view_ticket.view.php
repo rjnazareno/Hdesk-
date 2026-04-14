@@ -219,23 +219,31 @@
                                 <div class="flex-1">
                                     <textarea name="reply_message" rows="2" 
                                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-                                               placeholder="Write a reply or attach a file..."></textarea>
+                                               placeholder="Type your reply..."></textarea>
                                     <input type="file" id="customer-reply-image" name="reply_image" accept="image/*" class="hidden">
                                     <input type="file" id="customer-reply-file" name="reply_file" accept=".pdf,.doc,.docx,.xlsx,.txt,.jpg,.jpeg,.png" class="hidden">
                                     <div class="mt-2 flex items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <label for="customer-reply-image" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-emerald-600 hover:bg-emerald-50 cursor-pointer transition-colors" title="Attach image">
-                                                <i class="fas fa-image"></i>
+                                        <div class="flex items-center gap-4">
+                                            <label for="customer-reply-image" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" title="Attach image">
+                                                <i class="fas fa-image"></i><span>Photo</span>
                                             </label>
-                                            <label for="customer-reply-file" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-blue-600 hover:bg-blue-50 cursor-pointer transition-colors" title="Attach file">
-                                                <i class="fas fa-paperclip"></i>
+                                            <label for="customer-reply-file" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" title="Attach file">
+                                                <i class="fas fa-paperclip"></i><span>File</span>
                                             </label>
-                                            <span id="customer-reply-selected-file" class="text-xs text-gray-500 truncate max-w-[240px]">No attachment selected</span>
                                         </div>
                                         <button type="submit" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-colors inline-flex items-center gap-2">
                                             <i class="fas fa-paper-plane"></i>
                                             <span>Send Reply</span>
                                         </button>
+                                    </div>
+                                    <div id="customer-reply-selected-wrap" class="hidden mt-2">
+                                        <span id="customer-reply-selected-file" class="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-100 border border-gray-200 rounded-md text-xs text-gray-700">
+                                            <i class="fas fa-paperclip text-gray-500"></i>
+                                            <span class="truncate max-w-[260px]">Selected file</span>
+                                            <button type="button" id="customer-reply-clear-file" class="text-gray-400 hover:text-gray-600">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -437,10 +445,15 @@
             const imageInput = document.getElementById('customer-reply-image');
             const fileInput = document.getElementById('customer-reply-file');
             const selectedFileLabel = document.getElementById('customer-reply-selected-file');
+            const selectedFileWrap = document.getElementById('customer-reply-selected-wrap');
+            const clearSelectedButton = document.getElementById('customer-reply-clear-file');
 
             function setSelectedFileName(file, clearInput) {
                 if (selectedFileLabel) {
-                    selectedFileLabel.textContent = file ? file.name : 'No attachment selected';
+                    selectedFileLabel.querySelector('span').textContent = file ? file.name : 'Selected file';
+                }
+                if (selectedFileWrap) {
+                    selectedFileWrap.classList.toggle('hidden', !file);
                 }
                 if (clearInput) {
                     clearInput.value = '';
@@ -458,6 +471,14 @@
                 fileInput.addEventListener('change', function() {
                     const file = this.files && this.files.length ? this.files[0] : null;
                     setSelectedFileName(file, file ? imageInput : null);
+                });
+            }
+
+            if (clearSelectedButton) {
+                clearSelectedButton.addEventListener('click', function() {
+                    if (imageInput) imageInput.value = '';
+                    if (fileInput) fileInput.value = '';
+                    if (selectedFileWrap) selectedFileWrap.classList.add('hidden');
                 });
             }
         });
