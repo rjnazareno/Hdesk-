@@ -362,7 +362,7 @@ include __DIR__ . '/../views/layouts/header.php';
 ?>
 
 <div class="lg:ml-64 min-h-screen bg-gray-50">
-    <div class="max-w-[1500px] mx-auto px-4 py-6 pt-20 lg:pt-6">
+    <div class="max-w-[1280px] mx-auto px-4 py-6 pt-20 lg:pt-6">
         
         <!-- Top Navigation Bar -->
         <div class="flex items-center justify-between mb-6">
@@ -431,7 +431,7 @@ include __DIR__ . '/../views/layouts/header.php';
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Main Content Column -->
-            <div class="lg:col-span-8 xl:col-span-9 space-y-2 min-w-0">
+            <div class="lg:col-span-8 xl:col-span-8 space-y-2 min-w-0">
                 
                 <!-- Ticket Header Card -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -710,7 +710,7 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             
             <!-- Sidebar Column -->
-            <div class="space-y-4 lg:col-span-4 xl:col-span-3">
+            <div class="space-y-4 lg:col-span-4 xl:col-span-4">
                 
                 <?php if ($isITStaff && $slaData): ?>
                 <!-- SLA Card -->
