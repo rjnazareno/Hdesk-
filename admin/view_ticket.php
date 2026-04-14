@@ -362,7 +362,7 @@ include __DIR__ . '/../views/layouts/header.php';
 ?>
 
 <div class="lg:ml-64 min-h-screen bg-gray-50">
-    <div class="max-w-[1440px] mx-auto px-4 py-6 pt-20 lg:pt-6">
+    <div class="max-w-7xl mx-auto px-4 py-6 pt-20 lg:pt-6">
         
         <!-- Top Navigation Bar -->
         <div class="flex items-center justify-between mb-6">
@@ -562,9 +562,9 @@ include __DIR__ . '/../views/layouts/header.php';
                                             <div class="<?= $replyText !== '' ? 'mt-3' : '' ?>">
                                                 <?php if ($isImageAttachment): ?>
                                                     <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
-                                                        <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                         <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
                                                              alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
-                                                             class="max-h-60 rounded-lg border border-gray-200 object-cover">
+                                                             class="block max-w-full w-full max-h-60 rounded-lg border border-gray-200 object-contain">
                                                     </a>
                                                 <?php else: ?>
                                                     <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
