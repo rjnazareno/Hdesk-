@@ -227,16 +227,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment']) && !empty(
 }
 
 // Handle reply (conversation)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !empty(trim($_POST['reply_message']))) {
-    $replyMsg = sanitize(trim($_POST['reply_message']));
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_reply'])) {
+    $replyMsg = isset($_POST['reply_message']) ? sanitize(trim($_POST['reply_message'])) : '';
     $userType = ($_SESSION['user_type'] ?? 'user') === 'employee' ? 'employee' : 'user';
 
     $replyModel = new TicketReply();
+    $attachment = null;
+
+    if (isset($_FILES['reply_image']) && $_FILES['reply_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $attachment = $replyModel->uploadAttachment($_FILES['reply_image'], 'image');
+    } elseif (isset($_FILES['reply_file']) && $_FILES['reply_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $attachment = $replyModel->uploadAttachment($_FILES['reply_file'], 'file');
+    }
+
+    if (is_array($attachment) && isset($attachment['error'])) {
+        header("Location: view_ticket.php?id=" . $ticketId . "&error=reply_attachment");
+        exit();
+    }
+
+    if ($replyMsg === '' && empty($attachment['path'])) {
+        header("Location: view_ticket.php?id=" . $ticketId . "&error=reply_empty");
+        exit();
+    }
+
     $replyModel->create([
         'ticket_id' => $ticketId,
         'user_id' => $currentUser['id'],
         'user_type' => $userType,
-        'message' => $replyMsg
+        'message' => $replyMsg,
+        'attachment_path' => $attachment['path'] ?? null,
+        'attachment_name' => $attachment['name'] ?? null,
+        'attachment_mime' => $attachment['mime'] ?? null,
+        'attachment_kind' => $attachment['kind'] ?? null
     ]);
 
     // Auto-change status to in_progress and record first response when admin replies to pending ticket
@@ -387,6 +409,25 @@ include __DIR__ . '/../views/layouts/header.php';
             </button>
         </div>
         <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+        <div id="error-toast" class="fixed top-4 right-4 z-50 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>
+                <?php
+                $errorMsg = match($_GET['error']) {
+                    'reply_empty' => 'Reply must include a message or an attachment.',
+                    'reply_attachment' => 'Attachment upload failed. Please check the file and try again.',
+                    default => 'Unable to process request.'
+                };
+                echo $errorMsg;
+                ?>
+            </span>
+            <button onclick="this.parentElement.remove()" class="ml-2 hover:opacity-70">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <?php endif; ?>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Main Content Column -->
@@ -489,6 +530,12 @@ include __DIR__ . '/../views/layouts/header.php';
                                         (($_SESSION['user_type'] === 'employee' && $reply['user_type'] === 'employee') || 
                                          ($_SESSION['user_type'] === 'user' && $reply['user_type'] === 'user')));
                                 $isStaff = in_array($reply['sender_role'], ['superadmin', 'it', 'hr', 'admin', 'it_staff']);
+                                $replyText = trim((string)($reply['message'] ?? ''));
+                                $hasAttachment = !empty($reply['attachment_path']);
+                                $isImageAttachment = $hasAttachment && (
+                                    ($reply['attachment_kind'] ?? '') === 'image' ||
+                                    strpos((string)($reply['attachment_mime'] ?? ''), 'image/') === 0
+                                );
                             ?>
                             <div class="flex <?= $isMe ? 'justify-end' : 'justify-start' ?>">
                                 <div class="max-w-[75%]">
@@ -507,7 +554,29 @@ include __DIR__ . '/../views/layouts/header.php';
                                         <span class="text-[10px] text-gray-400"><?= date('M d, g:i A', strtotime($reply['created_at'])) ?></span>
                                     </div>
                                     <div class="<?= $isMe ? 'bg-blue-50 text-gray-800 border border-blue-200' : 'bg-gray-100 text-gray-800' ?> rounded-2xl px-4 py-3 text-sm leading-relaxed <?= $isMe ? 'rounded-tr-md' : 'rounded-tl-md' ?>">
-                                        <?= nl2br(htmlspecialchars($reply['message'])) ?>
+                                        <?php if ($replyText !== ''): ?>
+                                            <div><?= nl2br(htmlspecialchars($replyText)) ?></div>
+                                        <?php endif; ?>
+
+                                        <?php if ($hasAttachment): ?>
+                                            <div class="<?= $replyText !== '' ? 'mt-3' : '' ?>">
+                                                <?php if ($isImageAttachment): ?>
+                                                    <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
+                                                        <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                             alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
+                                                             class="max-h-60 rounded-lg border border-gray-200 object-cover">
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                       target="_blank"
+                                                       class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                        <i class="fas fa-paperclip text-gray-500"></i>
+                                                        <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
+                                                        <i class="fas fa-download text-gray-400"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -517,15 +586,27 @@ include __DIR__ . '/../views/layouts/header.php';
                         
                         <!-- Reply Form -->
                         <?php if ($ticket['status'] !== 'closed'): ?>
-                        <form method="POST" class="border-t border-gray-100 pt-4">
+                        <form method="POST" enctype="multipart/form-data" class="border-t border-gray-100 pt-4">
+                            <input type="hidden" name="send_reply" value="1">
                             <div class="flex gap-3">
                                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32" 
                                      alt="" class="w-8 h-8 rounded-full flex-shrink-0 mt-1">
                                 <div class="flex-1">
                                     <textarea name="reply_message" rows="2" 
-                                              class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-                                              placeholder="Type your reply..." required></textarea>
-                                    <div class="mt-2 flex justify-end">
+                                               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                                               placeholder="Write a reply or attach a file..."></textarea>
+                                    <input type="file" id="admin-reply-image" name="reply_image" accept="image/*" class="hidden">
+                                    <input type="file" id="admin-reply-file" name="reply_file" accept=".pdf,.doc,.docx,.xlsx,.txt,.jpg,.jpeg,.png" class="hidden">
+                                    <div class="mt-2 flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <label for="admin-reply-image" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-green-600 hover:bg-green-50 cursor-pointer transition-colors" title="Attach image">
+                                                <i class="fas fa-image"></i>
+                                            </label>
+                                            <label for="admin-reply-file" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-blue-600 hover:bg-blue-50 cursor-pointer transition-colors" title="Attach file">
+                                                <i class="fas fa-paperclip"></i>
+                                            </label>
+                                            <span id="admin-reply-selected-file" class="text-xs text-gray-500 truncate max-w-[240px]">No attachment selected</span>
+                                        </div>
                                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
                                             <i class="fas fa-paper-plane"></i>
                                             <span>Send Reply</span>
@@ -899,6 +980,15 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    const errorToast = document.getElementById('error-toast');
+    if (errorToast) {
+        setTimeout(() => {
+            errorToast.style.opacity = '0';
+            errorToast.style.transform = 'translateX(100%)';
+            setTimeout(() => errorToast.remove(), 300);
+        }, 3500);
+    }
     
     // Comment form - Enter to submit
     const commentBox = document.querySelector('textarea[name="comment"]');
@@ -910,6 +1000,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.form.submit();
                 }
             }
+        });
+    }
+
+    const imageInput = document.getElementById('admin-reply-image');
+    const fileInput = document.getElementById('admin-reply-file');
+    const selectedFileLabel = document.getElementById('admin-reply-selected-file');
+
+    function setSelectedFileName(file, clearInput) {
+        if (selectedFileLabel) {
+            selectedFileLabel.textContent = file ? file.name : 'No attachment selected';
+        }
+        if (clearInput) {
+            clearInput.value = '';
+        }
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            const file = this.files && this.files.length ? this.files[0] : null;
+            setSelectedFileName(file, file ? fileInput : null);
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const file = this.files && this.files.length ? this.files[0] : null;
+            setSelectedFileName(file, file ? imageInput : null);
         });
     }
     

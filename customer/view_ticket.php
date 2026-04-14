@@ -6,22 +6,44 @@
 require_once __DIR__ . '/../config/config.php';
 
 // Handle reply POST before controller
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message']) && !empty(trim($_POST['reply_message']))) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_reply'])) {
     $auth = new Auth();
     $auth->requireLogin();
     $currentUser = $auth->getCurrentUser();
     $isITStaff = $currentUser['role'] === 'it_staff' || $currentUser['role'] === 'admin' || $currentUser['role'] === 'internal';
 
     $ticketId = $_POST['ticket_id'] ?? ($_GET['id'] ?? 0);
-    $replyMsg = sanitize(trim($_POST['reply_message']));
+    $replyMsg = isset($_POST['reply_message']) ? sanitize(trim($_POST['reply_message'])) : '';
     $userType = ($_SESSION['user_type'] ?? 'employee');
 
     $replyModel = new TicketReply();
+    $attachment = null;
+
+    if (isset($_FILES['reply_image']) && $_FILES['reply_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $attachment = $replyModel->uploadAttachment($_FILES['reply_image'], 'image');
+    } elseif (isset($_FILES['reply_file']) && $_FILES['reply_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $attachment = $replyModel->uploadAttachment($_FILES['reply_file'], 'file');
+    }
+
+    if (is_array($attachment) && isset($attachment['error'])) {
+        header("Location: view_ticket.php?id=" . $ticketId . "&error=reply_attachment");
+        exit();
+    }
+
+    if ($replyMsg === '' && empty($attachment['path'])) {
+        header("Location: view_ticket.php?id=" . $ticketId . "&error=reply_empty");
+        exit();
+    }
+
     $replyModel->create([
         'ticket_id' => $ticketId,
         'user_id' => $currentUser['id'],
         'user_type' => $userType,
-        'message' => $replyMsg
+        'message' => $replyMsg,
+        'attachment_path' => $attachment['path'] ?? null,
+        'attachment_name' => $attachment['name'] ?? null,
+        'attachment_mime' => $attachment['mime'] ?? null,
+        'attachment_kind' => $attachment['kind'] ?? null
     ]);
 
     // Auto-change status to in_progress and record first response when admin replies to pending ticket

@@ -365,6 +365,10 @@ LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'
 | `user_id` | INT | Author ID |
 | `user_type` | VARCHAR(20) | `'user'` or `'employee'` |
 | `message` | TEXT | Reply content |
+| `attachment_path` | VARCHAR(255) NULL | Stored file path under `uploads/replies/` |
+| `attachment_name` | VARCHAR(255) NULL | Original uploaded filename |
+| `attachment_mime` | VARCHAR(150) NULL | Detected MIME type |
+| `attachment_kind` | ENUM('image','file') NULL | Attachment display type |
 | `created_at` | TIMESTAMP | Reply time |
 
 ---

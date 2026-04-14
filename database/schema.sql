@@ -4,6 +4,7 @@
 
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS `ticket_activity`;
+DROP TABLE IF EXISTS `ticket_replies`;
 DROP TABLE IF EXISTS `tickets`;
 DROP TABLE IF EXISTS `categories`;
 DROP TABLE IF EXISTS `users`;
@@ -85,6 +86,25 @@ CREATE TABLE `ticket_activity` (
   INDEX `idx_created` (`created_at`),
   FOREIGN KEY (`ticket_id`) REFERENCES `tickets`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Ticket Replies table: conversation thread for each ticket
+CREATE TABLE `ticket_replies` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `ticket_id` INT(11) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  `user_type` ENUM('employee', 'user') NOT NULL DEFAULT 'employee',
+  `message` TEXT NOT NULL,
+  `attachment_path` VARCHAR(255) DEFAULT NULL,
+  `attachment_name` VARCHAR(255) DEFAULT NULL,
+  `attachment_mime` VARCHAR(150) DEFAULT NULL,
+  `attachment_kind` ENUM('image', 'file') DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_ticket` (`ticket_id`),
+  INDEX `idx_user` (`user_id`, `user_type`),
+  INDEX `idx_created` (`created_at`),
+  FOREIGN KEY (`ticket_id`) REFERENCES `tickets`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default admin user (password: admin123)
