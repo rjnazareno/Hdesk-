@@ -5,69 +5,9 @@
  */
 class TicketReply {
     private $db;
-    private static $schemaChecked = false;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
-        $this->ensureSchema();
-    }
-
-    /**
-     * Ensure reply conversation schema exists in older deployments.
-     */
-    private function ensureSchema() {
-        if (self::$schemaChecked) {
-            return;
-        }
-
-        $this->db->exec("
-            CREATE TABLE IF NOT EXISTS `ticket_replies` (
-                `id` INT(11) NOT NULL AUTO_INCREMENT,
-                `ticket_id` INT(11) NOT NULL,
-                `user_id` INT(11) NOT NULL,
-                `user_type` ENUM('employee', 'user') NOT NULL DEFAULT 'employee',
-                `message` TEXT NOT NULL,
-                `attachment_path` VARCHAR(255) DEFAULT NULL,
-                `attachment_name` VARCHAR(255) DEFAULT NULL,
-                `attachment_mime` VARCHAR(150) DEFAULT NULL,
-                `attachment_kind` ENUM('image', 'file') DEFAULT NULL,
-                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`),
-                INDEX `idx_ticket` (`ticket_id`),
-                INDEX `idx_user` (`user_id`, `user_type`),
-                INDEX `idx_created` (`created_at`),
-                CONSTRAINT `ticket_replies_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets`(`id`) ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
-
-        $this->ensureColumnExists('ticket_replies', 'attachment_path', "ALTER TABLE `ticket_replies` ADD COLUMN `attachment_path` VARCHAR(255) DEFAULT NULL AFTER `message`");
-        $this->ensureColumnExists('ticket_replies', 'attachment_name', "ALTER TABLE `ticket_replies` ADD COLUMN `attachment_name` VARCHAR(255) DEFAULT NULL AFTER `attachment_path`");
-        $this->ensureColumnExists('ticket_replies', 'attachment_mime', "ALTER TABLE `ticket_replies` ADD COLUMN `attachment_mime` VARCHAR(150) DEFAULT NULL AFTER `attachment_name`");
-        $this->ensureColumnExists('ticket_replies', 'attachment_kind', "ALTER TABLE `ticket_replies` ADD COLUMN `attachment_kind` ENUM('image', 'file') DEFAULT NULL AFTER `attachment_mime`");
-
-        $this->ensureIndexExists('ticket_replies', 'idx_ticket', "CREATE INDEX `idx_ticket` ON `ticket_replies` (`ticket_id`)");
-        $this->ensureIndexExists('ticket_replies', 'idx_user', "CREATE INDEX `idx_user` ON `ticket_replies` (`user_id`, `user_type`)");
-        $this->ensureIndexExists('ticket_replies', 'idx_created', "CREATE INDEX `idx_created` ON `ticket_replies` (`created_at`)");
-
-        self::$schemaChecked = true;
-    }
-
-    private function ensureColumnExists($table, $column, $alterSql) {
-        $stmt = $this->db->prepare("SHOW COLUMNS FROM `{$table}` LIKE :column_name");
-        $stmt->execute([':column_name' => $column]);
-
-        if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->db->exec($alterSql);
-        }
-    }
-
-    private function ensureIndexExists($table, $indexName, $createSql) {
-        $stmt = $this->db->prepare("SHOW INDEX FROM `{$table}` WHERE Key_name = :index_name");
-        $stmt->execute([':index_name' => $indexName]);
-
-        if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->db->exec($createSql);
-        }
     }
 
     /**
