@@ -575,8 +575,7 @@ include __DIR__ . '/../views/layouts/header.php';
                                         <?php endif; ?>
 
                                         <?php if ($hasAttachment): ?>
-                                        <div class="<?= $replyText !== '' ? 'mt-3' : '' ?> bg-gray-50 border border-gray-100 rounded-lg p-3 max-w-2xl">
-                                            <p class="text-[11px] uppercase tracking-wide text-gray-400 mb-2">Attachments</p>
+                                        <div class="<?= $replyText !== '' ? 'mt-3' : '' ?>">
                                             <?php if ($isImageAttachment): ?>
                                             <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
                                                 <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
@@ -586,12 +585,13 @@ include __DIR__ . '/../views/layouts/header.php';
                                             <?php else: ?>
                                             <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
                                                target="_blank"
-                                               class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                               class="inline-flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-100 transition-colors">
                                                 <i class="fas fa-paperclip text-gray-500"></i>
                                                 <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
                                                 <i class="fas fa-download text-gray-400"></i>
                                             </a>
                                             <?php endif; ?>
+                                        </div>
                                         <?php endif; ?>
                                         </div>
                                     </div>
@@ -636,23 +636,31 @@ include __DIR__ . '/../views/layouts/header.php';
                                     <div class="flex-1">
                                         <textarea name="reply_message" rows="2"
                                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-                                                   placeholder="Write a reply..."></textarea>
+                                                   placeholder="Type your reply..."></textarea>
                                         <input type="file" id="admin-reply-image" name="reply_image" accept="image/*" class="hidden">
                                         <input type="file" id="admin-reply-file" name="reply_file" accept=".pdf,.doc,.docx,.xlsx,.txt,.jpg,.jpeg,.png" class="hidden">
                                         <div class="mt-2 flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-2">
-                                                <label for="admin-reply-image" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-green-600 hover:bg-green-50 cursor-pointer transition-colors" title="Attach image">
-                                                    <i class="fas fa-image"></i>
+                                            <div class="flex items-center gap-4">
+                                                <label for="admin-reply-image" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" title="Attach image">
+                                                    <i class="fas fa-image"></i><span>Photo</span>
                                                 </label>
-                                                <label for="admin-reply-file" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-blue-600 hover:bg-blue-50 cursor-pointer transition-colors" title="Attach file">
-                                                    <i class="fas fa-paperclip"></i>
+                                                <label for="admin-reply-file" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" title="Attach file">
+                                                    <i class="fas fa-paperclip"></i><span>File</span>
                                                 </label>
-                                                <span id="admin-reply-selected-file" class="text-xs text-gray-500 truncate max-w-[240px]">No attachment selected</span>
                                             </div>
                                             <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
                                                 <i class="fas fa-paper-plane"></i>
                                                 <span>Send Reply</span>
                                             </button>
+                                        </div>
+                                        <div id="admin-reply-selected-wrap" class="hidden mt-2">
+                                            <span id="admin-reply-selected-file" class="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-100 border border-gray-200 rounded-md text-xs text-gray-700">
+                                                <i class="fas fa-paperclip text-gray-500"></i>
+                                                <span class="truncate max-w-[260px]">Selected file</span>
+                                                <button type="button" id="admin-reply-clear-file" class="text-gray-400 hover:text-gray-600">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -989,9 +997,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('admin-reply-file');
     const selectedFileLabel = document.getElementById('admin-reply-selected-file');
 
+    const selectedFileWrap = document.getElementById('admin-reply-selected-wrap');
+    const clearSelectedButton = document.getElementById('admin-reply-clear-file');
+
     function setSelectedFileName(file, clearInput) {
         if (selectedFileLabel) {
-            selectedFileLabel.textContent = file ? file.name : 'No attachment selected';
+            selectedFileLabel.querySelector('span').textContent = file ? file.name : 'Selected file';
+        }
+        if (selectedFileWrap) {
+            selectedFileWrap.classList.toggle('hidden', !file);
         }
         if (clearInput) {
             clearInput.value = '';
@@ -1009,6 +1023,14 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.addEventListener('change', function() {
             const file = this.files && this.files.length ? this.files[0] : null;
             setSelectedFileName(file, file ? imageInput : null);
+        });
+    }
+
+    if (clearSelectedButton) {
+        clearSelectedButton.addEventListener('click', function() {
+            if (imageInput) imageInput.value = '';
+            if (fileInput) fileInput.value = '';
+            if (selectedFileWrap) selectedFileWrap.classList.add('hidden');
         });
     }
     
