@@ -523,8 +523,8 @@ include __DIR__ . '/../views/layouts/header.php';
                 <?php endif; ?>
                 
                 <!-- Unified Conversation + Activity (Reference-style thread) -->
-                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-5 border-b border-gray-100">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base font-semibold text-gray-900">
                                 <i class="fas fa-comments text-gray-400 mr-2"></i>Conversation
@@ -533,8 +533,8 @@ include __DIR__ . '/../views/layouts/header.php';
                         </div>
                     </div>
 
-                    <div class="p-6">
-                        <div class="space-y-7 mb-6 max-h-[620px] overflow-y-auto pr-2" id="replies-container">
+                    <div class="p-5">
+                        <div class="space-y-6 mb-5 max-h-[620px] overflow-y-auto pr-2 conversation-scroll" id="replies-container">
                             <?php if (empty($timelineItems)): ?>
                             <div class="text-center py-8">
                                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
@@ -555,13 +555,13 @@ include __DIR__ . '/../views/layouts/header.php';
                                         strpos((string)($reply['attachment_mime'] ?? ''), 'image/') === 0
                                     );
                                 ?>
-                                <div class="relative pl-12">
+                                <div class="relative pl-12 pb-2">
                                     <div class="absolute left-[15px] top-9 bottom-[-24px] w-px bg-gray-200"></div>
                                     <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xs font-semibold text-gray-700">
                                         <?= strtoupper(substr($reply['sender_name'] ?? '?', 0, 1)) ?>
                                     </div>
 
-                                    <div class="flex items-center gap-2 mb-2">
+                                    <div class="flex items-center gap-2 mb-1.5 flex-wrap">
                                         <span class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($reply['sender_name'] ?? 'Unknown') ?></span>
                                         <?php if ($isStaff): ?>
                                         <span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">Support Team</span>
@@ -569,44 +569,46 @@ include __DIR__ . '/../views/layouts/header.php';
                                         <span class="text-xs text-gray-400"><?= date('M d, Y - g:i A', strtotime($reply['created_at'])) ?></span>
                                     </div>
 
-                                    <?php if ($replyText !== ''): ?>
-                                    <p class="text-sm text-gray-800 whitespace-pre-line leading-relaxed"><?= htmlspecialchars($replyText) ?></p>
-                                    <?php endif; ?>
-
-                                    <?php if ($hasAttachment): ?>
-                                    <div class="<?= $replyText !== '' ? 'mt-3' : '' ?> bg-gray-50 border border-gray-100 rounded-lg p-3 max-w-2xl">
-                                        <p class="text-[11px] uppercase tracking-wide text-gray-400 mb-2">Attachments</p>
-                                        <?php if ($isImageAttachment): ?>
-                                        <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
-                                            <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
-                                                 alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
-                                                 class="max-h-56 rounded-lg border border-gray-200 object-cover">
-                                        </a>
-                                        <?php else: ?>
-                                        <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
-                                           target="_blank"
-                                           class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
-                                            <i class="fas fa-paperclip text-gray-500"></i>
-                                            <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
-                                            <i class="fas fa-download text-gray-400"></i>
-                                        </a>
+                                    <div class="bg-white border border-gray-200 rounded-xl px-4 py-3">
+                                        <?php if ($replyText !== ''): ?>
+                                        <p class="text-sm text-gray-800 whitespace-pre-line leading-relaxed"><?= htmlspecialchars($replyText) ?></p>
                                         <?php endif; ?>
+
+                                        <?php if ($hasAttachment): ?>
+                                        <div class="<?= $replyText !== '' ? 'mt-3' : '' ?> bg-gray-50 border border-gray-100 rounded-lg p-3 max-w-2xl">
+                                            <p class="text-[11px] uppercase tracking-wide text-gray-400 mb-2">Attachments</p>
+                                            <?php if ($isImageAttachment): ?>
+                                            <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
+                                                <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                     alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
+                                                     class="max-h-56 rounded-lg border border-gray-200 object-cover">
+                                            </a>
+                                            <?php else: ?>
+                                            <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                               target="_blank"
+                                               class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                <i class="fas fa-paperclip text-gray-500"></i>
+                                                <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
+                                                <i class="fas fa-download text-gray-400"></i>
+                                            </a>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                        </div>
                                     </div>
-                                    <?php endif; ?>
                                 </div>
                                 <?php else:
                                     $activity = $item['data'];
                                     $activityText = htmlspecialchars($activity['comment'] ?? ucfirst(str_replace('_', ' ', $activity['action_type'])));
                                     $isResolved = ($activity['action_type'] === 'status_change' && in_array((string)($activity['new_value'] ?? ''), ['resolved', 'closed'], true));
                                 ?>
-                                <div class="relative pl-12">
+                                <div class="relative pl-12 pb-2">
                                     <div class="absolute left-[15px] top-9 bottom-[-24px] w-px bg-gray-200"></div>
-                                    <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                        <i class="fas fa-bolt text-[11px] text-gray-500"></i>
+                                    <div class="absolute left-[12px] top-3 w-2.5 h-2.5 rounded-full bg-gray-300 border border-white">
                                     </div>
 
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($activity['user_name']) ?></span>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                                    <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                                        <span class="text-sm font-semibold text-gray-800"><?= htmlspecialchars($activity['user_name']) ?></span>
                                         <span class="text-xs text-gray-400"><?= formatDate($activity['created_at'], 'M d, Y - g:i A') ?></span>
                                     </div>
 
@@ -617,6 +619,7 @@ include __DIR__ . '/../views/layouts/header.php';
                                     <?php endif; ?>
 
                                     <p class="text-sm text-gray-700 leading-relaxed"><?= $activityText ?></p>
+                                    </div>
                                 </div>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -916,6 +919,30 @@ include __DIR__ . '/../views/layouts/header.php';
 .animate-slide-in { animation: slideIn 0.3s ease-out; }
 
 details[open] summary i.fa-chevron-down { transform: rotate(180deg); }
+
+.conversation-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+.conversation-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.conversation-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 999px;
+}
+
+.conversation-scroll::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+    border: 2px solid #f1f5f9;
+}
+
+.conversation-scroll::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
 
 @media print {
     .lg\\:ml-64 { margin-left: 0 !important; }
