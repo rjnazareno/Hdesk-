@@ -676,7 +676,7 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             
             <!-- Sidebar Column -->
-            <div class="space-y-4">
+            <div class="space-y-4 lg:col-span-1">
                 
                 <?php if ($isITStaff && $slaData): ?>
                 <!-- SLA Card -->
