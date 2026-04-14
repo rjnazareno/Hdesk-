@@ -429,9 +429,9 @@ include __DIR__ . '/../views/layouts/header.php';
         </div>
         <?php endif; ?>
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Main Content Column -->
-            <div class="lg:col-span-2 space-y-2">
+            <div class="md:col-span-2 space-y-2 min-w-0">
                 
                 <!-- Ticket Header Card -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -710,7 +710,7 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             
             <!-- Sidebar Column -->
-            <div class="space-y-4">
+            <div class="space-y-4 md:col-span-1">
                 
                 <?php if ($isITStaff && $slaData): ?>
                 <!-- SLA Card -->
