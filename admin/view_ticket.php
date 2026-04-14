@@ -31,6 +31,26 @@ $itStaff = $isITStaff ? $employeeModel->getAdminEmployees() : [];
 $replyModel = new TicketReply();
 $replies = $replyModel->getByTicketId($ticketId);
 
+// Build unified messenger-style timeline (replies + activity)
+$timelineItems = [];
+foreach ($replies as $replyItem) {
+    $timelineItems[] = [
+        'item_type' => 'reply',
+        'created_at' => $replyItem['created_at'],
+        'data' => $replyItem
+    ];
+}
+foreach ($activities as $activityItem) {
+    $timelineItems[] = [
+        'item_type' => 'activity',
+        'created_at' => $activityItem['created_at'],
+        'data' => $activityItem
+    ];
+}
+usort($timelineItems, function ($a, $b) {
+    return strtotime($a['created_at']) <=> strtotime($b['created_at']);
+});
+
 // Handle quick status change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isITStaff && isset($_POST['quick_status'])) {
     $newStatus = sanitize($_POST['quick_status']);
@@ -502,209 +522,167 @@ include __DIR__ . '/../views/layouts/header.php';
                 </div>
                 <?php endif; ?>
                 
-                <!-- Conversation / Replies -->
+                <!-- Unified Conversation + Activity (Messenger-style) -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base font-semibold text-gray-900">
-                                <i class="fas fa-comments text-gray-400 mr-2"></i>Conversation
+                                <i class="fas fa-comments text-gray-400 mr-2"></i>Conversation & Activity
                             </h3>
-                            <span class="text-xs text-gray-400 font-medium"><?= count($replies) ?> messages</span>
+                            <span class="text-xs text-gray-400 font-medium">
+                                <?= count($replies) ?> messages • <?= count($activities) ?> events
+                            </span>
                         </div>
                     </div>
-                    
+
                     <div class="p-6">
-                        <!-- Messages -->
-                        <div class="space-y-4 mb-6 max-h-[500px] overflow-y-auto" id="replies-container">
-                            <?php if (empty($replies)): ?>
+                        <div class="space-y-4 mb-6 max-h-[560px] overflow-y-auto pr-2" id="replies-container">
+                            <?php if (empty($timelineItems)): ?>
                             <div class="text-center py-8">
                                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
                                     <i class="fas fa-comments text-gray-400"></i>
                                 </div>
-                                <p class="text-sm text-gray-500">No messages yet</p>
-                                <p class="text-xs text-gray-400 mt-1">Start a conversation with the ticket submitter</p>
+                                <p class="text-sm text-gray-500">No timeline items yet</p>
+                                <p class="text-xs text-gray-400 mt-1">Start with a message or a quick activity note</p>
                             </div>
                             <?php else: ?>
-                            <?php foreach ($replies as $reply): 
-                                $isMe = ($reply['user_id'] == $currentUser['id'] && 
-                                        (($_SESSION['user_type'] === 'employee' && $reply['user_type'] === 'employee') || 
-                                         ($_SESSION['user_type'] === 'user' && $reply['user_type'] === 'user')));
-                                $isStaff = in_array($reply['sender_role'], ['superadmin', 'it', 'hr', 'admin', 'it_staff']);
-                                $replyText = trim((string)($reply['message'] ?? ''));
-                                $hasAttachment = !empty($reply['attachment_path']);
-                                $isImageAttachment = $hasAttachment && (
-                                    ($reply['attachment_kind'] ?? '') === 'image' ||
-                                    strpos((string)($reply['attachment_mime'] ?? ''), 'image/') === 0
-                                );
-                            ?>
-                            <div class="flex <?= $isMe ? 'justify-end' : 'justify-start' ?>">
-                                <div class="max-w-[75%]">
-                                    <div class="flex items-center gap-2 mb-1 <?= $isMe ? 'justify-end' : '' ?>">
-                                        <?php if (!$isMe): ?>
-                                        <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
-                                            <?= strtoupper(substr($reply['sender_name'] ?? '?', 0, 1)) ?>
-                                        </div>
-                                        <?php endif; ?>
-                                        <span class="text-xs font-medium <?= $isStaff ? 'text-blue-600' : 'text-gray-600' ?>">
-                                            <?= htmlspecialchars($reply['sender_name'] ?? 'Unknown') ?>
-                                            <?php if ($isStaff): ?>
-                                            <span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full ml-1">Staff</span>
+                            <?php foreach ($timelineItems as $item): ?>
+                                <?php if ($item['item_type'] === 'reply'):
+                                    $reply = $item['data'];
+                                    $isMe = ($reply['user_id'] == $currentUser['id'] &&
+                                            (($_SESSION['user_type'] === 'employee' && $reply['user_type'] === 'employee') ||
+                                             ($_SESSION['user_type'] === 'user' && $reply['user_type'] === 'user')));
+                                    $isStaff = in_array($reply['sender_role'], ['superadmin', 'it', 'hr', 'admin', 'it_staff']);
+                                    $replyText = trim((string)($reply['message'] ?? ''));
+                                    $hasAttachment = !empty($reply['attachment_path']);
+                                    $isImageAttachment = $hasAttachment && (
+                                        ($reply['attachment_kind'] ?? '') === 'image' ||
+                                        strpos((string)($reply['attachment_mime'] ?? ''), 'image/') === 0
+                                    );
+                                ?>
+                                <div class="flex <?= $isMe ? 'justify-end' : 'justify-start' ?>">
+                                    <div class="max-w-[78%]">
+                                        <div class="flex items-center gap-2 mb-1 <?= $isMe ? 'justify-end' : '' ?>">
+                                            <?php if (!$isMe): ?>
+                                            <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
+                                                <?= strtoupper(substr($reply['sender_name'] ?? '?', 0, 1)) ?>
+                                            </div>
                                             <?php endif; ?>
-                                        </span>
-                                        <span class="text-[10px] text-gray-400"><?= date('M d, g:i A', strtotime($reply['created_at'])) ?></span>
-                                    </div>
-                                    <div class="<?= $isMe ? 'bg-blue-50 text-gray-800 border border-blue-200' : 'bg-gray-100 text-gray-800' ?> rounded-2xl px-4 py-3 text-sm leading-relaxed <?= $isMe ? 'rounded-tr-md' : 'rounded-tl-md' ?>">
-                                        <?php if ($replyText !== ''): ?>
-                                            <div><?= nl2br(htmlspecialchars($replyText)) ?></div>
-                                        <?php endif; ?>
+                                            <span class="text-xs font-medium <?= $isStaff ? 'text-blue-600' : 'text-gray-600' ?>">
+                                                <?= htmlspecialchars($reply['sender_name'] ?? 'Unknown') ?>
+                                                <?php if ($isStaff): ?>
+                                                <span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full ml-1">Staff</span>
+                                                <?php endif; ?>
+                                            </span>
+                                            <span class="text-[10px] text-gray-400"><?= date('M d, g:i A', strtotime($reply['created_at'])) ?></span>
+                                        </div>
+                                        <div class="<?= $isMe ? 'bg-blue-50 text-gray-800 border border-blue-200' : 'bg-gray-100 text-gray-800' ?> rounded-2xl px-4 py-3 text-sm leading-relaxed <?= $isMe ? 'rounded-tr-md' : 'rounded-tl-md' ?>">
+                                            <?php if ($replyText !== ''): ?>
+                                                <div><?= nl2br(htmlspecialchars($replyText)) ?></div>
+                                            <?php endif; ?>
 
-                                        <?php if ($hasAttachment): ?>
+                                            <?php if ($hasAttachment): ?>
                                             <div class="<?= $replyText !== '' ? 'mt-3' : '' ?>">
                                                 <?php if ($isImageAttachment): ?>
-                                                    <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
-                                                        <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
-                                                             alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
-                                                             class="max-h-60 rounded-lg border border-gray-200 object-cover">
-                                                    </a>
+                                                <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>" target="_blank" class="block">
+                                                    <img src="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                         alt="<?= htmlspecialchars($reply['attachment_name'] ?? 'Image attachment') ?>"
+                                                         class="max-h-60 rounded-lg border border-gray-200 object-cover">
+                                                </a>
                                                 <?php else: ?>
-                                                    <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
-                                                       target="_blank"
-                                                       class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
-                                                        <i class="fas fa-paperclip text-gray-500"></i>
-                                                        <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
-                                                        <i class="fas fa-download text-gray-400"></i>
-                                                    </a>
+                                                <a href="../uploads/<?= htmlspecialchars($reply['attachment_path']) ?>"
+                                                   target="_blank"
+                                                   class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                    <i class="fas fa-paperclip text-gray-500"></i>
+                                                    <span><?= htmlspecialchars($reply['attachment_name'] ?? 'Attachment') ?></span>
+                                                    <i class="fas fa-download text-gray-400"></i>
+                                                </a>
                                                 <?php endif; ?>
                                             </div>
-                                        <?php endif; ?>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                <?php else:
+                                    $activity = $item['data'];
+                                    $activityIcons = [
+                                        'created' => ['icon' => 'fa-plus', 'bg' => 'bg-blue-100', 'text' => 'text-blue-600'],
+                                        'comment' => ['icon' => 'fa-comment', 'bg' => 'bg-gray-100', 'text' => 'text-gray-600'],
+                                        'status_change' => ['icon' => 'fa-exchange-alt', 'bg' => 'bg-purple-100', 'text' => 'text-purple-600'],
+                                        'assigned' => ['icon' => 'fa-user-plus', 'bg' => 'bg-green-100', 'text' => 'text-green-600'],
+                                        'resolution_added' => ['icon' => 'fa-check', 'bg' => 'bg-green-100', 'text' => 'text-green-600'],
+                                        'priority_change' => ['icon' => 'fa-flag', 'bg' => 'bg-orange-100', 'text' => 'text-orange-600'],
+                                        'reply' => ['icon' => 'fa-reply', 'bg' => 'bg-indigo-100', 'text' => 'text-indigo-600']
+                                    ];
+                                    $aIcon = $activityIcons[$activity['action_type']] ?? ['icon' => 'fa-info', 'bg' => 'bg-gray-100', 'text' => 'text-gray-500'];
+                                ?>
+                                <div class="flex items-start justify-center">
+                                    <div class="inline-flex items-start gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 max-w-[90%]">
+                                        <span class="w-6 h-6 rounded-full <?= $aIcon['bg'] ?> flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <i class="fas <?= $aIcon['icon'] ?> <?= $aIcon['text'] ?> text-[11px]"></i>
+                                        </span>
+                                        <div class="min-w-0">
+                                            <p class="text-xs text-gray-700 leading-relaxed">
+                                                <span class="font-medium text-gray-900"><?= htmlspecialchars($activity['user_name']) ?></span>
+                                                <?= htmlspecialchars($activity['comment'] ?? ucfirst(str_replace('_', ' ', $activity['action_type']))) ?>
+                                            </p>
+                                            <p class="text-[10px] text-gray-400 mt-1"><?= formatDate($activity['created_at'], 'M d, g:i A') ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
-                        
-                        <!-- Reply Form -->
+
                         <?php if ($ticket['status'] !== 'closed'): ?>
-                        <form method="POST" enctype="multipart/form-data" class="border-t border-gray-100 pt-4">
-                            <input type="hidden" name="send_reply" value="1">
-                            <div class="flex gap-3">
-                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32" 
-                                     alt="" class="w-8 h-8 rounded-full flex-shrink-0 mt-1">
-                                <div class="flex-1">
-                                    <textarea name="reply_message" rows="2" 
-                                               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-                                               placeholder="Write a reply or attach a file..."></textarea>
-                                    <input type="file" id="admin-reply-image" name="reply_image" accept="image/*" class="hidden">
-                                    <input type="file" id="admin-reply-file" name="reply_file" accept=".pdf,.doc,.docx,.xlsx,.txt,.jpg,.jpeg,.png" class="hidden">
-                                    <div class="mt-2 flex items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <label for="admin-reply-image" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-green-600 hover:bg-green-50 cursor-pointer transition-colors" title="Attach image">
-                                                <i class="fas fa-image"></i>
-                                            </label>
-                                            <label for="admin-reply-file" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-blue-600 hover:bg-blue-50 cursor-pointer transition-colors" title="Attach file">
-                                                <i class="fas fa-paperclip"></i>
-                                            </label>
-                                            <span id="admin-reply-selected-file" class="text-xs text-gray-500 truncate max-w-[240px]">No attachment selected</span>
+                        <div class="border-t border-gray-100 pt-4 space-y-4">
+                            <form method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="send_reply" value="1">
+                                <div class="flex gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32"
+                                         alt="" class="w-8 h-8 rounded-full flex-shrink-0 mt-1">
+                                    <div class="flex-1">
+                                        <textarea name="reply_message" rows="2"
+                                                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                                                   placeholder="Write a message or attach a file..."></textarea>
+                                        <input type="file" id="admin-reply-image" name="reply_image" accept="image/*" class="hidden">
+                                        <input type="file" id="admin-reply-file" name="reply_file" accept=".pdf,.doc,.docx,.xlsx,.txt,.jpg,.jpeg,.png" class="hidden">
+                                        <div class="mt-2 flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2">
+                                                <label for="admin-reply-image" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-green-600 hover:bg-green-50 cursor-pointer transition-colors" title="Attach image">
+                                                    <i class="fas fa-image"></i>
+                                                </label>
+                                                <label for="admin-reply-file" class="inline-flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full text-blue-600 hover:bg-blue-50 cursor-pointer transition-colors" title="Attach file">
+                                                    <i class="fas fa-paperclip"></i>
+                                                </label>
+                                                <span id="admin-reply-selected-file" class="text-xs text-gray-500 truncate max-w-[240px]">No attachment selected</span>
+                                            </div>
+                                            <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
+                                                <i class="fas fa-paper-plane"></i>
+                                                <span>Send</span>
+                                            </button>
                                         </div>
-                                        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
-                                            <i class="fas fa-paper-plane"></i>
-                                            <span>Send Reply</span>
-                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+
+                            <form method="POST" class="pl-11">
+                                <div class="flex items-center gap-2">
+                                    <textarea name="comment" rows="1"
+                                              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                                              placeholder="Add activity note (optional timeline event)..." required></textarea>
+                                    <button type="submit" class="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs hover:bg-gray-800 transition-colors">
+                                        Log Note
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                         <?php else: ?>
                         <div class="border-t border-gray-100 pt-4 text-center">
                             <p class="text-xs text-gray-400"><i class="fas fa-lock mr-1"></i>This ticket is closed. Replies are disabled.</p>
                         </div>
                         <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Activity Timeline -->
-                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-5 border-b border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-base font-semibold text-gray-900">Activity</h3>
-                            <span class="text-xs text-gray-400 font-medium"><?= count($activities) ?> events</span>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <!-- Comment Form at Top -->
-                        <form method="POST" class="mb-6">
-                            <div class="flex gap-3">
-                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($currentUser['full_name']) ?>&background=000000&color=fff&size=32" 
-                                     alt="" class="w-8 h-8 rounded-full flex-shrink-0">
-                                <div class="flex-1">
-                                    <?php 
-                                    $commentPlaceholder = "Add a comment or update...";
-                                    ?>
-                                    <textarea name="comment" rows="2" 
-                                              class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
-                                              placeholder="<?= $commentPlaceholder ?>" required></textarea>
-                                    <div class="mt-2 flex items-center justify-between">
-                                        <span class="text-xs text-gray-400">Press Enter to submit, Shift+Enter for new line</span>
-                                        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-gray-800 transition-colors inline-flex items-center gap-2">
-                                            <i class="fas fa-paper-plane"></i>
-                                            <span>Comment</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        
-                        <!-- Activity List -->
-                        <div class="max-h-96 overflow-y-auto space-y-4 pr-2">
-                            <?php if (empty($activities)): ?>
-                            <div class="text-center py-8">
-                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-comment-slash text-gray-400"></i>
-                                </div>
-                                <p class="text-sm text-gray-500">No activity yet</p>
-                                <p class="text-xs text-gray-400 mt-1">Be the first to add a comment</p>
-                            </div>
-                            <?php else: ?>
-                            <?php foreach ($activities as $activity): 
-                                $activityIcons = [
-                                    'created' => ['icon' => 'fa-plus', 'bg' => 'bg-blue-100', 'text' => 'text-blue-600'],
-                                    'comment' => ['icon' => 'fa-comment', 'bg' => 'bg-gray-100', 'text' => 'text-gray-600'],
-                                    'status_change' => ['icon' => 'fa-exchange-alt', 'bg' => 'bg-purple-100', 'text' => 'text-purple-600'],
-                                    'assigned' => ['icon' => 'fa-user-plus', 'bg' => 'bg-green-100', 'text' => 'text-green-600'],
-                                    'resolution_added' => ['icon' => 'fa-check', 'bg' => 'bg-green-100', 'text' => 'text-green-600'],
-                                    'priority_change' => ['icon' => 'fa-flag', 'bg' => 'bg-orange-100', 'text' => 'text-orange-600'],
-                                    'reply' => ['icon' => 'fa-reply', 'bg' => 'bg-indigo-100', 'text' => 'text-indigo-600']
-                                ];
-                                $aIcon = $activityIcons[$activity['action_type']] ?? ['icon' => 'fa-info', 'bg' => 'bg-gray-100', 'text' => 'text-gray-500'];
-                            ?>
-                            <div class="flex gap-3 group">
-                                <div class="flex flex-col items-center">
-                                    <div class="w-8 h-8 rounded-full <?= $aIcon['bg'] ?> flex items-center justify-center flex-shrink-0">
-                                        <i class="fas <?= $aIcon['icon'] ?> <?= $aIcon['text'] ?> text-xs"></i>
-                                    </div>
-                                    <?php if ($activity !== end($activities)): ?>
-                                    <div class="w-px h-full bg-gray-200 mt-2"></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="flex-1 pb-4">
-                                    <div class="flex items-baseline gap-2 flex-wrap">
-                                        <span class="font-medium text-gray-900 text-sm"><?= htmlspecialchars($activity['user_name']) ?></span>
-                                        <span class="text-xs text-gray-400"><?= formatDate($activity['created_at'], 'M d, g:i A') ?></span>
-                                    </div>
-                                    <?php if ($activity['action_type'] === 'comment'): ?>
-                                    <div class="mt-2 p-3 bg-gray-50 rounded-lg text-sm text-gray-700 leading-relaxed">
-                                        <?= nl2br(htmlspecialchars($activity['comment'])) ?>
-                                    </div>
-                                    <?php else: ?>
-                                    <p class="text-sm text-gray-600 mt-1"><?= htmlspecialchars($activity['comment'] ?? ucfirst(str_replace('_', ' ', $activity['action_type']))) ?></p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
                     </div>
                 </div>
             </div>
