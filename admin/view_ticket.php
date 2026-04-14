@@ -362,7 +362,7 @@ include __DIR__ . '/../views/layouts/header.php';
 ?>
 
 <div class="lg:ml-64 min-h-screen bg-gray-50">
-    <div class="max-w-5xl mx-auto px-4 py-6 pt-20 lg:pt-6">
+    <div class="max-w-[1500px] mx-auto px-4 py-6 pt-20 lg:pt-6">
         
         <!-- Top Navigation Bar -->
         <div class="flex items-center justify-between mb-6">
@@ -429,9 +429,9 @@ include __DIR__ . '/../views/layouts/header.php';
         </div>
         <?php endif; ?>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Main Content Column -->
-            <div class="md:col-span-2 space-y-2 min-w-0">
+            <div class="lg:col-span-8 xl:col-span-9 space-y-2 min-w-0">
                 
                 <!-- Ticket Header Card -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -538,7 +538,7 @@ include __DIR__ . '/../views/layouts/header.php';
                                 );
                             ?>
                             <div class="flex <?= $isMe ? 'justify-end' : 'justify-start' ?>">
-                                <div class="max-w-[75%]">
+                                <div class="max-w-[85%]">
                                     <div class="flex items-center gap-2 mb-1 <?= $isMe ? 'justify-end' : '' ?>">
                                         <?php if (!$isMe): ?>
                                         <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
@@ -710,7 +710,7 @@ include __DIR__ . '/../views/layouts/header.php';
             </div>
             
             <!-- Sidebar Column -->
-            <div class="space-y-4 md:col-span-1">
+            <div class="space-y-4 lg:col-span-4 xl:col-span-3">
                 
                 <?php if ($isITStaff && $slaData): ?>
                 <!-- SLA Card -->
