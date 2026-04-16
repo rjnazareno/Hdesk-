@@ -290,9 +290,15 @@ include __DIR__ . '/../layouts/header.php';
                                         </span>
                                         <!-- Title (hidden in pool view) -->
                                         <?php if ($currentView !== 'pool'): ?>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="font-medium text-gray-900 truncate group-hover:text-gray-700">
+                                        <div class="flex-1 min-w-0 relative group/title">
+                                            <div class="font-medium text-gray-900 truncate group-hover:text-gray-700" title="<?php echo htmlspecialchars($ticket['title']); ?>">
                                                 <?php echo htmlspecialchars($ticket['title']); ?>
+                                                <i class="fas fa-ellipsis-h text-gray-300 text-xs ml-2 group-hover/title:inline hidden"></i>
+                                            </div>
+                                            <!-- Tooltip on Hover -->
+                                            <div class="absolute left-0 top-full mt-2 hidden group-hover/title:block z-50 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg whitespace-pre-wrap max-w-xs break-words pointer-events-none">
+                                                <?php echo htmlspecialchars($ticket['title']); ?>
+                                                <div class="absolute bottom-full left-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
                                             </div>
                                         </div>
                                         <?php endif; ?>
