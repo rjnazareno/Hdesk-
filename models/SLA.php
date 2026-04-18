@@ -171,26 +171,14 @@ class SLA {
      */
     public function isSLABreached(DateTime $dueDate, $isBusinessHoursOnly, DateTime $checkTime = null) {
         $now = $checkTime ?? new DateTime();
-        
+
         if (!$isBusinessHoursOnly) {
             // Simple comparison for 24/7 SLAs
             return $now > $dueDate;
         }
-        
-        // For business hours SLA, check if it's currently a weekend
-        // If so, the SLA is effectively "paused"
-        if ($this->isWeekend($now)) {
-            // On weekends, never breach (SLA is paused)
-            return false;
-        }
-        
-        // Check if we're outside business hours
-        $hour = (int)$now->format('H');
-        if ($hour < self::BUSINESS_START_HOUR || $hour >= self::BUSINESS_END_HOUR) {
-            return false; // Outside business hours, SLA paused
-        }
-        
-        // During business hours, compare normally
+
+        // Business-hour due dates are already calculated to skip weekends and
+        // after-hours, so the breach check can use a direct timestamp compare.
         return $now > $dueDate;
     }
     
@@ -590,12 +578,11 @@ class SLA {
         
         // Check if SLA is auto-paused (weekend or after hours)
         $isWeekendPaused = $isBusinessHoursOnly && ($this->isWeekend($now) || !$this->isWithinBusinessHours($now));
-        $effectivelyPaused = $isPaused || $isWeekendPaused;
+        $manualPaused = (bool)$isPaused;
         
         if ($isBusinessHoursOnly) {
             // Calculate using business minutes only (excludes weekends)
             $totalMinutes = $this->getBusinessMinutesRemaining($due, true);
-            $isOverdue = $totalMinutes < 0;
         } else {
             // Simple calendar time calculation
             $diff = $now->diff($due);
@@ -603,16 +590,17 @@ class SLA {
             if ($diff->invert) {
                 $totalMinutes = -$totalMinutes;
             }
-            $isOverdue = $diff->invert;
         }
+
+        $isOverdue = $totalMinutes < 0;
         
         return [
             'minutes' => $totalMinutes,
             'hours' => floor(abs($totalMinutes) / 60),
             'remaining_minutes' => abs($totalMinutes) % 60,
-            'is_overdue' => $isOverdue && !$effectivelyPaused,
+            'is_overdue' => $isOverdue && !$manualPaused,
             'is_weekend_paused' => $isWeekendPaused,
-            'formatted' => $this->formatRemainingTime($totalMinutes, $isOverdue, $effectivelyPaused, $isWeekendPaused)
+            'formatted' => $this->formatRemainingTime($totalMinutes, $isOverdue, $manualPaused, $isWeekendPaused)
         ];
     }
     
@@ -629,7 +617,18 @@ class SLA {
         if ($isPaused && !$isWeekendPaused) {
             return 'Paused';
         }
-        
+
+        if ($isOverdue) {
+            $hours = floor(abs($totalMinutes) / 60);
+            $minutes = abs($totalMinutes) % 60;
+            $formatted = '';
+            if ($hours > 0) {
+                $formatted .= $hours . 'h ';
+            }
+            $formatted .= $minutes . 'm';
+            return 'BREACHED ' . $formatted . ' ago';
+        }
+
         if ($isWeekendPaused) {
             // Show remaining time with weekend pause indicator
             $hours = floor(abs($totalMinutes) / 60);
@@ -651,11 +650,7 @@ class SLA {
         }
         $formatted .= $minutes . 'm';
         
-        if ($isOverdue) {
-            return 'BREACHED ' . $formatted . ' ago';
-        } else {
-            return $formatted . ' remaining';
-        }
+        return $formatted . ' remaining';
     }
     
     /**
