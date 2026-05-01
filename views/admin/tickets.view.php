@@ -131,7 +131,7 @@ include __DIR__ . '/../layouts/header.php';
                         >
                     </div>
 
-                    <?php if ($isITStaff && $currentView === ''): ?>
+                    <?php if ($isITStaff && !in_array($currentView, ['pool', 'my_tickets'], true)): ?>
                     <!-- Employee -->
                     <div class="w-52">
                         <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Employee</label>
@@ -222,7 +222,7 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
                 </div>
                 <div class="hidden md:flex items-center gap-3">
-                    <?php if ($isITStaff && $currentView === ''): ?>
+                    <?php if ($isITStaff && !in_array($currentView, ['pool', 'my_tickets'], true)): ?>
                     <form method="GET" action="tickets.php" class="flex items-center gap-2">
                         <?php if (!empty($currentView)): ?>
                         <input type="hidden" name="view" value="<?php echo htmlspecialchars($currentView); ?>">
