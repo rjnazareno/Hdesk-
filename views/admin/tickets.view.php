@@ -188,9 +188,53 @@ include __DIR__ . '/../layouts/header.php';
                         </p>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-500">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    <span>Live View</span>
+                <div class="hidden md:flex items-center gap-3">
+                    <?php if ($isITStaff && $currentView === ''): ?>
+                    <form method="GET" action="tickets.php" class="flex items-center gap-2">
+                        <?php if (!empty($currentView)): ?>
+                        <input type="hidden" name="view" value="<?php echo htmlspecialchars($currentView); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['status'])): ?>
+                        <input type="hidden" name="status" value="<?php echo htmlspecialchars($filters['status']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['priority'])): ?>
+                        <input type="hidden" name="priority" value="<?php echo htmlspecialchars($filters['priority']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['category_id'])): ?>
+                        <input type="hidden" name="category_id" value="<?php echo htmlspecialchars($filters['category_id']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['department_id'])): ?>
+                        <input type="hidden" name="department_id" value="<?php echo htmlspecialchars($filters['department_id']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['search'])): ?>
+                        <input type="hidden" name="search" value="<?php echo htmlspecialchars($filters['search']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($sorting['sort_by'])): ?>
+                        <input type="hidden" name="sort_by" value="<?php echo htmlspecialchars($sorting['sort_by']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($sorting['sort_dir'])): ?>
+                        <input type="hidden" name="sort_dir" value="<?php echo htmlspecialchars($sorting['sort_dir']); ?>">
+                        <?php endif; ?>
+
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="employee_search"
+                                value="<?php echo htmlspecialchars($filters['employee_search']); ?>"
+                                placeholder="Employee name or email"
+                                class="w-56 pl-3 pr-10 py-2 border border-gray-200 rounded-lg bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 focus:border-transparent text-xs"
+                            >
+                            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" title="Search employee">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <?php endif; ?>
+
+                    <div class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-500">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span>Live View</span>
+                    </div>
                 </div>
             </div>
 
