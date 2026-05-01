@@ -121,6 +121,7 @@ class TicketsController {
             'category_id' => $_GET['category_id'] ?? '',
             'department_id' => $_GET['department_id'] ?? '',
             'search' => $_GET['search'] ?? '',
+            'employee_search' => $_GET['employee_search'] ?? '',
             'view' => $_GET['view'] ?? '',
             'date_from' => $_GET['date_from'] ?? '',
             'date_to' => $_GET['date_to'] ?? '',
@@ -128,6 +129,10 @@ class TicketsController {
             'assigned' => $_GET['assigned'] ?? ''
         ];
         
+        if (!$this->isITStaff) {
+            $filters['employee_search'] = '';
+        }
+
         // Handle assigned= query param from dashboard cards
         if ($filters['assigned'] === 'unassigned') {
             $filters['unassigned'] = true;

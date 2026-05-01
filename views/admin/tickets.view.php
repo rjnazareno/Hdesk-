@@ -97,6 +97,20 @@ include __DIR__ . '/../layouts/header.php';
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm"
                         >
                     </div>
+
+                    <?php if ($isITStaff && $currentView === ''): ?>
+                    <!-- Employee -->
+                    <div class="w-52">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Employee</label>
+                        <input
+                            type="text"
+                            name="employee_search"
+                            value="<?php echo htmlspecialchars($filters['employee_search']); ?>"
+                            placeholder="Name or email..."
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm"
+                        >
+                    </div>
+                    <?php endif; ?>
                     
                     <!-- Status -->
                     <div class="w-40">
@@ -195,6 +209,7 @@ include __DIR__ . '/../layouts/header.php';
                                 if (isset($_GET['priority'])) $url .= '&priority=' . urlencode($_GET['priority']);
                                 if (isset($_GET['category_id'])) $url .= '&category_id=' . urlencode($_GET['category_id']);
                                 if (isset($_GET['search'])) $url .= '&search=' . urlencode($_GET['search']);
+                                if (isset($_GET['employee_search'])) $url .= '&employee_search=' . urlencode($_GET['employee_search']);
                                 return $url;
                             }
                             

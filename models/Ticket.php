@@ -458,6 +458,18 @@ class Ticket {
             $params[':search2'] = $searchTerm;
             $params[':search3'] = $searchTerm;
         }
+
+        if (!empty($filters['employee_search'])) {
+            $sql .= " AND (\n"
+                . " (t.submitter_type = 'employee' AND (CONCAT(e.fname, ' ', e.lname) LIKE :emp_search1 OR e.email LIKE :emp_search2))\n"
+                . " OR (t.submitter_type = 'user' AND (u1.full_name LIKE :emp_search3 OR u1.email LIKE :emp_search4))\n"
+                . ")";
+            $employeeSearch = '%' . $filters['employee_search'] . '%';
+            $params[':emp_search1'] = $employeeSearch;
+            $params[':emp_search2'] = $employeeSearch;
+            $params[':emp_search3'] = $employeeSearch;
+            $params[':emp_search4'] = $employeeSearch;
+        }
         
         // Date range filters
         if (!empty($filters['date_from'])) {
@@ -531,8 +543,14 @@ class Ticket {
      */
     public function getTotalCount($filters = []) {
         $sql = "SELECT COUNT(*) as total
-                FROM tickets t
-                WHERE 1=1";
+            FROM tickets t";
+
+        if (!empty($filters['employee_search'])) {
+            $sql .= "\n                LEFT JOIN employees e ON t.submitter_id = e.id AND t.submitter_type = 'employee'\n"
+            . "                LEFT JOIN users u1 ON t.submitter_id = u1.id AND t.submitter_type = 'user'";
+        }
+
+        $sql .= "\n                WHERE 1=1";
         
         $params = [];
         
@@ -603,6 +621,18 @@ class Ticket {
             $params[':search1'] = $searchTerm;
             $params[':search2'] = $searchTerm;
             $params[':search3'] = $searchTerm;
+        }
+
+        if (isset($filters['employee_search']) && !empty($filters['employee_search'])) {
+            $sql .= " AND (\n"
+                . " (t.submitter_type = 'employee' AND (CONCAT(e.fname, ' ', e.lname) LIKE :emp_search1 OR e.email LIKE :emp_search2))\n"
+                . " OR (t.submitter_type = 'user' AND (u1.full_name LIKE :emp_search3 OR u1.email LIKE :emp_search4))\n"
+                . ")";
+            $employeeSearch = '%' . $filters['employee_search'] . '%';
+            $params[':emp_search1'] = $employeeSearch;
+            $params[':emp_search2'] = $employeeSearch;
+            $params[':emp_search3'] = $employeeSearch;
+            $params[':emp_search4'] = $employeeSearch;
         }
         
         // Date range filters
