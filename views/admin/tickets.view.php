@@ -31,11 +31,18 @@ $sorting = array_merge([
 
 $currentUser = isset($currentUser) && is_array($currentUser) ? $currentUser : ['role' => ''];
 $isITStaff = isset($isITStaff) ? (bool)$isITStaff : false;
+$sessionRole = $_SESSION['role'] ?? ($currentUser['role'] ?? '');
+$sessionType = $_SESSION['user_type'] ?? '';
+$sessionAdminRights = $_SESSION['admin_rights'] ?? ($currentUser['admin_rights'] ?? null);
+$hasAdminAccess = ($sessionType === 'user' && in_array($sessionRole, ['admin', 'it_staff'], true))
+    || ($sessionType === 'employee' && $sessionRole === 'internal' && !empty($sessionAdminRights))
+    || $isITStaff;
 
 // Set page-specific variables
 $currentView = $filters['view'] ?? '';
 // Support both pool and queue (legacy)
 if ($currentView === 'queue') $currentView = 'pool';
+$showEmployeeSearch = $hasAdminAccess && !in_array($currentView, ['pool', 'my_tickets'], true);
 $pageTitle = ($currentView === 'my_tickets' ? 'My Tickets' : ($currentView === 'pool' ? 'Ticket Pool' : 'All Tickets')) . ' - ' . APP_NAME;
 $includeFirebase = true; // Enable Firebase notifications
 $baseUrl = '../';
@@ -131,7 +138,7 @@ include __DIR__ . '/../layouts/header.php';
                         >
                     </div>
 
-                    <?php if ($isITStaff && !in_array($currentView, ['pool', 'my_tickets'], true)): ?>
+                    <?php if ($showEmployeeSearch): ?>
                     <!-- Employee -->
                     <div class="w-52">
                         <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Employee</label>
@@ -222,7 +229,7 @@ include __DIR__ . '/../layouts/header.php';
                     </div>
                 </div>
                 <div class="hidden md:flex items-center gap-3">
-                    <?php if ($isITStaff && !in_array($currentView, ['pool', 'my_tickets'], true)): ?>
+                    <?php if ($showEmployeeSearch): ?>
                     <form method="GET" action="tickets.php" class="flex items-center gap-2">
                         <?php if (!empty($currentView)): ?>
                         <input type="hidden" name="view" value="<?php echo htmlspecialchars($currentView); ?>">
