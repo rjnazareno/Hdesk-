@@ -1,4 +1,37 @@
 <?php 
+$filters = isset($filters) && is_array($filters) ? $filters : [];
+$filters = array_merge([
+    'view' => '',
+    'search' => '',
+    'employee_search' => '',
+    'status' => '',
+    'priority' => '',
+    'category_id' => '',
+    'department_id' => ''
+], $filters);
+
+$categories = isset($categories) && is_array($categories) ? $categories : [];
+$departments = isset($departments) && is_array($departments) ? $departments : [];
+$tickets = isset($tickets) && is_array($tickets) ? $tickets : [];
+$employeeAdmins = isset($employeeAdmins) && is_array($employeeAdmins) ? $employeeAdmins : [];
+
+$pagination = isset($pagination) && is_array($pagination) ? $pagination : [];
+$pagination = array_merge([
+    'current_page' => 1,
+    'total_pages' => 1,
+    'items_per_page' => 20,
+    'total_items' => 0
+], $pagination);
+
+$sorting = isset($sorting) && is_array($sorting) ? $sorting : [];
+$sorting = array_merge([
+    'sort_by' => 'created_at',
+    'sort_dir' => 'DESC'
+], $sorting);
+
+$currentUser = isset($currentUser) && is_array($currentUser) ? $currentUser : ['role' => ''];
+$isITStaff = isset($isITStaff) ? (bool)$isITStaff : false;
+
 // Set page-specific variables
 $currentView = $filters['view'] ?? '';
 // Support both pool and queue (legacy)
