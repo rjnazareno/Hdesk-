@@ -201,21 +201,45 @@ class ITStaffController {
         
         $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
                 st.resolution_due_at,
-                TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) as minutes_remaining
+                sp.is_business_hours
                 FROM tickets t
                 JOIN sla_tracking st ON t.id = st.ticket_id
+                JOIN sla_policies sp ON st.sla_policy_id = sp.id
                 WHERE t.assigned_to = :user_id
                 AND t.status NOT IN ('closed', 'resolved')
                 AND st.is_paused = 0
                 AND st.resolved_at IS NULL
-                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) <= 60
-                AND TIMESTAMPDIFF(MINUTE, NOW(), st.resolution_due_at) > 0
-                ORDER BY st.resolution_due_at ASC
-                LIMIT 5";
+                AND st.resolution_sla_status = 'pending'
+                ORDER BY st.resolution_due_at ASC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetchAll();
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $atRiskTickets = [];
+        $now = new DateTime();
+
+        foreach ($tickets as $ticket) {
+            $dueDate = new DateTime($ticket['resolution_due_at']);
+            $isBusinessHours = (bool)$ticket['is_business_hours'];
+
+            if ($isBusinessHours && $this->slaModel->isWeekend($now)) {
+                continue;
+            }
+
+            $minutesRemaining = $this->slaModel->getBusinessMinutesRemaining($dueDate, $isBusinessHours);
+
+            if ($minutesRemaining > 0 && $minutesRemaining <= 60) {
+                $ticket['minutes_remaining'] = $minutesRemaining;
+                unset($ticket['is_business_hours']);
+                $atRiskTickets[] = $ticket;
+                if (count($atRiskTickets) >= 5) {
+                    break;
+                }
+            }
+        }
+
+        return $atRiskTickets;
     }
 
     /**
@@ -227,20 +251,42 @@ class ITStaffController {
         
         $sql = "SELECT t.id, t.ticket_number, t.title, t.priority, t.status,
                 st.resolution_due_at,
-                TIMESTAMPDIFF(MINUTE, st.resolution_due_at, NOW()) as minutes_overdue
+                st.response_sla_status,
+                st.resolution_sla_status,
+                sp.is_business_hours
                 FROM tickets t
                 JOIN sla_tracking st ON t.id = st.ticket_id
+                JOIN sla_policies sp ON st.sla_policy_id = sp.id
                 WHERE t.assigned_to = :user_id
                 AND t.status NOT IN ('closed', 'resolved')
                 AND st.is_paused = 0
                 AND st.resolved_at IS NULL
-                AND NOW() > st.resolution_due_at
-                ORDER BY st.resolution_due_at ASC
-                LIMIT 5";
+                ORDER BY st.resolution_due_at ASC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetchAll();
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $breachedTickets = [];
+        $now = new DateTime();
+
+        foreach ($tickets as $ticket) {
+            $dueDate = new DateTime($ticket['resolution_due_at']);
+            $isBusinessHours = (bool)$ticket['is_business_hours'];
+            $isBreached = ($ticket['response_sla_status'] === 'breached' || $ticket['resolution_sla_status'] === 'breached')
+                || $this->slaModel->isSLABreached($dueDate, $isBusinessHours, $now);
+
+            if ($isBreached) {
+                $ticket['minutes_overdue'] = abs($this->slaModel->getBusinessMinutesRemaining($dueDate, $isBusinessHours));
+                unset($ticket['is_business_hours'], $ticket['response_sla_status'], $ticket['resolution_sla_status']);
+                $breachedTickets[] = $ticket;
+                if (count($breachedTickets) >= 5) {
+                    break;
+                }
+            }
+        }
+
+        return $breachedTickets;
     }
 
     /**
